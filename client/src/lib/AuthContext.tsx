@@ -24,11 +24,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession()
       .then(({ data }: { data: { session: Session | null } }) => {
         const session = data?.session ?? null
+        const expiresAt = session?.expires_at ? session.expires_at * 1000 : 0
+        if (expiresAt && expiresAt <= Date.now()) {
+          supabase.auth.signOut()
+          setSession(null)
+          setUser(null)
+          return
+        }
         setSession(session)
         setUser(session?.user ?? null)
       })
       .catch((error: any) => {
         console.warn('Supabase session check failed:', error?.message || error)
+        Object.keys(localStorage).filter(key => key.startsWith('sb-')).forEach(key => localStorage.removeItem(key))
         setSession(null)
         setUser(null)
       })
@@ -36,6 +44,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange?.((_event: string, session: Session | null) => {
+      if (_event === 'TOKEN_REFRESHED' && !session) {
+        setSession(null)
+        setUser(null)
+        setLoading(false)
+        return
+      }
+      if (_event === 'SIGNED_OUT') {
+        setSession(null)
+        setUser(null)
+        setLoading(false)
+        return
+      }
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)

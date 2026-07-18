@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useAuth } from '../../lib/AuthContext'
@@ -12,6 +12,16 @@ export default function SignIn() {
   const [error, setError] = useState('')
   const { signIn } = useAuth()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search || window.location.hash.replace(/^#/, '?'))
+    const oauthError = params.get('error_description') || params.get('error')
+    if (oauthError) {
+      supabase.auth.signOut()
+      setError(decodeURIComponent(oauthError))
+      window.history.replaceState({}, document.title, '/signin')
+    }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,11 +41,21 @@ export default function SignIn() {
   }
 
   const handleOAuth = async (provider: 'google' | 'github') => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: { redirectTo: `${window.location.origin}/dashboard` },
-    })
-    if (error) setError(error.message)
+    setLoading(true)
+    setError('')
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: `${window.location.origin}/dashboard` },
+      })
+      if (error) {
+        setError(error.message)
+        setLoading(false)
+      }
+    } catch (error: any) {
+      setError(error.message || `${provider} login failed`)
+      setLoading(false)
+    }
   }
 
   return (

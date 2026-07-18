@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Database, Edit3, Eye, FileText, Image, Plus, Save, Search, Send, Trash2 } from 'lucide-react'
+import { ArrowLeft, Edit3, Eye, FileText, Image, LogOut, Plus, Save, Search, Send, Trash2 } from 'lucide-react'
+import { useAuth } from '../../lib/AuthContext'
 // @ts-ignore - dependency is added in client/package.json for the JavaScript blog editor.
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
@@ -69,7 +70,6 @@ function resolveId(post: BlogPost) {
 }
 
 export default function AdminBlogManager() {
-  const [token, setToken] = useState(localStorage.getItem('hmorix_admin_token') || '')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [posts, setPosts] = useState<BlogPost[]>([])
@@ -80,6 +80,8 @@ export default function AdminBlogManager() {
   const [message, setMessage] = useState('')
   const [health, setHealth] = useState<any>(null)
   const [saving, setSaving] = useState(false)
+  const { user, session, signIn, signOut } = useAuth()
+  const token = session?.access_token || ''
 
   const filteredPosts = useMemo(() => {
     const query = search.toLowerCase()
@@ -107,6 +109,11 @@ export default function AdminBlogManager() {
       } as Record<string, string>,
     })
     const payload = await response.json().catch(() => ({}))
+    if (response.status === 401 || response.status === 403) {
+      await signOut()
+      setMessage(payload.error || 'Session expired. Please login again.')
+      throw new Error(payload.error || 'Session expired. Please login again.')
+    }
     if (!response.ok) throw new Error(payload.error || 'Request failed')
     return payload
   }
@@ -114,7 +121,7 @@ export default function AdminBlogManager() {
   async function loadHealth() {
     try {
       const payload = await fetch('/api/health').then(res => res.json())
-      setHealth(payload.status)
+      setHealth(typeof payload.status === 'object' ? payload.status : { api: true, mongodb: payload.database?.connected, supabase: payload.database?.provider === 'supabase' && payload.database?.connected })
     } catch (error: any) {
       setHealth({ api: false, error: error.message })
     }
@@ -131,10 +138,9 @@ export default function AdminBlogManager() {
 
   async function login() {
     try {
-      const payload = await requestJson('/api/login', { method: 'POST', body: JSON.stringify({ email, password }) })
-      localStorage.setItem('hmorix_admin_token', payload.token)
-      setToken(payload.token)
-      setMessage('Admin login active.')
+      const { error } = await signIn(email, password)
+      if (error) throw new Error(error.message || 'Login failed')
+      setMessage('Supabase login active.')
     } catch (error: any) {
       setMessage(error.message)
     }
@@ -225,7 +231,7 @@ export default function AdminBlogManager() {
           </div>
         </div>
 
-        {!token && (
+        {!user && (
           <div className="p-5 bg-obsidian-2 border border-glass-border rounded-[12px] mb-8 grid md:grid-cols-[1fr_auto] gap-4 items-end">
             <div className="grid md:grid-cols-2 gap-3">
               <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Admin email" className="px-4 py-3 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream outline-none focus:border-[#C8FF00] placeholder:text-cream/30" />
@@ -235,6 +241,13 @@ export default function AdminBlogManager() {
               <button onClick={login} className="btn-primary text-sm">Login</button>
               <button onClick={setupAdmin} className="btn-outline text-sm">Setup Admin</button>
             </div>
+          </div>
+        )}
+
+        {user && (
+          <div className="mb-6 p-3 bg-white/[0.04] border border-glass-border rounded-[8px] flex items-center justify-between gap-4">
+            <span className="text-sm text-cream/60">Signed in as {user.email}</span>
+            <button onClick={signOut} className="btn-outline text-sm flex items-center gap-2"><LogOut size={14} />Logout</button>
           </div>
         )}
 

@@ -26,13 +26,29 @@ async function getAuthUser(req: VercelRequest) {
       const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ROLE_KEY || process.env.SUPABASE_Role_KEY || '', { auth: { autoRefreshToken: false, persistSession: false } })
       const { data: { user }, error } = await supabase.auth.getUser(token)
       if (error || !user) return null
-      return { id: user.id, email: user.email || '', role: user.user_metadata?.role || 'user', name: user.user_metadata?.name }
+      return { id: user.id, email: user.email || '', role: user.user_metadata?.role || user.app_metadata?.role || 'user', name: user.user_metadata?.name }
     } else {
       const jwt = await import('jsonwebtoken')
       const decoded = jwt.default.verify(token, process.env.JWT_SECRET || 'hmorix-jwt-secret-change-me') as any
       return { id: decoded.sub || decoded.id, email: decoded.email, role: decoded.role || 'user', name: decoded.name }
     }
   } catch { return null }
+}
+
+function getSupabaseAdminClient() {
+  return createClient(
+    process.env.SUPABASE_URL || '',
+    process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ROLE_KEY || process.env.SUPABASE_Role_KEY || '',
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
+}
+
+function getSupabasePublicClient() {
+  return createClient(
+    process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '',
+    process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || '',
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
 }
 
 // ============================================
@@ -134,7 +150,62 @@ function createMySQLAdapter() {
 async function handleHealth(req: VercelRequest, res: VercelResponse) {
   const db = getDatabase()
   const dbHealthy = await db.healthCheck()
-  res.json({ status: dbHealthy ? 'healthy' : 'degraded', database: { provider: db.provider, connected: dbHealthy }, timestamp: new Date().toISOString(), version: '2.0.0' })
+  let mongoHealthy = false
+  try {
+    const collection = await getBlogCollection()
+    await collection.findOne({}, { projection: { _id: 1 } })
+    mongoHealthy = true
+  } catch {}
+  res.json({
+    success: true,
+    status: { api: true, mongodb: mongoHealthy, supabase: db.provider === 'supabase' ? dbHealthy : false },
+    database: { provider: db.provider, connected: dbHealthy },
+    timestamp: new Date().toISOString(),
+    version: '2.0.0',
+  })
+}
+
+async function handleLogin(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const { email, password } = req.body || {}
+  if (!email || !password) return res.status(400).json({ error: 'Email and password are required' })
+
+  const supabase = getSupabasePublicClient()
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error || !data.session || !data.user) return res.status(401).json({ error: error?.message || 'Invalid credentials' })
+
+  const role = data.user.user_metadata?.role || data.user.app_metadata?.role || (email === process.env.ADMIN_EMAIL ? 'admin' : 'user')
+  if (role !== 'admin') return res.status(403).json({ error: 'Admin access required' })
+
+  return res.json({
+    success: true,
+    token: data.session.access_token,
+    user: { id: data.user.id, email: data.user.email, name: data.user.user_metadata?.name || data.user.email, role },
+    storage: 'supabase',
+  })
+}
+
+async function handleSetupAdmin(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const { name = 'Admin', email, password } = req.body || {}
+  if (!email || !password) return res.status(400).json({ error: 'Email and password are required' })
+  if (process.env.ADMIN_EMAIL && email !== process.env.ADMIN_EMAIL) return res.status(403).json({ error: 'Use the configured ADMIN_EMAIL for setup' })
+
+  const supabase = getSupabaseAdminClient()
+  const { data, error } = await supabase.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { name, role: 'admin' },
+    app_metadata: { role: 'admin' },
+  })
+  if (error) return res.status(400).json({ error: error.message })
+  return res.status(201).json({ success: true, user: { id: data.user.id, email: data.user.email, name, role: 'admin' } })
+}
+
+async function handleLogout(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  return res.json({ success: true })
 }
 
 async function handleAuthSignin(req: VercelRequest, res: VercelResponse) {
@@ -332,31 +403,55 @@ async function getBlogCollection() {
 }
 
 async function writePublishedBlogBackup(blog: any) {
-  if (blog.status !== 'published') return
+  if (blog.status !== 'published') return null
   const fs = await import('fs/promises')
   const path = await import('path')
   const published = new Date(blog.publishedAt || blog.published_at || Date.now())
   const year = String(published.getFullYear())
   const month = String(published.getMonth() + 1).padStart(2, '0')
+  const backupJson = JSON.stringify({
+    title: blog.title || '',
+    slug: blog.slug || '',
+    content: blog.content || '',
+    author: blog.author || '',
+    publishedAt: blog.publishedAt || blog.published_at || '',
+    updatedAt: blog.updatedAt || blog.updated_at || '',
+    tags: blog.tags || [],
+    category: blog.category || '',
+    coverImage: blog.coverImage || blog.cover_image || '',
+    seo: blog.seo || {},
+    status: 'published',
+  }, null, 2)
+  const storagePath = `${year}/${month}/${blog.slug}.json`
+  const bucket = process.env.SUPABASE_BLOG_BUCKET || process.env.JSON_STORAGE_BUCKET || 'blogs'
+  const hasSupabaseStorage = Boolean(process.env.SUPABASE_URL && (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ROLE_KEY || process.env.SUPABASE_Role_KEY))
+
+  if (hasSupabaseStorage) {
+    const supabase = getSupabaseAdminClient()
+    const { data: buckets } = await supabase.storage.listBuckets()
+    if (!buckets?.some((item: any) => item.name === bucket)) {
+      await supabase.storage.createBucket(bucket, { public: false })
+    }
+    const { error } = await supabase.storage.from(bucket).upload(storagePath, backupJson, {
+      contentType: 'application/json',
+      upsert: true,
+    })
+    if (!error) return `supabase://${bucket}/${storagePath}`
+    console.warn('Supabase JSON backup failed:', error.message)
+  }
+
   const root = process.env.JSON_STORAGE_PATH || path.join(process.cwd(), 'storage', 'blogs')
   const dir = path.join(root, year, month)
   await fs.mkdir(dir, { recursive: true })
-  await fs.writeFile(
-    path.join(dir, `${blog.slug}.json`),
-    JSON.stringify({
-      title: blog.title || '',
-      slug: blog.slug || '',
-      content: blog.content || '',
-      author: blog.author || '',
-      publishedAt: blog.publishedAt || blog.published_at || '',
-      updatedAt: blog.updatedAt || blog.updated_at || '',
-      tags: blog.tags || [],
-      category: blog.category || '',
-      coverImage: blog.coverImage || blog.cover_image || '',
-      seo: blog.seo || {},
-      status: 'published',
-    }, null, 2)
-  )
+  const file = path.join(dir, `${blog.slug}.json`)
+  await fs.writeFile(file, backupJson)
+  return file
+}
+
+async function getBlogFilter(idOrSlug: string) {
+  const { ObjectId } = await import('mongodb')
+  if (ObjectId.isValid(idOrSlug)) return { _id: new ObjectId(idOrSlug) }
+  return { slug: idOrSlug }
 }
 
 async function handleBlogs(req: VercelRequest, res: VercelResponse) {
@@ -410,8 +505,8 @@ async function handleBlogs(req: VercelRequest, res: VercelResponse) {
     }
     const result = await collection.insertOne(blog)
     const saved = { ...blog, _id: result.insertedId }
-    await writePublishedBlogBackup(saved)
-    return res.status(201).json({ success: true, data: saved })
+    const backupPath = await writePublishedBlogBackup(saved)
+    return res.status(201).json({ success: true, data: saved, backupPath })
   }
   res.status(405).json({ error: 'Method not allowed' })
 }
@@ -422,16 +517,17 @@ async function handleBlog(req: VercelRequest, res: VercelResponse) {
 
 async function handleBlogSlug(req: VercelRequest, res: VercelResponse, slug: string) {
   const collection = await getBlogCollection()
+  const filter = await getBlogFilter(slug)
   if (req.method === 'GET') {
-    const blog = await collection.findOne({ slug })
+    const blog = await collection.findOne(filter)
     if (!blog) return res.status(404).json({ error: 'Blog not found' })
-    await collection.updateOne({ slug }, { $inc: { 'analytics.views': 1 } })
+    await collection.updateOne(filter, { $inc: { 'analytics.views': 1 } })
     return res.json({ success: true, data: blog })
   }
   if (req.method === 'PUT') {
     const user = await getAuthUser(req)
     if (!user || user.role !== 'admin') return res.status(401).json({ error: 'Admin access required' })
-    const existing = await collection.findOne({ slug })
+    const existing = await collection.findOne(filter)
     if (!existing) return res.status(404).json({ error: 'Blog not found' })
     const body = req.body || {}
     const nextSlug = slugifyTitle(body.slug || body.title || slug)
@@ -445,15 +541,15 @@ async function handleBlogSlug(req: VercelRequest, res: VercelResponse, slug: str
       publishedAt: status === 'published' ? (existing.publishedAt || new Date()) : existing.publishedAt,
       updatedAt: new Date(),
     }
-    await collection.updateOne({ slug }, { $set: update })
+    await collection.updateOne(filter, { $set: update })
     const saved = await collection.findOne({ slug: nextSlug })
-    if (saved) await writePublishedBlogBackup(saved)
-    return res.json({ success: true, data: saved })
+    const backupPath = saved ? await writePublishedBlogBackup(saved) : null
+    return res.json({ success: true, data: saved, backupPath })
   }
   if (req.method === 'DELETE') {
     const user = await getAuthUser(req)
     if (!user || user.role !== 'admin') return res.status(401).json({ error: 'Admin access required' })
-    await collection.deleteOne({ slug })
+    await collection.deleteOne(filter)
     return res.json({ success: true })
   }
   res.status(405).json({ error: 'Method not allowed' })
@@ -592,6 +688,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Route matching
     switch (routePath) {
       case 'health': return handleHealth(req, res)
+      case 'login': return handleLogin(req, res)
+      case 'logout': return handleLogout(req, res)
+      case 'setup-admin': return handleSetupAdmin(req, res)
       case 'auth/signin': return handleAuthSignin(req, res)
       case 'auth/signup': return handleAuthSignup(req, res)
       case 'auth/me': return handleAuthMe(req, res)
