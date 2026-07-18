@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import SEOHead from '../components/seo/SEOHead'
+import SEOHead from '../../components/seo/SEOHead'
 
 const sections = [
   { title: 'Main Pages', links: [

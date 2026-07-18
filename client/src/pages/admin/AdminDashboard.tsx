@@ -43,6 +43,7 @@ export default function AdminDashboard() {
             <h1 className="font-display text-3xl font-bold">Administration</h1>
           </div>
           <div className="flex items-center gap-3">
+            <Link to="/admin/blogs" className="btn-outline text-sm flex items-center gap-2"><FileText size={14} />Blog CMS</Link>
             <Link to="/admin/settings" className="btn-outline text-sm flex items-center gap-2"><Settings size={14} />System Settings</Link>
             <Link to="/admin/logs" className="btn-primary text-sm flex items-center gap-2"><Activity size={14} />View Logs</Link>
           </div>

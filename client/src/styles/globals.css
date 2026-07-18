@@ -52,3 +52,39 @@
 @keyframes typing { 0%,100%{width:0} 30%,70%{width:100%} }
 .animate-float { animation: float 6s ease-in-out infinite; }
 .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+.admin-quill .ql-toolbar,
+.admin-quill .ql-container {
+  border-color: rgba(255,255,255,0.08);
+}
+
+.admin-quill .ql-toolbar {
+  background: rgba(255,255,255,0.03);
+}
+
+.admin-quill .ql-container {
+  min-height: 360px;
+  color: #EAE8E3;
+  font-family: 'Inter', sans-serif;
+}
+
+.admin-quill .ql-editor {
+  min-height: 360px;
+  font-size: 14px;
+}
+
+.admin-quill .ql-editor.ql-blank::before {
+  color: rgba(234,232,227,0.3);
+}
+
+.admin-quill .ql-stroke {
+  stroke: rgba(234,232,227,0.6);
+}
+
+.admin-quill .ql-fill {
+  fill: rgba(234,232,227,0.6);
+}
+
+.admin-quill .ql-picker {
+  color: rgba(234,232,227,0.6);
+}

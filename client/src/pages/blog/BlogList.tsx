@@ -6,15 +6,28 @@ import { fallbackPosts, fetchBlogList } from './blogApi'
 
 const categories = ['All', 'Engineering', 'AI & ML', 'Product Updates', 'Security', 'Company', 'Tutorials', 'Case Studies']
 
+type BlogSummary = {
+  id: string
+  slug: string
+  title: string
+  excerpt: string
+  category: string
+  author: string
+  date: string
+  readTime: string
+  tags: string[]
+  featured: boolean
+}
+
 export default function BlogList() {
   const [activeCategory, setActiveCategory] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
-  const [posts, setPosts] = useState(fallbackPosts)
+  const [posts, setPosts] = useState<BlogSummary[]>(fallbackPosts)
 
   useEffect(() => {
     let active = true
     fetchBlogList()
-      .then(data => {
+      .then((data: BlogSummary[]) => {
         if (active && data.length) setPosts(data)
       })
       .catch(() => {
@@ -26,7 +39,7 @@ export default function BlogList() {
   const filtered = posts.filter(p => {
     const matchCategory = activeCategory === 'All' || p.category === activeCategory
     const query = searchQuery.toLowerCase()
-    const matchSearch = p.title.toLowerCase().includes(query) || p.excerpt.toLowerCase().includes(query) || p.category.toLowerCase().includes(query) || p.tags.some(tag => tag.toLowerCase().includes(query))
+    const matchSearch = p.title.toLowerCase().includes(query) || p.excerpt.toLowerCase().includes(query) || p.category.toLowerCase().includes(query) || p.tags.some((tag: string) => tag.toLowerCase().includes(query))
     return matchCategory && matchSearch
   })
 

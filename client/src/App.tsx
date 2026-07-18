@@ -50,6 +50,7 @@ import Certifications from './pages/Certifications'
 import ActivityFeed from './pages/ActivityFeed'
 import BlogList from './pages/blog/BlogList'
 import BlogPost from './pages/blog/BlogPost'
+import AdminBlogManager from './pages/blog/AdminBlogManager'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminUsers from './pages/admin/AdminUsers'
 import AdminSettings from './pages/admin/AdminSettings'
@@ -228,6 +229,7 @@ function App() {
 
           {/* Admin Portal */}
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/blogs" element={<AdminBlogManager />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="/admin/logs" element={<AdminLogs />} />

@@ -4,15 +4,32 @@ import { Clock, User, Tag, ArrowLeft, Share2, Bookmark, ThumbsUp } from 'lucide-
 // @ts-ignore - blogApi is intentionally plain JavaScript for the blog conversion.
 import { fallbackPostsContent, fetchBlogPost } from './blogApi'
 
+type ContentBlock = {
+  type: 'paragraph' | 'heading' | 'code' | 'html'
+  text: string
+}
+
+type BlogArticle = {
+  title: string
+  author: string
+  role: string
+  date: string
+  updatedDate?: string
+  readTime: string
+  category: string
+  content: ContentBlock[]
+  tags?: string[]
+}
+
 export default function BlogPost() {
   const { slug } = useParams()
-  const [post, setPost] = useState(slug ? fallbackPostsContent[slug] : null)
+  const [post, setPost] = useState<BlogArticle | null>(slug ? fallbackPostsContent[slug] : null)
 
   useEffect(() => {
     if (!slug) return
     let active = true
     fetchBlogPost(slug)
-      .then(data => {
+      .then((data: BlogArticle) => {
         if (active) setPost(data)
       })
       .catch(() => {
@@ -42,7 +59,7 @@ export default function BlogPost() {
 
         <div className="flex items-center gap-6 mb-8 pb-8 border-b border-glass-border">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-obsidian-3 rounded-full flex items-center justify-center text-xs font-bold">{post.author.split(' ').map(n => n[0]).join('')}</div>
+            <div className="w-10 h-10 bg-obsidian-3 rounded-full flex items-center justify-center text-xs font-bold">{post.author.split(' ').map((n: string) => n[0]).join('')}</div>
             <div>
               <div className="text-sm font-medium">{post.author}</div>
               <div className="text-xs text-cream/30">{post.role}</div>
@@ -59,7 +76,7 @@ export default function BlogPost() {
 
         {/* Article Content */}
         <article className="prose prose-invert max-w-none">
-          {post.content.map((block, i) => {
+          {post.content.map((block: ContentBlock, i: number) => {
             if (block.type === 'heading') return <h2 key={i} className="font-display text-xl font-bold mt-10 mb-4">{block.text}</h2>
             if (block.type === 'code') return <pre key={i} className="bg-obsidian-2 border border-glass-border rounded-[8px] p-4 overflow-x-auto my-6"><code className="text-xs text-cream/70 font-mono whitespace-pre">{block.text}</code></pre>
             if (block.type === 'html') return <div key={i} className="text-cream/60 leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: block.text }} />
@@ -67,9 +84,9 @@ export default function BlogPost() {
           })}
         </article>
 
-        {post.tags?.length > 0 && (
+        {(post.tags || []).length > 0 && (
           <div className="mt-10 flex flex-wrap gap-2">
-            {post.tags.map(tag => <span key={tag} className="px-2 py-0.5 bg-white/[0.06] text-cream/50 text-[10px] font-mono rounded">{tag}</span>)}
+            {(post.tags || []).map((tag: string) => <span key={tag} className="px-2 py-0.5 bg-white/[0.06] text-cream/50 text-[10px] font-mono rounded">{tag}</span>)}
           </div>
         )}
 
