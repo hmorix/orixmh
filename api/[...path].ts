@@ -23,7 +23,7 @@ async function getAuthUser(req: VercelRequest) {
   const dbProvider = (process.env.DATABASE || 'supabase').toLowerCase()
   try {
     if (dbProvider === 'supabase') {
-      const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SECRET_KEY || '', { auth: { autoRefreshToken: false, persistSession: false } })
+      const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ROLE_KEY || process.env.SUPABASE_Role_KEY || '', { auth: { autoRefreshToken: false, persistSession: false } })
       const { data: { user }, error } = await supabase.auth.getUser(token)
       if (error || !user) return null
       return { id: user.id, email: user.email || '', role: user.user_metadata?.role || 'user', name: user.user_metadata?.name }
@@ -47,7 +47,7 @@ function getDatabase() {
 function createSupabaseAdapter() {
   const supabase = createClient(
     process.env.SUPABASE_URL || '',
-    process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || '',
+    process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ROLE_KEY || process.env.SUPABASE_Role_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || '',
     { auth: { autoRefreshToken: false, persistSession: false } }
   )
   return {
@@ -87,7 +87,7 @@ function createMySQLAdapter() {
   const getPool = async () => {
     if (!pool) {
       const mysql = await import('mysql2/promise')
-      pool = mysql.createPool({ host: process.env.DB_HOST || 'localhost', port: parseInt(process.env.DB_PORT || '3306'), user: process.env.DB_USER || 'root', password: process.env.DB_PASSWORD || '', database: process.env.DB_NAME || 'hmorix', waitForConnections: true, connectionLimit: parseInt(process.env.DB_POOL_SIZE || '5'), charset: 'utf8mb4' })
+      pool = mysql.createPool({ host: process.env.MARIADB_HOST || process.env.DB_HOST || 'localhost', port: parseInt(process.env.MARIADB_PORT || process.env.DB_PORT || '3306'), user: process.env.MARIADB_USER || process.env.DB_USER || 'root', password: process.env.MARIADB_PASSWORD ?? process.env.DB_PASSWORD ?? '', database: process.env.MARIADB_DATABASE || process.env.DB_NAME || 'hmorix', waitForConnections: true, connectionLimit: parseInt(process.env.DB_POOL_SIZE || '5'), charset: 'utf8mb4' })
     }
     return pool
   }
@@ -297,25 +297,173 @@ async function handleAdminLogs(req: VercelRequest, res: VercelResponse) {
   ] })
 }
 
+function stripHtml(value: string) {
+  return String(value || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+function sanitizeHtml(value: string) {
+  return String(value || '')
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+    .replace(/\son\w+="[^"]*"/gi, '')
+    .replace(/\son\w+='[^']*'/gi, '')
+    .replace(/javascript:/gi, '')
+}
+
+function slugifyTitle(value: string) {
+  return String(value || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+function calculateReadingTime(value: string) {
+  const words = stripHtml(value).split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.ceil(words / 220))
+}
+
+function createExcerpt(value: string) {
+  return stripHtml(value).slice(0, 180)
+}
+
+async function getBlogCollection() {
+  const mongo = await import('./mongodb')
+  return mongo.getCollection('blogs')
+}
+
+async function writePublishedBlogBackup(blog: any) {
+  if (blog.status !== 'published') return
+  const fs = await import('fs/promises')
+  const path = await import('path')
+  const published = new Date(blog.publishedAt || blog.published_at || Date.now())
+  const year = String(published.getFullYear())
+  const month = String(published.getMonth() + 1).padStart(2, '0')
+  const root = process.env.JSON_STORAGE_PATH || path.join(process.cwd(), 'storage', 'blogs')
+  const dir = path.join(root, year, month)
+  await fs.mkdir(dir, { recursive: true })
+  await fs.writeFile(
+    path.join(dir, `${blog.slug}.json`),
+    JSON.stringify({
+      title: blog.title || '',
+      slug: blog.slug || '',
+      content: blog.content || '',
+      author: blog.author || '',
+      publishedAt: blog.publishedAt || blog.published_at || '',
+      updatedAt: blog.updatedAt || blog.updated_at || '',
+      tags: blog.tags || [],
+      category: blog.category || '',
+      coverImage: blog.coverImage || blog.cover_image || '',
+      seo: blog.seo || {},
+      status: 'published',
+    }, null, 2)
+  )
+}
+
+async function handleBlogs(req: VercelRequest, res: VercelResponse) {
+  const collection = await getBlogCollection()
+  if (req.method === 'GET') {
+    const { search = '', category = '', tag = '', page = '1', limit = '12', status = 'published' } = req.query as any
+    const pageNum = Math.max(1, parseInt(page))
+    const limitNum = Math.max(1, parseInt(limit))
+    const query: any = {}
+    if (status !== 'all') query.status = status
+    if (category) query.category = category
+    if (tag) query.tags = tag
+    if (search) query.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { content: { $regex: search, $options: 'i' } },
+      { category: { $regex: search, $options: 'i' } },
+      { tags: { $regex: search, $options: 'i' } },
+    ]
+    const [blogs, total] = await Promise.all([
+      collection.find(query).sort({ publishedAt: -1, createdAt: -1 }).skip((pageNum - 1) * limitNum).limit(limitNum).toArray(),
+      collection.countDocuments(query),
+    ])
+    return res.json({ success: true, data: blogs, total, page: pageNum, pages: Math.ceil(total / limitNum) })
+  }
+  if (req.method === 'POST') {
+    const user = await getAuthUser(req)
+    if (!user || user.role !== 'admin') return res.status(401).json({ error: 'Admin access required' })
+    const now = new Date()
+    const body = req.body || {}
+    const slug = slugifyTitle(body.slug || body.title)
+    const status = body.status || 'draft'
+    const blog = {
+      title: body.title || '',
+      slug,
+      content: sanitizeHtml(body.content),
+      author: body.author || user.name || user.email,
+      tags: Array.isArray(body.tags) ? body.tags : [],
+      category: body.category || '',
+      coverImage: body.coverImage || '',
+      seo: body.seo || {},
+      excerpt: body.excerpt || createExcerpt(body.content),
+      readingTime: body.readingTime || calculateReadingTime(body.content),
+      status,
+      likes: 0,
+      bookmarks: 0,
+      comments: [],
+      analytics: { views: 0, uniqueVisitors: 0, shares: 0 },
+      publishedAt: status === 'published' ? now : null,
+      createdAt: now,
+      updatedAt: now,
+    }
+    const result = await collection.insertOne(blog)
+    const saved = { ...blog, _id: result.insertedId }
+    await writePublishedBlogBackup(saved)
+    return res.status(201).json({ success: true, data: saved })
+  }
+  res.status(405).json({ error: 'Method not allowed' })
+}
+
 async function handleBlog(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
-  const db = getDatabase()
-  try { const { data } = await db.query('blog_posts', { where: { status: 'published' }, orderBy: { column: 'published_at', ascending: false }, limit: 20 }); if (data?.length) return res.json({ success: true, data }) } catch {}
-  res.json({ success: true, data: [
-    { id: 'building-ai-agents-at-scale', title: 'Building AI Agents at Scale', category: 'Engineering', author: 'Hamza Morix', date: '2024-06-28', readTime: '12 min', featured: true },
-    { id: 'zero-trust-architecture', title: 'Implementing Zero-Trust Architecture', category: 'Security', author: 'Mike Johnson', date: '2024-06-22', readTime: '15 min', featured: false },
-    { id: 'pdf-extraction-ml-pipeline', title: 'ML Pipeline for PDF Extraction', category: 'AI & ML', author: 'Dr. Emily Park', date: '2024-06-20', readTime: '18 min', featured: false },
-    { id: 'scaling-to-million-users', title: 'Scaling to 1 Million Users', category: 'Engineering', author: 'Alex Rivera', date: '2024-06-18', readTime: '14 min', featured: false },
-    { id: 'smart-home-iot-security', title: 'IoT Security for Smart Homes', category: 'Security', author: 'James Wu', date: '2024-06-15', readTime: '10 min', featured: false },
-    { id: 'react-performance-optimization', title: 'React Performance Optimization', category: 'Tutorials', author: 'Lisa Martinez', date: '2024-06-12', readTime: '11 min', featured: false },
-  ] })
+  return handleBlogs(req, res)
 }
 
 async function handleBlogSlug(req: VercelRequest, res: VercelResponse, slug: string) {
+  const collection = await getBlogCollection()
+  if (req.method === 'GET') {
+    const blog = await collection.findOne({ slug })
+    if (!blog) return res.status(404).json({ error: 'Blog not found' })
+    await collection.updateOne({ slug }, { $inc: { 'analytics.views': 1 } })
+    return res.json({ success: true, data: blog })
+  }
+  if (req.method === 'PUT') {
+    const user = await getAuthUser(req)
+    if (!user || user.role !== 'admin') return res.status(401).json({ error: 'Admin access required' })
+    const existing = await collection.findOne({ slug })
+    if (!existing) return res.status(404).json({ error: 'Blog not found' })
+    const body = req.body || {}
+    const nextSlug = slugifyTitle(body.slug || body.title || slug)
+    const status = body.status || existing.status
+    const update = {
+      ...body,
+      content: body.content ? sanitizeHtml(body.content) : existing.content,
+      slug: nextSlug,
+      excerpt: body.excerpt || createExcerpt(body.content || existing.content),
+      readingTime: body.readingTime || calculateReadingTime(body.content || existing.content),
+      publishedAt: status === 'published' ? (existing.publishedAt || new Date()) : existing.publishedAt,
+      updatedAt: new Date(),
+    }
+    await collection.updateOne({ slug }, { $set: update })
+    const saved = await collection.findOne({ slug: nextSlug })
+    if (saved) await writePublishedBlogBackup(saved)
+    return res.json({ success: true, data: saved })
+  }
+  if (req.method === 'DELETE') {
+    const user = await getAuthUser(req)
+    if (!user || user.role !== 'admin') return res.status(401).json({ error: 'Admin access required' })
+    await collection.deleteOne({ slug })
+    return res.json({ success: true })
+  }
+  res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function handleBlogTaxonomy(req: VercelRequest, res: VercelResponse, field: 'category' | 'tags') {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
-  const db = getDatabase()
-  try { const { data } = await db.queryOne('blog_posts', { where: { slug } }); if (data) return res.json({ success: true, data }) } catch {}
-  res.json({ success: true, data: { slug, title: slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '), author: 'HMorix Team', date: '2024-06-28', readTime: '10 min', content: 'Full article content would be loaded from database.' } })
+  const collection = await getBlogCollection()
+  const data = await collection.distinct(field, { status: 'published' })
+  return res.json({ success: true, data: data.flat().filter(Boolean).sort() })
 }
 
 async function handleContact(req: VercelRequest, res: VercelResponse) {
@@ -457,7 +605,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'analytics/traffic': return handleAnalyticsTraffic(req, res)
       case 'admin/stats': return handleAdminStats(req, res)
       case 'admin/logs': return handleAdminLogs(req, res)
+      case 'blogs': return handleBlogs(req, res)
       case 'blog': return handleBlog(req, res)
+      case 'categories': return handleBlogTaxonomy(req, res, 'category')
+      case 'tags': return handleBlogTaxonomy(req, res, 'tags')
       case 'contact': return handleContact(req, res)
       case 'notifications': return handleNotifications(req, res)
       case 'profile': return handleProfile(req, res)
@@ -473,6 +624,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // Handle blog/[slug] pattern
         if (routePath.startsWith('blog/')) {
           const slug = routePath.replace('blog/', '')
+          return handleBlogSlug(req, res, slug)
+        }
+        if (routePath.startsWith('blogs/')) {
+          const slug = routePath.replace('blogs/', '')
           return handleBlogSlug(req, res, slug)
         }
         return res.status(404).json({ error: 'Not found', path: routePath })

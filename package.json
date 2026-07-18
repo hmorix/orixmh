@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:api\"",
     "dev:client": "cd client && npm run dev",
-    "dev:api": "vercel dev",
+    "dev:api": "node server/index.js",
+    "dev:vercel": "vercel dev",
     "build": "cd client && npm run build",
     "install:all": "npm install && cd client && npm install"
   },
@@ -13,10 +14,20 @@
     "@supabase/supabase-js": "^2.39.0",
     "@vercel/node": "^3.0.0",
     "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
     "mongodb": "^6.3.0",
     "mysql2": "^3.9.0",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "sanitize-html": "^2.13.0",
+    "sharp": "^0.33.5",
+    "slugify": "^1.6.6"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

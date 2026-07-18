@@ -221,7 +221,7 @@ export default function AdminBlogManager() {
           <div className="flex flex-wrap items-center justify-end gap-2 text-xs">
             <span className={`px-2 py-1 rounded ${health?.api ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>API</span>
             <span className={`px-2 py-1 rounded ${health?.mongodb ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}>MongoDB</span>
-            <span className={`px-2 py-1 rounded ${health?.mariadb ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}>MariaDB</span>
+            <span className={`px-2 py-1 rounded ${health?.supabase ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}>Supabase</span>
           </div>
         </div>
 

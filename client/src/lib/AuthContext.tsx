@@ -21,19 +21,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
-      const session = data?.session ?? null
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
+    supabase.auth.getSession()
+      .then(({ data }: { data: { session: Session | null } }) => {
+        const session = data?.session ?? null
+        setSession(session)
+        setUser(session?.user ?? null)
+      })
+      .catch((error: any) => {
+        console.warn('Supabase session check failed:', error?.message || error)
+        setSession(null)
+        setUser(null)
+      })
+      .finally(() => setLoading(false))
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange?.((_event: string, session: Session | null) => {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
-    })
+    }) || { data: { subscription: { unsubscribe: () => {} } } }
 
     return () => subscription.unsubscribe()
   }, [])
