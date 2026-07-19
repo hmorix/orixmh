@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Edit3, Eye, FileText, Image, LogOut, Plus, Save, Search, Send, Trash2 } from 'lucide-react'
+import { ArrowLeft, Download, Edit3, Eye, FileText, Image, LogOut, Plus, Save, Search, Send, Trash2, Upload } from 'lucide-react'
 import { useAuth } from '../../lib/AuthContext'
 // @ts-ignore - dependency is added in client/package.json for the JavaScript blog editor.
 import ReactQuill from 'react-quill'
@@ -16,7 +16,7 @@ type BlogPost = {
   author: string
   category: string
   tags: string[]
-  status: 'draft' | 'published'
+  status: 'draft' | 'pending' | 'published'
   coverImage?: string
   readingTime?: number
   publishedAt?: string
@@ -69,6 +69,30 @@ function resolveId(post: BlogPost) {
   return post._id || post.slug || post.id || ''
 }
 
+function resolveSavedId(post: BlogPost) {
+  return post._id || post.id || ''
+}
+
+function blogJson(post: BlogPost, tagsText: string) {
+  const now = new Date().toISOString()
+  const slug = post.slug || post.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+  return {
+    title: post.title,
+    slug,
+    seoMetadata: post.seo || {},
+    author: post.author,
+    category: post.category,
+    tags: fromTagText(tagsText),
+    publishDate: post.status === 'published' ? post.publishedAt || now : null,
+    updatedDate: now,
+    coverImage: post.coverImage || '',
+    content: post.content,
+    readingTime: post.readingTime || 1,
+    status: post.status,
+    shareUrl: `${window.location.origin}/blog/${slug}`,
+  }
+}
+
 export default function AdminBlogManager() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -77,6 +101,7 @@ export default function AdminBlogManager() {
   const [tagText, setTagText] = useState('')
   const [search, setSearch] = useState('')
   const [preview, setPreview] = useState(false)
+  const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'pending' | 'published'>('all')
   const [message, setMessage] = useState('')
   const [health, setHealth] = useState<any>(null)
   const [saving, setSaving] = useState(false)
@@ -86,9 +111,11 @@ export default function AdminBlogManager() {
   const filteredPosts = useMemo(() => {
     const query = search.toLowerCase()
     return posts.filter(post => {
-      return post.title.toLowerCase().includes(query) || post.category.toLowerCase().includes(query) || post.status.includes(query)
+      const matchesStatus = statusFilter === 'all' || post.status === statusFilter
+      const matchesQuery = post.title.toLowerCase().includes(query) || post.category.toLowerCase().includes(query) || post.status.includes(query)
+      return matchesStatus && matchesQuery
     })
-  }, [posts, search])
+  }, [posts, search, statusFilter])
 
   useEffect(() => {
     loadHealth()
@@ -156,7 +183,7 @@ export default function AdminBlogManager() {
     }
   }
 
-  async function savePost(status: 'draft' | 'published') {
+  async function savePost(status: BlogPost['status']) {
     if (!token) {
       setMessage('Login as admin before saving.')
       return
@@ -164,17 +191,65 @@ export default function AdminBlogManager() {
     setSaving(true)
     try {
       const body = JSON.stringify({ ...draft, tags: fromTagText(tagText), status })
-      const id = resolveId(draft)
+      const id = resolveSavedId(draft)
       const payload = id
         ? await requestJson(`/api/blog/${id}`, { method: 'PUT', body })
         : await requestJson('/api/blog', { method: 'POST', body })
       setDraft(payload.data)
-      setMessage(status === 'published' ? `Published. JSON backup: ${payload.backupPath || 'created'}` : 'Draft saved.')
+      if (status === 'published') {
+        setMessage(payload.backupError ? `Published. Supabase JSON upload failed, use Download JSON. ${payload.backupError}` : `Published. JSON backup: ${payload.backupPath?.url || 'created'}`)
+      } else {
+        setMessage(status === 'pending' ? 'Moved to pending.' : 'Draft saved.')
+      }
       await loadPosts()
     } catch (error: any) {
       setMessage(error.message)
     } finally {
       setSaving(false)
+    }
+  }
+
+  function downloadJson(post: BlogPost = draft) {
+    const data = blogJson(post, post === draft ? tagText : toTagText(post.tags || []))
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = `${data.slug || 'blog'}.json`
+    document.body.appendChild(anchor)
+    anchor.click()
+    anchor.remove()
+    URL.revokeObjectURL(url)
+    setMessage('Blog JSON downloaded.')
+  }
+
+  async function importJson(file?: File) {
+    if (!file) return
+    try {
+      const parsed = JSON.parse(await file.text())
+      const imported: BlogPost = {
+        _id: draft._id,
+        id: draft.id,
+        title: parsed.title || '',
+        slug: parsed.slug || '',
+        excerpt: parsed.excerpt || '',
+        content: parsed.content || '',
+        author: parsed.author || 'HMorix Team',
+        category: parsed.category || 'Engineering',
+        tags: Array.isArray(parsed.tags) ? parsed.tags : [],
+        status: ['draft', 'pending', 'published'].includes(parsed.status) ? parsed.status : 'draft',
+        coverImage: parsed.coverImage || parsed.cover_image || '',
+        readingTime: parsed.readingTime || 1,
+        publishedAt: parsed.publishDate || parsed.publishedAt,
+        updatedAt: parsed.updatedDate || parsed.updatedAt,
+        seo: parsed.seo || parsed.seoMetadata || { canonical: '', metaDescription: '', keywords: '' },
+      }
+      setDraft(imported)
+      setTagText(toTagText(imported.tags))
+      setPreview(false)
+      setMessage('JSON loaded into editor. Save Draft or Publish to store it.')
+    } catch {
+      setMessage('Invalid blog JSON file.')
     }
   }
 
@@ -265,12 +340,25 @@ export default function AdminBlogManager() {
               <Plus size={14} /> New Blog
             </button>
 
+            <label className="w-full btn-outline text-sm flex items-center justify-center gap-2 cursor-pointer">
+              <Upload size={14} /> Import / Replace JSON
+              <input type="file" accept="application/json,.json" className="hidden" onChange={e => importJson(e.target.files?.[0])} />
+            </label>
+
+            <div className="grid grid-cols-4 gap-1">
+              {(['all', 'draft', 'pending', 'published'] as const).map(status => (
+                <button key={status} onClick={() => setStatusFilter(status)} className={`px-2 py-2 text-[11px] capitalize rounded-[4px] ${statusFilter === status ? 'bg-[#C8FF00] text-obsidian' : 'bg-white/[0.04] text-cream/50 hover:text-cream'}`}>
+                  {status}
+                </button>
+              ))}
+            </div>
+
             <div className="space-y-2 max-h-[720px] overflow-y-auto pr-1">
               {filteredPosts.map(post => (
                 <div key={resolveId(post)} className={`p-4 bg-obsidian-2 border rounded-[12px] cursor-pointer transition-all ${resolveId(draft) === resolveId(post) ? 'border-[#C8FF00]/60' : 'border-glass-border hover:border-[#C8FF00]/30'}`} onClick={() => { setDraft(post); setPreview(false) }}>
                   <div className="flex items-center justify-between gap-3 mb-2">
                     <span className="px-2 py-0.5 bg-white/[0.06] text-cream/50 text-[10px] font-mono rounded">{post.category || 'Uncategorized'}</span>
-                    <span className={`px-2 py-0.5 text-[10px] rounded ${post.status === 'published' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}>{post.status}</span>
+                    <span className={`px-2 py-0.5 text-[10px] rounded ${post.status === 'published' ? 'bg-green-500/10 text-green-400' : post.status === 'pending' ? 'bg-blue-500/10 text-blue-400' : 'bg-yellow-500/10 text-yellow-400'}`}>{post.status}</span>
                   </div>
                   <h3 className="font-display font-semibold text-sm mb-1">{post.title || 'Untitled blog'}</h3>
                   <p className="text-xs text-cream/30 line-clamp-2">{post.excerpt || 'No excerpt yet.'}</p>
@@ -287,7 +375,9 @@ export default function AdminBlogManager() {
               </div>
               <div className="flex items-center gap-2">
                 <button disabled={saving} onClick={() => savePost('draft')} className="btn-outline text-sm flex items-center gap-2"><Save size={14} />Save Draft</button>
+                <button disabled={saving} onClick={() => savePost('pending')} className="btn-outline text-sm flex items-center gap-2"><Save size={14} />Pending</button>
                 <button disabled={saving} onClick={() => savePost('published')} className="btn-primary text-sm flex items-center gap-2"><Send size={14} />Publish</button>
+                <button onClick={() => downloadJson()} className="btn-outline text-sm flex items-center gap-2"><Download size={14} />JSON</button>
                 {resolveId(draft) && <button onClick={() => deletePost(draft)} className="w-9 h-9 border border-glass-border rounded-[4px] flex items-center justify-center text-cream/40 hover:text-red-400 hover:border-red-400 transition-all"><Trash2 size={14} /></button>}
               </div>
             </div>

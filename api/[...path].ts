@@ -893,7 +893,8 @@ async function handleBlogs(req: VercelRequest, res: VercelResponse) {
     const now = new Date()
     const body = req.body || {}
     const slug = slugifyTitle(body.slug || body.title)
-    const status = body.status || 'draft'
+    const status = ['draft', 'pending', 'published'].includes(body.status) ? body.status : 'draft'
+    if (!body.title && !body.content) return res.status(400).json({ error: 'Blog title or content is required' })
     const blog = {
       title: body.title || '',
       slug,
@@ -916,9 +917,15 @@ async function handleBlogs(req: VercelRequest, res: VercelResponse) {
     }
     const result = await collection.insertOne(blog)
     const saved = { ...blog, _id: result.insertedId }
-    const backupPath = await writePublishedBlogBackup(saved)
-    if (backupPath) await collection.updateOne({ _id: result.insertedId }, { $set: { jsonUrl: backupPath.url, jsonPath: backupPath.path, shareUrl: `${appUrl()}/blog/${slug}` } })
-    return res.status(201).json({ success: true, data: { ...saved, jsonUrl: backupPath?.url, shareUrl: `${appUrl()}/blog/${slug}` }, backupPath })
+    let backupPath: any = null
+    let backupError = ''
+    try {
+      backupPath = await writePublishedBlogBackup(saved)
+      if (backupPath) await collection.updateOne({ _id: result.insertedId }, { $set: { jsonUrl: backupPath.url, jsonPath: backupPath.path, shareUrl: `${appUrl()}/blog/${slug}` } })
+    } catch (error: any) {
+      backupError = error?.message || 'JSON export upload failed'
+    }
+    return res.status(201).json({ success: true, data: { ...saved, jsonUrl: backupPath?.url, shareUrl: `${appUrl()}/blog/${slug}` }, backupPath, backupError })
   }
   res.status(405).json({ error: 'Method not allowed' })
 }
@@ -943,7 +950,7 @@ async function handleBlogSlug(req: VercelRequest, res: VercelResponse, slug: str
     if (!existing) return res.status(404).json({ error: 'Blog not found' })
     const body = req.body || {}
     const nextSlug = slugifyTitle(body.slug || body.title || slug)
-    const status = body.status || existing.status
+    const status = ['draft', 'pending', 'published'].includes(body.status) ? body.status : existing.status
     const update = {
       ...body,
       content: body.content ? sanitizeHtml(body.content) : existing.content,
@@ -955,9 +962,15 @@ async function handleBlogSlug(req: VercelRequest, res: VercelResponse, slug: str
     }
     await collection.updateOne(filter, { $set: update })
     const saved = await collection.findOne({ slug: nextSlug })
-    const backupPath = saved ? await writePublishedBlogBackup(saved) : null
-    if (saved && backupPath) await collection.updateOne({ _id: saved._id }, { $set: { jsonUrl: backupPath.url, jsonPath: backupPath.path, shareUrl: `${appUrl()}/blog/${nextSlug}` } })
-    return res.json({ success: true, data: saved, backupPath })
+    let backupPath: any = null
+    let backupError = ''
+    try {
+      backupPath = saved ? await writePublishedBlogBackup(saved) : null
+      if (saved && backupPath) await collection.updateOne({ _id: saved._id }, { $set: { jsonUrl: backupPath.url, jsonPath: backupPath.path, shareUrl: `${appUrl()}/blog/${nextSlug}` } })
+    } catch (error: any) {
+      backupError = error?.message || 'JSON export upload failed'
+    }
+    return res.json({ success: true, data: saved, backupPath, backupError })
   }
   if (req.method === 'DELETE') {
     const user = await getAuthUser(req)
