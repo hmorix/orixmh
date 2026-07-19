@@ -1,193 +1,87 @@
 # Environment Variables Reference
 
-## Server-Side Variables (.env)
+Do not commit real secrets. Add production values in Vercel Project Settings > Environment Variables.
 
-### Application URLs
-- `NEXT_PUBLIC_APP_URL` - Public application URL for OAuth redirects (e.g., https://orix-pink.vercel.app)
-- `APP_URL` - Server-side application URL
-- `SITE_URL` - Site URL for email verification links
-
-### Database Configuration
-- `DATABASE` - Database provider: "supabase" or "mysql" (default: "supabase")
-- `MONGODB_URI` - MongoDB connection string (mongodb+srv://user:pass@cluster.mongodb.net/db)
-
-### Supabase Configuration
-- `SUPABASE_URL` - Supabase project URL
-- `SUPABASE_PUBLISHABLE_KEY` - Supabase anon key (public)
-- `SUPABASE_SECRET_KEY` - Supabase service role key (private)
-
-### NVIDIA AI Configuration
-- `NVIDIA_API_KEY` - NVIDIA API key for AI models
-- `NVIDIA_MODEL` - NVIDIA model to use (default: meta/llama-3.1-405b-instruct)
-
-### JWT Configuration
-- `JWT_SECRET` - Secret key for JWT signing (min 32 characters)
-- `JWT_EXPIRES_IN` - JWT expiration time in seconds (default: 3600)
-
-### MySQL Configuration (if DATABASE=mysql)
-- `DB_HOST` - Database host
-- `DB_PORT` - Database port (default: 3306)
-- `DB_USER` - Database user
-- `DB_PASSWORD` - Database password
-- `DB_NAME` - Database name
-- `DB_POOL_SIZE` - Connection pool size (default: 5)
-
----
-
-## Client-Side Variables (client/.env)
-
-### Application URLs
-- `VITE_APP_URL` - Application URL for OAuth redirects and email verification
-- `VITE_API_URL` - API base URL (default: /api)
-
-### Supabase Configuration
-- `VITE_SUPABASE_URL` - Supabase project URL
-- `VITE_SUPABASE_PUBLISHABLE_KEY` - Supabase anon key (public only)
-
-### NVIDIA AI Configuration
-- `VITE_NVIDIA_API_KEY` - NVIDIA API key
-- `VITE_NVIDIA_MODEL` - NVIDIA model name
-
-### Feature Flags
-- `VITE_ENABLE_ANALYTICS` - Enable analytics tracking (true/false)
-- `VITE_ENABLE_AI_ASSISTANT` - Enable AI assistant (true/false)
-
----
-
-## Example .env File
+## Required Server Variables
 
 ```bash
-# Application URLs
-NEXT_PUBLIC_APP_URL=https://orix-pink.vercel.app
-APP_URL=https://orix-pink.vercel.app
-SITE_URL=https://orix-pink.vercel.app
-
-# Database
+APP_URL=https://your-domain.vercel.app
+VERCEL_URL=your-domain.vercel.app
+CLIENT_ORIGIN=https://your-domain.vercel.app
 DATABASE=supabase
-MONGODB_URI=mongodb+srv://Admin:PASSWORD@cluster.mongodb.net/orix?retryWrites=true&w=majority
 
-# Supabase
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/hmorix?retryWrites=true&w=majority
+
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-SUPABASE_SECRET_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+SUPABASE_STORAGE_BUCKET=Orixbucket
 
-# NVIDIA AI
-NVIDIA_API_KEY=your_nvidia_api_key
-NVIDIA_MODEL=meta/llama-3.1-405b-instruct
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USER=your_gmail_address@gmail.com
+SMTP_PASS=your_gmail_app_password
+SMTP_FROM_NAME=HMorix
 
-# JWT
-JWT_SECRET=your_super_secret_jwt_key_min_32_characters_long
-JWT_EXPIRES_IN=3600
+SESSION_SECRET=replace_with_32_plus_random_bytes
+JWT_SECRET=replace_with_32_plus_random_bytes
+JWT_REFRESH_SECRET=replace_with_32_plus_random_bytes
+ADMIN_EMAIL=admin@hmorix.com
 ```
 
----
-
-## Example client/.env File
+## Optional Server Variables
 
 ```bash
-VITE_APP_URL=https://orix-pink.vercel.app
+MARIADB_HOST=localhost
+MARIADB_PORT=3306
+MARIADB_DATABASE=hmorix
+MARIADB_USER=root
+MARIADB_PASSWORD=
+
+SESSION_TTL_MS=604800000
+JWT_EXPIRES_IN=3600
+MAX_UPLOAD_SIZE=8388608
+EMAIL_VERIFY_TTL_MS=86400000
+OTP_TTL_MS=600000
+OTP_RETRY_LIMIT=5
+OTP_RESEND_LIMIT=5
+```
+
+## Required Client Variables
+
+```bash
+VITE_APP_URL=https://your-domain.vercel.app
+VITE_API_URL=/api
 VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-VITE_API_URL=https://orix-pink.vercel.app/api
-VITE_NVIDIA_API_KEY=your_nvidia_api_key
-VITE_NVIDIA_MODEL=meta/llama-3.1-405b-instruct
-VITE_ENABLE_ANALYTICS=true
-VITE_ENABLE_AI_ASSISTANT=true
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
 ```
 
----
+## Database Notes
 
-## Vercel Environment Variables
+Set `DATABASE=supabase` to use Supabase tables for the existing business-data adapter such as CRM, projects, support tickets, notifications, settings, invoices, and operational dashboard data.
 
-When deploying to Vercel, add these environment variables in **Settings > Environment Variables**:
+MongoDB is still used for custom auth, users, profiles, sessions, OAuth account linking, verification tokens, OTP records, and blogs.
 
-```
-NEXT_PUBLIC_APP_URL=https://orix-pink.vercel.app
-APP_URL=https://orix-pink.vercel.app
-SITE_URL=https://orix-pink.vercel.app
-DATABASE=supabase
-MONGODB_URI=mongodb+srv://...
-SUPABASE_URL=https://...
-SUPABASE_PUBLISHABLE_KEY=...
-SUPABASE_SECRET_KEY=...
-NVIDIA_API_KEY=...
-NVIDIA_MODEL=meta/llama-3.1-405b-instruct
-JWT_SECRET=...
-JWT_EXPIRES_IN=3600
-VITE_SUPABASE_URL=https://...
-VITE_SUPABASE_PUBLISHABLE_KEY=...
-VITE_API_URL=https://orix-pink.vercel.app/api
-VITE_APP_URL=https://orix-pink.vercel.app
-VITE_NVIDIA_API_KEY=...
-VITE_NVIDIA_MODEL=meta/llama-3.1-405b-instruct
-VITE_ENABLE_ANALYTICS=true
-VITE_ENABLE_AI_ASSISTANT=true
-```
+Set `DATABASE=mariadb` only if you want those business-data adapter queries to use MariaDB instead.
 
----
+## Auth Provider Notes
 
-## How to Get These Values
+Google and GitHub authenticate through backend OAuth endpoints and store/link users in MongoDB by normalized email.
 
-### Supabase
-1. Go to supabase.com and create a project
-2. Go to **Settings > API**
-3. Copy `Project URL` and `anon key` (public)
-4. Copy `service_role key` (secret - keep safe!)
+Microsoft remains on Supabase Auth and still needs the Supabase client variables plus Microsoft provider configuration in Supabase.
 
-### MongoDB Atlas
-1. Go to mongodb.com/cloud/atlas
-2. Create a cluster
-3. Create a database user
-4. Click **Connect**
-5. Choose **Drivers**
-6. Copy the connection string
-7. Replace `<username>` and `<password>` with your credentials
+Email/password authentication is MongoDB-backed. Passwords are bcrypt hashed. Verification emails, OTP, and forgot-password OTP use Gmail SMTP through Nodemailer.
 
-### NVIDIA API
-1. Go to build.nvidia.com
-2. Create an API key
-3. Choose a model (e.g., meta/llama-3.1-405b-instruct)
+## Storage Notes
 
-### JWT Secret
-Generate a random string of at least 32 characters:
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
+Supabase Storage uses bucket `Orixbucket`. Create it as public, or allow the API service-role key to create it automatically. Store profile images, cover images, blog images, JSON exports, and attachments there.
 
----
+## Secret Rotation
 
-## Security Notes
-
-- Never commit `.env` files to version control
-- Keep `SUPABASE_SECRET_KEY` and `JWT_SECRET` confidential
-- Use strong, random values for secrets
-- Rotate secrets periodically
-- Use different values for development and production
-- Only expose `VITE_*` variables to the client
-- Server-side variables are never sent to the browser
-
----
-
-## Troubleshooting
-
-### Variables not loading
-- Restart development server after changing `.env`
-- Check file is in correct directory
-- Verify no syntax errors in `.env`
-- Check for spaces around `=` sign
-
-### OAuth not working
-- Verify `VITE_APP_URL` is correct
-- Check OAuth provider redirect URIs match
-- Ensure Supabase OAuth is enabled
-
-### Database connection failed
-- Verify connection string is correct
-- Check IP whitelist in MongoDB Atlas
-- Ensure database user has correct permissions
-- Test connection with MongoDB Compass
-
-### API errors
-- Check `SUPABASE_URL` and keys are correct
-- Verify `MONGODB_URI` is valid
-- Check JWT_SECRET is at least 32 characters
+OAuth client secrets and Gmail app passwords pasted into chat should be considered exposed. Rotate them in Google Cloud, GitHub Developer Settings, and Gmail App Passwords before production deployment.

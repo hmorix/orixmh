@@ -1,13 +1,21 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createClient } from '@supabase/supabase-js'
+import { MongoClient, ObjectId } from 'mongodb'
+import * as bcrypt from 'bcryptjs'
+import crypto from 'crypto'
+import * as nodemailer from 'nodemailer'
 
 // ============================================
 // CORS & AUTH HELPERS
 // ============================================
 function setCors(res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Origin', process.env.CLIENT_ORIGIN || process.env.APP_URL || '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-Token')
+  res.setHeader('Access-Control-Allow-Credentials', 'true')
+  res.setHeader('X-Content-Type-Options', 'nosniff')
+  res.setHeader('X-Frame-Options', 'DENY')
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
 }
 
 function handleCors(req: VercelRequest, res: VercelResponse): boolean {
@@ -16,29 +24,180 @@ function handleCors(req: VercelRequest, res: VercelResponse): boolean {
   return false
 }
 
+const SESSION_COOKIE = 'hm_session'
+const SESSION_TTL_MS = Number(process.env.SESSION_TTL_MS || 1000 * 60 * 60 * 24 * 7)
+let mongoClient: MongoClient | null = null
+
+function appUrl() {
+  const raw = process.env.APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+  return raw.replace(/\/$/, '')
+}
+
+function cleanEmail(email: string) {
+  return String(email || '').trim().toLowerCase()
+}
+
+function publicUser(user: any) {
+  return {
+    id: String(user._id || user.id),
+    email: user.email,
+    name: user.name || user.displayName || user.email,
+    displayName: user.displayName || user.name || '',
+    username: user.username || '',
+    role: user.role || 'user',
+    emailVerified: Boolean(user.emailVerified),
+    providers: user.providers || [],
+  }
+}
+
+function parseCookies(req: VercelRequest) {
+  const header = req.headers.cookie || ''
+  return Object.fromEntries(String(header).split(';').map(item => {
+    const index = item.indexOf('=')
+    if (index < 0) return ['', '']
+    return [item.slice(0, index).trim(), decodeURIComponent(item.slice(index + 1))]
+  }).filter(([key]) => key))
+}
+
+function signValue(value: string) {
+  return crypto.createHmac('sha256', process.env.SESSION_SECRET || process.env.JWT_SECRET || 'hmorix-session-secret-change-me').update(value).digest('base64url')
+}
+
+function encodeSessionCookie(sessionId: string) {
+  return `${sessionId}.${signValue(sessionId)}`
+}
+
+function decodeSessionCookie(value?: string) {
+  if (!value) return null
+  const [sessionId, signature] = value.split('.')
+  if (!sessionId || !signature) return null
+  const expected = signValue(sessionId)
+  if (signature.length !== expected.length) return null
+  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null
+  return sessionId
+}
+
+function setSessionCookie(res: VercelResponse, sessionId: string) {
+  const secure = process.env.NODE_ENV === 'production'
+  res.setHeader('Set-Cookie', `${SESSION_COOKIE}=${encodeURIComponent(encodeSessionCookie(sessionId))}; Path=/; Max-Age=${Math.floor(SESSION_TTL_MS / 1000)}; HttpOnly; SameSite=Lax${secure ? '; Secure' : ''}`)
+}
+
+function clearSessionCookie(res: VercelResponse) {
+  res.setHeader('Set-Cookie', `${SESSION_COOKIE}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`)
+}
+
+async function mongoDb() {
+  if (!process.env.MONGODB_URI) throw Object.assign(new Error('Database is not configured'), { status: 500, code: 'ENV_MISSING' })
+  if (!mongoClient) {
+    mongoClient = new MongoClient(process.env.MONGODB_URI, { maxPoolSize: 5 })
+    await mongoClient.connect()
+  }
+  return mongoClient.db()
+}
+
+async function mongoCollection(name: string) {
+  const db = await mongoDb()
+  return db.collection(name)
+}
+
+async function ensureIndexes() {
+  const db = await mongoDb()
+  await Promise.all([
+    db.collection('users').createIndex({ email: 1 }, { unique: true }),
+    db.collection('oauth_accounts').createIndex({ provider: 1, providerAccountId: 1 }, { unique: true }),
+    db.collection('oauth_accounts').createIndex({ email: 1 }),
+    db.collection('profiles').createIndex({ userId: 1 }, { unique: true }),
+    db.collection('profiles').createIndex({ username: 1 }, { unique: true, sparse: true }),
+    db.collection('sessions').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
+    db.collection('verification_tokens').createIndex({ tokenHash: 1 }, { unique: true }),
+    db.collection('verification_tokens').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
+    db.collection('otp_records').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
+  ])
+}
+
+function randomToken(bytes = 32) {
+  return crypto.randomBytes(bytes).toString('base64url')
+}
+
+function tokenHash(token: string) {
+  return crypto.createHash('sha256').update(token).digest('hex')
+}
+
+function generateOtp() {
+  return String(crypto.randomInt(100000, 1000000))
+}
+
+async function sendMail(options: { to: string; subject: string; html: string; text?: string }) {
+  const required = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS']
+  const missing = required.filter(key => !process.env[key])
+  if (missing.length) throw Object.assign(new Error(`SMTP is not configured: ${missing.join(', ')}`), { status: 500, code: 'SMTP_CONFIG' })
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT || 465),
+    secure: Number(process.env.SMTP_PORT || 465) === 465,
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+  })
+  await transporter.sendMail({
+    from: `"${process.env.SMTP_FROM_NAME || 'HMorix'}" <${process.env.SMTP_USER}>`,
+    ...options,
+  })
+}
+
+async function createSession(res: VercelResponse, user: any, req?: VercelRequest) {
+  const sessions = await mongoCollection('sessions')
+  const sessionId = randomToken(32)
+  const now = new Date()
+  const expiresAt = new Date(Date.now() + SESSION_TTL_MS)
+  await sessions.insertOne({
+    sessionId,
+    userId: String(user._id),
+    email: user.email,
+    createdAt: now,
+    updatedAt: now,
+    expiresAt,
+    invalidatedAt: null,
+    userAgent: req?.headers['user-agent'] || '',
+    ip: req?.headers['x-forwarded-for']?.toString().split(',')[0] || '',
+  })
+  setSessionCookie(res, sessionId)
+  return { sessionId, expiresAt }
+}
+
+async function findSessionUser(req: VercelRequest, res?: VercelResponse) {
+  const sessionId = decodeSessionCookie(parseCookies(req)[SESSION_COOKIE])
+  if (!sessionId) return null
+  const sessions = await mongoCollection('sessions')
+  const session = await sessions.findOne({ sessionId, invalidatedAt: null, expiresAt: { $gt: new Date() } })
+  if (!session) {
+    if (res) clearSessionCookie(res)
+    return null
+  }
+  const users = await mongoCollection('users')
+  const user = await users.findOne({ _id: new ObjectId(session.userId), disabledAt: { $exists: false } })
+  if (!user) return null
+  const expiresAt = new Date(Date.now() + SESSION_TTL_MS)
+  await sessions.updateOne({ sessionId }, { $set: { updatedAt: new Date(), expiresAt } })
+  if (res) setSessionCookie(res, sessionId)
+  return publicUser(user)
+}
+
 async function getAuthUser(req: VercelRequest) {
+  const sessionUser = await findSessionUser(req)
+  if (sessionUser) return sessionUser
   const authHeader = req.headers.authorization
   if (!authHeader || !authHeader.startsWith('Bearer ')) return null
   const token = authHeader.split(' ')[1]
-  const dbProvider = (process.env.DATABASE || 'supabase').toLowerCase()
   try {
-    if (dbProvider === 'supabase') {
-      const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ROLE_KEY || process.env.SUPABASE_Role_KEY || '', { auth: { autoRefreshToken: false, persistSession: false } })
-      const { data: { user }, error } = await supabase.auth.getUser(token)
-      if (error || !user) return null
-      return { id: user.id, email: user.email || '', role: user.user_metadata?.role || user.app_metadata?.role || 'user', name: user.user_metadata?.name }
-    } else {
-      const jwt = await import('jsonwebtoken')
-      const decoded = jwt.default.verify(token, process.env.JWT_SECRET || 'hmorix-jwt-secret-change-me') as any
-      return { id: decoded.sub || decoded.id, email: decoded.email, role: decoded.role || 'user', name: decoded.name }
-    }
+    const jwt = await import('jsonwebtoken')
+    const decoded = jwt.default.verify(token, process.env.JWT_SECRET || 'hmorix-jwt-secret-change-me') as any
+    return { id: decoded.sub || decoded.id, email: decoded.email, role: decoded.role || 'user', name: decoded.name }
   } catch { return null }
 }
 
 function getSupabaseAdminClient() {
   return createClient(
     process.env.SUPABASE_URL || '',
-    process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ROLE_KEY || process.env.SUPABASE_Role_KEY || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ROLE_KEY || process.env.SUPABASE_Role_KEY || '',
     { auth: { autoRefreshToken: false, persistSession: false } }
   )
 }
@@ -51,12 +210,56 @@ function getSupabasePublicClient() {
   )
 }
 
+const STORAGE_BUCKET = process.env.SUPABASE_STORAGE_BUCKET || 'Orixbucket'
+const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+const JSON_TYPES = new Set(['application/json'])
+const MAX_UPLOAD_SIZE = Number(process.env.MAX_UPLOAD_SIZE || 8 * 1024 * 1024)
+
+async function ensureStorageBucket() {
+  const supabase = getSupabaseAdminClient()
+  const { data } = await supabase.storage.listBuckets()
+  if (!data?.some((bucket: any) => bucket.name === STORAGE_BUCKET)) {
+    await supabase.storage.createBucket(STORAGE_BUCKET, { public: true })
+  }
+  return supabase
+}
+
+function extFromMime(mime: string, fallback = 'bin') {
+  const map: Record<string, string> = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+    'image/gif': 'gif',
+    'application/json': 'json',
+  }
+  return map[mime] || fallback
+}
+
+async function uploadBufferToStorage(buffer: Buffer, contentType: string, folder: string, baseName: string) {
+  if (buffer.length > MAX_UPLOAD_SIZE) throw Object.assign(new Error('File is too large'), { status: 413, code: 'UPLOAD_SIZE' })
+  const supabase = await ensureStorageBucket()
+  const safeName = String(baseName || 'file').replace(/\.[^.]+$/, '').replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'file'
+  const storagePath = `${folder}/${Date.now()}-${randomToken(8)}-${safeName}.${extFromMime(contentType)}`
+  const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(storagePath, buffer, { contentType, upsert: false })
+  if (error) throw Object.assign(new Error('Storage upload failed'), { status: 502, code: 'STORAGE_UPLOAD' })
+  const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(storagePath)
+  return { path: storagePath, url: data.publicUrl }
+}
+
+async function deleteStoragePath(path?: string) {
+  if (!path) return
+  try {
+    const supabase = await ensureStorageBucket()
+    await supabase.storage.from(STORAGE_BUCKET).remove([path])
+  } catch {}
+}
+
 // ============================================
 // DATABASE ADAPTER (inline for single-function)
 // ============================================
 function getDatabase() {
   const provider = (process.env.DATABASE || 'supabase').toLowerCase()
-  if (provider === 'mysql') return createMySQLAdapter()
+  if (provider === 'mysql' || provider === 'mariadb') return createMySQLAdapter()
   return createSupabaseAdapter()
 }
 
@@ -158,7 +361,7 @@ async function handleHealth(req: VercelRequest, res: VercelResponse) {
   } catch {}
   res.json({
     success: true,
-    status: { api: true, mongodb: mongoHealthy, supabase: db.provider === 'supabase' ? dbHealthy : false },
+    status: { api: true, mongodb: mongoHealthy, mariadb: dbHealthy, supabaseStorage: Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_STORAGE_BUCKET) },
     database: { provider: db.provider, connected: dbHealthy },
     timestamp: new Date().toISOString(),
     version: '2.0.0',
@@ -166,23 +369,7 @@ async function handleHealth(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleLogin(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
-  const { email, password } = req.body || {}
-  if (!email || !password) return res.status(400).json({ error: 'Email and password are required' })
-
-  const supabase = getSupabasePublicClient()
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error || !data.session || !data.user) return res.status(401).json({ error: error?.message || 'Invalid credentials' })
-
-  const role = data.user.user_metadata?.role || data.user.app_metadata?.role || (email === process.env.ADMIN_EMAIL ? 'admin' : 'user')
-  if (role !== 'admin') return res.status(403).json({ error: 'Admin access required' })
-
-  return res.json({
-    success: true,
-    token: data.session.access_token,
-    user: { id: data.user.id, email: data.user.email, name: data.user.user_metadata?.name || data.user.email, role },
-    storage: 'supabase',
-  })
+  return handleAuthSignin(req, res)
 }
 
 async function handleSetupAdmin(req: VercelRequest, res: VercelResponse) {
@@ -190,21 +377,27 @@ async function handleSetupAdmin(req: VercelRequest, res: VercelResponse) {
   const { name = 'Admin', email, password } = req.body || {}
   if (!email || !password) return res.status(400).json({ error: 'Email and password are required' })
   if (process.env.ADMIN_EMAIL && email !== process.env.ADMIN_EMAIL) return res.status(403).json({ error: 'Use the configured ADMIN_EMAIL for setup' })
-
-  const supabase = getSupabaseAdminClient()
-  const { data, error } = await supabase.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: { name, role: 'admin' },
-    app_metadata: { role: 'admin' },
-  })
-  if (error) return res.status(400).json({ error: error.message })
-  return res.status(201).json({ success: true, user: { id: data.user.id, email: data.user.email, name, role: 'admin' } })
+  await ensureIndexes()
+  const users = await mongoCollection('users')
+  const normalizedEmail = cleanEmail(email)
+  const passwordHash = await bcrypt.hash(password, 12)
+  const now = new Date()
+  const result = await users.findOneAndUpdate(
+    { email: normalizedEmail },
+    { $set: { name, role: 'admin', emailVerified: true, updatedAt: now }, $setOnInsert: { email: normalizedEmail, passwordHash, providers: ['email'], createdAt: now } },
+    { upsert: true, returnDocument: 'after' }
+  )
+  return res.status(201).json({ success: true, user: publicUser(result.value) })
 }
 
 async function handleLogout(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const sessionId = decodeSessionCookie(parseCookies(req)[SESSION_COOKIE])
+  if (sessionId) {
+    const sessions = await mongoCollection('sessions')
+    await sessions.updateOne({ sessionId }, { $set: { invalidatedAt: new Date() } })
+  }
+  clearSessionCookie(res)
   return res.json({ success: true })
 }
 
@@ -212,42 +405,54 @@ async function handleAuthSignin(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
   const { email, password } = req.body || {}
   if (!email || !password) return res.status(400).json({ error: 'Email and password are required' })
-  const dbProvider = (process.env.DATABASE || 'supabase').toLowerCase()
-  if (dbProvider === 'mysql') {
-    const db = getDatabase()
-    const { data: user } = await db.queryOne('users', { where: { email } })
-    if (user) {
-      const jwt = await import('jsonwebtoken')
-      const expiresIn = parseInt(process.env.JWT_EXPIRES_IN || '3600')
-      const token = jwt.default.sign({ sub: (user as any).id, email: (user as any).email, role: (user as any).role, name: (user as any).name }, process.env.JWT_SECRET || 'hmorix-jwt-secret-change-me', { expiresIn })
-      return res.json({ success: true, user: { id: (user as any).id, name: (user as any).name, email: (user as any).email, role: (user as any).role }, token })
-    }
-    return res.status(401).json({ success: false, error: 'Invalid credentials' })
-  }
-  res.json({ success: true, message: 'Use Supabase client-side auth for sign-in' })
+  await ensureIndexes()
+  const users = await mongoCollection('users')
+  const user = await users.findOne({ email: cleanEmail(email) })
+  if (!user?.passwordHash) return res.status(401).json({ success: false, error: 'Invalid email or password' })
+  const valid = await bcrypt.compare(password, user.passwordHash)
+  if (!valid) return res.status(401).json({ success: false, error: 'Invalid email or password' })
+  if (!user.emailVerified) return res.status(403).json({ success: false, code: 'EMAIL_NOT_VERIFIED', error: 'Please verify your email before signing in' })
+  await createSession(res, user, req)
+  return res.json({ success: true, user: publicUser(user) })
 }
 
 async function handleAuthSignup(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
   const { name, email, password, company } = req.body || {}
   if (!name || !email || !password) return res.status(400).json({ error: 'Name, email, and password are required' })
-  const dbProvider = (process.env.DATABASE || 'supabase').toLowerCase()
-  if (dbProvider === 'mysql') {
-    const db = getDatabase()
-    try {
-      const bcrypt = await import('bcryptjs')
-      const passwordHash = await bcrypt.default.hash(password, 10)
-      const { data: user, error } = await db.insert('users', { name, email, password_hash: passwordHash, company: company || '', role: 'user', plan: 'free' })
-      if (error) return res.status(400).json({ success: false, error: 'Email already registered' })
-      return res.json({ success: true, user: { id: (user as any)?.id, name, email }, message: 'Account created successfully' })
-    } catch { return res.status(400).json({ success: false, error: 'Registration failed' }) }
+  if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' })
+  await ensureIndexes()
+  const users = await mongoCollection('users')
+  const normalizedEmail = cleanEmail(email)
+  const existing = await users.findOne({ email: normalizedEmail })
+  if (existing?.passwordHash) return res.status(409).json({ error: 'An account with this email already exists' })
+  const now = new Date()
+  const passwordHash = await bcrypt.hash(password, 12)
+  const user = existing || (await users.insertOne({
+    email: normalizedEmail,
+    name,
+    displayName: name,
+    company: company || '',
+    passwordHash,
+    role: normalizedEmail === process.env.ADMIN_EMAIL ? 'admin' : 'user',
+    emailVerified: false,
+    providers: ['email'],
+    createdAt: now,
+    updatedAt: now,
+  })).insertedId
+  if (existing) {
+    await users.updateOne({ _id: existing._id }, { $set: { name, displayName: name, company: company || '', passwordHash, updatedAt: now }, $addToSet: { providers: 'email' } })
   }
-  res.json({ success: true, message: 'Use Supabase client-side auth for sign-up' })
+  const saved = existing ? await users.findOne({ _id: existing._id }) : await users.findOne({ _id: user })
+  await createVerificationEmail(saved)
+  await sendOtp(normalizedEmail, 'registration')
+  await upsertProfile(saved, { name, displayName: name, company })
+  return res.status(201).json({ success: true, user: publicUser(saved), message: 'Account created. Check your email to verify your account.' })
 }
 
 async function handleAuthMe(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
-  const user = await getAuthUser(req)
+  const user = await findSessionUser(req, res)
   if (!user) return res.status(401).json({ error: 'Not authenticated' })
   res.json({ success: true, user })
 }
@@ -398,54 +603,260 @@ function createExcerpt(value: string) {
 }
 
 async function getBlogCollection() {
-  const mongo = await import('./mongodb')
-  return mongo.getCollection('blogs')
+  return mongoCollection('blogs')
+}
+
+async function upsertProfile(user: any, data: any = {}) {
+  if (!user) return null
+  const profiles = await mongoCollection('profiles')
+  const userId = String(user._id || user.id)
+  const now = new Date()
+  const update: any = {
+    userId,
+    email: user.email,
+    name: data.name ?? data.displayName ?? user.name ?? '',
+    displayName: data.displayName ?? data.name ?? user.displayName ?? user.name ?? '',
+    username: data.username ?? user.username ?? undefined,
+    bio: data.bio ?? '',
+    phone: data.phone ?? '',
+    company: data.company ?? user.company ?? '',
+    country: data.country ?? '',
+    location: data.location ?? '',
+    website: data.website ?? '',
+    socialLinks: data.socialLinks ?? data.social_links ?? {},
+    theme: data.theme ?? 'dark',
+    avatarUrl: data.avatarUrl ?? data.avatar_url ?? '',
+    avatarPath: data.avatarPath ?? '',
+    coverImageUrl: data.coverImageUrl ?? data.cover_image_url ?? '',
+    coverImagePath: data.coverImagePath ?? '',
+    updatedAt: now,
+  }
+  Object.keys(update).forEach(key => update[key] === undefined && delete update[key])
+  await profiles.updateOne(
+    { userId },
+    { $set: update, $setOnInsert: { createdAt: now } },
+    { upsert: true }
+  )
+  return profiles.findOne({ userId })
+}
+
+async function createVerificationEmail(user: any) {
+  const token = randomToken(32)
+  const expiresAt = new Date(Date.now() + Number(process.env.EMAIL_VERIFY_TTL_MS || 1000 * 60 * 60 * 24))
+  const tokens = await mongoCollection('verification_tokens')
+  await tokens.deleteMany({ userId: String(user._id), type: 'email_verification' })
+  await tokens.insertOne({ userId: String(user._id), email: user.email, type: 'email_verification', tokenHash: tokenHash(token), expiresAt, createdAt: new Date(), usedAt: null })
+  const url = `${appUrl()}/verify?token=${encodeURIComponent(token)}`
+  await sendMail({
+    to: user.email,
+    subject: 'Verify your HMorix account',
+    text: `Verify your HMorix account: ${url}`,
+    html: `<p>Welcome to HMorix.</p><p><a href="${url}">Verify your account</a></p><p>This link expires in 24 hours.</p>`,
+  })
+}
+
+async function sendOtp(email: string, purpose = 'login') {
+  const normalizedEmail = cleanEmail(email)
+  const records = await mongoCollection('otp_records')
+  const recent = await records.countDocuments({ email: normalizedEmail, purpose, createdAt: { $gt: new Date(Date.now() - 15 * 60 * 1000) } })
+  if (recent >= Number(process.env.OTP_RESEND_LIMIT || 5)) throw Object.assign(new Error('Too many OTP requests. Please try again later.'), { status: 429 })
+  const otp = generateOtp()
+  const expiresAt = new Date(Date.now() + Number(process.env.OTP_TTL_MS || 10 * 60 * 1000))
+  await records.insertOne({ email: normalizedEmail, purpose, otpHash: tokenHash(otp), attempts: 0, maxAttempts: Number(process.env.OTP_RETRY_LIMIT || 5), expiresAt, createdAt: new Date(), usedAt: null })
+  await sendMail({
+    to: normalizedEmail,
+    subject: 'Your HMorix verification code',
+    text: `Your HMorix OTP is ${otp}. It expires in 10 minutes.`,
+    html: `<p>Your HMorix verification code is <strong>${otp}</strong>.</p><p>It expires in 10 minutes.</p>`,
+  })
+}
+
+async function handleVerifyEmail(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'GET' && req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const token = (req.method === 'GET' ? req.query.token : req.body?.token) as string
+  if (!token) return res.status(400).json({ success: false, status: 'invalid', error: 'Verification token is missing' })
+  const tokens = await mongoCollection('verification_tokens')
+  const record = await tokens.findOne({ tokenHash: tokenHash(token), type: 'email_verification', usedAt: null })
+  if (!record) return res.status(400).json({ success: false, status: 'invalid', error: 'Invalid verification token' })
+  if (record.expiresAt <= new Date()) return res.status(410).json({ success: false, status: 'expired', error: 'Verification token has expired' })
+  const users = await mongoCollection('users')
+  await users.updateOne({ _id: new ObjectId(record.userId) }, { $set: { emailVerified: true, updatedAt: new Date() } })
+  await tokens.updateOne({ _id: record._id }, { $set: { usedAt: new Date() } })
+  return res.json({ success: true, status: 'verified', message: 'Email verified successfully' })
+}
+
+async function handleResendVerification(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const email = cleanEmail(req.body?.email)
+  if (!email) return res.status(400).json({ error: 'Email is required' })
+  const users = await mongoCollection('users')
+  const user = await users.findOne({ email })
+  if (user && !user.emailVerified) await createVerificationEmail(user)
+  return res.json({ success: true, message: 'If an unverified account exists, a new verification email has been sent.' })
+}
+
+async function handleOtpRequest(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const email = cleanEmail(req.body?.email)
+  const purpose = String(req.body?.purpose || 'login')
+  if (!email) return res.status(400).json({ error: 'Email is required' })
+  await sendOtp(email, purpose)
+  return res.json({ success: true, message: 'OTP sent' })
+}
+
+async function handleOtpVerify(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const email = cleanEmail(req.body?.email)
+  const code = String(req.body?.code || '')
+  const purpose = String(req.body?.purpose || 'login')
+  if (!email || !/^\d{6}$/.test(code)) return res.status(400).json({ error: 'A valid 6 digit OTP is required' })
+  const records = await mongoCollection('otp_records')
+  const record = await records.findOne({ email, purpose, usedAt: null, expiresAt: { $gt: new Date() } }, { sort: { createdAt: -1 } })
+  if (!record) return res.status(400).json({ error: 'OTP is invalid or expired' })
+  if (record.attempts >= record.maxAttempts) return res.status(429).json({ error: 'OTP retry limit exceeded' })
+  if (record.otpHash !== tokenHash(code)) {
+    await records.updateOne({ _id: record._id }, { $inc: { attempts: 1 } })
+    return res.status(400).json({ error: 'OTP is invalid' })
+  }
+  await records.updateOne({ _id: record._id }, { $set: { usedAt: new Date() } })
+  return res.json({ success: true, message: 'OTP verified' })
+}
+
+async function handleForgotPassword(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const email = cleanEmail(req.body?.email)
+  if (!email) return res.status(400).json({ error: 'Email is required' })
+  await sendOtp(email, 'forgot_password')
+  return res.json({ success: true, message: 'If the account exists, a reset OTP has been sent.' })
+}
+
+async function handleOAuthStart(req: VercelRequest, res: VercelResponse, provider: 'google' | 'github') {
+  const redirectUri = `${appUrl()}/api/auth/${provider}/callback`
+  const state = randomToken(16)
+  const states = await mongoCollection('oauth_states')
+  await states.insertOne({ state: tokenHash(state), provider, expiresAt: new Date(Date.now() + 10 * 60 * 1000), createdAt: new Date() })
+  const clientId = provider === 'google' ? process.env.GOOGLE_CLIENT_ID : process.env.GITHUB_CLIENT_ID
+  if (!clientId) return res.status(500).json({ error: `${provider} OAuth is not configured` })
+  const url = provider === 'google'
+    ? `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent('openid email profile')}&state=${encodeURIComponent(state)}`
+    : `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent('read:user user:email')}&state=${encodeURIComponent(state)}`
+  res.writeHead(302, { Location: url })
+  res.end()
+}
+
+async function handleOAuthCallback(req: VercelRequest, res: VercelResponse, provider: 'google' | 'github') {
+  const { code, state } = req.query as any
+  if (!code || !state) return redirectRetry(res)
+  const states = await mongoCollection('oauth_states')
+  const validState = await states.findOne({ state: tokenHash(state), provider, expiresAt: { $gt: new Date() } })
+  if (!validState) return redirectRetry(res)
+  await states.deleteOne({ _id: validState._id })
+  const redirectUri = `${appUrl()}/api/auth/${provider}/callback`
+  const oauthUser = provider === 'google'
+    ? await fetchGoogleUser(String(code), redirectUri)
+    : await fetchGithubUser(String(code), redirectUri)
+  if (!oauthUser.email) return redirectRetry(res)
+  const user = await linkOAuthUser(provider, oauthUser)
+  await createSession(res, user, req)
+  res.writeHead(302, { Location: `${appUrl()}/dashboard` })
+  res.end()
+}
+
+async function fetchGoogleUser(code: string, redirectUri: string) {
+  const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ code, client_id: process.env.GOOGLE_CLIENT_ID || '', client_secret: process.env.GOOGLE_CLIENT_SECRET || '', redirect_uri: redirectUri, grant_type: 'authorization_code' }),
+  })
+  const token = await tokenRes.json() as any
+  const profileRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', { headers: { Authorization: `Bearer ${token.access_token}` } })
+  const profile = await profileRes.json() as any
+  return { providerAccountId: profile.id, email: cleanEmail(profile.email), name: profile.name, avatarUrl: profile.picture }
+}
+
+async function fetchGithubUser(code: string, redirectUri: string) {
+  const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
+    method: 'POST',
+    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, client_id: process.env.GITHUB_CLIENT_ID, client_secret: process.env.GITHUB_CLIENT_SECRET, redirect_uri: redirectUri }),
+  })
+  const token = await tokenRes.json() as any
+  const userRes = await fetch('https://api.github.com/user', { headers: { Authorization: `Bearer ${token.access_token}`, Accept: 'application/vnd.github+json' } })
+  const profile = await userRes.json() as any
+  let email = cleanEmail(profile.email)
+  if (!email) {
+    const emailsRes = await fetch('https://api.github.com/user/emails', { headers: { Authorization: `Bearer ${token.access_token}`, Accept: 'application/vnd.github+json' } })
+    const emails = await emailsRes.json() as any[]
+    email = cleanEmail(emails.find(item => item.primary && item.verified)?.email || emails.find(item => item.verified)?.email || '')
+  }
+  return { providerAccountId: String(profile.id), email, name: profile.name || profile.login, avatarUrl: profile.avatar_url }
+}
+
+async function linkOAuthUser(provider: 'google' | 'github', oauthUser: any) {
+  await ensureIndexes()
+  const users = await mongoCollection('users')
+  const accounts = await mongoCollection('oauth_accounts')
+  const now = new Date()
+  let user = await users.findOne({ email: oauthUser.email })
+  if (!user) {
+    const result = await users.insertOne({
+      email: oauthUser.email,
+      name: oauthUser.name || oauthUser.email,
+      displayName: oauthUser.name || '',
+      avatarUrl: oauthUser.avatarUrl || '',
+      emailVerified: true,
+      role: oauthUser.email === process.env.ADMIN_EMAIL ? 'admin' : 'user',
+      providers: [provider],
+      createdAt: now,
+      updatedAt: now,
+    })
+    user = await users.findOne({ _id: result.insertedId })
+  } else {
+    await users.updateOne({ _id: user._id }, { $set: { emailVerified: true, updatedAt: now, avatarUrl: user.avatarUrl || oauthUser.avatarUrl || '' }, $addToSet: { providers: provider } })
+    user = await users.findOne({ _id: user._id })
+  }
+  await accounts.updateOne(
+    { provider, providerAccountId: oauthUser.providerAccountId },
+    { $set: { userId: String(user!._id), email: oauthUser.email, name: oauthUser.name || '', avatarUrl: oauthUser.avatarUrl || '', updatedAt: now }, $setOnInsert: { createdAt: now } },
+    { upsert: true }
+  )
+  await upsertProfile(user, { name: user?.name, displayName: user?.displayName, avatarUrl: user?.avatarUrl })
+  return user
+}
+
+function redirectRetry(res: VercelResponse) {
+  clearSessionCookie(res)
+  res.writeHead(302, { Location: `${appUrl()}/retry` })
+  res.end()
 }
 
 async function writePublishedBlogBackup(blog: any) {
   if (blog.status !== 'published') return null
-  const fs = await import('fs/promises')
-  const path = await import('path')
   const published = new Date(blog.publishedAt || blog.published_at || Date.now())
   const year = String(published.getFullYear())
   const month = String(published.getMonth() + 1).padStart(2, '0')
   const backupJson = JSON.stringify({
     title: blog.title || '',
     slug: blog.slug || '',
-    content: blog.content || '',
+    seoMetadata: blog.seo || blog.seoMetadata || {},
     author: blog.author || '',
-    publishedAt: blog.publishedAt || blog.published_at || '',
-    updatedAt: blog.updatedAt || blog.updated_at || '',
-    tags: blog.tags || [],
     category: blog.category || '',
+    tags: blog.tags || [],
+    publishDate: blog.publishedAt || blog.published_at || '',
+    updatedDate: blog.updatedAt || blog.updated_at || '',
     coverImage: blog.coverImage || blog.cover_image || '',
-    seo: blog.seo || {},
+    content: blog.content || '',
+    readingTime: blog.readingTime || 1,
     status: 'published',
+    shareUrl: `${appUrl()}/blog/${blog.slug}`,
   }, null, 2)
   const storagePath = `${year}/${month}/${blog.slug}.json`
-  const bucket = process.env.SUPABASE_BLOG_BUCKET || process.env.JSON_STORAGE_BUCKET || 'blogs'
-  const hasSupabaseStorage = Boolean(process.env.SUPABASE_URL && (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ROLE_KEY || process.env.SUPABASE_Role_KEY))
-
-  if (hasSupabaseStorage) {
-    const supabase = getSupabaseAdminClient()
-    const { data: buckets } = await supabase.storage.listBuckets()
-    if (!buckets?.some((item: any) => item.name === bucket)) {
-      await supabase.storage.createBucket(bucket, { public: false })
-    }
-    const { error } = await supabase.storage.from(bucket).upload(storagePath, backupJson, {
-      contentType: 'application/json',
-      upsert: true,
-    })
-    if (!error) return `supabase://${bucket}/${storagePath}`
-    console.warn('Supabase JSON backup failed:', error.message)
-  }
-
-  const root = process.env.JSON_STORAGE_PATH || path.join(process.cwd(), 'storage', 'blogs')
-  const dir = path.join(root, year, month)
-  await fs.mkdir(dir, { recursive: true })
-  const file = path.join(dir, `${blog.slug}.json`)
-  await fs.writeFile(file, backupJson)
-  return file
+  const supabase = await ensureStorageBucket()
+  const fullPath = `blogs/json/${storagePath}`
+  const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(fullPath, backupJson, { contentType: 'application/json', upsert: true })
+  if (error) throw Object.assign(new Error('Blog JSON export upload failed'), { status: 502, code: 'STORAGE_JSON' })
+  const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fullPath)
+  return { path: fullPath, url: data.publicUrl }
 }
 
 async function getBlogFilter(idOrSlug: string) {
@@ -506,7 +917,8 @@ async function handleBlogs(req: VercelRequest, res: VercelResponse) {
     const result = await collection.insertOne(blog)
     const saved = { ...blog, _id: result.insertedId }
     const backupPath = await writePublishedBlogBackup(saved)
-    return res.status(201).json({ success: true, data: saved, backupPath })
+    if (backupPath) await collection.updateOne({ _id: result.insertedId }, { $set: { jsonUrl: backupPath.url, jsonPath: backupPath.path, shareUrl: `${appUrl()}/blog/${slug}` } })
+    return res.status(201).json({ success: true, data: { ...saved, jsonUrl: backupPath?.url, shareUrl: `${appUrl()}/blog/${slug}` }, backupPath })
   }
   res.status(405).json({ error: 'Method not allowed' })
 }
@@ -544,6 +956,7 @@ async function handleBlogSlug(req: VercelRequest, res: VercelResponse, slug: str
     await collection.updateOne(filter, { $set: update })
     const saved = await collection.findOne({ slug: nextSlug })
     const backupPath = saved ? await writePublishedBlogBackup(saved) : null
+    if (saved && backupPath) await collection.updateOne({ _id: saved._id }, { $set: { jsonUrl: backupPath.url, jsonPath: backupPath.path, shareUrl: `${appUrl()}/blog/${nextSlug}` } })
     return res.json({ success: true, data: saved, backupPath })
   }
   if (req.method === 'DELETE') {
@@ -587,19 +1000,112 @@ async function handleNotifications(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleProfile(req: VercelRequest, res: VercelResponse) {
-  const db = getDatabase()
-  const user = await getAuthUser(req)
+  const user = await findSessionUser(req, res)
+  if (!user) return res.status(401).json({ error: 'Not authenticated' })
   if (req.method === 'GET') {
-    if (user) { try { const { data } = await db.queryOne('user_profiles', { where: { id: user.id } }); if (data) return res.json({ success: true, data }) } catch {} }
-    return res.json({ success: true, data: { id: user?.id || 'usr_1001', email: user?.email || 'demo@hmorix.com', name: user?.name || 'Demo User', role: user?.role || 'user', company: 'HMorix', plan: 'business', created_at: '2024-01-15T00:00:00Z' } })
+    const profiles = await mongoCollection('profiles')
+    const profile = await profiles.findOne({ userId: user.id })
+    if (profile) return res.json({ success: true, data: { ...profile, role: user.role, emailVerified: user.emailVerified } })
+    const created = await upsertProfile({ _id: user.id, email: user.email, name: user.name, displayName: user.displayName })
+    return res.json({ success: true, data: { ...created, role: user.role, emailVerified: user.emailVerified } })
   }
   if (req.method === 'PUT') {
-    if (!user) return res.status(401).json({ error: 'Not authenticated' })
-    const { name, phone, company } = req.body || {}
-    try { await db.update('user_profiles', { name, phone, company }, { id: user.id }) } catch {}
-    return res.json({ success: true, message: 'Profile updated' })
+    const body = req.body || {}
+    const allowed = ['name', 'displayName', 'username', 'bio', 'phone', 'company', 'country', 'location', 'website', 'socialLinks', 'theme', 'avatarUrl', 'coverImageUrl']
+    const update: any = {}
+    for (const key of allowed) if (body[key] !== undefined) update[key] = typeof body[key] === 'string' ? sanitizeText(body[key], key === 'bio' ? 1000 : 160) : body[key]
+    if (update.username && !/^[a-zA-Z0-9_]{3,32}$/.test(update.username)) return res.status(400).json({ error: 'Username must be 3-32 letters, numbers, or underscores' })
+    const profiles = await mongoCollection('profiles')
+    if (update.username) {
+      const duplicate = await profiles.findOne({ username: update.username, userId: { $ne: user.id } })
+      if (duplicate) return res.status(409).json({ error: 'Username is already taken' })
+    }
+    const profile = await upsertProfile({ _id: user.id, email: user.email, name: user.name, displayName: user.displayName }, update)
+    const users = await mongoCollection('users')
+    await users.updateOne({ _id: new ObjectId(user.id) }, { $set: { name: update.name || update.displayName || user.name, displayName: update.displayName || update.name || user.displayName, username: update.username || user.username, updatedAt: new Date() } })
+    return res.json({ success: true, message: 'Profile updated', data: profile })
   }
   res.status(405).json({ error: 'Method not allowed' })
+}
+
+function sanitizeText(value: string, max = 160) {
+  return String(value || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, max)
+}
+
+async function readRawBody(req: VercelRequest): Promise<Buffer> {
+  if (Buffer.isBuffer(req.body)) return req.body
+  if (typeof req.body === 'string') return Buffer.from(req.body)
+  if (req.body && typeof req.body === 'object') return Buffer.from(JSON.stringify(req.body))
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = []
+    req.on('data', chunk => chunks.push(Buffer.from(chunk)))
+    req.on('end', () => resolve(Buffer.concat(chunks)))
+    req.on('error', reject)
+  })
+}
+
+async function parseUpload(req: VercelRequest) {
+  const contentType = String(req.headers['content-type'] || '')
+  if (contentType.includes('application/json')) {
+    const body = req.body || {}
+    const data = String(body.data || '').replace(/^data:[^;]+;base64,/, '')
+    return {
+      file: data ? Buffer.from(data, 'base64') : null,
+      filename: body.filename || 'upload',
+      mime: body.mime || body.contentType || 'application/octet-stream',
+      kind: body.kind || 'attachments',
+      oldPath: body.oldPath,
+    }
+  }
+  const boundary = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/)?.[1] || contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/)?.[2]
+  if (!boundary) return { file: null, filename: '', mime: '', kind: 'attachments', oldPath: '' }
+  const raw = await readRawBody(req)
+  const delimiter = Buffer.from(`--${boundary}`)
+  const parts = raw.toString('binary').split(delimiter.toString('binary'))
+  const fields: any = {}
+  let file: Buffer | null = null
+  let filename = 'upload'
+  let mime = 'application/octet-stream'
+  for (const part of parts) {
+    const [rawHeaders, rawContent] = part.split('\r\n\r\n')
+    if (!rawHeaders || !rawContent) continue
+    const name = rawHeaders.match(/name="([^"]+)"/)?.[1]
+    const fileNameMatch = rawHeaders.match(/filename="([^"]*)"/)?.[1]
+    const typeMatch = rawHeaders.match(/Content-Type:\s*([^\r\n]+)/i)?.[1]
+    const content = rawContent.replace(/\r\n--$/, '').replace(/\r\n$/, '')
+    if (fileNameMatch) {
+      filename = fileNameMatch
+      mime = typeMatch || mime
+      file = Buffer.from(content, 'binary')
+    } else if (name) {
+      fields[name] = content
+    }
+  }
+  return { file, filename, mime, kind: fields.kind || 'attachments', oldPath: fields.oldPath }
+}
+
+async function handleUpload(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const user = await getAuthUser(req)
+  if (!user) return res.status(401).json({ error: 'Login required' })
+  const parsed = await parseUpload(req)
+  if (!parsed.file) return res.status(400).json({ error: 'File is required' })
+  const kind = String(parsed.kind || 'attachments')
+  const folderMap: Record<string, string> = {
+    avatar: `profiles/${user.id}/avatar`,
+    profile: `profiles/${user.id}/avatar`,
+    cover: `profiles/${user.id}/cover`,
+    blog: 'blogs/images',
+    content: 'blogs/images',
+    json: 'blogs/json',
+    attachment: `attachments/${user.id}`,
+    attachments: `attachments/${user.id}`,
+  }
+  const allowed = kind === 'json' ? JSON_TYPES : IMAGE_TYPES
+  if (!allowed.has(parsed.mime)) return res.status(400).json({ error: 'Unsupported file type' })
+  const upload = await uploadBufferToStorage(parsed.file, parsed.mime, folderMap[kind] || `attachments/${user.id}`, parsed.filename)
+  if (parsed.oldPath) await deleteStoragePath(parsed.oldPath)
+  return res.json({ success: true, url: upload.url, path: upload.path, publicUrl: upload.url })
 }
 
 async function handleProjects(req: VercelRequest, res: VercelResponse) {
@@ -694,6 +1200,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'auth/signin': return handleAuthSignin(req, res)
       case 'auth/signup': return handleAuthSignup(req, res)
       case 'auth/me': return handleAuthMe(req, res)
+      case 'auth/verify-email': return handleVerifyEmail(req, res)
+      case 'auth/resend-verification': return handleResendVerification(req, res)
+      case 'auth/otp/request': return handleOtpRequest(req, res)
+      case 'auth/otp/verify': return handleOtpVerify(req, res)
+      case 'auth/forgot-password': return handleForgotPassword(req, res)
+      case 'auth/google': return handleOAuthStart(req, res, 'google')
+      case 'auth/google/callback': return handleOAuthCallback(req, res, 'google')
+      case 'auth/github': return handleOAuthStart(req, res, 'github')
+      case 'auth/github/callback': return handleOAuthCallback(req, res, 'github')
       case 'dashboard/stats': return handleDashboardStats(req, res)
       case 'crm/stats': return handleCrmStats(req, res)
       case 'crm/contacts': return handleCrmContacts(req, res)
@@ -711,6 +1226,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'contact': return handleContact(req, res)
       case 'notifications': return handleNotifications(req, res)
       case 'profile': return handleProfile(req, res)
+      case 'upload': return handleUpload(req, res)
       case 'projects': return handleProjects(req, res)
       case 'invoices': return handleInvoices(req, res)
       case 'tickets': return handleTickets(req, res)
@@ -732,7 +1248,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(404).json({ error: 'Not found', path: routePath })
     }
   } catch (error: any) {
-    console.error('API Error:', error)
-    res.status(500).json({ error: 'Internal server error', message: error.message })
+    console.error('API Error:', { code: error?.code, message: error?.message, route: req.url })
+    const status = Number(error?.status || 500)
+    const messageByCode: Record<string, string> = {
+      SMTP_CONFIG: 'Email delivery is not configured',
+      STORAGE_UPLOAD: 'File upload failed. Please try again.',
+      STORAGE_JSON: 'Blog export failed. Please try again.',
+      UPLOAD_SIZE: 'File is too large',
+      ENV_MISSING: 'Service is not configured',
+    }
+    res.status(status).json({ error: messageByCode[error?.code] || (status >= 500 ? 'Something went wrong. Please try again.' : error?.message || 'Request failed') })
   }
 }

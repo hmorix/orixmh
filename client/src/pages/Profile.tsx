@@ -1,8 +1,86 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Camera, Mail, Phone, MapPin, Globe, Shield, Key, Bell, Clock } from 'lucide-react'
+import { api } from '../lib/config'
 
 export default function Profile() {
   const [activeTab, setActiveTab] = useState('overview')
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [message, setMessage] = useState('')
+  const [profile, setProfile] = useState({
+    name: '',
+    displayName: '',
+    username: '',
+    email: '',
+    phone: '',
+    location: '',
+    website: '',
+    bio: '',
+    company: '',
+    theme: 'dark',
+    avatarUrl: '',
+    coverImageUrl: '',
+    socialLinks: { twitter: '', linkedin: '', github: '', website: '' },
+  })
+
+  useEffect(() => {
+    fetch(api.profile.get, { credentials: 'include' })
+      .then(async response => {
+        if (response.status === 401) {
+          window.location.href = '/retry'
+          return null
+        }
+        return response.json()
+      })
+      .then(result => {
+        if (!result?.data) return
+        const data = result.data
+        setProfile(current => ({
+          ...current,
+          ...data,
+          name: data.name || data.displayName || '',
+          displayName: data.displayName || data.name || '',
+          avatarUrl: data.avatarUrl || data.avatar_url || '',
+          coverImageUrl: data.coverImageUrl || data.cover_image_url || '',
+          socialLinks: data.socialLinks || data.social_links || current.socialLinks,
+        }))
+      })
+      .catch(() => setMessage('Unable to load profile'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const initials = (profile.displayName || profile.name || profile.email || 'HM')
+    .split(/\s+/)
+    .map(part => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+
+  const saveProfile = async () => {
+    setSaving(true)
+    setMessage('')
+    try {
+      const response = await fetch(api.profile.update, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profile),
+      })
+      const result = await response.json().catch(() => ({}))
+      if (response.status === 401) {
+        window.location.href = '/retry'
+        return
+      }
+      if (!response.ok) throw new Error(result.error || 'Failed to save profile')
+      setMessage('Profile saved')
+    } catch (error: any) {
+      setMessage(error.message || 'Failed to save profile')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const updateProfile = (key: string, value: string) => setProfile(current => ({ ...current, [key]: value }))
 
   return (
     <div className="pt-32 pb-20">
@@ -10,19 +88,21 @@ export default function Profile() {
         {/* Profile Header */}
         <div className="flex flex-col md:flex-row items-start gap-8 mb-12">
           <div className="relative">
-            <div className="w-28 h-28 bg-obsidian-3 border-2 border-glass-border rounded-full flex items-center justify-center text-3xl font-display font-bold text-[#C8FF00]">JD</div>
+            <div className="w-28 h-28 bg-obsidian-3 border-2 border-glass-border rounded-full flex items-center justify-center text-3xl font-display font-bold text-[#C8FF00] overflow-hidden">
+              {profile.avatarUrl ? <img src={profile.avatarUrl} alt="" className="w-full h-full object-cover" /> : initials}
+            </div>
             <button className="absolute bottom-0 right-0 w-8 h-8 bg-[#C8FF00] rounded-full flex items-center justify-center hover:scale-105 transition-transform">
               <Camera size={14} className="text-obsidian" />
             </button>
           </div>
           <div className="flex-1">
-            <h1 className="font-display text-3xl font-bold">John Doe</h1>
-            <p className="text-cream/50 mt-1">Enterprise Administrator</p>
+            <h1 className="font-display text-3xl font-bold">{profile.displayName || profile.name || 'Your Profile'}</h1>
+            <p className="text-cream/50 mt-1">{profile.company || 'HMorix Account'}</p>
             <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-cream/40">
-              <span className="flex items-center gap-1.5"><Mail size={14} /> admin@hmorix.com</span>
-              <span className="flex items-center gap-1.5"><Phone size={14} /> +1 (555) 123-4567</span>
-              <span className="flex items-center gap-1.5"><MapPin size={14} /> San Francisco, CA</span>
-              <span className="flex items-center gap-1.5"><Globe size={14} /> hmorix.com</span>
+              <span className="flex items-center gap-1.5"><Mail size={14} /> {profile.email || 'No email'}</span>
+              <span className="flex items-center gap-1.5"><Phone size={14} /> {profile.phone || 'No phone'}</span>
+              <span className="flex items-center gap-1.5"><MapPin size={14} /> {profile.location || 'No location'}</span>
+              <span className="flex items-center gap-1.5"><Globe size={14} /> {profile.website || 'No website'}</span>
             </div>
             <div className="flex items-center gap-3 mt-4">
               <span className="px-3 py-1 bg-[#C8FF00]/10 text-[#C8FF00] text-xs rounded-full font-medium">Pro Plan</span>
@@ -30,7 +110,7 @@ export default function Profile() {
               <span className="px-3 py-1 bg-blue-500/10 text-blue-400 text-xs rounded-full font-medium">2FA Enabled</span>
             </div>
           </div>
-          <button className="btn-primary">Edit Profile</button>
+          <button onClick={() => setActiveTab('overview')} className="btn-primary">Edit Profile</button>
         </div>
 
         {/* Tabs */}
@@ -47,14 +127,17 @@ export default function Profile() {
             <div className="lg:col-span-2 space-y-6">
               <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
                 <h3 className="font-display font-semibold mb-4">Personal Information</h3>
+                {message && <div className="mb-4 text-sm text-cream/60">{message}</div>}
                 <div className="grid grid-cols-2 gap-4">
-                  <div><label className="block text-xs text-cream/40 mb-1">First Name</label><input type="text" defaultValue="John" className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" /></div>
-                  <div><label className="block text-xs text-cream/40 mb-1">Last Name</label><input type="text" defaultValue="Doe" className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" /></div>
-                  <div><label className="block text-xs text-cream/40 mb-1">Email</label><input type="email" defaultValue="admin@hmorix.com" className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" /></div>
-                  <div><label className="block text-xs text-cream/40 mb-1">Phone</label><input type="tel" defaultValue="+1 (555) 123-4567" className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" /></div>
-                  <div className="col-span-2"><label className="block text-xs text-cream/40 mb-1">Bio</label><textarea rows={3} defaultValue="Enterprise technology leader with 10+ years of experience in building scalable systems." className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00] resize-none" /></div>
+                  <div><label className="block text-xs text-cream/40 mb-1">Display Name</label><input type="text" value={profile.displayName} onChange={e => updateProfile('displayName', e.target.value)} className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" /></div>
+                  <div><label className="block text-xs text-cream/40 mb-1">Username</label><input type="text" value={profile.username} onChange={e => updateProfile('username', e.target.value)} className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" /></div>
+                  <div><label className="block text-xs text-cream/40 mb-1">Email</label><input type="email" value={profile.email} disabled className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream/60 outline-none" /></div>
+                  <div><label className="block text-xs text-cream/40 mb-1">Phone</label><input type="tel" value={profile.phone} onChange={e => updateProfile('phone', e.target.value)} className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" /></div>
+                  <div><label className="block text-xs text-cream/40 mb-1">Location</label><input type="text" value={profile.location} onChange={e => updateProfile('location', e.target.value)} className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" /></div>
+                  <div><label className="block text-xs text-cream/40 mb-1">Website</label><input type="url" value={profile.website} onChange={e => updateProfile('website', e.target.value)} className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" /></div>
+                  <div className="col-span-2"><label className="block text-xs text-cream/40 mb-1">Bio</label><textarea rows={3} value={profile.bio} onChange={e => updateProfile('bio', e.target.value)} className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00] resize-none" /></div>
                 </div>
-                <button className="mt-4 btn-primary">Save Changes</button>
+                <button onClick={saveProfile} disabled={saving || loading} className="mt-4 btn-primary disabled:opacity-50">{saving ? 'Saving...' : 'Save Changes'}</button>
               </div>
 
               <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">

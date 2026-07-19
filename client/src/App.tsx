@@ -40,6 +40,8 @@ import Roadmap from './pages/Roadmap'
 import KnowledgeBase from './pages/KnowledgeBase'
 import Support from './pages/Support'
 import Profile from './pages/Profile'
+import Retry from './pages/Retry'
+import NotFound from './pages/NotFound'
 import Settings from './pages/settings/Settings'
 import ClientPortal from './pages/portal/ClientPortal'
 import CaseStudies from './pages/CaseStudies'
@@ -224,6 +226,7 @@ function App() {
 
           {/* User Pages */}
           <Route path="/profile" element={<Profile />} />
+          <Route path="/retry" element={<Retry />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/portal" element={<ClientPortal />} />
 
@@ -239,6 +242,7 @@ function App() {
           <Route path="/employee/directory" element={<Directory />} />
           <Route path="/employee/requests" element={<Requests />} />
           <Route path="/employee/tasks" element={<Tasks />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
 
         {/* Auth Pages (no layout) */}

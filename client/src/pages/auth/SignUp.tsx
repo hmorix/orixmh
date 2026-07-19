@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useAuth } from '../../lib/AuthContext'
-import { supabase, auth as supabaseAuth } from '../../lib/supabase'
-import { getOAuthRedirectUrl } from '../../lib/config'
+import { auth as supabaseAuth } from '../../lib/supabase'
+import { config, getOAuthRedirectUrl } from '../../lib/config'
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false)
@@ -54,11 +54,11 @@ export default function SignUp() {
   }
 
   const handleOAuth = async (provider: 'google' | 'github' | 'azure') => {
-    const providerMap: Record<string, any> = { google: 'google', github: 'github', azure: 'azure' }
-    const { error } = await supabaseAuth.signInWithOAuth(
-      providerMap[provider],
-      getOAuthRedirectUrl('/profile-setup')
-    )
+    if (provider === 'google' || provider === 'github') {
+      window.location.href = `${config.apiUrl}/auth/${provider}`
+      return
+    }
+    const { error } = await supabaseAuth.signInWithOAuth('azure', getOAuthRedirectUrl('/profile-setup'))
     if (error) setError(error.message)
   }
 

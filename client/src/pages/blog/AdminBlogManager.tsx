@@ -102,6 +102,7 @@ export default function AdminBlogManager() {
   async function requestJson(path: string, options: RequestInit = {}) {
     const response = await fetch(path, {
       ...options,
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...tokenHeaders(token),
@@ -197,7 +198,7 @@ export default function AdminBlogManager() {
     const form = new FormData()
     form.append('image', file)
     form.append('kind', 'cover')
-    const response = await fetch('/api/upload', { method: 'POST', headers: tokenHeaders(token), body: form })
+    const response = await fetch('/api/upload', { method: 'POST', credentials: 'include', headers: tokenHeaders(token), body: form })
     const payload = await response.json()
     if (!response.ok) {
       setMessage(payload.error || 'Upload failed')

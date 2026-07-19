@@ -1,10 +1,28 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import { supabase, auth } from './supabase'
-import type { User, Session } from '@supabase/supabase-js'
+import { api, config } from './config'
+import { supabase } from './supabase'
+
+type AppUser = {
+  id: string
+  email: string
+  name?: string
+  displayName?: string
+  username?: string
+  role?: string
+  emailVerified?: boolean
+  providers?: string[]
+  user_metadata?: { name?: string }
+}
+
+type AppSession = {
+  user: AppUser
+  access_token?: string
+  expiresAt?: string
+}
 
 interface AuthContextType {
-  user: User | null
-  session: Session | null
+  user: AppUser | null
+  session: AppSession | null
   loading: boolean
   signUp: (email: string, password: string, metadata?: { name?: string; company?: string }) => Promise<{ error: any }>
   signIn: (email: string, password: string) => Promise<{ error: any }>
@@ -14,75 +32,87 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+async function apiRequest(url: string, options: RequestInit = {}) {
+  const response = await fetch(url, {
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    ...options,
+  })
+  const data = await response.json().catch(() => ({}))
+  if (response.status === 401) {
+    localStorage.removeItem('hm_token')
+    Object.keys(localStorage).filter(key => key.startsWith('sb-')).forEach(key => localStorage.removeItem(key))
+  }
+  if (!response.ok) throw new Error(data.error || data.message || 'Request failed')
+  return data
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
+  const [user, setUser] = useState<AppUser | null>(null)
+  const [session, setSession] = useState<AppSession | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession()
-      .then(({ data }: { data: { session: Session | null } }) => {
-        const session = data?.session ?? null
-        const expiresAt = session?.expires_at ? session.expires_at * 1000 : 0
-        if (expiresAt && expiresAt <= Date.now()) {
-          supabase.auth.signOut()
-          setSession(null)
-          setUser(null)
-          return
-        }
-        setSession(session)
-        setUser(session?.user ?? null)
+    apiRequest(api.auth.me)
+      .then(data => {
+        const nextUser = { ...data.user, user_metadata: { name: data.user.name || data.user.displayName } }
+        setUser(nextUser)
+        setSession({ user: nextUser, access_token: 'cookie-session' })
       })
-      .catch((error: any) => {
-        console.warn('Supabase session check failed:', error?.message || error)
-        Object.keys(localStorage).filter(key => key.startsWith('sb-')).forEach(key => localStorage.removeItem(key))
-        setSession(null)
+      .catch(() => {
         setUser(null)
+        setSession(null)
       })
       .finally(() => setLoading(false))
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange?.((_event: string, session: Session | null) => {
-      if (_event === 'TOKEN_REFRESHED' && !session) {
-        setSession(null)
-        setUser(null)
-        setLoading(false)
-        return
-      }
-      if (_event === 'SIGNED_OUT') {
-        setSession(null)
-        setUser(null)
-        setLoading(false)
-        return
-      }
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    }) || { data: { subscription: { unsubscribe: () => {} } } }
-
-    return () => subscription.unsubscribe()
   }, [])
 
   const signUp = async (email: string, password: string, metadata?: { name?: string; company?: string }) => {
-    const { error } = await auth.signUp(email, password, metadata)
-    return { error }
+    try {
+      await apiRequest(api.auth.signup, {
+        method: 'POST',
+        body: JSON.stringify({ email, password, name: metadata?.name, company: metadata?.company }),
+      })
+      return { error: null }
+    } catch (error: any) {
+      return { error }
+    }
   }
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await auth.signIn(email, password)
-    return { error }
+    try {
+      const data = await apiRequest(api.auth.signin, {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      })
+      const nextUser = { ...data.user, user_metadata: { name: data.user.name || data.user.displayName } }
+      setUser(nextUser)
+      setSession({ user: nextUser, access_token: 'cookie-session' })
+      return { error: null }
+    } catch (error: any) {
+      setUser(null)
+      setSession(null)
+      return { error }
+    }
   }
 
   const signOut = async () => {
-    await auth.signOut()
+    await fetch(`${config.apiUrl}/logout`, { method: 'POST', credentials: 'include' }).catch(() => null)
+    await supabase.auth.signOut().catch(() => null)
+    localStorage.removeItem('hm_token')
     setUser(null)
     setSession(null)
   }
 
   const resetPassword = async (email: string) => {
-    const { error } = await auth.resetPassword(email)
-    return { error }
+    try {
+      await apiRequest(`${config.apiUrl}/auth/forgot-password`, {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+      })
+      return { error: null }
+    } catch (error: any) {
+      return { error }
+    }
   }
 
   return (

@@ -36,7 +36,7 @@ export default function ForgotPassword() {
             <span className="text-cream">HMorix</span>
           </Link>
           <h1 className="font-display text-2xl font-bold text-cream mb-2">Reset your password</h1>
-          <p className="text-sm text-cream/50">Enter your email and we'll send you a reset link</p>
+          <p className="text-sm text-cream/50">Enter your email and we'll send you a reset OTP</p>
         </div>
 
         <div className="p-8 bg-obsidian-2 border border-glass-border rounded-[16px]">
@@ -62,7 +62,7 @@ export default function ForgotPassword() {
                 <span className="text-green-500 text-xl">✓</span>
               </div>
               <h3 className="font-display font-semibold text-cream mb-2">Check your email</h3>
-              <p className="text-sm text-cream/50 mb-4">We've sent a password reset link to <span className="text-cream">{email}</span></p>
+              <p className="text-sm text-cream/50 mb-4">We've sent a password reset OTP to <span className="text-cream">{email}</span></p>
               <button onClick={() => { setSent(false); setError('') }} className="text-sm text-[#C8FF00] hover:underline">Didn't receive it? Try again</button>
             </div>
           )}
