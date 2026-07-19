@@ -159,6 +159,7 @@ async function createSession(res: VercelResponse, user: any, req?: VercelRequest
     userAgent: req?.headers['user-agent'] || '',
     ip: req?.headers['x-forwarded-for']?.toString().split(',')[0] || '',
   })
+  await logActivity(String(user._id), 'login', parseUserAgent(String(req?.headers['user-agent'] || '')), req)
   setSessionCookie(res, sessionId)
   return { sessionId, expiresAt }
 }
@@ -179,6 +180,36 @@ async function findSessionUser(req: VercelRequest, res?: VercelResponse) {
   await sessions.updateOne({ sessionId }, { $set: { updatedAt: new Date(), expiresAt } })
   if (res) setSessionCookie(res, sessionId)
   return publicUser(user)
+}
+
+function parseUserAgent(userAgent = '') {
+  let browser = 'Unknown'
+  let os = 'Unknown'
+  let device = 'Desktop'
+  if (/Edg/i.test(userAgent)) browser = 'Edge'
+  else if (/Chrome/i.test(userAgent)) browser = 'Chrome'
+  else if (/Firefox/i.test(userAgent)) browser = 'Firefox'
+  else if (/Safari/i.test(userAgent)) browser = 'Safari'
+  if (/Android/i.test(userAgent)) { os = 'Android'; device = 'Android' }
+  else if (/iPhone|iPad/i.test(userAgent)) { os = 'iOS'; device = /iPad/i.test(userAgent) ? 'iPad' : 'iPhone' }
+  else if (/Windows/i.test(userAgent)) os = 'Windows'
+  else if (/Mac/i.test(userAgent)) os = 'macOS'
+  else if (/Linux/i.test(userAgent)) os = 'Linux'
+  return { browser, os, device }
+}
+
+async function logActivity(userId: string, action: string, details: any = {}, req?: VercelRequest) {
+  try {
+    const activity = await mongoCollection('activity_log')
+    await activity.insertOne({
+      userId,
+      action,
+      details,
+      ip: req?.headers['x-forwarded-for']?.toString().split(',')[0] || '',
+      userAgent: req?.headers['user-agent'] || '',
+      createdAt: new Date(),
+    })
+  } catch {}
 }
 
 async function getAuthUser(req: VercelRequest) {
@@ -1036,9 +1067,140 @@ async function handleProfile(req: VercelRequest, res: VercelResponse) {
     const profile = await upsertProfile({ _id: user.id, email: user.email, name: user.name, displayName: user.displayName }, update)
     const users = await mongoCollection('users')
     await users.updateOne({ _id: new ObjectId(user.id) }, { $set: { name: update.name || update.displayName || user.name, displayName: update.displayName || update.name || user.displayName, username: update.username || user.username, updatedAt: new Date() } })
+    await logActivity(user.id, 'profile_updated', { fields: Object.keys(update) }, req)
     return res.json({ success: true, message: 'Profile updated', data: profile })
   }
   res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function handleAccountSummary(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+  const user = await findSessionUser(req, res)
+  if (!user) return res.status(401).json({ error: 'Not authenticated' })
+  const [sessions, activities, accounts, billing, apiKeys] = await Promise.all([
+    getRecentSessions(user.id),
+    getRecentActivity(user.id),
+    getConnectedAccounts(user.id),
+    getBilling(user.id),
+    getApiKeys(user.id),
+  ])
+  res.json({ success: true, data: { sessions, activities, accounts, billing, apiKeys, user } })
+}
+
+async function getRecentSessions(userId: string) {
+  const sessions = await mongoCollection('sessions')
+  const rows = await sessions.find({ userId }).sort({ updatedAt: -1 }).limit(4).toArray()
+  return rows.map((row: any) => ({ id: row.sessionId, ...parseUserAgent(row.userAgent || ''), ip: row.ip || 'Unknown', active: !row.invalidatedAt && row.expiresAt > new Date(), createdAt: row.createdAt, updatedAt: row.updatedAt }))
+}
+
+async function getRecentActivity(userId: string) {
+  const activity = await mongoCollection('activity_log')
+  return activity.find({ userId }).sort({ createdAt: -1 }).limit(20).toArray()
+}
+
+async function getConnectedAccounts(userId: string) {
+  const accounts = await mongoCollection('oauth_accounts')
+  const rows = await accounts.find({ userId }).toArray()
+  const providers = ['google', 'github', 'microsoft', 'email']
+  return providers.map(provider => {
+    const row = rows.find((item: any) => item.provider === provider)
+    return { provider, connected: provider === 'email' || Boolean(row), email: row?.email || '', name: row?.name || '' }
+  })
+}
+
+async function getBilling(userId: string) {
+  const billing = await mongoCollection('billing_accounts')
+  const invoices = await mongoCollection('billing_invoices')
+  let account = await billing.findOne({ userId })
+  if (!account) {
+    account = { userId, plan: 'Free', status: 'active', currency: 'INR', paymentMethods: [], createdAt: new Date(), updatedAt: new Date() }
+    await billing.insertOne(account)
+  }
+  const rows = await invoices.find({ userId }).sort({ createdAt: -1 }).limit(20).toArray()
+  return { account, invoices: rows }
+}
+
+async function getApiKeys(userId: string) {
+  const keys = await mongoCollection('api_keys')
+  const rows = await keys.find({ userId, revokedAt: null }).sort({ createdAt: -1 }).limit(20).toArray()
+  return rows.map((row: any) => ({ id: String(row._id), name: row.name, prefix: row.prefix, createdAt: row.createdAt, lastUsedAt: row.lastUsedAt || null }))
+}
+
+async function handleChangePassword(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const user = await findSessionUser(req, res)
+  if (!user) return res.status(401).json({ error: 'Not authenticated' })
+  const users = await mongoCollection('users')
+  const fullUser = await users.findOne({ _id: new ObjectId(user.id) })
+  if (!fullUser?.passwordHash) return res.status(403).json({ error: 'Password changes are only available for email/password accounts' })
+  const { currentPassword, newPassword } = req.body || {}
+  if (!currentPassword || !newPassword || String(newPassword).length < 8) return res.status(400).json({ error: 'Current password and an 8 character new password are required' })
+  const valid = await bcrypt.compare(currentPassword, fullUser.passwordHash)
+  if (!valid) return res.status(401).json({ error: 'Current password is incorrect' })
+  await users.updateOne({ _id: fullUser._id }, { $set: { passwordHash: await bcrypt.hash(newPassword, 12), updatedAt: new Date() } })
+  await logActivity(user.id, 'password_changed', {}, req)
+  res.json({ success: true, message: 'Password updated' })
+}
+
+async function handleApiKeys(req: VercelRequest, res: VercelResponse) {
+  const user = await findSessionUser(req, res)
+  if (!user) return res.status(401).json({ error: 'Not authenticated' })
+  const keys = await mongoCollection('api_keys')
+  if (req.method === 'GET') return res.json({ success: true, data: await getApiKeys(user.id) })
+  if (req.method === 'POST') {
+    const name = sanitizeText(req.body?.name || 'Terminal key', 80)
+    const raw = `hm_${randomToken(32)}`
+    const prefix = `${raw.slice(0, 9)}...${raw.slice(-4)}`
+    const result = await keys.insertOne({ userId: user.id, name, prefix, keyHash: tokenHash(raw), createdAt: new Date(), lastUsedAt: null, revokedAt: null })
+    await logActivity(user.id, 'api_key_created', { name }, req)
+    return res.status(201).json({ success: true, data: { id: String(result.insertedId), name, prefix, key: raw, createdAt: new Date() } })
+  }
+  res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function handleBilling(req: VercelRequest, res: VercelResponse) {
+  const user = await findSessionUser(req, res)
+  if (!user) return res.status(401).json({ error: 'Not authenticated' })
+  if (req.method === 'GET') return res.json({ success: true, data: await getBilling(user.id) })
+  if (req.method === 'POST') {
+    const method = String(req.body?.method || '')
+    if (!['card', 'upi', 'bank_transfer'].includes(method)) return res.status(400).json({ error: 'Payment method must be card, upi, or bank_transfer' })
+    const billing = await mongoCollection('billing_accounts')
+    const label = method === 'card' ? `Card ending ${String(req.body?.last4 || '4242').slice(-4)}` : method === 'upi' ? `UPI ${sanitizeText(req.body?.upi || 'demo@upi', 80)}` : 'Bank transfer'
+    await billing.updateOne({ userId: user.id }, { $push: { paymentMethods: { method, label, addedAt: new Date() } }, $set: { updatedAt: new Date() }, $setOnInsert: { plan: 'Free', status: 'active', currency: 'INR', createdAt: new Date() } }, { upsert: true })
+    await logActivity(user.id, 'payment_method_added', { method }, req)
+    return res.json({ success: true, data: await getBilling(user.id) })
+  }
+  res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function handleAssignBill(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!user || user.role !== 'admin') return res.status(401).json({ error: 'Admin access required' })
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const email = cleanEmail(req.body?.email)
+  const users = await mongoCollection('users')
+  const target = await users.findOne({ email })
+  if (!target) return res.status(404).json({ error: 'User not found' })
+  const amount = Number(req.body?.amount || 0)
+  const invoices = await mongoCollection('billing_invoices')
+  const invoice = { userId: String(target._id), email, number: `INV-${Date.now()}`, title: sanitizeText(req.body?.title || 'Service bill', 120), amount, currency: req.body?.currency || 'INR', status: 'due', dueDate: req.body?.dueDate || null, createdAt: new Date(), updatedAt: new Date() }
+  const result = await invoices.insertOne(invoice)
+  await logActivity(String(target._id), 'bill_assigned', { invoice: invoice.number, amount }, req)
+  res.status(201).json({ success: true, data: { ...invoice, _id: result.insertedId } })
+}
+
+async function handleInvoicePdf(req: VercelRequest, res: VercelResponse, id: string) {
+  const user = await findSessionUser(req, res)
+  if (!user) return res.status(401).json({ error: 'Not authenticated' })
+  const invoices = await mongoCollection('billing_invoices')
+  const invoice = ObjectId.isValid(id) ? await invoices.findOne({ _id: new ObjectId(id), userId: user.id }) : await invoices.findOne({ number: id, userId: user.id })
+  if (!invoice) return res.status(404).json({ error: 'Invoice not found' })
+  const text = `HMorix Invoice\n\nInvoice: ${invoice.number}\nTitle: ${invoice.title}\nAmount: ${invoice.currency} ${invoice.amount}\nStatus: ${invoice.status}\nCustomer: ${user.email}\nDate: ${new Date(invoice.createdAt).toLocaleDateString()}`
+  const pdf = Buffer.from(`%PDF-1.4\n1 0 obj<<>>endobj\n2 0 obj<< /Length ${text.length + 80} >>stream\nBT /F1 18 Tf 72 740 Td (${text.replace(/[()]/g, '')}) Tj ET\nendstream endobj\n3 0 obj<< /Type /Page /Parent 4 0 R /Contents 2 0 R >>endobj\n4 0 obj<< /Type /Pages /Kids [3 0 R] /Count 1 >>endobj\n5 0 obj<< /Type /Catalog /Pages 4 0 R >>endobj\ntrailer<< /Root 5 0 R >>\n%%EOF`)
+  res.setHeader('Content-Type', 'application/pdf')
+  res.setHeader('Content-Disposition', `attachment; filename="${invoice.number}.pdf"`)
+  res.end(pdf)
 }
 
 function sanitizeText(value: string, max = 160) {
@@ -1118,6 +1280,14 @@ async function handleUpload(req: VercelRequest, res: VercelResponse) {
   if (!allowed.has(parsed.mime)) return res.status(400).json({ error: 'Unsupported file type' })
   const upload = await uploadBufferToStorage(parsed.file, parsed.mime, folderMap[kind] || `attachments/${user.id}`, parsed.filename)
   if (parsed.oldPath) await deleteStoragePath(parsed.oldPath)
+  if (kind === 'avatar' || kind === 'profile') {
+    await upsertProfile({ _id: user.id, email: user.email, name: user.name, displayName: user.displayName }, { avatarUrl: upload.url, avatarPath: upload.path })
+    await logActivity(user.id, 'profile_picture_changed', { path: upload.path }, req)
+  }
+  if (kind === 'cover') {
+    await upsertProfile({ _id: user.id, email: user.email, name: user.name, displayName: user.displayName }, { coverImageUrl: upload.url, coverImagePath: upload.path })
+    await logActivity(user.id, 'cover_image_changed', { path: upload.path }, req)
+  }
   return res.json({ success: true, url: upload.url, path: upload.path, publicUrl: upload.url })
 }
 
@@ -1239,6 +1409,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'contact': return handleContact(req, res)
       case 'notifications': return handleNotifications(req, res)
       case 'profile': return handleProfile(req, res)
+      case 'account/summary': return handleAccountSummary(req, res)
+      case 'account/change-password': return handleChangePassword(req, res)
+      case 'account/api-keys': return handleApiKeys(req, res)
+      case 'account/billing': return handleBilling(req, res)
+      case 'employee/assign-bill': return handleAssignBill(req, res)
       case 'upload': return handleUpload(req, res)
       case 'projects': return handleProjects(req, res)
       case 'invoices': return handleInvoices(req, res)
@@ -1257,6 +1432,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (routePath.startsWith('blogs/')) {
           const slug = routePath.replace('blogs/', '')
           return handleBlogSlug(req, res, slug)
+        }
+        if (routePath.startsWith('account/billing/invoices/') && routePath.endsWith('/pdf')) {
+          const id = routePath.replace('account/billing/invoices/', '').replace('/pdf', '')
+          return handleInvoicePdf(req, res, id)
         }
         return res.status(404).json({ error: 'Not found', path: routePath })
     }

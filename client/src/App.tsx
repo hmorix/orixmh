@@ -31,6 +31,7 @@ import PDFTemplates from './pages/products/PDFTemplates'
 import Developers from './pages/Developers'
 import Playground from './pages/Playground'
 import SmartHome from './pages/SmartHome'
+import HarshSharma from './pages/HarshSharma'
 import Dashboard from './pages/Dashboard'
 import Architecture from './pages/Architecture'
 import Careers from './pages/Careers'
@@ -61,6 +62,7 @@ import EmployeePortal from './pages/employee/EmployeePortal'
 import Directory from './pages/employee/Directory'
 import Requests from './pages/employee/Requests'
 import Tasks from './pages/employee/Tasks'
+import BillingAssignment from './pages/employee/BillingAssignment'
 import SignIn from './pages/auth/SignIn'
 import SignUp from './pages/auth/SignUp'
 import ForgotPassword from './pages/auth/ForgotPassword'
@@ -189,6 +191,7 @@ function App() {
           <Route path="/developers" element={<Developers />} />
           <Route path="/playground" element={<Playground />} />
           <Route path="/smart-home" element={<SmartHome />} />
+          <Route path="/harsh-sharma" element={<HarshSharma />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/architecture" element={<Architecture />} />
           <Route path="/activity" element={<ActivityFeed />} />
@@ -242,6 +245,7 @@ function App() {
           <Route path="/employee/directory" element={<Directory />} />
           <Route path="/employee/requests" element={<Requests />} />
           <Route path="/employee/tasks" element={<Tasks />} />
+          <Route path="/employee/billing" element={<BillingAssignment />} />
           <Route path="*" element={<NotFound />} />
         </Route>
 

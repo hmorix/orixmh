@@ -166,15 +166,16 @@ export default function EmployeePortal() {
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { label: 'Payslips', icon: FileText },
+                    { label: 'Assign Bills', icon: FileText, to: '/employee/billing' },
                     { label: 'Benefits', icon: Award },
                     { label: 'Directory', icon: Users },
                     { label: 'IT Support', icon: MessageSquare },
                     { label: 'Policies', icon: Briefcase },
                     { label: 'Training', icon: TrendingUp },
                   ].map((link, i) => (
-                    <button key={i} className="flex items-center gap-2 p-2 text-xs text-cream/40 hover:text-cream hover:bg-white/[0.04] rounded-[4px] transition-all">
+                    <Link key={i} to={(link as any).to || '#'} className="flex items-center gap-2 p-2 text-xs text-cream/40 hover:text-cream hover:bg-white/[0.04] rounded-[4px] transition-all">
                       <link.icon size={12} />{link.label}
-                    </button>
+                    </Link>
                   ))}
                 </div>
               </div>
