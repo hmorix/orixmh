@@ -645,27 +645,32 @@ async function upsertProfile(user: any, data: any = {}) {
   const update: any = {
     userId,
     email: user.email,
-    name: data.name ?? data.displayName ?? user.name ?? '',
-    displayName: data.displayName ?? data.name ?? user.displayName ?? user.name ?? '',
-    username: data.username ?? user.username ?? undefined,
-    bio: data.bio ?? '',
-    phone: data.phone ?? '',
-    company: data.company ?? user.company ?? '',
-    country: data.country ?? '',
-    location: data.location ?? '',
-    website: data.website ?? '',
-    socialLinks: data.socialLinks ?? data.social_links ?? {},
-    theme: data.theme ?? 'dark',
-    avatarUrl: data.avatarUrl ?? data.avatar_url ?? '',
-    avatarPath: data.avatarPath ?? '',
-    coverImageUrl: data.coverImageUrl ?? data.cover_image_url ?? '',
-    coverImagePath: data.coverImagePath ?? '',
     updatedAt: now,
   }
+  const fields: Record<string, any> = {
+    name: data.name ?? data.displayName,
+    displayName: data.displayName ?? data.name,
+    username: data.username,
+    bio: data.bio,
+    phone: data.phone,
+    company: data.company,
+    country: data.country,
+    location: data.location,
+    website: data.website,
+    socialLinks: data.socialLinks ?? data.social_links,
+    theme: data.theme,
+    avatarUrl: data.avatarUrl ?? data.avatar_url,
+    avatarPath: data.avatarPath,
+    coverImageUrl: data.coverImageUrl ?? data.cover_image_url,
+    coverImagePath: data.coverImagePath,
+  }
+  Object.entries(fields).forEach(([key, value]) => {
+    if (value !== undefined) update[key] = value
+  })
   Object.keys(update).forEach(key => update[key] === undefined && delete update[key])
   await profiles.updateOne(
     { userId },
-    { $set: update, $setOnInsert: { createdAt: now } },
+    { $set: update, $setOnInsert: { createdAt: now, name: user.name || '', displayName: user.displayName || user.name || '', bio: '', phone: '', company: user.company || '', country: '', location: '', website: '', socialLinks: {}, theme: 'dark', avatarUrl: '', avatarPath: '', coverImageUrl: '', coverImagePath: '' } },
     { upsert: true }
   )
   return profiles.findOne({ userId })
@@ -1066,7 +1071,11 @@ async function handleProfile(req: VercelRequest, res: VercelResponse) {
     }
     const profile = await upsertProfile({ _id: user.id, email: user.email, name: user.name, displayName: user.displayName }, update)
     const users = await mongoCollection('users')
-    await users.updateOne({ _id: new ObjectId(user.id) }, { $set: { name: update.name || update.displayName || user.name, displayName: update.displayName || update.name || user.displayName, username: update.username || user.username, updatedAt: new Date() } })
+    const userUpdate: any = { updatedAt: new Date() }
+    if (update.name || update.displayName) userUpdate.name = update.name || update.displayName
+    if (update.displayName || update.name) userUpdate.displayName = update.displayName || update.name
+    if (update.username) userUpdate.username = update.username
+    await users.updateOne({ _id: new ObjectId(user.id) }, { $set: userUpdate })
     await logActivity(user.id, 'profile_updated', { fields: Object.keys(update) }, req)
     return res.json({ success: true, message: 'Profile updated', data: profile })
   }

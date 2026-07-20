@@ -50,7 +50,7 @@ async function apiRequest(url: string, options: RequestInit = {}) {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null)
   const [session, setSession] = useState<AppSession | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading] = useState(false)
 
   useEffect(() => {
     apiRequest(api.auth.me)
@@ -63,7 +63,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null)
         setSession(null)
       })
-      .finally(() => setLoading(false))
   }, [])
 
   const signUp = async (email: string, password: string, metadata?: { name?: string; company?: string }) => {
