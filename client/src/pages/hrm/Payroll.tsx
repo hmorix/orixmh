@@ -144,7 +144,7 @@ export default function Payroll() {
                   <tr key={emp.employeeId || emp.id || index} className="border-b border-glass-border/50 hover:bg-white/[0.02]">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-obsidian-3 rounded-full flex items-center justify-center text-[10px] font-bold">{emp.name.split(' ').map(n => n[0]).join('')}</div>
+                        <div className="w-8 h-8 bg-obsidian-3 rounded-full flex items-center justify-center text-[10px] font-bold">{emp.name.split(' ').map((n: string) => n[0]).join('')}</div>
                         <div>
                           <div className="font-medium">{emp.name}</div>
                           <div className="text-[10px] text-cream/30">{emp.role}</div>

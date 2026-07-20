@@ -175,7 +175,7 @@ export default function HRMDashboard() {
             <div className="space-y-3">
               {liveRecentHires.map((hire: any, i: number) => (
                 <div key={i} className="flex items-center gap-3 p-3 bg-obsidian border border-glass-border rounded-[8px]">
-                  <div className="w-10 h-10 bg-obsidian-3 rounded-full flex items-center justify-center text-xs font-bold">{hire.name.split(' ').map(n => n[0]).join('')}</div>
+                  <div className="w-10 h-10 bg-obsidian-3 rounded-full flex items-center justify-center text-xs font-bold">{hire.name.split(' ').map((n: string) => n[0]).join('')}</div>
                   <div className="flex-1">
                     <div className="text-sm font-medium">{hire.name}</div>
                     <div className="text-[10px] text-cream/30">{hire.role} · {hire.department}</div>
@@ -195,7 +195,7 @@ export default function HRMDashboard() {
             <div className="space-y-3">
               {liveUpcomingReviews.map((review: any, i: number) => (
                 <div key={i} className="flex items-center gap-3 p-3 bg-obsidian border border-glass-border rounded-[8px]">
-                  <div className="w-10 h-10 bg-obsidian-3 rounded-full flex items-center justify-center text-xs font-bold">{review.name.split(' ').map(n => n[0]).join('')}</div>
+                  <div className="w-10 h-10 bg-obsidian-3 rounded-full flex items-center justify-center text-xs font-bold">{review.name.split(' ').map((n: string) => n[0]).join('')}</div>
                   <div className="flex-1">
                     <div className="text-sm font-medium">{review.name}</div>
                     <div className="text-[10px] text-cream/30">{review.department}</div>
