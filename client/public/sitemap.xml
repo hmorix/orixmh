@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://orixmh.vercel.app/</loc><priority>1.0</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/about</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/services</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/services/web-design</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/services/mobile-apps</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/services/digital-marketing</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/services/ai-solutions</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/services/software-development</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/services/advertising</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/services/ecommerce</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/billingflow</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/billingflow/features</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/billingflow/pricing</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/billingflow/docs</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/agent</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/pdf-automation</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/smart-home</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/developers</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/security</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/trust</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/compliance</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/blog</loc><priority>0.8</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/case-studies</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/whitepapers</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/certifications</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/careers</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/contact</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/pricing</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/faq</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/harsh-sharma</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/terms</loc><priority>0.3</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/privacy</loc><priority>0.3</priority><changefreq>yearly</changefreq></url>
+</urlset>

@@ -1,8 +1,10 @@
-# HMorix Platform - robots.txt
-# Generated for SEO optimization
-
 User-agent: *
 Allow: /
+Allow: /sitemap.xml
+Allow: /manifest.webmanifest
+Allow: /site.webmanifest
+Allow: /security.txt
+Allow: /.well-known/security.txt
 Disallow: /admin
 Disallow: /api
 Disallow: /settings
@@ -12,18 +14,15 @@ Disallow: /portal
 Disallow: /employee
 Disallow: /crm
 Disallow: /hrm
+Disallow: /retry
 Disallow: /*.json
-Disallow: /*.xml
 Disallow: /*?*
 Disallow: /*#*
 
-# Crawl delay
 Crawl-delay: 1
 
-# Sitemap
-Sitemap: https://orix-pink.vercel.app/sitemap.xml
+Sitemap: https://orixmh.vercel.app/sitemap.xml
 
-# Specific rules for search engines
 User-agent: Googlebot
 Allow: /
 Crawl-delay: 0

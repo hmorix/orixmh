@@ -1,0 +1,18 @@
+# HMorix
+
+HMorix provides enterprise AI software, web design, mobile app development, digital marketing, SEO, advertising automation, cybersecurity, cloud automation, PDF automation, billing software, developer tools, and smart home technology services.
+
+## Important Pages
+
+- Home: https://orixmh.vercel.app/
+- Services: https://orixmh.vercel.app/services
+- Web Design: https://orixmh.vercel.app/services/web-design
+- Mobile Apps: https://orixmh.vercel.app/services/mobile-apps
+- Digital Marketing: https://orixmh.vercel.app/services/digital-marketing
+- AI Solutions: https://orixmh.vercel.app/services/ai-solutions
+- Software Development: https://orixmh.vercel.app/services/software-development
+- BillingFlow: https://orixmh.vercel.app/billingflow
+- AI Agent: https://orixmh.vercel.app/agent
+- PDF Automation: https://orixmh.vercel.app/pdf-automation
+- Security: https://orixmh.vercel.app/security
+- Contact: https://orixmh.vercel.app/contact
