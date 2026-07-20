@@ -1,19 +1,35 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Mail, Phone } from 'lucide-react'
+import { Loader2, Search, Mail, Phone } from 'lucide-react'
+import { config } from '../../lib/config'
 
 export default function SearchAccount() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<any[]>([])
   const [searched, setSearched] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
     setSearched(true)
-    if (query.includes('@')) {
-      setResults([{ email: query, name: 'Account Found', method: 'email' }])
-    } else {
+    setLoading(true)
+    setError('')
+    try {
+      const response = await fetch(`${config.apiUrl}/auth/search-account`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(data.error || 'Unable to search account')
+      setResults(data.results || [])
+    } catch (err) {
       setResults([])
+      setError(err instanceof Error ? err.message : 'Unable to search account')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -35,8 +51,13 @@ export default function SearchAccount() {
               <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-cream/30" />
               <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Email address or phone number" className="w-full pl-10 pr-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00] placeholder:text-cream/30" />
             </div>
-            <button type="submit" className="btn-primary w-full">Search</button>
+            <button type="submit" disabled={loading} className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-60">
+              {loading && <Loader2 size={16} className="animate-spin" />}
+              {loading ? 'Searching...' : 'Search'}
+            </button>
           </form>
+
+          {error && <div className="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-[4px] text-sm text-red-400">{error}</div>}
 
           {searched && (
             <div className="mt-6">
@@ -53,9 +74,10 @@ export default function SearchAccount() {
                             {r.method === 'email' ? <Mail size={10} /> : <Phone size={10} />}
                             {r.email || r.phone}
                           </div>
+                          {r.providers?.length > 0 && <div className="text-[11px] text-cream/30 mt-1">Connected: {r.providers.join(', ')}</div>}
                         </div>
                       </div>
-                      <Link to="/forgot-password" className="block mt-3 text-center text-xs text-[#C8FF00] hover:underline">Send recovery link</Link>
+                      <Link to={`/forgot-password?email=${encodeURIComponent(query.includes('@') ? query : '')}`} className="block mt-3 text-center text-xs text-[#C8FF00] hover:underline">Send recovery OTP</Link>
                     </div>
                   ))}
                 </div>

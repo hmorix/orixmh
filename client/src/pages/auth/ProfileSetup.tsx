@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Upload, Loader2, AlertCircle } from 'lucide-react'
 import { useAuth } from '../../lib/AuthContext'
-import { supabase } from '../../lib/supabase'
-import { api } from '../../lib/config'
+import { api, config } from '../../lib/config'
 
 const MAX_FILE_SIZE = 1.5 * 1024 * 1024 // 1.5 MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -70,34 +69,34 @@ export default function ProfileSetup() {
 
       // Upload avatar if provided
       if (avatarFile) {
-        const fileName = `${user.id}-${Date.now()}.${avatarFile.type.split('/')[1]}`
-        const { data, error: uploadError } = await supabase.storage
-          .from('avatars')
-          .upload(fileName, avatarFile, { upsert: true })
-
-        if (uploadError) throw uploadError
-
-        const { data: publicData } = supabase.storage
-          .from('avatars')
-          .getPublicUrl(fileName)
-
-        avatarUrl = publicData.publicUrl
+        const uploadBody = new FormData()
+        uploadBody.append('file', avatarFile)
+        uploadBody.append('kind', 'avatar')
+        const uploadResponse = await fetch(`${config.apiUrl}/upload`, {
+          method: 'POST',
+          credentials: 'include',
+          body: uploadBody,
+        })
+        const uploadData = await uploadResponse.json().catch(() => ({}))
+        if (!uploadResponse.ok) throw new Error(uploadData.error || 'Failed to upload profile picture')
+        avatarUrl = uploadData.url || uploadData.publicUrl
       }
 
       // Update profile via API
       const response = await fetch(api.profile.update, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
         },
         body: JSON.stringify({
           name: formData.fullName,
+          displayName: formData.fullName,
           username: formData.username,
           bio: formData.bio,
           country: formData.country,
-          avatar_url: avatarUrl,
-          social_links: {
+          ...(avatarUrl ? { avatarUrl } : {}),
+          socialLinks: {
             twitter: formData.twitter,
             linkedin: formData.linkedin,
             github: formData.github,

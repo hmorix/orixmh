@@ -672,9 +672,29 @@ async function upsertProfile(user: any, data: any = {}) {
     if (value !== undefined) update[key] = value
   })
   Object.keys(update).forEach(key => update[key] === undefined && delete update[key])
+  const insertDefaults: Record<string, any> = {
+    createdAt: now,
+    name: user.name || '',
+    displayName: user.displayName || user.name || '',
+    bio: '',
+    phone: '',
+    company: user.company || '',
+    country: '',
+    location: '',
+    website: '',
+    socialLinks: {},
+    theme: 'dark',
+    avatarUrl: '',
+    avatarPath: '',
+    coverImageUrl: '',
+    coverImagePath: '',
+  }
+  Object.keys(update).forEach(key => {
+    delete insertDefaults[key]
+  })
   await profiles.updateOne(
     { userId },
-    { $set: update, $setOnInsert: { createdAt: now, name: user.name || '', displayName: user.displayName || user.name || '', bio: '', phone: '', company: user.company || '', country: '', location: '', website: '', socialLinks: {}, theme: 'dark', avatarUrl: '', avatarPath: '', coverImageUrl: '', coverImagePath: '' } },
+    { $set: update, $setOnInsert: insertDefaults },
     { upsert: true }
   )
   return profiles.findOne({ userId })
@@ -768,6 +788,67 @@ async function handleForgotPassword(req: VercelRequest, res: VercelResponse) {
   if (!email) return res.status(400).json({ error: 'Email is required' })
   await sendOtp(email, 'forgot_password')
   return res.json({ success: true, message: 'If the account exists, a reset OTP has been sent.' })
+}
+
+async function handleResetPassword(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const email = cleanEmail(req.body?.email)
+  const code = String(req.body?.code || '').trim()
+  const password = String(req.body?.password || '')
+  if (!email || !/^\d{6}$/.test(code)) return res.status(400).json({ error: 'A valid email and 6 digit OTP are required' })
+  if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' })
+
+  const records = await mongoCollection('otp_records')
+  const record = await records.findOne({ email, purpose: 'forgot_password', usedAt: null, expiresAt: { $gt: new Date() } }, { sort: { createdAt: -1 } })
+  if (!record) return res.status(400).json({ error: 'OTP is invalid or expired' })
+  if (record.attempts >= record.maxAttempts) return res.status(429).json({ error: 'OTP retry limit exceeded' })
+  if (record.otpHash !== tokenHash(code)) {
+    await records.updateOne({ _id: record._id }, { $inc: { attempts: 1 } })
+    return res.status(400).json({ error: 'OTP is invalid' })
+  }
+
+  const users = await mongoCollection('users')
+  const user = await users.findOne({ email })
+  if (user?.passwordHash) {
+    await users.updateOne(
+      { _id: user._id },
+      { $set: { passwordHash: await bcrypt.hash(password, 12), updatedAt: new Date() }, $addToSet: { providers: 'email' } }
+    )
+    await logActivity(String(user._id), 'password_reset', {}, req)
+  }
+  await records.updateOne({ _id: record._id }, { $set: { usedAt: new Date() } })
+  return res.json({ success: true, message: 'Password reset successfully. Please sign in again.' })
+}
+
+async function handleSearchAccount(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const query = String(req.body?.query || '').trim()
+  if (query.length < 3) return res.status(400).json({ error: 'Enter an email address or phone number' })
+  const users = await mongoCollection('users')
+  const profiles = await mongoCollection('profiles')
+  let user: any = null
+  let profile: any = null
+  if (query.includes('@')) {
+    user = await users.findOne({ email: cleanEmail(query) })
+    if (user) profile = await profiles.findOne({ userId: String(user._id) })
+  } else {
+    profile = await profiles.findOne({ phone: sanitizeText(query, 40) })
+    if (profile?.userId) user = await users.findOne({ _id: new ObjectId(profile.userId) })
+  }
+  if (!user) return res.json({ success: true, found: false, results: [] })
+  const email = String(user.email || '')
+  const [local, domain] = email.split('@')
+  const maskedEmail = domain ? `${local.slice(0, 2)}${local.length > 2 ? '***' : '*'}@${domain}` : ''
+  return res.json({
+    success: true,
+    found: true,
+    results: [{
+      email: maskedEmail,
+      name: profile?.displayName || user.displayName || user.name || 'HMorix account',
+      method: user.passwordHash ? 'email' : (user.providers?.[0] || 'oauth'),
+      providers: user.providers || [],
+    }],
+  })
 }
 
 async function handleOAuthStart(req: VercelRequest, res: VercelResponse, provider: 'google' | 'github') {
@@ -1443,6 +1524,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'auth/otp/request': return handleOtpRequest(req, res)
       case 'auth/otp/verify': return handleOtpVerify(req, res)
       case 'auth/forgot-password': return handleForgotPassword(req, res)
+      case 'auth/reset-password': return handleResetPassword(req, res)
+      case 'auth/search-account': return handleSearchAccount(req, res)
       case 'auth/google': return handleOAuthStart(req, res, 'google')
       case 'auth/google/callback': return handleOAuthCallback(req, res, 'google')
       case 'auth/github': return handleOAuthStart(req, res, 'github')
