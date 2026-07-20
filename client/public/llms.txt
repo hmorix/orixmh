@@ -2,6 +2,8 @@
 
 HMorix provides enterprise AI software, web design, mobile app development, digital marketing, SEO, advertising automation, cybersecurity, cloud automation, PDF automation, billing software, developer tools, and smart home technology services.
 
+Primary service locations include Hathras, Mathura, Aligarh, Agra, Vrindavan, Delhi, Noida, Mumbai, and Bengaluru.
+
 ## Important Pages
 
 - Home: https://orixmh.vercel.app/
@@ -16,3 +18,10 @@ HMorix provides enterprise AI software, web design, mobile app development, digi
 - PDF Automation: https://orixmh.vercel.app/pdf-automation
 - Security: https://orixmh.vercel.app/security
 - Contact: https://orixmh.vercel.app/contact
+- Harsh Sharma: https://orixmh.vercel.app/harsh-sharma
+- Web App Development in Hathras: https://orixmh.vercel.app/locations/hathras/web-app-development
+- AI Integration in Hathras: https://orixmh.vercel.app/locations/hathras/ai-integration
+- SEO Services in Mathura: https://orixmh.vercel.app/locations/mathura/seo
+- Software Development in Aligarh: https://orixmh.vercel.app/locations/aligarh/software
+- Web App Development in Agra: https://orixmh.vercel.app/locations/agra/web-app-development
+- Hosting in Vrindavan: https://orixmh.vercel.app/locations/vrindavan/hosting

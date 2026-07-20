@@ -11,6 +11,8 @@ interface SEOHeadProps {
 
 export default function SEOHead({ title, description, keywords, canonical, ogImage, type = 'website' }: SEOHeadProps) {
   useEffect(() => {
+    const siteUrl = import.meta.env.VITE_APP_URL || 'https://orixmh.vercel.app'
+    const pageUrl = `${siteUrl.replace(/\/$/, '')}${canonical || ''}`
     document.title = `${title} | HMorix`
     
     const setMeta = (name: string, content: string, property = false) => {
@@ -29,7 +31,7 @@ export default function SEOHead({ title, description, keywords, canonical, ogIma
     setMeta('og:title', `${title} | HMorix`, true)
     setMeta('og:description', description, true)
     setMeta('og:type', type, true)
-    setMeta('og:url', `https://hmorix.com${canonical || ''}`, true)
+    setMeta('og:url', pageUrl, true)
     if (ogImage) setMeta('og:image', ogImage, true)
     setMeta('twitter:title', `${title} | HMorix`, true)
     setMeta('twitter:description', description, true)
@@ -41,7 +43,7 @@ export default function SEOHead({ title, description, keywords, canonical, ogIma
         link.rel = 'canonical'
         document.head.appendChild(link)
       }
-      link.href = `https://hmorix.com${canonical}`
+      link.href = pageUrl
     }
   }, [title, description, keywords, canonical, ogImage, type])
 
