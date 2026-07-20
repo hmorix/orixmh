@@ -1111,10 +1111,11 @@ async function getConnectedAccounts(userId: string) {
 async function getBilling(userId: string) {
   const billing = await mongoCollection('billing_accounts')
   const invoices = await mongoCollection('billing_invoices')
-  let account = await billing.findOne({ userId })
+  let account: any = await billing.findOne({ userId })
   if (!account) {
-    account = { userId, plan: 'Free', status: 'active', currency: 'INR', paymentMethods: [], createdAt: new Date(), updatedAt: new Date() }
-    await billing.insertOne(account)
+    const defaultAccount = { userId, plan: 'Free', status: 'active', currency: 'INR', paymentMethods: [], createdAt: new Date(), updatedAt: new Date() }
+    const result = await billing.insertOne(defaultAccount)
+    account = { ...defaultAccount, _id: result.insertedId }
   }
   const rows = await invoices.find({ userId }).sort({ createdAt: -1 }).limit(20).toArray()
   return { account, invoices: rows }
@@ -1167,7 +1168,7 @@ async function handleBilling(req: VercelRequest, res: VercelResponse) {
     if (!['card', 'upi', 'bank_transfer'].includes(method)) return res.status(400).json({ error: 'Payment method must be card, upi, or bank_transfer' })
     const billing = await mongoCollection('billing_accounts')
     const label = method === 'card' ? `Card ending ${String(req.body?.last4 || '4242').slice(-4)}` : method === 'upi' ? `UPI ${sanitizeText(req.body?.upi || 'demo@upi', 80)}` : 'Bank transfer'
-    await billing.updateOne({ userId: user.id }, { $push: { paymentMethods: { method, label, addedAt: new Date() } }, $set: { updatedAt: new Date() }, $setOnInsert: { plan: 'Free', status: 'active', currency: 'INR', createdAt: new Date() } }, { upsert: true })
+    await billing.updateOne({ userId: user.id }, { $push: { paymentMethods: { method, label, addedAt: new Date() } } as any, $set: { updatedAt: new Date() }, $setOnInsert: { plan: 'Free', status: 'active', currency: 'INR', createdAt: new Date() } }, { upsert: true })
     await logActivity(user.id, 'payment_method_added', { method }, req)
     return res.json({ success: true, data: await getBilling(user.id) })
   }
@@ -1281,11 +1282,11 @@ async function handleUpload(req: VercelRequest, res: VercelResponse) {
   const upload = await uploadBufferToStorage(parsed.file, parsed.mime, folderMap[kind] || `attachments/${user.id}`, parsed.filename)
   if (parsed.oldPath) await deleteStoragePath(parsed.oldPath)
   if (kind === 'avatar' || kind === 'profile') {
-    await upsertProfile({ _id: user.id, email: user.email, name: user.name, displayName: user.displayName }, { avatarUrl: upload.url, avatarPath: upload.path })
+    await upsertProfile({ _id: user.id, email: user.email, name: user.name, displayName: (user as any).displayName || user.name }, { avatarUrl: upload.url, avatarPath: upload.path })
     await logActivity(user.id, 'profile_picture_changed', { path: upload.path }, req)
   }
   if (kind === 'cover') {
-    await upsertProfile({ _id: user.id, email: user.email, name: user.name, displayName: user.displayName }, { coverImageUrl: upload.url, coverImagePath: upload.path })
+    await upsertProfile({ _id: user.id, email: user.email, name: user.name, displayName: (user as any).displayName || user.name }, { coverImageUrl: upload.url, coverImagePath: upload.path })
     await logActivity(user.id, 'cover_image_changed', { path: upload.path }, req)
   }
   return res.json({ success: true, url: upload.url, path: upload.path, publicUrl: upload.url })
@@ -1324,8 +1325,49 @@ async function handleTickets(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleSettings(req: VercelRequest, res: VercelResponse) {
-  if (req.method === 'GET') return res.json({ success: true, data: { theme: 'dark', accent_color: '#C8FF00', language: 'en-US', timezone: 'America/Los_Angeles', date_format: 'MM/DD/YYYY', currency: 'USD', email_notifications: true, push_notifications: true, security_alerts: true, product_updates: false, weekly_digest: true, sidebar_expanded: true, font_size: 14 } })
-  if (req.method === 'PUT') return res.json({ success: true, message: 'Settings updated' })
+  const user = await findSessionUser(req, res)
+  if (!user) return res.status(401).json({ error: 'Not authenticated' })
+  const settings = await mongoCollection('user_settings')
+  const defaults = {
+    userId: user.id,
+    displayName: user.name || '',
+    username: (user as any).username || '',
+    email: user.email,
+    company: '',
+    emailNotifications: true,
+    pushNotifications: true,
+    securityAlerts: true,
+    productUpdates: false,
+    marketingEmails: false,
+    weeklyDigest: true,
+    ticketUpdates: true,
+    invoiceReminders: true,
+    theme: 'dark',
+    accentColor: '#C8FF00',
+    fontSize: 14,
+    sidebarExpanded: true,
+    language: 'en-US',
+    timezone: 'Asia/Kolkata',
+    dateFormat: 'DD/MM/YYYY',
+    currency: 'INR',
+    storageLimitGb: 10,
+    integrations: {},
+  }
+  if (req.method === 'GET') {
+    const saved = await settings.findOne({ userId: user.id })
+    return res.json({ success: true, data: { ...defaults, ...(saved || {}) } })
+  }
+  if (req.method === 'PUT') {
+    const allowed = ['displayName', 'username', 'company', 'emailNotifications', 'pushNotifications', 'securityAlerts', 'productUpdates', 'marketingEmails', 'weeklyDigest', 'ticketUpdates', 'invoiceReminders', 'theme', 'accentColor', 'fontSize', 'sidebarExpanded', 'language', 'timezone', 'dateFormat', 'currency', 'integrations']
+    const update: any = {}
+    for (const key of allowed) if (req.body?.[key] !== undefined) update[key] = req.body[key]
+    await settings.updateOne({ userId: user.id }, { $set: { ...update, userId: user.id, updatedAt: new Date() }, $setOnInsert: { createdAt: new Date() } }, { upsert: true })
+    if (update.displayName || update.username || update.company) {
+      await upsertProfile({ _id: user.id, email: user.email, name: user.name, displayName: (user as any).displayName || user.name }, { displayName: update.displayName, username: update.username, company: update.company })
+    }
+    await logActivity(user.id, 'settings_updated', { fields: Object.keys(update) }, req)
+    return res.json({ success: true, data: await settings.findOne({ userId: user.id }), message: 'Settings updated' })
+  }
   res.status(405).json({ error: 'Method not allowed' })
 }
 

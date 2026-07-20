@@ -1,104 +1,95 @@
 import { Routes, Route } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { lazy, Suspense, useState, useEffect } from 'react'
 import { useAuth } from './lib/AuthContext'
 import MainLayout from './layouts/MainLayout'
-import Home from './pages/Home'
-import About from './pages/About'
-import Services from './pages/Services'
-import Pricing from './pages/Pricing'
-import Contact from './pages/Contact'
-import Security from './pages/Security'
-import Status from './pages/Status'
-import Trust from './pages/Trust'
-import Compliance from './pages/Compliance'
-import BillingFlow from './pages/products/BillingFlow'
-import BillingFlowFeatures from './pages/products/BillingFlowFeatures'
-import BillingFlowPricing from './pages/products/BillingFlowPricing'
-import BillingFlowDocs from './pages/products/BillingFlowDocs'
-import BillingFlowAPI from './pages/products/BillingFlowAPI'
-import BillingFlowDemo from './pages/products/BillingFlowDemo'
-import BillingFlowChangelog from './pages/products/BillingFlowChangelog'
-import AIAgent from './pages/products/AIAgent'
-import AIAgentPlayground from './pages/products/AIAgentPlayground'
-import AIAgentDocs from './pages/products/AIAgentDocs'
-import AIAgentTemplates from './pages/products/AIAgentTemplates'
-import AIAgentWorkflows from './pages/products/AIAgentWorkflows'
-import AIAgentExamples from './pages/products/AIAgentExamples'
-import PDFAutomation from './pages/products/PDFAutomation'
-import PDFDocs from './pages/products/PDFDocs'
-import PDFDemo from './pages/products/PDFDemo'
-import PDFTemplates from './pages/products/PDFTemplates'
-import Developers from './pages/Developers'
-import Playground from './pages/Playground'
-import SmartHome from './pages/SmartHome'
-import HarshSharma from './pages/HarshSharma'
-import Dashboard from './pages/Dashboard'
-import Architecture from './pages/Architecture'
-import Careers from './pages/Careers'
-import Investors from './pages/Investors'
-import Partners from './pages/Partners'
-import Roadmap from './pages/Roadmap'
-import KnowledgeBase from './pages/KnowledgeBase'
-import Support from './pages/Support'
-import Profile from './pages/Profile'
-import Retry from './pages/Retry'
-import NotFound from './pages/NotFound'
-import Settings from './pages/settings/Settings'
-import ClientPortal from './pages/portal/ClientPortal'
-import CaseStudies from './pages/CaseStudies'
-import Whitepapers from './pages/Whitepapers'
-import MediaKit from './pages/MediaKit'
-import PressReleases from './pages/PressReleases'
-import Certifications from './pages/Certifications'
-import ActivityFeed from './pages/ActivityFeed'
-import BlogList from './pages/blog/BlogList'
-import BlogPost from './pages/blog/BlogPost'
-import AdminBlogManager from './pages/blog/AdminBlogManager'
-import AdminDashboard from './pages/admin/AdminDashboard'
-import AdminUsers from './pages/admin/AdminUsers'
-import AdminSettings from './pages/admin/AdminSettings'
-import AdminLogs from './pages/admin/AdminLogs'
-import EmployeePortal from './pages/employee/EmployeePortal'
-import Directory from './pages/employee/Directory'
-import Requests from './pages/employee/Requests'
-import Tasks from './pages/employee/Tasks'
-import BillingAssignment from './pages/employee/BillingAssignment'
-import SignIn from './pages/auth/SignIn'
-import SignUp from './pages/auth/SignUp'
-import ForgotPassword from './pages/auth/ForgotPassword'
-import Verify from './pages/auth/Verify'
-import SearchAccount from './pages/auth/SearchAccount'
-import ProfileSetup from './pages/auth/ProfileSetup'
 import CommandPalette from './components/CommandPalette'
 
-// Service Pages
-import WebDesign from './pages/services/WebDesign'
-import MobileApps from './pages/services/MobileApps'
-import DigitalMarketing from './pages/services/DigitalMarketing'
-import AISolutions from './pages/services/AISolutions'
-import SoftwareDev from './pages/services/SoftwareDev'
-import Advertising from './pages/services/Advertising'
-import Ecommerce from './pages/services/Ecommerce'
-
-// SEO & Legal Pages
-import Sitemap from './pages/Sitemap'
-import FAQ from './pages/FAQ'
-import Testimonials from './pages/Testimonials'
-import Terms from './pages/legal/Terms'
-import Privacy from './pages/legal/Privacy'
-
-// CRM Pages
-import CRMDashboard from './pages/crm/CRMDashboard'
-import Contacts from './pages/crm/Contacts'
-import Deals from './pages/crm/Deals'
-
-// HRM Pages
-import HRMDashboard from './pages/hrm/HRMDashboard'
-import Recruitment from './pages/hrm/Recruitment'
-import Payroll from './pages/hrm/Payroll'
-
-// Analytics
-import AnalyticsDashboard from './pages/analytics/AnalyticsDashboard'
+const Home = lazy(() => import('./pages/Home'))
+const About = lazy(() => import('./pages/About'))
+const Services = lazy(() => import('./pages/Services'))
+const Pricing = lazy(() => import('./pages/Pricing'))
+const Contact = lazy(() => import('./pages/Contact'))
+const Security = lazy(() => import('./pages/Security'))
+const Status = lazy(() => import('./pages/Status'))
+const Trust = lazy(() => import('./pages/Trust'))
+const Compliance = lazy(() => import('./pages/Compliance'))
+const BillingFlow = lazy(() => import('./pages/products/BillingFlow'))
+const BillingFlowFeatures = lazy(() => import('./pages/products/BillingFlowFeatures'))
+const BillingFlowPricing = lazy(() => import('./pages/products/BillingFlowPricing'))
+const BillingFlowDocs = lazy(() => import('./pages/products/BillingFlowDocs'))
+const BillingFlowAPI = lazy(() => import('./pages/products/BillingFlowAPI'))
+const BillingFlowDemo = lazy(() => import('./pages/products/BillingFlowDemo'))
+const BillingFlowChangelog = lazy(() => import('./pages/products/BillingFlowChangelog'))
+const AIAgent = lazy(() => import('./pages/products/AIAgent'))
+const AIAgentPlayground = lazy(() => import('./pages/products/AIAgentPlayground'))
+const AIAgentDocs = lazy(() => import('./pages/products/AIAgentDocs'))
+const AIAgentTemplates = lazy(() => import('./pages/products/AIAgentTemplates'))
+const AIAgentWorkflows = lazy(() => import('./pages/products/AIAgentWorkflows'))
+const AIAgentExamples = lazy(() => import('./pages/products/AIAgentExamples'))
+const PDFAutomation = lazy(() => import('./pages/products/PDFAutomation'))
+const PDFDocs = lazy(() => import('./pages/products/PDFDocs'))
+const PDFDemo = lazy(() => import('./pages/products/PDFDemo'))
+const PDFTemplates = lazy(() => import('./pages/products/PDFTemplates'))
+const Developers = lazy(() => import('./pages/Developers'))
+const Playground = lazy(() => import('./pages/Playground'))
+const SmartHome = lazy(() => import('./pages/SmartHome'))
+const HarshSharma = lazy(() => import('./pages/HarshSharma'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Architecture = lazy(() => import('./pages/Architecture'))
+const Careers = lazy(() => import('./pages/Careers'))
+const Investors = lazy(() => import('./pages/Investors'))
+const Partners = lazy(() => import('./pages/Partners'))
+const Roadmap = lazy(() => import('./pages/Roadmap'))
+const KnowledgeBase = lazy(() => import('./pages/KnowledgeBase'))
+const Support = lazy(() => import('./pages/Support'))
+const Profile = lazy(() => import('./pages/Profile'))
+const Retry = lazy(() => import('./pages/Retry'))
+const NotFound = lazy(() => import('./pages/NotFound'))
+const Settings = lazy(() => import('./pages/settings/Settings'))
+const ClientPortal = lazy(() => import('./pages/portal/ClientPortal'))
+const CaseStudies = lazy(() => import('./pages/CaseStudies'))
+const Whitepapers = lazy(() => import('./pages/Whitepapers'))
+const MediaKit = lazy(() => import('./pages/MediaKit'))
+const PressReleases = lazy(() => import('./pages/PressReleases'))
+const Certifications = lazy(() => import('./pages/Certifications'))
+const ActivityFeed = lazy(() => import('./pages/ActivityFeed'))
+const BlogList = lazy(() => import('./pages/blog/BlogList'))
+const BlogPost = lazy(() => import('./pages/blog/BlogPost'))
+const AdminBlogManager = lazy(() => import('./pages/blog/AdminBlogManager'))
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'))
+const AdminLogs = lazy(() => import('./pages/admin/AdminLogs'))
+const EmployeePortal = lazy(() => import('./pages/employee/EmployeePortal'))
+const Directory = lazy(() => import('./pages/employee/Directory'))
+const Requests = lazy(() => import('./pages/employee/Requests'))
+const Tasks = lazy(() => import('./pages/employee/Tasks'))
+const BillingAssignment = lazy(() => import('./pages/employee/BillingAssignment'))
+const SignIn = lazy(() => import('./pages/auth/SignIn'))
+const SignUp = lazy(() => import('./pages/auth/SignUp'))
+const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'))
+const Verify = lazy(() => import('./pages/auth/Verify'))
+const SearchAccount = lazy(() => import('./pages/auth/SearchAccount'))
+const ProfileSetup = lazy(() => import('./pages/auth/ProfileSetup'))
+const WebDesign = lazy(() => import('./pages/services/WebDesign'))
+const MobileApps = lazy(() => import('./pages/services/MobileApps'))
+const DigitalMarketing = lazy(() => import('./pages/services/DigitalMarketing'))
+const AISolutions = lazy(() => import('./pages/services/AISolutions'))
+const SoftwareDev = lazy(() => import('./pages/services/SoftwareDev'))
+const Advertising = lazy(() => import('./pages/services/Advertising'))
+const Ecommerce = lazy(() => import('./pages/services/Ecommerce'))
+const Sitemap = lazy(() => import('./pages/Sitemap'))
+const FAQ = lazy(() => import('./pages/FAQ'))
+const Testimonials = lazy(() => import('./pages/Testimonials'))
+const Terms = lazy(() => import('./pages/legal/Terms'))
+const Privacy = lazy(() => import('./pages/legal/Privacy'))
+const CRMDashboard = lazy(() => import('./pages/crm/CRMDashboard'))
+const Contacts = lazy(() => import('./pages/crm/Contacts'))
+const Deals = lazy(() => import('./pages/crm/Deals'))
+const HRMDashboard = lazy(() => import('./pages/hrm/HRMDashboard'))
+const Recruitment = lazy(() => import('./pages/hrm/Recruitment'))
+const Payroll = lazy(() => import('./pages/hrm/Payroll'))
+const AnalyticsDashboard = lazy(() => import('./pages/analytics/AnalyticsDashboard'))
 
 function App() {
   const [commandOpen, setCommandOpen] = useState(false)
@@ -117,22 +108,27 @@ function App() {
 
   const { loading } = useAuth()
 
+  const appLoader = (
+    <div className="min-h-screen bg-obsidian flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 border-4 border-crimson border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-cream/60 font-mono text-sm animate-pulse">Initializing HMorix Platform...</p>
+      </div>
+    </div>
+  )
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-obsidian flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-crimson border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-cream/60 font-mono text-sm animate-pulse">Initializing HMorix Platform...</p>
-        </div>
-      </div>
+      appLoader
     )
   }
 
   return (
     <>
       <CommandPalette isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
-      <Routes>
-        <Route element={<MainLayout onCommandOpen={() => setCommandOpen(true)} />}>
+      <Suspense fallback={appLoader}>
+        <Routes>
+          <Route element={<MainLayout onCommandOpen={() => setCommandOpen(true)} />}>
           {/* Core Pages */}
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
@@ -255,8 +251,9 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify" element={<Verify />} />
         <Route path="/search-account" element={<SearchAccount />} />
-        <Route path="/profile-setup" element={<ProfileSetup />} />
-      </Routes>
+          <Route path="/profile-setup" element={<ProfileSetup />} />
+        </Routes>
+      </Suspense>
     </>
   )
 }
