@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import SEOHead from '../../components/seo/SEOHead'
-import { Briefcase, Clock, Loader2, MapPin, Users } from 'lucide-react'
+import { Briefcase, Clock, Loader2, MapPin, Trash2, Users } from 'lucide-react'
 import { config } from '../../lib/config'
 
 type Job = {
@@ -26,6 +26,8 @@ export default function Recruitment() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [showForm, setShowForm] = useState(false)
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null)
+  const [applications, setApplications] = useState<any[]>([])
   const [form, setForm] = useState({ role: '', department: 'Engineering', location: 'Hathras', type: 'Full-time', salary: '', openings: '1' })
 
   const loadJobs = async () => {
@@ -69,6 +71,40 @@ export default function Recruitment() {
     setForm({ role: '', department: 'Engineering', location: 'Hathras', type: 'Full-time', salary: '', openings: '1' })
     setShowForm(false)
     setMessage('Job posted successfully')
+  }
+
+  const deleteJob = async (id: string) => {
+    const response = await fetch(`${config.apiUrl}/hrm/recruitment?id=${encodeURIComponent(id)}`, { method: 'DELETE', credentials: 'include' })
+    const data = await response.json().catch(() => ({}))
+    if (!response.ok) {
+      setMessage(data.error || 'Unable to delete job')
+      return
+    }
+    setJobs(prev => prev.filter(job => String(job._id) !== id))
+    setMessage('Job closed and removed from careers')
+  }
+
+  const viewApplicants = async (job: Job) => {
+    setSelectedJob(job)
+    const response = await fetch(`${config.apiUrl}/careers/applications?jobId=${encodeURIComponent(String(job._id))}`, { credentials: 'include', cache: 'no-store' })
+    const data = await response.json().catch(() => ({}))
+    setApplications(response.ok ? data.data || [] : [])
+  }
+
+  const updateApplication = async (id: string, status: string, createEmployee = false) => {
+    const response = await fetch(`${config.apiUrl}/careers/applications`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status, createEmployee }),
+    })
+    const data = await response.json().catch(() => ({}))
+    if (!response.ok) {
+      setMessage(data.error || 'Unable to update applicant')
+      return
+    }
+    setApplications(prev => prev.map(app => String(app._id) === id ? data.data : app))
+    setMessage(createEmployee ? 'Applicant selected and moved to employee onboarding' : 'Applicant updated')
   }
 
   return (
@@ -132,6 +168,7 @@ export default function Recruitment() {
                     <div className="flex items-center gap-2">
                       <span className="flex items-center gap-1 px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs"><Users size={12} /> {job.applicants || 0}</span>
                       <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">{job.status}</span>
+                      {job._id && <button onClick={() => deleteJob(String(job._id))} className="p-1.5 bg-red-500/10 text-red-400 rounded hover:bg-red-500/20"><Trash2 size={14} /></button>}
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -142,9 +179,40 @@ export default function Recruitment() {
                       </div>
                     ))}
                   </div>
+                  <button onClick={() => viewApplicants(job)} className="mt-3 px-3 py-2 bg-white/[0.04] border border-glass-border rounded-[6px] text-xs text-cream/60 hover:text-[#C8FF00] hover:border-[#C8FF00]/40">View applicants</button>
                 </div>
               )
             })}
+          </div>
+        )}
+
+        {selectedJob && (
+          <div className="mt-8 p-6 bg-obsidian-2 border border-glass-border rounded-[12px]">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display text-lg font-semibold">Applicants - {selectedJob.role || selectedJob.title}</h2>
+              <button onClick={() => setSelectedJob(null)} className="text-xs text-cream/40 hover:text-cream">Close</button>
+            </div>
+            <div className="space-y-3">
+              {applications.length === 0 && <div className="text-sm text-cream/40">No applications yet.</div>}
+              {applications.map(app => (
+                <div key={app._id} className="p-4 bg-obsidian border border-glass-border rounded-[8px]">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <div className="font-medium">{app.name}</div>
+                      <div className="text-xs text-cream/40">{app.email} · {app.phone || 'No phone'} · {app.location || 'No location'}</div>
+                      {app.resumeUrl && <a href={app.resumeUrl} target="_blank" rel="noreferrer" className="text-xs text-[#C8FF00]">Open resume</a>}
+                      {app.resumeText && <p className="mt-2 text-xs text-cream/50 line-clamp-2">{app.resumeText}</p>}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs">{app.status}</span>
+                      <button onClick={() => updateApplication(String(app._id), 'interview')} className="px-2 py-1 bg-white/[0.04] border border-glass-border rounded text-xs">Interview</button>
+                      <button onClick={() => updateApplication(String(app._id), 'selected', true)} className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">Select</button>
+                      <button onClick={() => updateApplication(String(app._id), 'rejected')} className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs">Reject</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

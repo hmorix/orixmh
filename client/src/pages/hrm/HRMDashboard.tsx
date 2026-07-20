@@ -58,6 +58,24 @@ export default function HRMDashboard() {
       .catch(err => setError(err instanceof Error ? err.message : 'Unable to load HRM data'))
   }, [])
 
+  const decideLeave = async (id: string, status: 'approved' | 'rejected') => {
+    const response = await fetch(`${config.apiUrl}/hrm/leave`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status }),
+    })
+    const data = await response.json().catch(() => ({}))
+    if (!response.ok) {
+      setError(data.error || 'Unable to update leave request')
+      return
+    }
+    setOverview((prev: any) => ({
+      ...prev,
+      leaveRequests: (prev?.leaveRequests || []).map((leave: any) => String(leave._id) === id ? data.data : leave),
+    }))
+  }
+
   const liveStats = useMemo(() => {
     const s = overview?.stats
     if (!s) return stats
@@ -158,8 +176,8 @@ export default function HRMDashboard() {
                   <div className="text-[10px] text-cream/30">{req.type} · {req.dates} ({req.days}d)</div>
                   {req.status === 'pending' && (
                     <div className="flex gap-2 mt-2">
-                      <button className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-[10px] hover:bg-green-500/30">Approve</button>
-                      <button className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-[10px] hover:bg-red-500/30">Reject</button>
+                      <button onClick={() => decideLeave(String(req._id), 'approved')} className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-[10px] hover:bg-green-500/30">Approve</button>
+                      <button onClick={() => decideLeave(String(req._id), 'rejected')} className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-[10px] hover:bg-red-500/30">Reject</button>
                     </div>
                   )}
                 </div>
