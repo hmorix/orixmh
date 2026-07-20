@@ -35,7 +35,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 async function apiRequest(url: string, options: RequestInit = {}) {
   const response = await fetch(url, {
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    cache: 'no-store',
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache', ...(options.headers || {}) },
     ...options,
   })
   const data = await response.json().catch(() => ({}))
@@ -55,6 +56,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     apiRequest(api.auth.me)
       .then(data => {
+        if (!data.user) {
+          setUser(null)
+          setSession(null)
+          return
+        }
         const nextUser = { ...data.user, user_metadata: { name: data.user.name || data.user.displayName } }
         setUser(nextUser)
         setSession({ user: nextUser, access_token: 'cookie-session' })

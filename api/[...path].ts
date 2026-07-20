@@ -13,6 +13,10 @@ function setCors(res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-Token')
   res.setHeader('Access-Control-Allow-Credentials', 'true')
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+  res.setHeader('Pragma', 'no-cache')
+  res.setHeader('Expires', '0')
+  res.setHeader('Surrogate-Control', 'no-store')
   res.setHeader('X-Content-Type-Options', 'nosniff')
   res.setHeader('X-Frame-Options', 'DENY')
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
@@ -484,8 +488,8 @@ async function handleAuthSignup(req: VercelRequest, res: VercelResponse) {
 async function handleAuthMe(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
   const user = await findSessionUser(req, res)
-  if (!user) return res.status(401).json({ error: 'Not authenticated' })
-  res.json({ success: true, user })
+  if (!user) return res.json({ success: true, authenticated: false, user: null })
+  res.json({ success: true, authenticated: true, user })
 }
 
 async function handleDashboardStats(req: VercelRequest, res: VercelResponse) {

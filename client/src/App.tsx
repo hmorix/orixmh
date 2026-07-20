@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
-import { lazy, Suspense, useState, useEffect } from 'react'
+import { Component, lazy, Suspense, useState, useEffect, type ReactNode } from 'react'
 import { useAuth } from './lib/AuthContext'
 import MainLayout from './layouts/MainLayout'
 import CommandPalette from './components/CommandPalette'
@@ -91,6 +91,32 @@ const Recruitment = lazy(() => import('./pages/hrm/Recruitment'))
 const Payroll = lazy(() => import('./pages/hrm/Payroll'))
 const AnalyticsDashboard = lazy(() => import('./pages/analytics/AnalyticsDashboard'))
 
+class AppErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false }
+
+  static getDerivedStateFromError() {
+    return { failed: true }
+  }
+
+  render() {
+    if (this.state.failed) {
+      return (
+        <div className="min-h-screen bg-obsidian flex items-center justify-center px-6">
+          <div className="max-w-[420px] text-center">
+            <h1 className="font-display text-2xl font-bold text-cream mb-2">Session expired</h1>
+            <p className="text-sm text-cream/50 mb-6">Please login again</p>
+            <div className="flex justify-center gap-3">
+              <a href="/signin" className="btn-primary">Retry Login</a>
+              <a href="/" className="btn-outline">Return Home</a>
+            </div>
+          </div>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
 function App() {
   const [commandOpen, setCommandOpen] = useState(false)
 
@@ -126,8 +152,9 @@ function App() {
   return (
     <>
       <CommandPalette isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
-      <Suspense fallback={appLoader}>
-        <Routes>
+      <AppErrorBoundary>
+        <Suspense fallback={appLoader}>
+          <Routes>
           <Route element={<MainLayout onCommandOpen={() => setCommandOpen(true)} />}>
           {/* Core Pages */}
           <Route path="/" element={<Home />} />
@@ -252,8 +279,9 @@ function App() {
         <Route path="/verify" element={<Verify />} />
         <Route path="/search-account" element={<SearchAccount />} />
           <Route path="/profile-setup" element={<ProfileSetup />} />
-        </Routes>
-      </Suspense>
+          </Routes>
+        </Suspense>
+      </AppErrorBoundary>
     </>
   )
 }
