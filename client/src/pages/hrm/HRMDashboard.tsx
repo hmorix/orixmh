@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import SEOHead from '../../components/seo/SEOHead'
 import { Users, UserPlus, UserMinus, Clock, Calendar, Award, TrendingUp, Briefcase, ArrowUpRight } from 'lucide-react'
+import { config } from '../../lib/config'
 
 const stats = [
   { label: 'Total Employees', value: '247', change: '+8', icon: Users, color: 'text-blue-400' },
@@ -44,6 +45,34 @@ const upcomingReviews = [
 
 export default function HRMDashboard() {
   const [tab, setTab] = useState<'overview' | 'recruitment' | 'payroll' | 'performance'>('overview')
+  const [overview, setOverview] = useState<any>(null)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    fetch(`${config.apiUrl}/hrm/overview`, { credentials: 'include', cache: 'no-store' })
+      .then(async response => {
+        const data = await response.json().catch(() => ({}))
+        if (!response.ok) throw new Error(data.error || 'Unable to load HRM data')
+        setOverview(data.data)
+      })
+      .catch(err => setError(err instanceof Error ? err.message : 'Unable to load HRM data'))
+  }, [])
+
+  const liveStats = useMemo(() => {
+    const s = overview?.stats
+    if (!s) return stats
+    return [
+      { label: 'Total Employees', value: String(s.totalEmployees), change: `${s.activeEmployees} active`, icon: Users, color: 'text-blue-400' },
+      { label: 'New Hires (45d)', value: String(s.newHires), change: '+real', icon: UserPlus, color: 'text-green-400' },
+      { label: 'Open Positions', value: String(s.openPositions), change: `${overview.recruitment?.length || 0} roles`, icon: Briefcase, color: 'text-purple-400' },
+      { label: 'Task Completion', value: `${s.taskCompletionRate}%`, change: `${s.avgPerformance}/5 avg`, icon: Clock, color: 'text-yellow-400' },
+    ]
+  }, [overview])
+
+  const liveDepartments = overview?.departments || departments
+  const liveLeaveRequests = overview?.leaveRequests || leaveRequests
+  const liveRecentHires = overview?.recentHires || recentHires
+  const liveUpcomingReviews = overview?.upcomingReviews || upcomingReviews
 
   return (
     <div className="pt-32 pb-20 min-h-screen">
@@ -60,6 +89,8 @@ export default function HRMDashboard() {
           </div>
         </div>
 
+        {error && <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30 rounded-[8px] text-sm text-red-400">{error}</div>}
+
         {/* Tabs */}
         <div className="flex gap-1 mb-8 border-b border-glass-border">
           {(['overview', 'recruitment', 'payroll', 'performance'] as const).map(t => (
@@ -69,7 +100,7 @@ export default function HRMDashboard() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {stats.map((s, i) => (
+          {liveStats.map((s, i) => (
             <div key={i} className="p-5 bg-obsidian-2 border border-glass-border rounded-[12px]">
               <div className="flex items-center justify-between mb-3">
                 <s.icon size={18} className={s.color} />
@@ -97,13 +128,13 @@ export default function HRMDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {departments.map((dept, i) => (
+                  {liveDepartments.map((dept: any, i: number) => (
                     <tr key={i} className="border-b border-glass-border/50 hover:bg-white/[0.02]">
                       <td className="py-3 font-medium">{dept.name}</td>
                       <td className="py-3">{dept.headcount}</td>
-                      <td className="py-3 text-[#C8FF00]">{dept.budget}</td>
+                      <td className="py-3 text-[#C8FF00]">{dept.budget || `₹${Number(dept.payroll || 0).toLocaleString('en-IN')}`}</td>
                       <td className="py-3">{dept.openRoles > 0 ? <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-[10px]">{dept.openRoles} open</span> : <span className="text-cream/30">—</span>}</td>
-                      <td className="py-3 text-cream/50">{dept.avgTenure}</td>
+                      <td className="py-3 text-cream/50">{dept.avgTenure || `${dept.avgScore || 0}/5 score`}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -115,10 +146,10 @@ export default function HRMDashboard() {
           <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px]">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-display text-lg font-semibold">Leave Requests</h2>
-              <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded text-[10px]">{leaveRequests.filter(l => l.status === 'pending').length} pending</span>
+              <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded text-[10px]">{liveLeaveRequests.filter((l: any) => l.status === 'pending').length} pending</span>
             </div>
             <div className="space-y-3">
-              {leaveRequests.map((req, i) => (
+              {liveLeaveRequests.map((req: any, i: number) => (
                 <div key={i} className="p-3 bg-obsidian border border-glass-border rounded-[8px]">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium">{req.name}</span>
@@ -142,7 +173,7 @@ export default function HRMDashboard() {
           <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px]">
             <h2 className="font-display text-lg font-semibold mb-4">Recent Hires</h2>
             <div className="space-y-3">
-              {recentHires.map((hire, i) => (
+              {liveRecentHires.map((hire: any, i: number) => (
                 <div key={i} className="flex items-center gap-3 p-3 bg-obsidian border border-glass-border rounded-[8px]">
                   <div className="w-10 h-10 bg-obsidian-3 rounded-full flex items-center justify-center text-xs font-bold">{hire.name.split(' ').map(n => n[0]).join('')}</div>
                   <div className="flex-1">
@@ -151,7 +182,7 @@ export default function HRMDashboard() {
                   </div>
                   <div className="text-right">
                     <span className={`px-2 py-0.5 rounded text-[10px] ${hire.status === 'onboarding' ? 'bg-blue-500/20 text-blue-400' : 'bg-green-500/20 text-green-400'}`}>{hire.status}</span>
-                    <div className="text-[10px] text-cream/20 mt-1">{hire.startDate}</div>
+                    <div className="text-[10px] text-cream/20 mt-1">{String(hire.startDate).slice(0, 10)}</div>
                   </div>
                 </div>
               ))}
@@ -162,7 +193,7 @@ export default function HRMDashboard() {
           <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px]">
             <h2 className="font-display text-lg font-semibold mb-4">Upcoming Reviews</h2>
             <div className="space-y-3">
-              {upcomingReviews.map((review, i) => (
+              {liveUpcomingReviews.map((review: any, i: number) => (
                 <div key={i} className="flex items-center gap-3 p-3 bg-obsidian border border-glass-border rounded-[8px]">
                   <div className="w-10 h-10 bg-obsidian-3 rounded-full flex items-center justify-center text-xs font-bold">{review.name.split(' ').map(n => n[0]).join('')}</div>
                   <div className="flex-1">
@@ -182,9 +213,9 @@ export default function HRMDashboard() {
                 <span className="text-xs font-medium">Performance Summary</span>
               </div>
               <div className="grid grid-cols-3 gap-4 mt-2">
-                <div><div className="text-lg font-bold">4.2</div><div className="text-[10px] text-cream/30">Avg Score</div></div>
-                <div><div className="text-lg font-bold">87%</div><div className="text-[10px] text-cream/30">Goals Met</div></div>
-                <div><div className="text-lg font-bold">92%</div><div className="text-[10px] text-cream/30">Satisfaction</div></div>
+                <div><div className="text-lg font-bold">{overview?.stats?.avgPerformance || 4.2}</div><div className="text-[10px] text-cream/30">Avg Score</div></div>
+                <div><div className="text-lg font-bold">{overview?.stats?.taskCompletionRate || 87}%</div><div className="text-[10px] text-cream/30">Tasks Done</div></div>
+                <div><div className="text-lg font-bold">{overview?.stats?.pendingLeaves || 0}</div><div className="text-[10px] text-cream/30">Pending Leave</div></div>
               </div>
             </div>
           </div>

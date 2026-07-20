@@ -571,6 +571,231 @@ async function handleHrmEmployees(req: VercelRequest, res: VercelResponse) {
   }
 }
 
+const hrmSeedEmployees = [
+  { name: 'Harsh Sharma', email: 'harsh@hmorix.com', department: 'Leadership', role: 'CEO', location: 'Hathras', status: 'active', salary: 2400000, performanceScore: 4.9, startDate: '2023-01-01' },
+  { name: 'Aarav Singh', email: 'aarav@hmorix.com', department: 'Engineering', role: 'Full Stack Developer', location: 'Noida', status: 'active', salary: 960000, performanceScore: 4.5, startDate: '2024-02-12' },
+  { name: 'Priya Verma', email: 'priya@hmorix.com', department: 'AI/ML', role: 'AI Integration Engineer', location: 'Bengaluru', status: 'active', salary: 1320000, performanceScore: 4.6, startDate: '2024-03-18' },
+  { name: 'Rohan Gupta', email: 'rohan@hmorix.com', department: 'Marketing', role: 'SEO Manager', location: 'Delhi', status: 'active', salary: 780000, performanceScore: 4.2, startDate: '2024-05-06' },
+  { name: 'Neha Sharma', email: 'neha@hmorix.com', department: 'HR', role: 'HR Executive', location: 'Agra', status: 'active', salary: 600000, performanceScore: 4.1, startDate: '2024-06-03' },
+]
+
+async function ensureHrmSeed() {
+  const employees = await mongoCollection('hrm_employees')
+  if (await employees.countDocuments()) return
+  const now = new Date()
+  const inserted = await employees.insertMany(hrmSeedEmployees.map((employee, index) => ({ ...employee, employeeId: `HM-${String(index + 1).padStart(4, '0')}`, createdAt: now, updatedAt: now })))
+  const ids = Object.values(inserted.insertedIds).map(id => String(id))
+  const tasks = await mongoCollection('hrm_tasks')
+  await tasks.insertMany([
+    { title: 'Complete profile data review', description: 'Verify personal and payroll profile data.', employeeId: ids[1], assigneeName: 'Aarav Singh', dueDate: '2026-07-25', priority: 'high', category: 'HR', status: 'todo', performanceScore: null, createdAt: now, updatedAt: now },
+    { title: 'Publish AI integration case study', description: 'Prepare service content for AI integration pages.', employeeId: ids[2], assigneeName: 'Priya Verma', dueDate: '2026-07-28', priority: 'medium', category: 'AI/ML', status: 'in_progress', performanceScore: null, createdAt: now, updatedAt: now },
+    { title: 'Local SEO keyword review', description: 'Review Hathras, Mathura, Aligarh, Agra, Vrindavan keywords.', employeeId: ids[3], assigneeName: 'Rohan Gupta', dueDate: '2026-07-30', priority: 'high', category: 'Marketing', status: 'todo', performanceScore: null, createdAt: now, updatedAt: now },
+  ])
+  const leaves = await mongoCollection('hrm_leave_requests')
+  await leaves.insertMany([
+    { employeeId: ids[4], name: 'Neha Sharma', type: 'Annual Leave', dates: 'Aug 1-2, 2026', days: 2, status: 'pending', createdAt: now, updatedAt: now },
+    { employeeId: ids[1], name: 'Aarav Singh', type: 'Sick Leave', dates: 'Jul 18, 2026', days: 1, status: 'approved', createdAt: now, updatedAt: now },
+  ])
+  const recruitment = await mongoCollection('hrm_recruitment')
+  await recruitment.insertMany([
+    { role: 'React Developer', department: 'Engineering', location: 'Noida', openings: 2, applicants: 18, status: 'open', createdAt: now, updatedAt: now },
+    { role: 'SEO Executive', department: 'Marketing', location: 'Hathras', openings: 1, applicants: 9, status: 'interview', createdAt: now, updatedAt: now },
+  ])
+}
+
+async function getHrmOverviewData() {
+  await ensureHrmSeed()
+  const [employeesCol, tasksCol, leavesCol, recruitmentCol, payrollCol] = await Promise.all([
+    mongoCollection('hrm_employees'),
+    mongoCollection('hrm_tasks'),
+    mongoCollection('hrm_leave_requests'),
+    mongoCollection('hrm_recruitment'),
+    mongoCollection('hrm_payroll_runs'),
+  ])
+  const [employees, tasks, leaveRequests, recruitment, lastPayroll] = await Promise.all([
+    employeesCol.find({}).sort({ name: 1 }).toArray(),
+    tasksCol.find({}).sort({ dueDate: 1 }).toArray(),
+    leavesCol.find({}).sort({ createdAt: -1 }).toArray(),
+    recruitmentCol.find({}).sort({ createdAt: -1 }).toArray(),
+    payrollCol.findOne({}, { sort: { createdAt: -1 } }),
+  ])
+  const departmentMap = new Map<string, any>()
+  employees.forEach((employee: any) => {
+    const department = employee.department || 'General'
+    const row = departmentMap.get(department) || { name: department, headcount: 0, openRoles: 0, payroll: 0, score: 0 }
+    row.headcount += 1
+    row.payroll += Number(employee.salary || 0)
+    row.score += Number(employee.performanceScore || 0)
+    departmentMap.set(department, row)
+  })
+  recruitment.forEach((job: any) => {
+    const row = departmentMap.get(job.department) || { name: job.department, headcount: 0, openRoles: 0, payroll: 0, score: 0 }
+    row.openRoles += Number(job.openings || 0)
+    departmentMap.set(job.department, row)
+  })
+  const departments = Array.from(departmentMap.values()).map((dept: any) => ({ ...dept, avgScore: dept.headcount ? Number((dept.score / dept.headcount).toFixed(1)) : 0 }))
+  const avgPerformance = employees.length ? Number((employees.reduce((sum: number, employee: any) => sum + Number(employee.performanceScore || 0), 0) / employees.length).toFixed(1)) : 0
+  return {
+    employees,
+    tasks,
+    leaveRequests,
+    recruitment,
+    departments,
+    recentHires: employees.slice().sort((a: any, b: any) => String(b.startDate).localeCompare(String(a.startDate))).slice(0, 5),
+    upcomingReviews: employees.slice(0, 5).map((employee: any, index: number) => ({ name: employee.name, department: employee.department, dueDate: new Date(Date.now() + (index + 3) * 86400000).toISOString().slice(0, 10), type: index % 2 ? 'Quarterly' : 'Annual' })),
+    stats: {
+      totalEmployees: employees.length,
+      activeEmployees: employees.filter((employee: any) => employee.status === 'active').length,
+      newHires: employees.filter((employee: any) => new Date(employee.startDate).getTime() > Date.now() - 45 * 86400000).length,
+      openPositions: recruitment.reduce((sum: number, job: any) => sum + Number(job.openings || 0), 0),
+      pendingLeaves: leaveRequests.filter((leave: any) => leave.status === 'pending').length,
+      taskCompletionRate: tasks.length ? Math.round((tasks.filter((task: any) => task.status === 'done').length / tasks.length) * 100) : 0,
+      avgPerformance,
+      monthlyPayroll: employees.reduce((sum: number, employee: any) => sum + Math.round(Number(employee.salary || 0) / 12), 0),
+    },
+    lastPayroll,
+  }
+}
+
+async function handleHrmOverview(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+  return res.json({ success: true, data: await getHrmOverviewData() })
+}
+
+async function handleHrmPeople(req: VercelRequest, res: VercelResponse) {
+  await ensureHrmSeed()
+  const employees = await mongoCollection('hrm_employees')
+  if (req.method === 'GET') return res.json({ success: true, data: await employees.find({}).sort({ name: 1 }).toArray() })
+  if (req.method === 'POST') {
+    const body = req.body || {}
+    const name = sanitizeText(body.name, 120)
+    const email = cleanEmail(body.email)
+    if (!name || !email) return res.status(400).json({ error: 'Name and email are required' })
+    const now = new Date()
+    const doc = { name, email, employeeId: `HM-${Date.now().toString().slice(-6)}`, department: sanitizeText(body.department || 'General', 80), role: sanitizeText(body.role || 'Employee', 100), location: sanitizeText(body.location || 'Remote', 80), status: 'active', salary: Number(body.salary || 0), performanceScore: Number(body.performanceScore || 4), startDate: body.startDate || now.toISOString().slice(0, 10), createdAt: now, updatedAt: now }
+    const result = await employees.insertOne(doc)
+    return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
+  }
+  return res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function handleHrmTasks(req: VercelRequest, res: VercelResponse) {
+  await ensureHrmSeed()
+  const tasks = await mongoCollection('hrm_tasks')
+  const employees = await mongoCollection('hrm_employees')
+  if (req.method === 'GET') return res.json({ success: true, data: await tasks.find({}).sort({ dueDate: 1 }).toArray() })
+  if (req.method === 'POST') {
+    const body = req.body || {}
+    const employee = body.employeeId ? await employees.findOne({ _id: new ObjectId(String(body.employeeId)) }).catch(() => null) : null
+    const now = new Date()
+    const doc = { title: sanitizeText(body.title || 'New task', 140), description: sanitizeText(body.description || '', 500), employeeId: employee ? String(employee._id) : '', assigneeName: employee?.name || sanitizeText(body.assigneeName || 'Unassigned', 120), dueDate: body.dueDate || now.toISOString().slice(0, 10), priority: body.priority || 'medium', category: sanitizeText(body.category || 'General', 80), status: 'todo', performanceScore: null, feedback: '', submittedAt: null, createdAt: now, updatedAt: now }
+    const result = await tasks.insertOne(doc)
+    return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
+  }
+  if (req.method === 'PUT') {
+    const id = String(req.body?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid task id is required' })
+    const status = String(req.body?.status || 'done')
+    const score = Math.max(1, Math.min(5, Number(req.body?.performanceScore || (status === 'done' ? 4 : 3))))
+    const update: any = { status, updatedAt: new Date() }
+    if (status === 'done') Object.assign(update, { submittedAt: new Date(), performanceScore: score, feedback: sanitizeText(req.body?.feedback || 'Submitted and scored by HR.', 500) })
+    await tasks.updateOne({ _id: new ObjectId(id) }, { $set: update })
+    const task = await tasks.findOne({ _id: new ObjectId(id) })
+    if (task?.employeeId && status === 'done') await employees.updateOne({ _id: new ObjectId(task.employeeId) }, { $set: { performanceScore: score, updatedAt: new Date() } })
+    return res.json({ success: true, data: task })
+  }
+  return res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function handleHrmPayroll(req: VercelRequest, res: VercelResponse) {
+  await ensureHrmSeed()
+  const employees = await mongoCollection('hrm_employees')
+  const payrollRuns = await mongoCollection('hrm_payroll_runs')
+  const period = String(req.query.period || req.body?.period || new Date().toISOString().slice(0, 7))
+  const people = await employees.find({ status: { $ne: 'inactive' } }).sort({ name: 1 }).toArray()
+  const rows = people.map((employee: any) => {
+    const base = Math.round(Number(employee.salary || 0) / 12)
+    const bonus = Math.round(base * 0.05)
+    const deductions = Math.round((base + bonus) * 0.12)
+    return { employeeId: String(employee._id), name: employee.name, department: employee.department, role: employee.role, baseSalary: base, bonus, deductions, net: base + bonus - deductions, status: 'pending' }
+  })
+  if (req.method === 'POST') {
+    const run = { period, rows: rows.map(row => ({ ...row, status: 'processed' })), totalNet: rows.reduce((sum, row) => sum + row.net, 0), status: 'processed', createdAt: new Date() }
+    const result = await payrollRuns.insertOne(run)
+    return res.json({ success: true, data: { _id: result.insertedId, ...run } })
+  }
+  return res.json({ success: true, data: { period, summary: { employees: rows.length, totalPayroll: rows.reduce((sum, row) => sum + row.net, 0), avgSalary: rows.length ? Math.round(rows.reduce((sum, row) => sum + row.baseSalary, 0) / rows.length) : 0, nextPayDate: `${period}-28` }, rows, lastRun: await payrollRuns.findOne({ period }, { sort: { createdAt: -1 } }) } })
+}
+
+async function handleHrmPayrollExport(req: VercelRequest, res: VercelResponse) {
+  const payroll = await new Promise<any>(resolve => {
+    const fakeRes: any = { json: (payload: any) => resolve(payload) }
+    handleHrmPayroll({ ...req, method: 'GET' } as any, fakeRes)
+  })
+  const rows = payroll?.data?.rows || []
+  const csv = ['Employee,Department,Role,Base Salary,Bonus,Deductions,Net Pay,Status', ...rows.map((row: any) => [row.name, row.department, row.role, row.baseSalary, row.bonus, row.deductions, row.net, row.status].map((value: any) => `"${String(value).replace(/"/g, '""')}"`).join(','))].join('\n')
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+  res.setHeader('Content-Disposition', 'attachment; filename="hmorix-payroll.csv"')
+  return res.status(200).send(csv)
+}
+
+function siteAssistantFallback(message: string) {
+  const text = message.toLowerCase()
+  if (text.includes('forgot') || text.includes('password')) return { reply: 'To reset your password, open Forgot Password, enter your email, then use the 6 digit OTP sent to your Gmail inbox to set a new password.', actions: [{ label: 'Open Forgot Password', href: '/forgot-password' }, { label: 'Find Account', href: '/search-account' }] }
+  if (text.includes('blog')) return { reply: 'For blogs, open the Blog page to read published posts. Admin users can manage drafts, pending posts, published posts, JSON imports, and exports from Blog Manager.', actions: [{ label: 'Open Blogs', href: '/blog' }, { label: 'Blog Manager', href: '/admin/blogs' }] }
+  if (text.includes('profile')) return { reply: 'Open your Profile page to update personal information, profile picture, cover image, social links, billing, API keys, sessions, and account security settings.', actions: [{ label: 'Open Profile', href: '/profile' }, { label: 'Settings', href: '/settings' }] }
+  if (text.includes('payroll') || text.includes('hrm') || text.includes('employee')) return { reply: 'The HRM area includes real employee overview, departments, tasks, payroll runs, recruitment, leave requests, and performance summaries.', actions: [{ label: 'Open HRM', href: '/hrm' }, { label: 'Payroll', href: '/hrm/payroll' }, { label: 'Tasks', href: '/employee/tasks' }] }
+  if (text.includes('seo') || text.includes('service')) return { reply: 'HMorix offers web app development, hosting, automation, AI integration, software development, SEO, and product services for Hathras, Mathura, Aligarh, Agra, Vrindavan, Delhi, Noida, Mumbai, and Bengaluru.', actions: [{ label: 'View Services', href: '/services' }, { label: 'Contact HMorix', href: '/contact' }] }
+  return { reply: 'I can help you navigate HMorix services, blogs, profile settings, password reset, HRM, BillingFlow, PDF Automation, AI Agent, and support pages. Tell me what you want to do.', actions: [{ label: 'Services', href: '/services' }, { label: 'Contact', href: '/contact' }, { label: 'Support', href: '/support' }] }
+}
+
+async function handleAiChat(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const message = sanitizeText(req.body?.message || '', 1200)
+  if (!message) return res.status(400).json({ error: 'Message is required' })
+  const fallback = siteAssistantFallback(message)
+  if (!process.env.NVIDIA_API_KEY) return res.json({ success: true, ...fallback, provider: 'fallback' })
+  try {
+    const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.NVIDIA_API_KEY}` },
+      body: JSON.stringify({
+        model: process.env.NVIDIA_MODEL || 'nvidia/deepseek-v4-flash',
+        messages: [
+          { role: 'system', content: 'You are HMorix AI Assistant. Answer using HMorix website knowledge. Be concise. For actions, mention exact pages: /forgot-password, /search-account, /blog, /profile, /settings, /services, /contact, /hrm, /hrm/payroll, /employee/tasks, /playground. Never ask for passwords or secrets.' },
+          { role: 'user', content: message },
+        ],
+        temperature: 0.3,
+        max_tokens: 500,
+      }),
+    })
+    const data = await response.json().catch(() => ({}))
+    const reply = data?.choices?.[0]?.message?.content || fallback.reply
+    return res.json({ success: true, reply, actions: fallback.actions, provider: 'nvidia' })
+  } catch {
+    return res.json({ success: true, ...fallback, provider: 'fallback' })
+  }
+}
+
+async function handleAiPlayground(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const type = String(req.body?.type || 'chat')
+  const prompt = sanitizeText(req.body?.prompt || '', 2000)
+  if (!prompt) return res.status(400).json({ error: 'Prompt is required' })
+  const connections: Record<string, string> = { website: 'Connected with Orix Labs', pdf: 'Connected with HMorix PDF Editor', invoice: 'Connected with Orix Billing Flow', workflow: 'Connected with HMorix Builder', chat: 'Connected with HMorix AI Assistant' }
+  const fallback = type === 'website'
+    ? `Status: ${connections[type]}\n\nGenerated website plan:\n- Pages: Home, About, Services, Contact\n- Stack: React, TypeScript, Tailwind, Vercel\n- SEO: sitemap, metadata, schema, analytics\n- Next step: request an Orix Labs access token for export.`
+    : type === 'pdf'
+      ? `Status: ${connections[type]}\n\nPDF automation ready:\n- Upload PDF\n- Extract text, invoices, tables, totals\n- Export JSON/CSV\n- Access token required for live PDF Editor jobs.`
+      : type === 'invoice'
+        ? `Status: ${connections[type]}\n\nInvoice workflow ready:\n- Generate invoice\n- Assign bill to user\n- Download PDF\n- Access token required for live Billing Flow sync.`
+        : type === 'workflow'
+          ? `Status: ${connections[type]}\n\nWorkflow ready:\n- Trigger\n- Conditions\n- Actions\n- Notifications\n- Access token required for HMorix Builder deployment.`
+          : siteAssistantFallback(prompt).reply
+  if (type === 'chat') return handleAiChat({ ...req, body: { message: prompt }, method: 'POST' } as any, res)
+  return res.json({ success: true, result: fallback, status: connections[type] || 'Connected', requiresAccessToken: true })
+}
+
 async function handleAnalyticsOverview(req: VercelRequest, res: VercelResponse) {
   const { period = '30d' } = req.query as any
   res.json({ visitors: { total: 847230, unique: 623400, returning: 223830, growth: '+23.4%' }, pageViews: { total: 2400000, perSession: 2.84, growth: '+18.7%' }, sessions: { total: 845000, avgDuration: '4m 32s', growth: '+12.1%' }, bounceRate: { rate: 32.4, change: '-5.2%' }, conversions: { total: 12847, rate: 1.52, growth: '+34.2%' }, revenue: { total: 847000, perVisitor: 1.0, growth: '+28.9%' }, period })
@@ -1536,6 +1761,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'crm/deals': return handleCrmDeals(req, res)
       case 'hrm/stats': return handleHrmStats(req, res)
       case 'hrm/employees': return handleHrmEmployees(req, res)
+      case 'hrm/overview': return handleHrmOverview(req, res)
+      case 'hrm/people': return handleHrmPeople(req, res)
+      case 'hrm/tasks': return handleHrmTasks(req, res)
+      case 'hrm/payroll': return handleHrmPayroll(req, res)
+      case 'hrm/payroll/export': return handleHrmPayrollExport(req, res)
+      case 'ai/chat': return handleAiChat(req, res)
+      case 'ai/playground': return handleAiPlayground(req, res)
       case 'analytics/overview': return handleAnalyticsOverview(req, res)
       case 'analytics/traffic': return handleAnalyticsTraffic(req, res)
       case 'admin/stats': return handleAdminStats(req, res)
