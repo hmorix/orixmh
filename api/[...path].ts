@@ -739,6 +739,34 @@ async function handleHrmPayrollExport(req: VercelRequest, res: VercelResponse) {
   return res.status(200).send(csv)
 }
 
+async function handleHrmRecruitment(req: VercelRequest, res: VercelResponse) {
+  await ensureHrmSeed()
+  const recruitment = await mongoCollection('hrm_recruitment')
+  if (req.method === 'GET') return res.json({ success: true, data: await recruitment.find({}).sort({ createdAt: -1 }).toArray() })
+  if (req.method === 'POST') {
+    const body = req.body || {}
+    const role = sanitizeText(body.role || body.title || '', 120)
+    if (!role) return res.status(400).json({ error: 'Role title is required' })
+    const now = new Date()
+    const doc = {
+      role,
+      department: sanitizeText(body.department || 'Engineering', 80),
+      location: sanitizeText(body.location || 'Hathras', 80),
+      type: sanitizeText(body.type || 'Full-time', 40),
+      salary: sanitizeText(body.salary || 'As per experience', 80),
+      openings: Number(body.openings || 1),
+      applicants: Number(body.applicants || 0),
+      status: body.status || 'open',
+      pipeline: body.pipeline || { applied: Number(body.applicants || 0), screening: 0, interview: 0, offer: 0 },
+      createdAt: now,
+      updatedAt: now,
+    }
+    const result = await recruitment.insertOne(doc)
+    return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
+  }
+  return res.status(405).json({ error: 'Method not allowed' })
+}
+
 function siteAssistantFallback(message: string) {
   const text = message.toLowerCase()
   if (text.includes('forgot') || text.includes('password')) return { reply: 'To reset your password, open Forgot Password, enter your email, then use the 6 digit OTP sent to your Gmail inbox to set a new password.', actions: [{ label: 'Open Forgot Password', href: '/forgot-password' }, { label: 'Find Account', href: '/search-account' }] }
@@ -1766,6 +1794,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'hrm/tasks': return handleHrmTasks(req, res)
       case 'hrm/payroll': return handleHrmPayroll(req, res)
       case 'hrm/payroll/export': return handleHrmPayrollExport(req, res)
+      case 'hrm/recruitment': return handleHrmRecruitment(req, res)
       case 'ai/chat': return handleAiChat(req, res)
       case 'ai/playground': return handleAiPlayground(req, res)
       case 'analytics/overview': return handleAnalyticsOverview(req, res)

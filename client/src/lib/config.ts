@@ -5,7 +5,7 @@
 
 export const config = {
   // Application URLs
-  appUrl: import.meta.env.VITE_APP_URL || 'https://orix-pink.vercel.app',
+  appUrl: import.meta.env.VITE_APP_URL || 'https://orixmh.vercel.app',
   apiUrl: import.meta.env.VITE_API_URL || '/api',
   
   // Supabase
@@ -14,7 +14,7 @@ export const config = {
   
   // NVIDIA AI
   nvidiaApiKey: import.meta.env.VITE_NVIDIA_API_KEY || '',
-  nvidiaModel: import.meta.env.VITE_NVIDIA_MODEL || 'meta/llama-3.1-405b-instruct',
+  nvidiaModel: import.meta.env.VITE_NVIDIA_MODEL || 'nvidia/deepseek-v4-flash',
   
   // Feature Flags
   enableAnalytics: import.meta.env.VITE_ENABLE_ANALYTICS === 'true',
