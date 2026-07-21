@@ -1,5 +1,19 @@
-import { Link } from 'react-router-dom'
+iimport { Link } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
+import {
+  Globe,
+  Bot,
+  ShieldCheck,
+  FileText,
+  CreditCard,
+  House,
+  BarChart3,
+  Cloud,
+  Target,
+  Zap,
+  Lock,
+  Handshake
+} from 'lucide-react
 
 function CounterNumber({ target, suffix }: { target: number; suffix: string }) {
   const ref = useRef<HTMLSpanElement>(null)
@@ -108,17 +122,19 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-glass-border border border-glass-border rounded-[16px] overflow-hidden mt-16">
             {[
-              { icon: '🌐', title: 'Enterprise Websites', desc: 'High-performance, scalable web applications built with modern frameworks.' },
-              { icon: '🤖', title: 'AI Agents', desc: 'Custom AI solutions that automate workflows and generate content.' },
-              { icon: '🔒', title: 'Cyber Security', desc: 'Penetration testing, audits, and continuous security monitoring.' },
-              { icon: '📄', title: 'PDF Automation', desc: 'Intelligent document processing at enterprise scale.' },
-              { icon: '💳', title: 'BillingFlow', desc: 'Complete invoicing and payment management platform.' },
-              { icon: '🏠', title: 'Smart Home', desc: 'IoT solutions for modern connected living spaces.' },
-              { icon: '📊', title: 'Analytics', desc: 'Real-time business intelligence and data visualization.' },
-              { icon: '☁️', title: 'Cloud Solutions', desc: 'Scalable infrastructure and deployment pipelines.' },
-            ].map((s, i) => (
+  { icon: Globe, title: 'Enterprise Websites', desc: 'High-performance, scalable web applications built with modern frameworks.' },
+  { icon: Bot, title: 'AI Agents', desc: 'Custom AI solutions that automate workflows and generate content.' },
+  { icon: ShieldCheck, title: 'Cyber Security', desc: 'Penetration testing, audits, and continuous security monitoring.' },
+  { icon: FileText, title: 'PDF Automation', desc: 'Intelligent document processing at enterprise scale.' },
+  { icon: CreditCard, title: 'BillingFlow', desc: 'Complete invoicing and payment management platform.' },
+  { icon: House, title: 'Smart Home', desc: 'IoT solutions for modern connected living spaces.' },
+  { icon: BarChart3, title: 'Analytics', desc: 'Real-time business intelligence and data visualization.' },
+  { icon: Cloud, title: 'Cloud Solutions', desc: 'Scalable infrastructure and deployment pipelines.' },
+].map((s, i) => (
               <div key={i} className="bg-obsidian p-8 hover:bg-obsidian-2 transition-colors group">
-                <div className="text-2xl mb-4">{s.icon}</div>
+                <div className="mb-4 text-[#C8FF00]">
+  <s.icon className="w-8 h-8 stroke-[1.8]" />
+</div>
                 <h3 className="font-display font-semibold mb-2 group-hover:text-[#C8FF00] transition-colors">{s.title}</h3>
                 <p className="text-sm text-cream/50">{s.desc}</p>
               </div>
@@ -132,10 +148,10 @@ export default function Home() {
         <div className="max-w-[1280px] mx-auto px-8">
           <div className="grid grid-cols-2 md:grid-cols-4">
             {[
-              { num: '120+', label: 'Enterprise Clients' },
-              { num: '300+', label: 'Projects Delivered' },
+              { num: '12+', label: 'Enterprise Clients' },
+              { num: '180+', label: 'Projects Delivered' },
               { num: '98%', label: 'Client Satisfaction' },
-              { num: '5+', label: 'Years of Innovation' },
+              { num: '3+', label: 'Years of Innovation' },
             ].map((s, i) => (
               <div key={i} className="py-8 px-6 text-center border-r border-glass-border last:border-r-0">
                 <div className="font-display text-4xl font-bold tracking-tight">{s.num.replace(/[+%]/,'')}<span className="text-[#C8FF00]">{s.num.match(/[+%]/)?.[0]}</span></div>
@@ -155,7 +171,9 @@ export default function Home() {
             <div className="md:col-span-2 p-8 border border-glass-border rounded-[16px] bg-white/[0.04] hover:border-[rgba(200,255,0,0.2)] hover:bg-obsidian-2 transition-all">
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div>
-                  <div className="text-2xl mb-4">🎯</div>
+                <div className="mb-4 text-[#C8FF00]">
+  <Target className="w-8 h-8 stroke-[1.8]" />
+</div>
                   <h3 className="font-display font-semibold text-lg mb-2">Enterprise-first Approach</h3>
                   <p className="text-sm text-cream/60">Every solution we build is designed for scale, security, and longevity. We architect systems that grow with your business.</p>
                 </div>
@@ -170,13 +188,31 @@ export default function Home() {
               </div>
             </div>
             {[
-              { icon: '⚡', title: 'Rapid Delivery', desc: 'Streamlined process delivers quality faster without sacrificing depth.' },
-              { icon: '🔒', title: 'Security by Design', desc: 'Security embedded at every layer from code review to deployment.' },
-              { icon: '📊', title: 'Data-Driven', desc: 'Every choice backed by analytics and real-world performance metrics.' },
-              { icon: '🤝', title: 'Long-term Partnership', desc: 'Lasting relationships with ongoing maintenance and support.' },
-            ].map((item, i) => (
+  {
+    icon: Zap,
+    title: 'Rapid Delivery',
+    desc: 'Streamlined process delivers quality faster without sacrificing depth.'
+  },
+  {
+    icon: Lock,
+    title: 'Security by Design',
+    desc: 'Security embedded at every layer from code review to deployment.'
+  },
+  {
+    icon: BarChart3,
+    title: 'Data-Driven',
+    desc: 'Every choice backed by analytics and real-world performance metrics.'
+  },
+  {
+    icon: Handshake,
+    title: 'Long-term Partnership',
+    desc: 'Lasting relationships with ongoing maintenance and support.'
+  },
+].map((item, i) => (
               <div key={i} className="p-8 border border-glass-border rounded-[16px] bg-white/[0.04] hover:border-[rgba(200,255,0,0.2)] hover:bg-obsidian-2 transition-all">
-                <div className="text-2xl mb-4">{item.icon}</div>
+                <div className="mb-4 text-[#C8FF00]">
+  <item.icon className="w-8 h-8 stroke-[1.8]" />
+</div>
                 <h3 className="font-display font-semibold mb-2">{item.title}</h3>
                 <p className="text-sm text-cream/60">{item.desc}</p>
               </div>
@@ -205,7 +241,7 @@ export default function Home() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[radial-gradient(ellipse,rgba(200,255,0,0.06)_0%,transparent_70%)] pointer-events-none" />
             <span className="label-mono">Ready to Begin?</span>
             <h2 className="font-display text-[clamp(2rem,4vw,4rem)] font-bold tracking-tight mt-6 mb-4">Let's build something<br/><em className="not-italic text-[#C8FF00]">remarkable</em></h2>
-            <p className="text-cream/60 max-w-[520px] mx-auto mb-10">Join 120+ enterprise clients who trust HMorix to power their technology.</p>
+            <p className="text-cream/60 max-w-[520px] mx-auto mb-10">Join 12+ enterprise clients who trust HMorix to power their technology.</p>
             <div className="flex gap-4 justify-center flex-wrap">
               <Link to="/contact" className="px-8 py-3.5 bg-[#C8FF00] text-obsidian font-display font-semibold rounded-[4px] hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(200,255,0,0.25)] transition-all">Schedule a Call</Link>
               <Link to="/pricing" className="px-8 py-3.5 border border-glass-border text-cream/60 font-display rounded-[4px] hover:border-cream hover:text-cream transition-all">View Pricing</Link>

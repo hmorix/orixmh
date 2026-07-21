@@ -504,48 +504,90 @@ async function handleDashboardStats(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleCrmStats(req: VercelRequest, res: VercelResponse) {
-  res.json({ contacts: { total: 12847, active: 9234, newThisMonth: 342, growth: '+12.3%' }, deals: { active: 234, totalValue: 4200000, avgDealSize: 17948, winRate: 68 }, pipeline: { lead: 45, qualification: 23, discovery: 18, proposal: 12, negotiation: 8, closedWon: 34 }, revenue: { mrr: 847000, arr: 10164000, growth: '+18.7%' }, activities: { callsToday: 34, emailsToday: 87, meetingsToday: 12 } })
+  const contactsCol = await mongoCollection('crm_contacts')
+  const dealsCol = await mongoCollection('crm_deals')
+  const [totalContacts, activeContacts, deals] = await Promise.all([
+    contactsCol.countDocuments({}),
+    contactsCol.countDocuments({ status: 'active' }),
+    dealsCol.find({}).toArray(),
+  ])
+  const totalValue = deals.reduce((sum: number, deal: any) => sum + Number(deal.value || 0), 0)
+  const stageCount = (stage: string) => deals.filter((deal: any) => deal.stage === stage).length
+  res.json({
+    contacts: { total: totalContacts, active: activeContacts, newThisMonth: 0, growth: '+0%' },
+    deals: { active: deals.filter((deal: any) => deal.stage !== 'closed_won').length, totalValue, avgDealSize: deals.length ? Math.round(totalValue / deals.length) : 0, winRate: deals.length ? Math.round((stageCount('closed_won') / deals.length) * 100) : 0 },
+    pipeline: { lead: stageCount('lead'), qualification: stageCount('qualification'), discovery: stageCount('discovery'), proposal: stageCount('proposal'), negotiation: stageCount('negotiation'), closedWon: stageCount('closed_won') },
+    revenue: { mrr: 0, arr: 0, growth: '+0%' },
+    activities: { callsToday: 0, emailsToday: 0, meetingsToday: 0 },
+  })
 }
 
 async function handleCrmContacts(req: VercelRequest, res: VercelResponse) {
-  const db = getDatabase()
+  const contactsCol = await mongoCollection('crm_contacts')
+  const dealsCol = await mongoCollection('crm_deals')
   if (req.method === 'GET') {
     const { page = '1', limit = '20', search, status } = req.query as any
     const pageNum = parseInt(page); const limitNum = parseInt(limit)
-    try {
-      const options: any = { orderBy: { column: 'created_at', ascending: false }, limit: limitNum, offset: (pageNum - 1) * limitNum, count: true }
-      if (status) options.where = { status }
-      if (search) options.search = [{ column: 'name', value: search }, { column: 'email', value: search }]
-      const { data, count } = await db.query('crm_contacts', options)
-      return res.json({ contacts: data, total: count || data.length, page: pageNum, pages: Math.ceil((count || data.length) / limitNum) })
-    } catch {
-      const contacts = Array.from({ length: 50 }, (_, i) => ({ id: i + 1, name: ['John Smith', 'Emily Davis', 'Robert Chang', 'Anna Petrov', 'Michael Park'][i % 5], email: `contact${i}@company.com`, phone: `+1-555-0${100 + i}`, company: ['Meridian Corp', 'NovaTech', 'Quantum Labs', 'FastCart', 'Stellar Digital'][i % 5], role: ['CTO', 'VP Engineering', 'Head of AI', 'CEO', 'Director'][i % 5], status: i % 8 === 0 ? 'inactive' : 'active', lastContact: new Date(Date.now() - i * 86400000).toISOString(), deals: Math.floor(Math.random() * 5), totalValue: Math.floor(Math.random() * 500000), tags: [['enterprise'], ['mid-market'], ['startup'], ['hot-lead'], ['enterprise', 'ai']][i % 5], created: new Date(2024, 0, 1 + i).toISOString() }))
-      return res.json({ contacts: contacts.slice((pageNum - 1) * limitNum, pageNum * limitNum), total: contacts.length, page: pageNum, pages: Math.ceil(contacts.length / limitNum) })
-    }
+    const filter: any = {}
+    if (status && status !== 'all') filter.status = status
+    if (search) filter.$or = ['name', 'email', 'company', 'phone'].map(field => ({ [field]: { $regex: String(search), $options: 'i' } }))
+    const [contacts, total] = await Promise.all([
+      contactsCol.find(filter).sort({ updatedAt: -1, name: 1 }).skip((pageNum - 1) * limitNum).limit(limitNum).toArray(),
+      contactsCol.countDocuments(filter),
+    ])
+    const ids = contacts.map((contact: any) => String(contact._id))
+    const dealRows = ids.length ? await dealsCol.find({ contactId: { $in: ids } }).toArray() : []
+    const enriched = contacts.map((contact: any) => {
+      const related = dealRows.filter((deal: any) => deal.contactId === String(contact._id))
+      return { ...contact, id: String(contact._id), deals: related.length, totalValue: related.reduce((sum: number, deal: any) => sum + Number(deal.value || 0), 0) }
+    })
+    return res.json({ contacts: enriched, total, page: pageNum, pages: Math.max(1, Math.ceil(total / limitNum)) })
   }
   if (req.method === 'POST') {
-    const { name, email, phone, company, role, tags } = req.body || {}
-    try { const { data } = await db.insert('crm_contacts', { name, email, phone, company, role, tags: JSON.stringify(tags || []), status: 'active' }); return res.json(data || { id: Date.now(), name, email, phone, company, role, tags, status: 'active', created: new Date().toISOString() }) } catch { return res.json({ id: Date.now(), name, email, phone, company, role, tags, status: 'active', created: new Date().toISOString() }) }
+    const { name, email, phone, company, role, tags, notes } = req.body || {}
+    if (!name || !email) return res.status(400).json({ error: 'Name and email are required' })
+    const now = new Date()
+    const doc = { name: sanitizeText(name, 120), email: cleanEmail(email), phone: sanitizeText(phone || '', 40), company: sanitizeText(company || '', 120), role: sanitizeText(role || '', 100), status: 'active', tags: Array.isArray(tags) ? tags.map((tag: any) => sanitizeText(String(tag), 40)).filter(Boolean) : [], notes: sanitizeText(notes || '', 1000), lastContact: now, createdAt: now, updatedAt: now }
+    const result = await contactsCol.insertOne(doc)
+    return res.status(201).json({ success: true, data: { _id: result.insertedId, id: String(result.insertedId), ...doc } })
+  }
+  if (req.method === 'PUT') {
+    const id = String(req.body?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid contact id is required' })
+    const update = { ...req.body, updatedAt: new Date() }
+    delete update.id
+    if (update.email) update.email = cleanEmail(update.email)
+    await contactsCol.updateOne({ _id: new ObjectId(id) }, { $set: update })
+    return res.json({ success: true, data: await contactsCol.findOne({ _id: new ObjectId(id) }) })
   }
   res.status(405).json({ error: 'Method not allowed' })
 }
 
 async function handleCrmDeals(req: VercelRequest, res: VercelResponse) {
-  const db = getDatabase()
+  const dealsCol = await mongoCollection('crm_deals')
+  const contactsCol = await mongoCollection('crm_contacts')
   if (req.method === 'GET') {
-    try { const { data } = await db.query('crm_deals', { orderBy: { column: 'created_at', ascending: false } }); return res.json({ deals: data, total: data.length }) } catch {
-      return res.json({ deals: [
-        { id: 1, name: 'Enterprise License - Meridian Corp', value: 245000, stage: 'negotiation', probability: 85, owner: 'Sarah Chen', contact: 'John Smith', company: 'Meridian Corp', created: '2024-06-01', expectedClose: '2024-07-15' },
-        { id: 2, name: 'Platform Migration - NovaTech', value: 180000, stage: 'proposal', probability: 60, owner: 'Mike Johnson', contact: 'Emily Davis', company: 'NovaTech', created: '2024-06-05', expectedClose: '2024-08-01' },
-        { id: 3, name: 'AI Agent Deployment - Quantum Labs', value: 320000, stage: 'discovery', probability: 40, owner: 'Alex Rivera', contact: 'Robert Chang', company: 'Quantum Labs', created: '2024-06-10', expectedClose: '2024-09-01' },
-        { id: 4, name: 'BillingFlow Integration - FastCart', value: 95000, stage: 'closed_won', probability: 100, owner: 'Lisa Martinez', contact: 'Anna Petrov', company: 'FastCart', created: '2024-05-15', expectedClose: '2024-06-28' },
-        { id: 5, name: 'Smart Home B2B - GreenLeaf', value: 150000, stage: 'qualification', probability: 30, owner: 'David Kim', contact: 'Lisa Thompson', company: 'GreenLeaf Homes', created: '2024-06-12', expectedClose: '2024-08-15' },
-      ], total: 5 })
-    }
+    const deals = await dealsCol.find({}).sort({ updatedAt: -1, createdAt: -1 }).toArray()
+    return res.json({ deals: deals.map((deal: any) => ({ ...deal, id: String(deal._id) })), total: deals.length })
   }
   if (req.method === 'POST') {
-    const { name, value, stage, contactId, probability } = req.body || {}
-    try { const { data } = await db.insert('crm_deals', { name, value, stage, contact_id: contactId, probability }); return res.json(data || { id: Date.now(), name, value, stage, probability, contactId, created: new Date().toISOString() }) } catch { return res.json({ id: Date.now(), name, value, stage, probability, contactId, created: new Date().toISOString() }) }
+    const { name, value, stage, contactId, probability, owner, company, contact, expectedClose } = req.body || {}
+    if (!name) return res.status(400).json({ error: 'Deal name is required' })
+    const linked = ObjectId.isValid(String(contactId || '')) ? await contactsCol.findOne({ _id: new ObjectId(String(contactId)) }) : null
+    const now = new Date()
+    const doc = { name: sanitizeText(name, 160), value: Number(value || 0), stage: sanitizeText(stage || 'lead', 40), probability: Number(probability || 20), contactId: linked ? String(linked._id) : '', contact: sanitizeText(contact || linked?.name || '', 120), company: sanitizeText(company || linked?.company || '', 120), owner: sanitizeText(owner || 'HMorix Sales', 120), expectedClose: sanitizeText(expectedClose || '', 40), createdAt: now, updatedAt: now }
+    const result = await dealsCol.insertOne(doc)
+    return res.status(201).json({ success: true, data: { _id: result.insertedId, id: String(result.insertedId), ...doc } })
+  }
+  if (req.method === 'PUT') {
+    const id = String(req.body?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid deal id is required' })
+    const update = { ...req.body, updatedAt: new Date() }
+    delete update.id
+    if (update.value !== undefined) update.value = Number(update.value || 0)
+    if (update.probability !== undefined) update.probability = Number(update.probability || 0)
+    await dealsCol.updateOne({ _id: new ObjectId(id) }, { $set: update })
+    return res.json({ success: true, data: await dealsCol.findOne({ _id: new ObjectId(id) }) })
   }
   res.status(405).json({ error: 'Method not allowed' })
 }
@@ -672,9 +714,40 @@ async function handleHrmPeople(req: VercelRequest, res: VercelResponse) {
     const email = cleanEmail(body.email)
     if (!name || !email) return res.status(400).json({ error: 'Name and email are required' })
     const now = new Date()
-    const doc = { name, email, employeeId: `HM-${Date.now().toString().slice(-6)}`, department: sanitizeText(body.department || 'General', 80), role: sanitizeText(body.role || 'Employee', 100), location: sanitizeText(body.location || 'Remote', 80), status: 'active', salary: Number(body.salary || 0), performanceScore: Number(body.performanceScore || 4), startDate: body.startDate || now.toISOString().slice(0, 10), createdAt: now, updatedAt: now }
+    const documents = [
+      { name: 'Offer letter', status: 'pending', url: '' },
+      { name: 'Identity proof', status: 'pending', url: '' },
+      { name: 'Address proof', status: 'pending', url: '' },
+      { name: 'Bank details', status: 'pending', url: '' },
+    ]
+    const doc = { name, email, employeeId: `HM-${Date.now().toString().slice(-6)}`, department: sanitizeText(body.department || 'General', 80), role: sanitizeText(body.role || 'Employee', 100), location: sanitizeText(body.location || 'Remote', 80), phone: sanitizeText(body.phone || '', 40), status: body.status || 'active', salary: Number(body.salary || 0), performanceScore: Number(body.performanceScore || 4), startDate: body.startDate || now.toISOString().slice(0, 10), documents: body.documents || documents, emergencyContact: body.emergencyContact || {}, notes: sanitizeText(body.notes || '', 1000), createdAt: now, updatedAt: now }
     const result = await employees.insertOne(doc)
     return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
+  }
+  if (req.method === 'PUT') {
+    const id = String(req.body?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid employee id is required' })
+    const update = { ...req.body, updatedAt: new Date() }
+    delete update.id
+    if (update.email) update.email = cleanEmail(update.email)
+    if (update.salary !== undefined) update.salary = Number(update.salary || 0)
+    await employees.updateOne({ _id: new ObjectId(id) }, { $set: update })
+    return res.json({ success: true, data: await employees.findOne({ _id: new ObjectId(id) }) })
+  }
+  return res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function handleHrmLeave(req: VercelRequest, res: VercelResponse) {
+  await ensureHrmSeed()
+  const leaves = await mongoCollection('hrm_leave_requests')
+  if (req.method === 'GET') return res.json({ success: true, data: await leaves.find({}).sort({ createdAt: -1 }).toArray() })
+  if (req.method === 'PUT') {
+    const id = String(req.body?.id || '')
+    const status = String(req.body?.status || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid leave request id is required' })
+    if (!['approved', 'rejected', 'pending'].includes(status)) return res.status(400).json({ error: 'Valid status is required' })
+    await leaves.updateOne({ _id: new ObjectId(id) }, { $set: { status, decidedAt: new Date(), updatedAt: new Date() } })
+    return res.json({ success: true, data: await leaves.findOne({ _id: new ObjectId(id) }) })
   }
   return res.status(405).json({ error: 'Method not allowed' })
 }
@@ -742,7 +815,12 @@ async function handleHrmPayrollExport(req: VercelRequest, res: VercelResponse) {
 async function handleHrmRecruitment(req: VercelRequest, res: VercelResponse) {
   await ensureHrmSeed()
   const recruitment = await mongoCollection('hrm_recruitment')
-  if (req.method === 'GET') return res.json({ success: true, data: await recruitment.find({}).sort({ createdAt: -1 }).toArray() })
+  const applications = await mongoCollection('job_applications')
+  if (req.method === 'GET') {
+    const jobs = await recruitment.find({ deletedAt: { $exists: false } }).sort({ createdAt: -1 }).toArray()
+    const counts = await applications.aggregate([{ $group: { _id: '$jobId', count: { $sum: 1 } } }]).toArray()
+    return res.json({ success: true, data: jobs.map((job: any) => ({ ...job, applicants: counts.find((count: any) => count._id === String(job._id))?.count || Number(job.applicants || 0) })) })
+  }
   if (req.method === 'POST') {
     const body = req.body || {}
     const role = sanitizeText(body.role || body.title || '', 120)
@@ -763,6 +841,72 @@ async function handleHrmRecruitment(req: VercelRequest, res: VercelResponse) {
     }
     const result = await recruitment.insertOne(doc)
     return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
+  }
+  if (req.method === 'PUT') {
+    const id = String(req.body?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid recruitment id is required' })
+    const update = { ...req.body, updatedAt: new Date() }
+    delete update.id
+    await recruitment.updateOne({ _id: new ObjectId(id) }, { $set: update })
+    return res.json({ success: true, data: await recruitment.findOne({ _id: new ObjectId(id) }) })
+  }
+  if (req.method === 'DELETE') {
+    const id = String(req.query.id || req.body?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid recruitment id is required' })
+    await recruitment.updateOne({ _id: new ObjectId(id) }, { $set: { deletedAt: new Date(), status: 'closed', updatedAt: new Date() } })
+    return res.json({ success: true })
+  }
+  return res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function handleCareers(req: VercelRequest, res: VercelResponse) {
+  await ensureHrmSeed()
+  const recruitment = await mongoCollection('hrm_recruitment')
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+  const jobs = await recruitment.find({ deletedAt: { $exists: false }, status: { $ne: 'closed' } }).sort({ createdAt: -1 }).toArray()
+  return res.json({ success: true, data: jobs })
+}
+
+async function handleJobApplications(req: VercelRequest, res: VercelResponse) {
+  await ensureHrmSeed()
+  const applications = await mongoCollection('job_applications')
+  const recruitment = await mongoCollection('hrm_recruitment')
+  const employees = await mongoCollection('hrm_employees')
+  if (req.method === 'GET') {
+    const { jobId } = req.query as any
+    const filter = jobId ? { jobId: String(jobId) } : {}
+    return res.json({ success: true, data: await applications.find(filter).sort({ createdAt: -1 }).toArray() })
+  }
+  if (req.method === 'POST') {
+    const body = req.body || {}
+    const jobId = String(body.jobId || '')
+    if (!ObjectId.isValid(jobId)) return res.status(400).json({ error: 'Valid job id is required' })
+    const job = await recruitment.findOne({ _id: new ObjectId(jobId), deletedAt: { $exists: false } })
+    if (!job) return res.status(404).json({ error: 'Job not found' })
+    const name = sanitizeText(body.name || '', 120)
+    const email = cleanEmail(body.email || '')
+    if (!name || !email) return res.status(400).json({ error: 'Name and email are required' })
+    const now = new Date()
+    const doc = { jobId, jobTitle: job.role || job.title, name, email, phone: sanitizeText(body.phone || '', 40), location: sanitizeText(body.location || '', 100), resumeUrl: sanitizeText(body.resumeUrl || '', 500), resumeText: sanitizeText(body.resumeText || '', 4000), portfolio: sanitizeText(body.portfolio || '', 300), coverLetter: sanitizeText(body.coverLetter || '', 3000), status: 'applied', score: 0, notes: '', createdAt: now, updatedAt: now }
+    const result = await applications.insertOne(doc)
+    await recruitment.updateOne({ _id: new ObjectId(jobId) }, { $inc: { applicants: 1 }, $set: { updatedAt: now } })
+    return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
+  }
+  if (req.method === 'PUT') {
+    const id = String(req.body?.id || '')
+    const status = String(req.body?.status || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid application id is required' })
+    if (!['applied', 'screening', 'interview', 'selected', 'rejected', 'hired'].includes(status)) return res.status(400).json({ error: 'Valid application status is required' })
+    await applications.updateOne({ _id: new ObjectId(id) }, { $set: { status, score: Number(req.body?.score || 0), notes: sanitizeText(req.body?.notes || '', 1000), updatedAt: new Date() } })
+    const application = await applications.findOne({ _id: new ObjectId(id) })
+    if ((status === 'selected' || status === 'hired') && application && req.body?.createEmployee) {
+      const existing = await employees.findOne({ email: application.email })
+      if (!existing) {
+        const now = new Date()
+        await employees.insertOne({ name: application.name, email: application.email, phone: application.phone || '', employeeId: `HM-${Date.now().toString().slice(-6)}`, department: 'General', role: application.jobTitle || 'Employee', location: application.location || 'Remote', status: 'onboarding', salary: 0, performanceScore: 4, startDate: now.toISOString().slice(0, 10), documents: [{ name: 'Resume', status: application.resumeUrl ? 'received' : 'pending', url: application.resumeUrl || '' }, { name: 'Offer letter', status: 'pending', url: '' }, { name: 'Identity proof', status: 'pending', url: '' }], createdAt: now, updatedAt: now })
+      }
+    }
+    return res.json({ success: true, data: application })
   }
   return res.status(405).json({ error: 'Method not allowed' })
 }
@@ -1791,10 +1935,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'hrm/employees': return handleHrmEmployees(req, res)
       case 'hrm/overview': return handleHrmOverview(req, res)
       case 'hrm/people': return handleHrmPeople(req, res)
+      case 'hrm/leave': return handleHrmLeave(req, res)
       case 'hrm/tasks': return handleHrmTasks(req, res)
       case 'hrm/payroll': return handleHrmPayroll(req, res)
       case 'hrm/payroll/export': return handleHrmPayrollExport(req, res)
       case 'hrm/recruitment': return handleHrmRecruitment(req, res)
+      case 'careers': return handleCareers(req, res)
+      case 'careers/applications': return handleJobApplications(req, res)
       case 'ai/chat': return handleAiChat(req, res)
       case 'ai/playground': return handleAiPlayground(req, res)
       case 'analytics/overview': return handleAnalyticsOverview(req, res)
