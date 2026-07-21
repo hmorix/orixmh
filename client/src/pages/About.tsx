@@ -17,7 +17,10 @@ const values = [
     desc: "We build lasting relationships. Your success is our success.",
   },
 ];
+
+export default function About() {
   return (
+   
     <div className="pt-32 pb-20">
       <div className="max-w-[1280px] mx-auto px-8">
         <div className="mb-16">
@@ -86,6 +89,6 @@ const values = [
         </div>
       </div>
     </div>
-  )
+  );
 }
 	
