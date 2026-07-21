@@ -55,7 +55,9 @@ export default function Careers() {
                   {job.salary && <><span>·</span><span>{job.salary}</span></>}
                 </div>
               </div>
-              <span className="text-[#C8FF00] text-sm whitespace-nowrap">Apply -></span>
+              <span className="text-[#C8FF00] text-sm whitespace-nowrap">
+  Apply -&gt;
+</span>
             </Link>
           ))}
         </div>

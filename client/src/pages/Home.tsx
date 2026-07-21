@@ -1,4 +1,4 @@
-iimport { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
 import {
   Globe,
@@ -13,7 +13,7 @@ import {
   Zap,
   Lock,
   Handshake
-} from 'lucide-react
+} from 'lucide-react''
 
 function CounterNumber({ target, suffix }: { target: number; suffix: string }) {
   const ref = useRef<HTMLSpanElement>(null)
