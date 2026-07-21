@@ -6,7 +6,7 @@ import {
   ShieldCheck,
   FileText,
   CreditCard,
-  Home,
+  Home as HomeIcon,
   BarChart3,
   Cloud,
   Target,
