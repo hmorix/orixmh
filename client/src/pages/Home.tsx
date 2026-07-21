@@ -13,7 +13,7 @@ import {
   Zap,
   Lock,
   Handshake
-} from 'lucide-react''
+} from 'lucide-react'
 
 function CounterNumber({ target, suffix }: { target: number; suffix: string }) {
   const ref = useRef<HTMLSpanElement>(null)
