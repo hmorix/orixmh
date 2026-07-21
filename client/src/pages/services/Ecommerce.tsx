@@ -47,10 +47,10 @@ export default function Ecommerce() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
           {[
-            { value: '$2.4B+', label: 'GMV Processed' },
+            { value: '2.4M+', label: 'GMV Processed' },
             { value: '340%', label: 'Avg Conversion Lift' },
-            { value: '150+', label: 'Stores Launched' },
-            { value: '99.99%', label: 'Uptime' },
+            { value: '12+', label: 'Stores Launched' },
+            { value: '98.99%', label: 'Uptime' },
           ].map((s, i) => (
             <div key={i} className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px] text-center">
               <div className="font-display text-2xl font-bold text-[#C8FF00]">{s.value}</div>

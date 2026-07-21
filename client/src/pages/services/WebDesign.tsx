@@ -12,10 +12,12 @@ const features = [
 ]
 
 const portfolio = [
-  { name: 'Meridian Corp', type: 'Enterprise SaaS Dashboard', tech: 'React, TypeScript, D3.js', result: '60% faster load time' },
-  { name: 'NovaTech', type: 'E-commerce Platform', tech: 'Next.js, Stripe, PostgreSQL', result: '340% conversion increase' },
-  { name: 'Quantum Labs', type: 'AI Research Portal', tech: 'React, Python, TensorFlow', result: '2M+ monthly visitors' },
-  { name: 'Stellar Digital', type: 'Marketing Website', tech: 'Next.js, Tailwind, Vercel', result: '98 Lighthouse score' },
+  { name: 'HMorix', type: 'Enterprise SaaS Dashboard', tech: 'React, TypeScript, D3.js', result: '60% faster load time' },
+  { name: 'HAmart', type: 'E-commerce Platform', tech: 'Next.js, Stripe, PostgreSQL', result: '340% conversion increase' },
+  { name: 'Orix Labs', type: 'AI Research Portal', tech: 'React, Python, TensorFlow', result: '1M+ monthly visitors' },
+  { name: 'Corix', type: 'Digital Presece Social Platform', tech: 'Next.js, Tailwind, Vercel', result: 'Gen Z Platform' },
+   { name: 'Billing Flow', type: 'BILLING Automation', tech: 'Next.js, Tailwind, Vercel', result: '100k+  User' },
+   { name: 'Orix P2DF', type: 'PDF Automation', tech: 'Next.js, Tailwind, Vercel', result: 'Automate Over 2M+ Paper Work' },
 ]
 
 export default function WebDesign() {
@@ -78,8 +80,8 @@ export default function WebDesign() {
           <h2 className="font-display text-2xl font-bold text-center mb-8">Web Design Packages</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { name: 'Starter', price: '$2,999', desc: 'Perfect for startups and small businesses', features: ['5-page responsive website', 'Custom UI/UX design', 'SEO optimization', 'Mobile-first design', 'Contact forms', '3 revision rounds'] },
-              { name: 'Business', price: '$7,999', desc: 'For growing companies that need more', features: ['15-page website', 'Custom animations', 'CMS integration', 'E-commerce ready', 'Blog system', 'Analytics dashboard', 'Priority support'], popular: true },
+              { name: 'Starter', price: '27,000', desc: 'Perfect for startups and small businesses', features: ['5-page responsive website', 'Custom UI/UX design', 'SEO optimization', 'Mobile-first design', 'Contact forms', '3 revision rounds'] },
+              { name: 'Business', price: '75,000', desc: 'For growing companies that need more', features: ['15-page website', 'Custom animations', 'CMS integration', 'E-commerce ready', 'Blog system', 'Analytics dashboard', 'Priority support'], popular: true },
               { name: 'Enterprise', price: 'Custom', desc: 'Full-scale web applications', features: ['Unlimited pages', 'Custom web application', 'API development', 'Database design', 'CI/CD pipeline', 'Dedicated team', '24/7 support', 'SLA guarantee'] },
             ].map((plan, i) => (
               <div key={i} className={`p-6 bg-obsidian-2 border rounded-[16px] ${plan.popular ? 'border-[#C8FF00]' : 'border-glass-border'}`}>
@@ -100,7 +102,7 @@ export default function WebDesign() {
         <div className="text-center p-12 bg-obsidian-2 border border-glass-border rounded-[16px]">
           <h2 className="font-display text-2xl font-bold mb-3">Ready to Build Your Dream Website?</h2>
           <p className="text-cream/40 mb-6">Let's discuss your project and create something extraordinary together.</p>
-          <Link to="/contact" className="inline-flex items-center gap-2 px-6 py-3 bg-[#C8FF00] text-obsidian font-semibold rounded-[4px] hover:bg-[#b8ef00] transition-all">Start Your Project <ArrowRight size={16} /></Link>
+          <Link to="/pricing" className="inline-flex items-center gap-2 px-6 py-3 bg-[#C8FF00] text-obsidian font-semibold rounded-[4px] hover:bg-[#b8ef00] transition-all">Start Your Project <ArrowRight size={16} /></Link>
         </div>
       </div>
     </div>

@@ -1,12 +1,39 @@
 import { Link } from 'react-router-dom'
 import SEOHead from '../../components/seo/SEOHead'
-import { Smartphone, Download, Shield, Zap, Code, Layers, CheckCircle, ArrowRight, Star } from 'lucide-react'
+import {
+  Smartphone,
+  Download,
+ Shield,
+  Zap,
+  Code,
+  Layers,
+  CheckCircle,
+  ArrowRight,
+  Apple,
+  Globe,
+} from 'lucide-react'
 
 const platforms = [
-  { name: 'Android APK Development', desc: 'Native Android apps and APK development with Kotlin/Java. Custom APK builds, Google Play Store deployment, and enterprise distribution.', icon: '🤖' },
-  { name: 'iOS App Development', desc: 'Native iOS applications with Swift/SwiftUI. App Store optimization, TestFlight distribution, and enterprise certificates.', icon: '🍎' },
-  { name: 'Cross-Platform Apps', desc: 'React Native and Flutter development for simultaneous Android & iOS deployment. One codebase, two platforms.', icon: '🔄' },
-  { name: 'Progressive Web Apps', desc: 'PWA development with offline support, push notifications, and app-like experiences without app store requirements.', icon: '🌐' },
+  {
+    name: 'Android APK Development',
+    desc: 'Native Android apps and APK development with Kotlin/Java. Custom APK builds, Google Play Store deployment, and enterprise distribution.',
+    icon: Smartphone,
+  },
+  {
+    name: 'iOS App Development',
+    desc: 'Native iOS applications with Swift/SwiftUI. App Store optimization, TestFlight distribution, and enterprise certificates.',
+    icon: Apple,
+  },
+  {
+    name: 'Cross-Platform Apps',
+    desc: 'React Native and Flutter development for simultaneous Android & iOS deployment. One codebase, two platforms.',
+    icon: Layers,
+  },
+  {
+    name: 'Progressive Web Apps',
+    desc: 'PWA development with offline support, push notifications, and app-like experiences without app store requirements.',
+    icon: Globe,
+  },
 ]
 
 const appTypes = [
@@ -36,7 +63,9 @@ export default function MobileApps() {
         <div className="grid md:grid-cols-2 gap-6 mb-16">
           {platforms.map((p, i) => (
             <div key={i} className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px] hover:border-[#C8FF00]/20 transition-all">
-              <div className="text-3xl mb-4">{p.icon}</div>
+              <div className="w-14 h-14 rounded-xl bg-[#C8FF00]/10 flex items-center justify-center mb-4">
+  <p.icon className="w-7 h-7 text-[#C8FF00]" />
+</div>
               <h3 className="font-display text-lg font-semibold mb-2">{p.name}</h3>
               <p className="text-sm text-cream/40">{p.desc}</p>
             </div>
@@ -76,10 +105,10 @@ export default function MobileApps() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
           {[
-            { value: '200+', label: 'Apps Delivered' },
-            { value: '4.8★', label: 'Avg Store Rating' },
-            { value: '50M+', label: 'Total Downloads' },
-            { value: '99.9%', label: 'Crash-Free Rate' },
+            { value: '20+', label: 'Apps Delivered' },
+            { value: '4.2★', label: 'Avg Store Rating' },
+            { value: '5M+', label: 'Total Downloads' },
+            { value: '92.9%', label: 'Crash-Free Rate' },
           ].map((s, i) => (
             <div key={i} className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px] text-center">
               <div className="font-display text-2xl font-bold text-[#C8FF00]">{s.value}</div>
@@ -92,7 +121,7 @@ export default function MobileApps() {
         <div className="text-center p-12 bg-obsidian-2 border border-glass-border rounded-[16px]">
           <h2 className="font-display text-2xl font-bold mb-3">Ready to Build Your Mobile App?</h2>
           <p className="text-cream/40 mb-6">Get a free consultation and project estimate for your mobile app or APK development.</p>
-          <Link to="/contact" className="inline-flex items-center gap-2 px-6 py-3 bg-[#C8FF00] text-obsidian font-semibold rounded-[4px] hover:bg-[#b8ef00] transition-all">Get Free Quote <ArrowRight size={16} /></Link>
+          <Link to="/pricing" className="inline-flex items-center gap-2 px-6 py-3 bg-[#C8FF00] text-obsidian font-semibold rounded-[4px] hover:bg-[#b8ef00] transition-all">Get Free Quote <ArrowRight size={16} /></Link>
         </div>
       </div>
     </div>

@@ -54,10 +54,10 @@ export default function AISolutions() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
           {[
-            { value: '10,000+', label: 'AI Agents Deployed' },
-            { value: '99.2%', label: 'Model Accuracy' },
-            { value: '400%', label: 'Avg Efficiency Gain' },
-            { value: '<200ms', label: 'Inference Latency' },
+            { value: '500+', label: 'AI Agents Deployed' },
+            { value: '94.2%', label: 'Model Accuracy' },
+            { value: '200%', label: 'Avg Efficiency Gain' },
+            { value: '<350ms', label: 'Inference Latency' },
           ].map((s, i) => (
             <div key={i} className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px] text-center">
               <div className="font-display text-2xl font-bold text-[#C8FF00]">{s.value}</div>

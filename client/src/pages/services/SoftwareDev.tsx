@@ -61,10 +61,10 @@ export default function SoftwareDev() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
           {[
-            { value: '500+', label: 'Projects Delivered' },
-            { value: '99.99%', label: 'Uptime SLA' },
-            { value: '12+', label: 'Years Experience' },
-            { value: '50+', label: 'Engineers' },
+            { value: '80+', label: 'Projects Delivered' },
+            { value: '98.99%', label: 'Uptime SLA' },
+            { value: '3+', label: 'Years Experience' },
+            { value: '12+', label: 'Engineers' },
           ].map((s, i) => (
             <div key={i} className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px] text-center">
               <div className="font-display text-2xl font-bold text-[#C8FF00]">{s.value}</div>

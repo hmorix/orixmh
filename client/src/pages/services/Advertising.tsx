@@ -1,14 +1,52 @@
 import { Link } from 'react-router-dom'
 import SEOHead from '../../components/seo/SEOHead'
-import { Megaphone, Target, BarChart3, Zap, Globe, Users, CheckCircle, ArrowRight } from 'lucide-react'
+import {
+  Megaphone,
+  Target,
+  BarChart3,
+  Zap,
+  Globe,
+  Users,
+  CheckCircle,
+  ArrowRight,
+  Search,
+  Smartphone,
+  Briefcase,
+  Monitor,
+  Newspaper,
+} from 'lucide-react'
 
 const channels = [
-  { name: 'Google Ads', desc: 'Search, Display, Shopping, YouTube, and Performance Max campaigns', icon: '🔍' },
-  { name: 'Meta Ads', desc: 'Facebook, Instagram, Messenger, and WhatsApp advertising', icon: '📱' },
-  { name: 'LinkedIn Ads', desc: 'B2B advertising, sponsored content, and InMail campaigns', icon: '💼' },
-  { name: 'TikTok Ads', desc: 'Short-form video advertising and creator partnerships', icon: '🎵' },
-  { name: 'Programmatic', desc: 'Real-time bidding, DSP management, and connected TV', icon: '🖥️' },
-  { name: 'Native Ads', desc: 'Content discovery platforms, sponsored articles, and native placements', icon: '📰' },
+  {
+    name: 'Google Ads',
+    desc: 'Search, Display, Shopping, YouTube, and Performance Max campaigns',
+    icon: Search,
+  },
+  {
+    name: 'Meta Ads',
+    desc: 'Facebook, Instagram, Messenger, and WhatsApp advertising',
+    icon: Smartphone,
+  },
+  {
+    name: 'LinkedIn Ads',
+    desc: 'B2B advertising, sponsored content, and InMail campaigns',
+    icon: Briefcase,
+  },
+  {
+    name: 'TikTok Ads',
+    desc: 'Short-form video advertising and creator partnerships',
+    icon: Megaphone,
+  },
+  {
+    name: 'Programmatic',
+    desc: 'Real-time bidding, DSP management, and connected TV',
+    icon: Monitor,
+  },
+  {
+    name: 'Native Ads',
+    desc: 'Content discovery platforms, sponsored articles, and native placements',
+    icon: Newspaper,
+  },
 ]
 
 export default function Advertising() {
@@ -31,7 +69,9 @@ export default function Advertising() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {channels.map((c, i) => (
             <div key={i} className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px] hover:border-[#C8FF00]/20 transition-all">
-              <div className="text-3xl mb-3">{c.icon}</div>
+              <div className="w-14 h-14 rounded-xl bg-[#C8FF00]/10 flex items-center justify-center mb-4">
+  <c.icon className="w-7 h-7 text-[#C8FF00]" />
+</div>
               <h3 className="font-display font-semibold mb-2">{c.name}</h3>
               <p className="text-sm text-cream/40">{c.desc}</p>
             </div>
@@ -62,7 +102,7 @@ export default function Advertising() {
           {[
             { value: '5.2x', label: 'Average ROAS' },
             { value: '-43%', label: 'Cost Per Acquisition' },
-            { value: '2.8M+', label: 'Monthly Ad Spend Managed' },
+            { value: '450k+', label: 'Monthly Leady' },
             { value: '847%', label: 'Best Campaign ROI' },
           ].map((s, i) => (
             <div key={i} className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px] text-center">
