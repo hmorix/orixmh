@@ -6,13 +6,13 @@ import {
   ShieldCheck,
   FileText,
   CreditCard,
-  House,
+  Home,
   BarChart3,
   Cloud,
   Target,
   Zap,
   Lock,
-  Handshake
+  Users,
 } from 'lucide-react'
 
 function CounterNumber({ target, suffix }: { target: number; suffix: string }) {
@@ -204,7 +204,7 @@ export default function Home() {
     desc: 'Every choice backed by analytics and real-world performance metrics.'
   },
   {
-    icon: HandHeart,
+    icon: Users,
     title: 'Long-term Partnership',
     desc: 'Lasting relationships with ongoing maintenance and support.'
   },
