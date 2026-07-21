@@ -15,9 +15,10 @@ export default function Contact() {
             <p className="text-cream/60 mb-8">Ready to start your project? Have questions? We'd love to hear from you.</p>
             <div className="space-y-6">
               {[
-                { icon: Mail, title: 'Email', value: 'hello@hmorix.com' },
-                { icon: Phone, title: 'Phone', value: '+1 (555) 000-0000' },
-                { icon: MapPin, title: 'Office', value: 'San Francisco, CA' },
+                { icon: Mail, title: 'Email', value: 'hmorix.in@gmail.com' },
+                { icon: Phone, title: 'Phone', value: '+91 93681 53189 },
+                { icon: MapPin, title: 'Office', value: 'Agra Road, Hathras, Uttar Pradesh - 204101, India' },
+                { icon: MapPin, title: 'Office', value: 'Gujani J Block Kanpur, Uttar Pradesh - 208022, India'},
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-4">
                   <div className="w-10 h-10 bg-[#C8FF00]/10 border border-[rgba(200,255,0,0.2)] rounded-[4px] flex items-center justify-center flex-shrink-0">
@@ -55,6 +56,9 @@ export default function Contact() {
                     <option>AI Solutions</option>
                     <option>Cyber Security</option>
                     <option>Smart Home</option>
+                    <option>Software Development</option>
+                    <option>SEO Optimation</option>
+                    <option>HMorix Implantation</option>
                     <option>Other</option>
                   </select>
                 </div>

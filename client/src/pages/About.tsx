@@ -1,4 +1,23 @@
+import { Award, ShieldCheck, Handshake } from "lucide-react";
 export default function About() {
+const values = [
+  {
+    icon: Award,
+    title: "Excellence",
+    desc: "We hold ourselves to the highest standards in every line of code and every client interaction.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Security First",
+    desc: "Security is not an afterthought. It is embedded in our DNA and every product we build.",
+  },
+  {
+    {
+  icon: Users,
+  title: "Partnership",
+  desc: "We build lasting relationships. Your success is our success.",
+},
+];
   return (
     <div className="pt-32 pb-20">
       <div className="max-w-[1280px] mx-auto px-8">
@@ -25,29 +44,39 @@ export default function About() {
         </div>
 
         {/* Values */}
-        <h2 className="font-display text-2xl font-bold mb-8">Our Values</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-24">
-          {[
-            { icon: '🎯', title: 'Excellence', desc: 'We hold ourselves to the highest standards in every line of code and every client interaction.' },
-            { icon: '🔐', title: 'Security First', desc: 'Security is not an afterthought. It is embedded in our DNA and every product we build.' },
-            { icon: '🤝', title: 'Partnership', desc: 'We build lasting relationships. Your success is our success, and we invest in both.' },
-          ].map((v, i) => (
-            <div key={i} className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px] hover:border-[rgba(200,255,0,0.2)] transition-all">
-              <div className="text-3xl mb-4">{v.icon}</div>
-              <h3 className="font-display font-semibold mb-2">{v.title}</h3>
-              <p className="text-sm text-cream/50">{v.desc}</p>
-            </div>
-          ))}
-        </div>
+       <h2 className="font-display text-2xl font-bold mb-8">Our Values</h2>
+
+<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-24">
+  {values.map((v, i) => (
+    <div
+      key={i}
+      className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px] hover:border-[rgba(200,255,0,0.2)] transition-all"
+    >
+      <div className="w-14 h-14 rounded-xl bg-[#C8FF00]/10 border border-[#C8FF00]/20 flex items-center justify-center mb-4">
+        <v.icon
+          className="w-7 h-7 text-[#C8FF00]"
+          strokeWidth={2}
+        />
+      </div>
+
+      <h3 className="font-display font-semibold mb-2">{v.title}</h3>
+      <p className="text-sm text-cream/50">{v.desc}</p>
+    </div>
+  ))}
+</div>
 
         {/* Team */}
         <h2 className="font-display text-2xl font-bold mb-8">Leadership Team</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { initials: 'HM', name: 'Hassan Morix', role: 'CEO & Founder' },
-            { initials: 'AK', name: 'Aisha Khan', role: 'CTO' },
-            { initials: 'JR', name: 'James Rivera', role: 'VP Engineering' },
-            { initials: 'SL', name: 'Sarah Lin', role: 'Head of AI' },
+            { initials: 'HM', name: 'Harsh Sharma', role: 'CEO & Founder' },
+            { initials: 'SS', name: 'Shiva Sharma', role: 'Co-Founder' },
+            { initials: 'SS', name: 'Shivani Sharma', role: 'Hiring Manger' },
+            { initials: 'MK', name: 'Manik Garg', role: 'CTO' },
+			{ initials: 'PK', name: 'Prateek Jain', role: 'Head of AI' },
+            { initials: 'SS', name: 'Sushant Singh', role: 'Head of Security' },
+            { initials: 'KK', name: 'Krishna Kushwah', role: 'VP Engineering' },
+           
           ].map((m, i) => (
             <div key={i} className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px] text-center hover:border-[rgba(200,255,0,0.2)] transition-all">
               <div className="w-16 h-16 bg-[#C8FF00]/10 border-2 border-[rgba(200,255,0,0.3)] rounded-full flex items-center justify-center mx-auto mb-4 font-display font-bold text-[#C8FF00]">{m.initials}</div>
@@ -60,3 +89,4 @@ export default function About() {
     </div>
   )
 }
+	
