@@ -1,5 +1,5 @@
 import { Award, ShieldCheck, Handshake } from "lucide-react";
-export default function About() {
+
 const values = [
   {
     icon: Award,
@@ -12,11 +12,10 @@ const values = [
     desc: "Security is not an afterthought. It is embedded in our DNA and every product we build.",
   },
   {
-    {
-  icon: Users,
-  title: "Partnership",
-  desc: "We build lasting relationships. Your success is our success.",
-},
+    icon: Handshake,
+    title: "Partnership",
+    desc: "We build lasting relationships. Your success is our success.",
+  },
 ];
   return (
     <div className="pt-32 pb-20">
@@ -34,7 +33,7 @@ const values = [
             <p className="text-cream/60">Today we serve enterprise clients across multiple industries, delivering custom software, AI solutions, and security services that drive measurable business outcomes.</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {[{num:'120+',label:'Clients Served'},{num:'300+',label:'Projects Completed'},{num:'5+',label:'Years Experience'},{num:'98%',label:'Satisfaction Rate'}].map((s,i) => (
+            {[{num:'12+',label:'Clients Served'},{num:'180+',label:'Projects Completed'},{num:'3+',label:'Years Experience'},{num:'98%',label:'Satisfaction Rate'}].map((s,i) => (
               <div key={i} className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
                 <div className="font-display text-2xl font-bold text-[#C8FF00]">{s.num}</div>
                 <div className="text-xs text-cream/40 mt-1">{s.label}</div>

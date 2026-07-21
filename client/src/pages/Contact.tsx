@@ -16,7 +16,7 @@ export default function Contact() {
             <div className="space-y-6">
               {[
                 { icon: Mail, title: 'Email', value: 'hmorix.in@gmail.com' },
-                { icon: Phone, title: 'Phone', value: '+91 93681 53189 },
+               { icon: Phone, title: 'Phone', value: '+91 93681 53189' },
                 { icon: MapPin, title: 'Office', value: 'Agra Road, Hathras, Uttar Pradesh - 204101, India' },
                 { icon: MapPin, title: 'Office', value: 'Gujani J Block Kanpur, Uttar Pradesh - 208022, India'},
               ].map((item, i) => (
