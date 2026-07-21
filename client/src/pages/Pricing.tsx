@@ -11,8 +11,8 @@ export default function Pricing() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {[
-            { plan: 'Starter', price: '$2,499', period: '/project', desc: 'For small businesses and startups', features: ['Single web application','Up to 10 pages','Basic SEO','3 months support','Source code delivery','Responsive design'], cta: 'Get Started' },
-            { plan: 'Professional', price: '$7,999', period: '/project', desc: 'For growing companies', features: ['Full-stack application','Unlimited pages','Advanced SEO & analytics','12 months support','CI/CD pipeline','Custom integrations','Priority support'], cta: 'Get Started', featured: true },
+            { plan: 'Starter', price: 'Inr 27,000', period: '/project', desc: 'For small businesses and startups', features: ['Single web application','Up to 20 pages','Basic SEO','11 months support','Source code delivery','Responsive design,HMorix Product &Services'], cta: 'Get Started' },
+            { plan: 'Professional', price: 'Inr 75,000', period: '/project', desc: 'For growing companies', features: ['Full-stack application','100+ pages','Advanced SEO & analytics','12 months support','CI/CD pipeline','Custom integrations','Priority support'], cta: 'Get Started', featured: true },
             { plan: 'Enterprise', price: 'Custom', period: '', desc: 'For large organizations', features: ['Multiple applications','Dedicated team','24/7 support','SLA guarantee','Security audits','Custom infrastructure','On-site consulting'], cta: 'Contact Sales' },
           ].map((plan, i) => (
             <div key={i} className={`p-8 border rounded-[24px] relative ${plan.featured ? 'border-[rgba(200,255,0,0.4)] bg-obsidian-3' : 'border-glass-border bg-obsidian-2'}`}>
