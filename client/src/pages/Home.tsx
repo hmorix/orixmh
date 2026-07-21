@@ -127,7 +127,11 @@ export default function Home() {
   { icon: ShieldCheck, title: 'Cyber Security', desc: 'Penetration testing, audits, and continuous security monitoring.' },
   { icon: FileText, title: 'PDF Automation', desc: 'Intelligent document processing at enterprise scale.' },
   { icon: CreditCard, title: 'BillingFlow', desc: 'Complete invoicing and payment management platform.' },
-  { icon: Home, title: 'Smart Home', desc: 'IoT solutions for modern connected living spaces.' },
+ {
+  icon: HomeIcon,
+  title: "Smart Home",
+  desc: "IoT solutions for modern connected living spaces."
+}
   { icon: BarChart3, title: 'Analytics', desc: 'Real-time business intelligence and data visualization.' },
   { icon: Cloud, title: 'Cloud Solutions', desc: 'Scalable infrastructure and deployment pipelines.' },
 ].map((s, i) => (
