@@ -1,8 +1,27 @@
 import { useState } from 'react'
 import { Mail, MapPin, Phone } from 'lucide-react'
+import { config } from '../lib/config'
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false)
+  const [message, setMessage] = useState('')
+  const [form, setForm] = useState({ first_name: '', last_name: '', email: '', service: 'Web Development', message: '' })
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setMessage('')
+    const response = await fetch(`${config.apiUrl}/contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    })
+    const data = await response.json().catch(() => ({}))
+    if (!response.ok) {
+      setMessage(data.error || 'Unable to send message')
+      return
+    }
+    setSubmitted(true)
+  }
 
   return (
     <div className="pt-32 pb-20">
@@ -34,24 +53,25 @@ export default function Contact() {
           </div>
           <div className="lg:col-span-3 p-8 bg-obsidian-2 border border-glass-border rounded-[24px]">
             {!submitted ? (
-              <form onSubmit={e => { e.preventDefault(); setSubmitted(true) }} className="space-y-4">
+              <form onSubmit={submit} className="space-y-4">
+                {message && <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-[8px] text-sm text-red-400">{message}</div>}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-cream/60 mb-1.5">First Name</label>
-                    <input type="text" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" />
+                    <input type="text" required value={form.first_name} onChange={e => setForm({ ...form, first_name: e.target.value })} className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-cream/60 mb-1.5">Last Name</label>
-                    <input type="text" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" />
+                    <input type="text" value={form.last_name} onChange={e => setForm({ ...form, last_name: e.target.value })} className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-cream/60 mb-1.5">Email</label>
-                  <input type="email" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" />
+                  <input type="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-cream/60 mb-1.5">Service Needed</label>
-                  <select className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]">
+                  <select value={form.service} onChange={e => setForm({ ...form, service: e.target.value })} className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]">
                     <option>Web Development</option>
                     <option>AI Solutions</option>
                     <option>Cyber Security</option>
@@ -64,7 +84,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-cream/60 mb-1.5">Message</label>
-                  <textarea rows={4} className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00] resize-none" />
+                  <textarea rows={4} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00] resize-none" />
                 </div>
                 <button type="submit" className="w-full py-3 bg-[#C8FF00] text-obsidian font-display font-semibold rounded-[4px] hover:opacity-90 transition-all">Send Message</button>
               </form>

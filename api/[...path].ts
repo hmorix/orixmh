@@ -926,7 +926,7 @@ async function handleAiChat(req: VercelRequest, res: VercelResponse) {
   const message = sanitizeText(req.body?.message || '', 1200)
   if (!message) return res.status(400).json({ error: 'Message is required' })
   const fallback = siteAssistantFallback(message)
-  if (!process.env.NVIDIA_API_KEY) return res.json({ success: true, ...fallback, provider: 'fallback' })
+  if (!process.env.NVIDIA_API_KEY) return res.json({ success: true, ...fallback, provider: 'fallback', providerError: 'NVIDIA_API_KEY is not configured on the server' })
   try {
     const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
       method: 'POST',
@@ -941,11 +941,12 @@ async function handleAiChat(req: VercelRequest, res: VercelResponse) {
         max_tokens: 500,
       }),
     })
-    const data = await response.json().catch(() => ({}))
+    const data: any = await response.json().catch(() => ({}))
+    if (!response.ok) return res.json({ success: true, ...fallback, provider: 'fallback', providerError: data?.error?.message || data?.message || `NVIDIA request failed with ${response.status}` })
     const reply = data?.choices?.[0]?.message?.content || fallback.reply
     return res.json({ success: true, reply, actions: fallback.actions, provider: 'nvidia' })
-  } catch {
-    return res.json({ success: true, ...fallback, provider: 'fallback' })
+  } catch (error: any) {
+    return res.json({ success: true, ...fallback, provider: 'fallback', providerError: error?.message || 'NVIDIA request failed' })
   }
 }
 
@@ -1510,23 +1511,41 @@ async function handleContact(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
   const { first_name, last_name, email, service, message } = req.body || {}
   if (!first_name || !email) return res.status(400).json({ error: 'Name and email are required' })
-  const db = getDatabase()
-  try { await db.insert('contact_submissions', { first_name, last_name, email, service, message }) } catch {}
+  const now = new Date()
+  const name = `${sanitizeText(first_name, 80)} ${sanitizeText(last_name || '', 80)}`.trim()
+  const normalizedEmail = cleanEmail(email)
+  const contacts = await mongoCollection('crm_contacts')
+  const submissions = await mongoCollection('contact_submissions')
+  const notifications = await mongoCollection('notifications')
+  const activity = await mongoCollection('activity_log')
+  const submission = { firstName: sanitizeText(first_name, 80), lastName: sanitizeText(last_name || '', 80), name, email: normalizedEmail, service: sanitizeText(service || 'General inquiry', 120), message: sanitizeText(message || '', 2000), status: 'new', source: 'contact_page', createdAt: now, updatedAt: now }
+  await submissions.insertOne(submission)
+  await contacts.updateOne(
+    { email: normalizedEmail },
+    {
+      $set: { name, email: normalizedEmail, role: sanitizeText(service || 'Lead', 100), status: 'lead', source: 'contact_page', lastContact: now, updatedAt: now },
+      $setOnInsert: { phone: '', company: '', tags: ['website-lead'], notes: sanitizeText(message || '', 1000), createdAt: now },
+    },
+    { upsert: true }
+  )
+  await notifications.insertOne({ title: 'New website lead', message: `${name} submitted ${service || 'a contact request'}`, type: 'lead', read: false, createdAt: now })
+  await activity.insertOne({ userId: 'system', action: 'contact_lead_created', details: { name, email: normalizedEmail, service }, createdAt: now })
   res.json({ success: true, message: 'Thank you for contacting us. We will get back to you soon.' })
 }
 
 async function handleNotifications(req: VercelRequest, res: VercelResponse) {
-  const db = getDatabase()
   const user = await getAuthUser(req)
+  const notifications = await mongoCollection('notifications')
   if (req.method === 'GET') {
-    if (user) { try { const { data } = await db.query('notifications', { where: { user_id: user.id }, orderBy: { column: 'created_at', ascending: false }, limit: 20 }); return res.json({ success: true, data }) } catch {} }
-    return res.json({ success: true, data: [
-      { id: 1, title: 'Deployment Successful', message: 'BillingFlow v2.4.1 deployed to production', type: 'success', read: false, created_at: new Date().toISOString() },
-      { id: 2, title: 'New Support Ticket', message: 'TKT-4523: API rate limiting issue', type: 'info', read: false, created_at: new Date(Date.now() - 3600000).toISOString() },
-      { id: 3, title: 'Security Alert', message: 'Unusual login attempt blocked from 103.42.18.91', type: 'warning', read: true, created_at: new Date(Date.now() - 7200000).toISOString() },
-    ] })
+    const filter = user ? { $or: [{ userId: user.id }, { userId: { $exists: false } }, { userId: 'system' }] } : { userId: { $exists: false } }
+    const data = await notifications.find(filter).sort({ createdAt: -1 }).limit(30).toArray()
+    return res.json({ success: true, data })
   }
-  if (req.method === 'PUT') { return res.json({ success: true, message: 'All notifications marked as read' }) }
+  if (req.method === 'PUT') {
+    const filter = user ? { $or: [{ userId: user.id }, { userId: { $exists: false } }, { userId: 'system' }] } : {}
+    await notifications.updateMany(filter, { $set: { read: true, readAt: new Date() } })
+    return res.json({ success: true, message: 'All notifications marked as read' })
+  }
   res.status(405).json({ error: 'Method not allowed' })
 }
 

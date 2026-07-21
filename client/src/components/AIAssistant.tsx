@@ -29,7 +29,8 @@ export default function AIAssistant() {
       })
       const data = await response.json().catch(() => ({}))
       if (!response.ok) throw new Error(data.error || 'Assistant is unavailable')
-      setMessages(prev => [...prev, { role: 'assistant', content: data.reply || 'I can help you navigate HMorix.', actions: data.actions || [] }])
+      const debug = data.provider === 'fallback' && data.providerError ? `\n\nAI provider: ${data.providerError}` : ''
+      setMessages(prev => [...prev, { role: 'assistant', content: `${data.reply || 'I can help you navigate HMorix.'}${debug}`, actions: data.actions || [] }])
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: 'I can still help you navigate HMorix. For password reset use Forgot Password, for account changes use Profile, and for service questions open Services or Contact.', actions: [{ label: 'Forgot Password', href: '/forgot-password' }, { label: 'Profile', href: '/profile' }, { label: 'Contact', href: '/contact' }] }])
     } finally {

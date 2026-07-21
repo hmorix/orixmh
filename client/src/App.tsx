@@ -38,6 +38,7 @@ const LocalServices = lazy(() => import('./pages/LocalServices'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Architecture = lazy(() => import('./pages/Architecture'))
 const Careers = lazy(() => import('./pages/Careers'))
+const ApplyJob = lazy(() => import('./pages/ApplyJob'))
 const Investors = lazy(() => import('./pages/Investors'))
 const Partners = lazy(() => import('./pages/Partners'))
 const Roadmap = lazy(() => import('./pages/Roadmap'))
@@ -237,6 +238,7 @@ function App() {
 
           {/* Company */}
           <Route path="/careers" element={<Careers />} />
+          <Route path="/careers/apply/:id" element={<ApplyJob />} />
           <Route path="/investors" element={<Investors />} />
           <Route path="/partners" element={<Partners />} />
           <Route path="/roadmap" element={<Roadmap />} />

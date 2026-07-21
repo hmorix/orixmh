@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { Search, Menu, X, Moon, Sun, Bell, User, LogOut } from 'lucide-react'
 import { useAuth } from '../lib/AuthContext'
 import { useTheme } from '../lib/ThemeContext'
+import { config } from '../lib/config'
 
 interface NavbarProps {
   onCommandOpen: () => void
@@ -13,6 +14,7 @@ export default function Navbar({ onCommandOpen }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const [userOpen, setUserOpen] = useState(false)
+  const [notifications, setNotifications] = useState<any[]>([])
   const location = useLocation()
   const { user, signOut } = useAuth()
   const { theme, setTheme } = useTheme()
@@ -24,6 +26,23 @@ export default function Navbar({ onCommandOpen }: NavbarProps) {
   }, [])
 
   useEffect(() => { setMobileOpen(false); setNotifOpen(false); setUserOpen(false) }, [location])
+
+  useEffect(() => {
+    if (!user) return
+    fetch(`${config.apiUrl}/notifications`, { credentials: 'include', cache: 'no-store' })
+      .then(async response => {
+        const data = await response.json().catch(() => ({}))
+        if (response.ok) setNotifications(data.data || [])
+      })
+      .catch(() => setNotifications([]))
+  }, [user])
+
+  const unreadCount = notifications.filter(item => !item.read).length
+
+  const markNotificationsRead = async () => {
+    await fetch(`${config.apiUrl}/notifications`, { method: 'PUT', credentials: 'include' }).catch(() => null)
+    setNotifications(prev => prev.map(item => ({ ...item, read: true })))
+  }
 
   const handleThemeToggle = async () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark'
@@ -141,19 +160,20 @@ export default function Navbar({ onCommandOpen }: NavbarProps) {
               <div className="relative">
                 <button onClick={() => { setNotifOpen(!notifOpen); setUserOpen(false) }} className="w-9 h-9 border border-glass-border rounded-[4px] flex items-center justify-center text-cream/60 hover:text-cream hover:border-cream transition-all relative">
                   <Bell size={16} />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#C8FF00] rounded-full text-[8px] text-obsidian font-bold flex items-center justify-center">3</span>
+                  {unreadCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#C8FF00] rounded-full text-[8px] text-obsidian font-bold flex items-center justify-center">{unreadCount}</span>}
                 </button>
                 {notifOpen && (
                   <div className="absolute top-full right-0 mt-2 w-80 bg-obsidian-2 border border-glass-border rounded-[8px] p-4 backdrop-blur-[20px]">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-sm font-semibold">Notifications</span>
-                      <button className="text-[10px] text-[#C8FF00]">Mark all read</button>
+                      <button onClick={markNotificationsRead} className="text-[10px] text-[#C8FF00]">Mark all read</button>
                     </div>
                     <div className="space-y-2">
-                      {[{title:'Deployment successful',desc:'BillingFlow v2.4.1 is live',time:'2m ago'},{title:'New ticket assigned',desc:'TKT-4522 needs your attention',time:'1h ago'},{title:'Security scan complete',desc:'No vulnerabilities found',time:'3h ago'}].map((n,i) => (
-                        <div key={i} className="p-2 bg-white/[0.02] rounded-[4px] hover:bg-white/[0.04] cursor-pointer">
+                      {notifications.length === 0 && <div className="p-2 text-xs text-cream/40">No notifications yet.</div>}
+                      {notifications.map((n, i) => (
+                        <div key={n._id || i} className={`p-2 rounded-[4px] hover:bg-white/[0.04] cursor-pointer ${n.read ? 'bg-white/[0.01]' : 'bg-white/[0.03]'}`}>
                           <div className="text-xs font-medium">{n.title}</div>
-                          <div className="text-[10px] text-cream/30">{n.desc} · {n.time}</div>
+                          <div className="text-[10px] text-cream/30">{n.message} · {new Date(n.createdAt).toLocaleString()}</div>
                         </div>
                       ))}
                     </div>
