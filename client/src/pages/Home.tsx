@@ -131,7 +131,7 @@ export default function Home() {
   icon: HomeIcon,
   title: "Smart Home",
   desc: "IoT solutions for modern connected living spaces."
-}
+},
   { icon: BarChart3, title: 'Analytics', desc: 'Real-time business intelligence and data visualization.' },
   { icon: Cloud, title: 'Cloud Solutions', desc: 'Scalable infrastructure and deployment pipelines.' },
 ].map((s, i) => (
