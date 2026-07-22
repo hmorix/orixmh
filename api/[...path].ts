@@ -547,7 +547,7 @@ async function handleCrmContacts(req: VercelRequest, res: VercelResponse) {
     const { name, email, phone, company, role, tags, notes } = req.body || {}
     if (!name || !email) return res.status(400).json({ error: 'Name and email are required' })
     const now = new Date()
-    const doc = { name: sanitizeText(name, 120), email: cleanEmail(email), phone: sanitizeText(phone || '', 40), company: sanitizeText(company || '', 120), role: sanitizeText(role || '', 100), status: 'active', tags: Array.isArray(tags) ? tags.map((tag: any) => sanitizeText(String(tag), 40)).filter(Boolean) : [], notes: sanitizeText(notes || '', 1000), lastContact: now, createdAt: now, updatedAt: now }
+    const doc = { name: sanitizeText(name, 120), email: cleanEmail(email), phone: sanitizeText(phone || '', 40), company: sanitizeText(company || '', 120), role: sanitizeText(role || '', 100), status: sanitizeText(req.body?.status || 'lead', 30), tags: Array.isArray(tags) ? tags.map((tag: any) => sanitizeText(String(tag), 40)).filter(Boolean) : [], notes: sanitizeText(notes || '', 1000), lastContact: now, createdAt: now, updatedAt: now }
     const result = await contactsCol.insertOne(doc)
     return res.status(201).json({ success: true, data: { _id: result.insertedId, id: String(result.insertedId), ...doc } })
   }
@@ -921,18 +921,42 @@ function siteAssistantFallback(message: string) {
   return { reply: 'I can help you navigate HMorix services, blogs, profile settings, password reset, HRM, BillingFlow, PDF Automation, AI Agent, and support pages. Tell me what you want to do.', actions: [{ label: 'Services', href: '/services' }, { label: 'Contact', href: '/contact' }, { label: 'Support', href: '/support' }] }
 }
 
+function nvidiaApiKey() {
+  return process.env.NVIDIA_API_KEY || process.env.VITE_NVIDIA_API_KEY || process.env.NVAPI_KEY || ''
+}
+
+function nvidiaKeySource() {
+  if (process.env.NVIDIA_API_KEY) return 'NVIDIA_API_KEY'
+  if (process.env.VITE_NVIDIA_API_KEY) return 'VITE_NVIDIA_API_KEY'
+  if (process.env.NVAPI_KEY) return 'NVAPI_KEY'
+  return ''
+}
+
+async function handleAiStatus(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+  const key = nvidiaApiKey()
+  return res.json({
+    success: true,
+    nvidiaConfigured: Boolean(key),
+    keySource: nvidiaKeySource() || null,
+    keyPrefix: key ? `${key.slice(0, 8)}...${key.slice(-4)}` : null,
+    model: process.env.NVIDIA_MODEL || process.env.VITE_NVIDIA_MODEL || 'nvidia/deepseek-v4-flash',
+  })
+}
+
 async function handleAiChat(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
   const message = sanitizeText(req.body?.message || '', 1200)
   if (!message) return res.status(400).json({ error: 'Message is required' })
   const fallback = siteAssistantFallback(message)
-  if (!process.env.NVIDIA_API_KEY) return res.json({ success: true, ...fallback, provider: 'fallback', providerError: 'NVIDIA_API_KEY is not configured on the server' })
+  const apiKey = nvidiaApiKey()
+  if (!apiKey) return res.json({ success: true, ...fallback, provider: 'fallback', providerError: 'NVIDIA_API_KEY is not configured on the server. Set NVIDIA_API_KEY in Vercel Project Settings, then redeploy.' })
   try {
     const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.NVIDIA_API_KEY}` },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({
-        model: process.env.NVIDIA_MODEL || 'nvidia/deepseek-v4-flash',
+        model: process.env.NVIDIA_MODEL || process.env.VITE_NVIDIA_MODEL || 'nvidia/deepseek-v4-flash',
         messages: [
           { role: 'system', content: 'You are HMorix AI Assistant. Answer using HMorix website knowledge. Be concise. For actions, mention exact pages: /forgot-password, /search-account, /blog, /profile, /settings, /services, /contact, /hrm, /hrm/payroll, /employee/tasks, /playground. Never ask for passwords or secrets.' },
           { role: 'user', content: message },
@@ -1516,8 +1540,6 @@ async function handleContact(req: VercelRequest, res: VercelResponse) {
   const normalizedEmail = cleanEmail(email)
   const contacts = await mongoCollection('crm_contacts')
   const submissions = await mongoCollection('contact_submissions')
-  const notifications = await mongoCollection('notifications')
-  const activity = await mongoCollection('activity_log')
   const submission = { firstName: sanitizeText(first_name, 80), lastName: sanitizeText(last_name || '', 80), name, email: normalizedEmail, service: sanitizeText(service || 'General inquiry', 120), message: sanitizeText(message || '', 2000), status: 'new', source: 'contact_page', createdAt: now, updatedAt: now }
   await submissions.insertOne(submission)
   await contacts.updateOne(
@@ -1528,8 +1550,14 @@ async function handleContact(req: VercelRequest, res: VercelResponse) {
     },
     { upsert: true }
   )
-  await notifications.insertOne({ title: 'New website lead', message: `${name} submitted ${service || 'a contact request'}`, type: 'lead', read: false, createdAt: now })
-  await activity.insertOne({ userId: 'system', action: 'contact_lead_created', details: { name, email: normalizedEmail, service }, createdAt: now })
+  try {
+    const notifications = await mongoCollection('notifications')
+    await notifications.insertOne({ title: 'New website lead', message: `${name} submitted ${service || 'a contact request'}`, type: 'lead', read: false, createdAt: now })
+  } catch {}
+  try {
+    const activity = await mongoCollection('activity_log')
+    await activity.insertOne({ userId: 'system', action: 'contact_lead_created', details: { name, email: normalizedEmail, service }, createdAt: now })
+  } catch {}
   res.json({ success: true, message: 'Thank you for contacting us. We will get back to you soon.' })
 }
 
@@ -1961,6 +1989,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'hrm/recruitment': return handleHrmRecruitment(req, res)
       case 'careers': return handleCareers(req, res)
       case 'careers/applications': return handleJobApplications(req, res)
+      case 'ai/status': return handleAiStatus(req, res)
       case 'ai/chat': return handleAiChat(req, res)
       case 'ai/playground': return handleAiPlayground(req, res)
       case 'analytics/overview': return handleAnalyticsOverview(req, res)

@@ -19,7 +19,7 @@ type Contact = {
   notes?: string
 }
 
-const blankForm = { id: '', name: '', email: '', phone: '', company: '', role: '', tags: '', notes: '' }
+const blankForm = { id: '', name: '', email: '', phone: '', company: '', role: '', status: 'lead', tags: '', notes: '' }
 
 export default function Contacts() {
   const [search, setSearch] = useState('')
@@ -57,7 +57,7 @@ export default function Contacts() {
 
   const openEdit = (contact: Contact) => {
     setSelected(contact)
-    setForm({ id: String(contact._id || contact.id || ''), name: contact.name || '', email: contact.email || '', phone: contact.phone || '', company: contact.company || '', role: contact.role || '', tags: (contact.tags || []).join(', '), notes: contact.notes || '' })
+    setForm({ id: String(contact._id || contact.id || ''), name: contact.name || '', email: contact.email || '', phone: contact.phone || '', company: contact.company || '', role: contact.role || '', status: contact.status || 'lead', tags: (contact.tags || []).join(', '), notes: contact.notes || '' })
     setShowForm(true)
   }
 
@@ -102,6 +102,11 @@ export default function Contacts() {
             <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="Phone" className="px-3 py-2 bg-obsidian border border-glass-border rounded-[6px] text-sm outline-none focus:border-[#C8FF00]" />
             <input value={form.company} onChange={e => setForm({ ...form, company: e.target.value })} placeholder="Company" className="px-3 py-2 bg-obsidian border border-glass-border rounded-[6px] text-sm outline-none focus:border-[#C8FF00]" />
             <input value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} placeholder="Role / service" className="px-3 py-2 bg-obsidian border border-glass-border rounded-[6px] text-sm outline-none focus:border-[#C8FF00]" />
+            <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} className="px-3 py-2 bg-obsidian border border-glass-border rounded-[6px] text-sm outline-none focus:border-[#C8FF00]">
+              <option value="lead">Lead</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
             <input value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} placeholder="Tags, comma separated" className="px-3 py-2 bg-obsidian border border-glass-border rounded-[6px] text-sm outline-none focus:border-[#C8FF00]" />
             <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} placeholder="Notes" className="md:col-span-3 px-3 py-2 bg-obsidian border border-glass-border rounded-[6px] text-sm outline-none focus:border-[#C8FF00]" />
             <button type="submit" className="btn-primary text-sm">{form.id ? 'Update Lead' : 'Save Lead'}</button>
