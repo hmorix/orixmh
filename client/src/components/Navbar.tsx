@@ -228,23 +228,23 @@ export default function Navbar({ onCommandOpen }: NavbarProps) {
 
         {/* Mobile Menu */}
         {mobileOpen && (
-          <div className="md:hidden mt-4 space-y-2 pb-4">
-            <Link to="/" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">Home</Link>
-            <Link to="/services" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">Services</Link>
-            <Link to="/billingflow" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">BillingFlow</Link>
-            <Link to="/agent" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">AI Agent</Link>
-            <Link to="/pricing" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">Pricing</Link>
-            <Link to="/blog" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">Blog</Link>
+          <div className="md:hidden mt-4 space-y-2 pb-4 bg-obsidian-2/95 border border-glass-border rounded-[12px] p-2 shadow-2xl backdrop-blur-[24px]">
+            <Link to="/" className="block px-3 py-2 text-sm text-cream/85 hover:text-cream hover:bg-white/[0.08] rounded-[6px]">Home</Link>
+            <Link to="/services" className="block px-3 py-2 text-sm text-cream/85 hover:text-cream hover:bg-white/[0.08] rounded-[6px]">Services</Link>
+            <Link to="/billingflow" className="block px-3 py-2 text-sm text-cream/85 hover:text-cream hover:bg-white/[0.08] rounded-[6px]">BillingFlow</Link>
+            <Link to="/agent" className="block px-3 py-2 text-sm text-cream/85 hover:text-cream hover:bg-white/[0.08] rounded-[6px]">AI Agent</Link>
+            <Link to="/pricing" className="block px-3 py-2 text-sm text-cream/85 hover:text-cream hover:bg-white/[0.08] rounded-[6px]">Pricing</Link>
+            <Link to="/blog" className="block px-3 py-2 text-sm text-cream/85 hover:text-cream hover:bg-white/[0.08] rounded-[6px]">Blog</Link>
             {user ? (
               <>
-                <Link to="/profile" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">Profile</Link>
-                <Link to="/settings" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">Settings</Link>
-                <button onClick={handleSignOut} className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-[4px]">Sign Out</button>
+                <Link to="/profile" className="block px-3 py-2 text-sm text-cream/85 hover:text-cream hover:bg-white/[0.08] rounded-[6px]">Profile</Link>
+                <Link to="/settings" className="block px-3 py-2 text-sm text-cream/85 hover:text-cream hover:bg-white/[0.08] rounded-[6px]">Settings</Link>
+                <button onClick={handleSignOut} className="w-full text-left px-3 py-2 text-sm text-red-300 hover:bg-red-500/10 rounded-[6px]">Sign Out</button>
               </>
             ) : (
               <>
-                <Link to="/signin" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">Login</Link>
-                <Link to="/signup" className="block px-3 py-2 text-sm text-[#C8FF00] hover:bg-white/[0.04] rounded-[4px]">Get Started</Link>
+                <Link to="/signin" className="block px-3 py-2 text-sm text-cream/85 hover:text-cream hover:bg-white/[0.08] rounded-[6px]">Login</Link>
+                <Link to="/signup" className="block px-3 py-2 text-sm text-[#C8FF00] hover:bg-white/[0.08] rounded-[6px]">Get Started</Link>
               </>
             )}
           </div>
