@@ -504,22 +504,36 @@ async function handleDashboardStats(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleCrmStats(req: VercelRequest, res: VercelResponse) {
+  const overview = await getCrmOverviewData()
+  res.json({ success: true, data: overview.stats })
+}
+
+async function getCrmOverviewData() {
   const contactsCol = await mongoCollection('crm_contacts')
   const dealsCol = await mongoCollection('crm_deals')
-  const [totalContacts, activeContacts, deals] = await Promise.all([
-    contactsCol.countDocuments({}),
-    contactsCol.countDocuments({ status: 'active' }),
-    dealsCol.find({}).toArray(),
+  const submissionsCol = await mongoCollection('contact_submissions')
+  const activityCol = await mongoCollection('activity_log')
+  const [contacts, deals, submissions] = await Promise.all([
+    contactsCol.find({ deletedAt: { $exists: false } }).sort({ updatedAt: -1, createdAt: -1 }).toArray(),
+    dealsCol.find({ deletedAt: { $exists: false } }).sort({ updatedAt: -1, createdAt: -1 }).toArray(),
+    submissionsCol.find({}).sort({ createdAt: -1 }).toArray(),
   ])
   const totalValue = deals.reduce((sum: number, deal: any) => sum + Number(deal.value || 0), 0)
   const stageCount = (stage: string) => deals.filter((deal: any) => deal.stage === stage).length
-  res.json({
-    contacts: { total: totalContacts, active: activeContacts, newThisMonth: 0, growth: '+0%' },
-    deals: { active: deals.filter((deal: any) => deal.stage !== 'closed_won').length, totalValue, avgDealSize: deals.length ? Math.round(totalValue / deals.length) : 0, winRate: deals.length ? Math.round((stageCount('closed_won') / deals.length) * 100) : 0 },
-    pipeline: { lead: stageCount('lead'), qualification: stageCount('qualification'), discovery: stageCount('discovery'), proposal: stageCount('proposal'), negotiation: stageCount('negotiation'), closedWon: stageCount('closed_won') },
-    revenue: { mrr: 0, arr: 0, growth: '+0%' },
-    activities: { callsToday: 0, emailsToday: 0, meetingsToday: 0 },
-  })
+  const recentActivity = await activityCol.find({ action: { $in: ['contact_lead_created', 'lead_updated', 'deal_created', 'deal_updated', 'deal_deleted', 'lead_deleted', 'deal_lost'] } }).sort({ createdAt: -1 }).limit(10).toArray()
+  return {
+    contacts,
+    deals,
+    submissions,
+    recentActivity,
+    stats: {
+      contacts: { total: contacts.length, active: contacts.filter((contact: any) => contact.status === 'active').length, newThisMonth: submissions.filter((item: any) => new Date(item.createdAt).getMonth() === new Date().getMonth()).length, growth: '+0%' },
+      deals: { active: deals.filter((deal: any) => !['closed_won', 'closed_lost'].includes(deal.stage)).length, totalValue, avgDealSize: deals.length ? Math.round(totalValue / deals.length) : 0, winRate: deals.length ? Math.round((stageCount('closed_won') / deals.length) * 100) : 0 },
+      pipeline: { lead: stageCount('lead'), qualification: stageCount('qualification'), discovery: stageCount('discovery'), proposal: stageCount('proposal'), negotiation: stageCount('negotiation'), closedWon: stageCount('closed_won'), closedLost: stageCount('closed_lost') },
+      revenue: { mrr: 0, arr: 0, growth: '+0%' },
+      activities: { callsToday: recentActivity.filter((item: any) => item.action === 'call').length, emailsToday: recentActivity.filter((item: any) => item.action === 'email').length, meetingsToday: recentActivity.filter((item: any) => item.action === 'meeting').length },
+    },
+  }
 }
 
 async function handleCrmContacts(req: VercelRequest, res: VercelResponse) {
@@ -549,6 +563,12 @@ async function handleCrmContacts(req: VercelRequest, res: VercelResponse) {
     const now = new Date()
     const doc = { name: sanitizeText(name, 120), email: cleanEmail(email), phone: sanitizeText(phone || '', 40), company: sanitizeText(company || '', 120), role: sanitizeText(role || '', 100), status: sanitizeText(req.body?.status || 'lead', 30), tags: Array.isArray(tags) ? tags.map((tag: any) => sanitizeText(String(tag), 40)).filter(Boolean) : [], notes: sanitizeText(notes || '', 1000), lastContact: now, createdAt: now, updatedAt: now }
     const result = await contactsCol.insertOne(doc)
+    await dealsCol.updateOne(
+      { contact: doc.name, company: doc.company, deletedAt: { $exists: false } },
+      { $set: { name: `${doc.role || 'Lead'} - ${doc.company || doc.name}`, value: 0, stage: 'lead', probability: 20, contactId: String(result.insertedId), contact: doc.name, company: doc.company, owner: 'HMorix Sales', expectedClose: '', createdAt: now, updatedAt: now } },
+      { upsert: true }
+    )
+    await logActivity('system', 'lead_created', { name: doc.name, email: doc.email, company: doc.company }, req)
     return res.status(201).json({ success: true, data: { _id: result.insertedId, id: String(result.insertedId), ...doc } })
   }
   if (req.method === 'PUT') {
@@ -558,7 +578,18 @@ async function handleCrmContacts(req: VercelRequest, res: VercelResponse) {
     delete update.id
     if (update.email) update.email = cleanEmail(update.email)
     await contactsCol.updateOne({ _id: new ObjectId(id) }, { $set: update })
+    await dealsCol.updateOne({ contactId: id }, { $set: { contact: update.name || undefined, company: update.company || undefined, updatedAt: new Date() } })
+    await logActivity('system', 'lead_updated', { id, fields: Object.keys(update) }, req)
     return res.json({ success: true, data: await contactsCol.findOne({ _id: new ObjectId(id) }) })
+  }
+  if (req.method === 'DELETE') {
+    const id = String(req.query.id || req.body?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid contact id is required' })
+    const contact = await contactsCol.findOne({ _id: new ObjectId(id) })
+    await contactsCol.deleteOne({ _id: new ObjectId(id) })
+    if (contact) await dealsCol.deleteMany({ $or: [{ contactId: id }, { contact: contact.name, company: contact.company }] })
+    await logActivity('system', 'lead_deleted', { id, email: contact?.email }, req)
+    return res.json({ success: true })
   }
   res.status(405).json({ error: 'Method not allowed' })
 }
@@ -577,6 +608,7 @@ async function handleCrmDeals(req: VercelRequest, res: VercelResponse) {
     const now = new Date()
     const doc = { name: sanitizeText(name, 160), value: Number(value || 0), stage: sanitizeText(stage || 'lead', 40), probability: Number(probability || 20), contactId: linked ? String(linked._id) : '', contact: sanitizeText(contact || linked?.name || '', 120), company: sanitizeText(company || linked?.company || '', 120), owner: sanitizeText(owner || 'HMorix Sales', 120), expectedClose: sanitizeText(expectedClose || '', 40), createdAt: now, updatedAt: now }
     const result = await dealsCol.insertOne(doc)
+    await logActivity('system', 'deal_created', { name: doc.name, stage: doc.stage, value: doc.value }, req)
     return res.status(201).json({ success: true, data: { _id: result.insertedId, id: String(result.insertedId), ...doc } })
   }
   if (req.method === 'PUT') {
@@ -587,9 +619,32 @@ async function handleCrmDeals(req: VercelRequest, res: VercelResponse) {
     if (update.value !== undefined) update.value = Number(update.value || 0)
     if (update.probability !== undefined) update.probability = Number(update.probability || 0)
     await dealsCol.updateOne({ _id: new ObjectId(id) }, { $set: update })
+    await logActivity('system', 'deal_updated', { id, fields: Object.keys(update) }, req)
     return res.json({ success: true, data: await dealsCol.findOne({ _id: new ObjectId(id) }) })
   }
+  if (req.method === 'DELETE') {
+    const id = String(req.query.id || req.body?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid deal id is required' })
+    await dealsCol.deleteOne({ _id: new ObjectId(id) })
+    await logActivity('system', 'deal_deleted', { id }, req)
+    return res.json({ success: true })
+  }
   res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function handleCrmOverview(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+  const overview = await getCrmOverviewData()
+  const activeDeals = overview.deals.filter((deal: any) => !['closed_won', 'closed_lost'].includes(deal.stage))
+  const recentDeals = overview.deals.slice(0, 5)
+  const recentContacts = overview.contacts.slice(0, 5)
+  const recentActivity = overview.recentActivity.map((item: any) => ({
+    type: item.action?.includes('email') ? 'email' : item.action?.includes('meeting') ? 'meeting' : 'call',
+    title: item.action.replace(/_/g, ' '),
+    description: item.details?.name || item.details?.email || item.details?.id || 'CRM activity',
+    time: item.createdAt,
+  }))
+  return res.json({ success: true, data: { ...overview.stats, recentDeals, recentContacts, recentActivity, activeDeals } })
 }
 
 async function handleHrmStats(req: VercelRequest, res: VercelResponse) {
@@ -1550,6 +1605,26 @@ async function handleContact(req: VercelRequest, res: VercelResponse) {
     },
     { upsert: true }
   )
+  const deals = await mongoCollection('crm_deals')
+  await deals.updateOne(
+    { $or: [{ contact: name, company: sanitizeText(service || 'Website inquiry', 120) }, { contactId: normalizedEmail }, { contact: name }] },
+    {
+      $set: {
+        name: `${sanitizeText(service || 'Website inquiry', 120)} - ${name}`,
+        value: 0,
+        stage: 'lead',
+        probability: 20,
+        contact: name,
+        company: sanitizeText(service || 'Website inquiry', 120),
+        contactId: normalizedEmail,
+        owner: 'HMorix Sales',
+        expectedClose: '',
+        updatedAt: now,
+      },
+      $setOnInsert: { createdAt: now },
+    },
+    { upsert: true }
+  )
   try {
     const notifications = await mongoCollection('notifications')
     await notifications.insertOne({ title: 'New website lead', message: `${name} submitted ${service || 'a contact request'}`, type: 'lead', read: false, createdAt: now })
@@ -1976,6 +2051,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'auth/github/callback': return handleOAuthCallback(req, res, 'github')
       case 'dashboard/stats': return handleDashboardStats(req, res)
       case 'crm/stats': return handleCrmStats(req, res)
+      case 'crm/overview': return handleCrmOverview(req, res)
       case 'crm/contacts': return handleCrmContacts(req, res)
       case 'crm/deals': return handleCrmDeals(req, res)
       case 'hrm/stats': return handleHrmStats(req, res)

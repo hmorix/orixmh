@@ -10,6 +10,7 @@ const stageDefs = [
   { key: 'proposal', name: 'Proposal', color: 'border-orange-500' },
   { key: 'negotiation', name: 'Negotiation', color: 'border-pink-500' },
   { key: 'closed_won', name: 'Closed Won', color: 'border-green-500' },
+  { key: 'closed_lost', name: 'Closed Lost', color: 'border-red-500' },
 ]
 
 const blankDeal = { id: '', name: '', company: '', contact: '', value: '', owner: 'HMorix Sales', stage: 'lead', probability: '20', expectedClose: '' }
@@ -64,9 +65,21 @@ export default function Deals() {
     loadDeals()
   }
 
+  const deleteDeal = async (deal: any) => {
+    await fetch(`${config.apiUrl}/crm/deals?id=${encodeURIComponent(String(deal._id || deal.id))}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+    loadDeals()
+  }
+
   const openEdit = (deal: any) => {
     setForm({ id: String(deal._id || deal.id || ''), name: deal.name || '', company: deal.company || '', contact: deal.contact || '', value: String(deal.value || ''), owner: deal.owner || 'HMorix Sales', stage: deal.stage || 'lead', probability: String(deal.probability || 20), expectedClose: deal.expectedClose || '' })
     setShowForm(true)
+  }
+
+  const markLost = async (deal: any) => {
+    await updateStage(deal, 'closed_lost')
   }
 
   return (
@@ -123,6 +136,10 @@ export default function Deals() {
                           <div className="w-6 h-6 bg-obsidian-3 rounded-full flex items-center justify-center text-[8px] font-bold">{String(deal.owner || 'H')[0]}</div>
                           <div className="flex items-center gap-1"><div className="w-16 h-1.5 bg-obsidian-3 rounded-full overflow-hidden"><div className="h-full bg-[#C8FF00] rounded-full" style={{ width: `${Number(deal.probability || 0)}%` }} /></div><span className="text-[9px] text-cream/30">{deal.probability || 0}%</span></div>
                         </div>
+                        <div className="mt-2 flex items-center gap-2">
+                          <button onClick={(e) => { e.stopPropagation(); markLost(deal) }} className="text-[10px] text-red-300 hover:text-red-200">Lose</button>
+                          <button onClick={(e) => { e.stopPropagation(); deleteDeal(deal) }} className="text-[10px] text-cream/40 hover:text-cream">Delete</button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -134,7 +151,7 @@ export default function Deals() {
         ) : (
           <div className="bg-obsidian-2 border border-glass-border rounded-[12px] overflow-hidden">
             <table className="w-full text-sm">
-              <thead><tr className="text-left text-cream/30 text-xs border-b border-glass-border bg-white/[0.02]"><th className="p-4">Deal</th><th className="p-4">Company</th><th className="p-4">Value</th><th className="p-4">Stage</th><th className="p-4">Owner</th><th className="p-4">Probability</th></tr></thead>
+              <thead><tr className="text-left text-cream/30 text-xs border-b border-glass-border bg-white/[0.02]"><th className="p-4">Deal</th><th className="p-4">Company</th><th className="p-4">Value</th><th className="p-4">Stage</th><th className="p-4">Owner</th><th className="p-4">Probability</th><th className="p-4">Actions</th></tr></thead>
               <tbody>
                 {deals.map(deal => (
                   <tr key={deal._id || deal.id} onClick={() => openEdit(deal)} className="border-b border-glass-border/50 hover:bg-white/[0.02] cursor-pointer">
@@ -144,9 +161,15 @@ export default function Deals() {
                     <td className="p-4"><select value={deal.stage || 'lead'} onClick={e => e.stopPropagation()} onChange={e => updateStage(deal, e.target.value)} className="bg-obsidian border border-glass-border rounded px-2 py-1 text-xs">{stageDefs.map(stage => <option key={stage.key} value={stage.key}>{stage.name}</option>)}</select></td>
                     <td className="p-4">{deal.owner || '-'}</td>
                     <td className="p-4">{deal.probability || 0}%</td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-2">
+                        <button onClick={(e) => { e.stopPropagation(); markLost(deal) }} className="text-[10px] text-red-300 hover:text-red-200">Lose</button>
+                        <button onClick={(e) => { e.stopPropagation(); deleteDeal(deal) }} className="text-[10px] text-cream/40 hover:text-cream">Delete</button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
-                {deals.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-cream/40">No deals yet. Add your first live deal.</td></tr>}
+                {deals.length === 0 && <tr><td colSpan={7} className="p-8 text-center text-cream/40">No deals yet. Add your first live deal.</td></tr>}
               </tbody>
             </table>
           </div>

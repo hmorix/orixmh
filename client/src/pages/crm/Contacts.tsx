@@ -81,6 +81,15 @@ export default function Contacts() {
     loadContacts()
   }
 
+  const deleteContact = async (contact: Contact) => {
+    await fetch(`${config.apiUrl}/crm/contacts?id=${encodeURIComponent(String(contact._id || contact.id))}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+    if (selected && String(selected._id || selected.id) === String(contact._id || contact.id)) setSelected(null)
+    loadContacts()
+  }
+
   return (
     <div className="pt-32 pb-20 min-h-screen">
       <SEOHead title="CRM Contacts" description="Manage all your business contacts, leads, and customer relationships in one place." keywords="CRM contacts, contact management, lead management, customer database, sales contacts" canonical="/crm/contacts" />
@@ -142,6 +151,7 @@ export default function Contacts() {
                   <th className="p-4 font-medium">Last Contact</th>
                   <th className="p-4 font-medium">Tags</th>
                   <th className="p-4 font-medium"></th>
+                  <th className="p-4 font-medium"></th>
                 </tr>
               </thead>
               <tbody>
@@ -169,9 +179,10 @@ export default function Contacts() {
                     <td className="p-4 text-cream/50">{contact.lastContact ? new Date(contact.lastContact).toLocaleDateString() : '-'}</td>
                     <td className="p-4"><div className="flex gap-1 flex-wrap">{(contact.tags || []).map((tag, i) => <span key={i} className="px-1.5 py-0.5 bg-white/[0.06] text-cream/40 text-[9px] rounded">{tag}</span>)}</div></td>
                     <td className="p-4"><button onClick={e => { e.stopPropagation(); openEdit(contact) }} className="text-cream/30 hover:text-cream"><MoreVertical size={14} /></button></td>
+                    <td className="p-4"><button onClick={e => { e.stopPropagation(); deleteContact(contact) }} className="text-[10px] text-red-300 hover:text-red-200">Delete</button></td>
                   </tr>
                 ))}
-                {filtered.length === 0 && <tr><td colSpan={9} className="p-8 text-center text-cream/40">No leads yet. Contact form submissions will appear here.</td></tr>}
+                {filtered.length === 0 && <tr><td colSpan={10} className="p-8 text-center text-cream/40">No leads yet. Contact form submissions will appear here.</td></tr>}
               </tbody>
             </table>
           </div>
@@ -194,6 +205,9 @@ export default function Contacts() {
                 <p className="text-sm text-cream/40 mt-2">{selected.notes || 'No notes yet.'}</p>
               </div>
               <button onClick={() => openEdit(selected)} className="btn-outline text-sm">Edit Lead</button>
+            </div>
+            <div className="mt-4 flex items-center gap-3">
+              <button onClick={() => deleteContact(selected)} className="px-3 py-2 bg-red-500/10 border border-red-500/20 text-red-300 rounded-[6px] text-sm hover:bg-red-500/15">Delete Lead</button>
             </div>
           </div>
         )}

@@ -1,41 +1,46 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import SEOHead from '../../components/seo/SEOHead'
 import { Users, DollarSign, TrendingUp, Target, Phone, Mail, Calendar, BarChart3, PieChart, ArrowUpRight, ArrowDownRight } from 'lucide-react'
-
-const stats = [
-  { label: 'Total Contacts', value: '12,847', change: '+12.3%', up: true, icon: Users },
-  { label: 'Active Deals', value: '234', change: '+8.7%', up: true, icon: Target },
-  { label: 'Pipeline Value', value: '$4.2M', change: '+23.1%', up: true, icon: DollarSign },
-  { label: 'Win Rate', value: '68%', change: '+5.2%', up: true, icon: TrendingUp },
-]
-
-const recentDeals = [
-  { id: 1, name: 'Enterprise License - Meridian Corp', value: '$245,000', stage: 'Negotiation', probability: 85, owner: 'Sarah Chen', daysInStage: 3 },
-  { id: 2, name: 'Platform Migration - NovaTech', value: '$180,000', stage: 'Proposal', probability: 60, owner: 'Mike Johnson', daysInStage: 7 },
-  { id: 3, name: 'AI Agent Deployment - Quantum Labs', value: '$320,000', stage: 'Discovery', probability: 40, owner: 'Alex Rivera', daysInStage: 2 },
-  { id: 4, name: 'BillingFlow Integration - FastCart', value: '$95,000', stage: 'Closed Won', probability: 100, owner: 'Lisa Martinez', daysInStage: 0 },
-  { id: 5, name: 'Smart Home B2B - GreenLeaf', value: '$150,000', stage: 'Qualification', probability: 30, owner: 'David Kim', daysInStage: 5 },
-]
-
-const activities = [
-  { type: 'call', contact: 'John Smith', company: 'Meridian Corp', time: '10 min ago', note: 'Discussed pricing for enterprise tier' },
-  { type: 'email', contact: 'Emily Davis', company: 'NovaTech', time: '1h ago', note: 'Sent proposal document v2' },
-  { type: 'meeting', contact: 'Robert Chang', company: 'Quantum Labs', time: '2h ago', note: 'Product demo - AI Agent platform' },
-  { type: 'call', contact: 'Anna Petrov', company: 'FastCart', time: '3h ago', note: 'Contract signed, deal closed' },
-]
-
-const pipelineStages = [
-  { name: 'Lead', count: 45, value: '$890K', color: 'bg-blue-500' },
-  { name: 'Qualification', count: 23, value: '$1.2M', color: 'bg-purple-500' },
-  { name: 'Discovery', count: 18, value: '$980K', color: 'bg-yellow-500' },
-  { name: 'Proposal', count: 12, value: '$720K', color: 'bg-orange-500' },
-  { name: 'Negotiation', count: 8, value: '$540K', color: 'bg-pink-500' },
-  { name: 'Closed Won', count: 34, value: '$2.1M', color: 'bg-green-500' },
-]
+import { config } from '../../lib/config'
 
 export default function CRMDashboard() {
   const [timeRange, setTimeRange] = useState('30d')
+  const [overview, setOverview] = useState<any>(null)
+
+  useEffect(() => {
+    fetch(`${config.apiUrl}/crm/overview`, { credentials: 'include', cache: 'no-store' })
+      .then(async response => {
+        const data = await response.json().catch(() => ({}))
+        if (response.ok) setOverview(data.data || null)
+      })
+      .catch(() => setOverview(null))
+  }, [timeRange])
+
+  const stats = overview
+    ? [
+        { label: 'Total Contacts', value: String(overview.contacts.total), change: `${overview.contacts.growth || '+0%'}`, up: true, icon: Users },
+        { label: 'Active Deals', value: String(overview.deals.active), change: '+live', up: true, icon: Target },
+        { label: 'Pipeline Value', value: `₹${Number(overview.deals.totalValue || 0).toLocaleString('en-IN')}`, change: '+live', up: true, icon: DollarSign },
+        { label: 'Win Rate', value: `${overview.deals.winRate || 0}%`, change: '+live', up: true, icon: TrendingUp },
+      ]
+    : [
+        { label: 'Total Contacts', value: '0', change: '+0%', up: true, icon: Users },
+        { label: 'Active Deals', value: '0', change: '+0%', up: true, icon: Target },
+        { label: 'Pipeline Value', value: '₹0', change: '+0%', up: true, icon: DollarSign },
+        { label: 'Win Rate', value: '0%', change: '+0%', up: true, icon: TrendingUp },
+      ]
+
+  const recentDeals = overview?.recentDeals || []
+  const activities = overview?.recentActivity || []
+  const pipelineStages = [
+    { name: 'Lead', count: overview?.pipeline?.lead || 0, value: 'Lead stage', color: 'bg-blue-500' },
+    { name: 'Qualification', count: overview?.pipeline?.qualification || 0, value: 'Qualification stage', color: 'bg-purple-500' },
+    { name: 'Discovery', count: overview?.pipeline?.discovery || 0, value: 'Discovery stage', color: 'bg-yellow-500' },
+    { name: 'Proposal', count: overview?.pipeline?.proposal || 0, value: 'Proposal stage', color: 'bg-orange-500' },
+    { name: 'Negotiation', count: overview?.pipeline?.negotiation || 0, value: 'Negotiation stage', color: 'bg-pink-500' },
+    { name: 'Closed Won', count: overview?.pipeline?.closedWon || 0, value: 'Won deals', color: 'bg-green-500' },
+  ]
 
   return (
     <div className="pt-32 pb-20 min-h-screen">
@@ -97,15 +102,15 @@ export default function CRMDashboard() {
           <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px]">
             <h2 className="font-display text-lg font-semibold mb-4">Recent Activity</h2>
             <div className="space-y-3">
-              {activities.map((a, i) => (
+              {activities.map((a: any, i: number) => (
                 <div key={i} className="flex gap-3 p-2 rounded-[6px] hover:bg-white/[0.02]">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${a.type === 'call' ? 'bg-blue-500/20 text-blue-400' : a.type === 'email' ? 'bg-green-500/20 text-green-400' : 'bg-purple-500/20 text-purple-400'}`}>
                     {a.type === 'call' ? <Phone size={12} /> : a.type === 'email' ? <Mail size={12} /> : <Calendar size={12} />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-medium truncate">{a.contact} · {a.company}</div>
-                    <div className="text-[10px] text-cream/30 truncate">{a.note}</div>
-                    <div className="text-[10px] text-cream/20 mt-0.5">{a.time}</div>
+                    <div className="text-xs font-medium truncate">{a.title || a.contact || 'CRM activity'}</div>
+                    <div className="text-[10px] text-cream/30 truncate">{a.description || a.note || ''}</div>
+                    <div className="text-[10px] text-cream/20 mt-0.5">{a.time ? new Date(a.time).toLocaleString() : ''}</div>
                   </div>
                 </div>
               ))}
@@ -132,14 +137,14 @@ export default function CRMDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {recentDeals.map(deal => (
-                  <tr key={deal.id} className="border-b border-glass-border/50 hover:bg-white/[0.02]">
+                {recentDeals.map((deal: any, i: number) => (
+                  <tr key={deal.id || deal._id || i} className="border-b border-glass-border/50 hover:bg-white/[0.02]">
                     <td className="py-3 font-medium">{deal.name}</td>
-                    <td className="py-3 text-[#C8FF00]">{deal.value}</td>
-                    <td className="py-3"><span className={`px-2 py-0.5 rounded text-[10px] font-medium ${deal.stage === 'Closed Won' ? 'bg-green-500/20 text-green-400' : deal.stage === 'Negotiation' ? 'bg-pink-500/20 text-pink-400' : 'bg-blue-500/20 text-blue-400'}`}>{deal.stage}</span></td>
-                    <td className="py-3">{deal.probability}%</td>
-                    <td className="py-3 text-cream/50">{deal.owner}</td>
-                    <td className="py-3 text-cream/50">{deal.daysInStage}d</td>
+                    <td className="py-3 text-[#C8FF00]">₹{Number(deal.value || 0).toLocaleString('en-IN')}</td>
+                    <td className="py-3"><span className={`px-2 py-0.5 rounded text-[10px] font-medium ${deal.stage === 'closed_won' ? 'bg-green-500/20 text-green-400' : deal.stage === 'negotiation' ? 'bg-pink-500/20 text-pink-400' : 'bg-blue-500/20 text-blue-400'}`}>{String(deal.stage || 'lead').replace(/_/g, ' ')}</span></td>
+                    <td className="py-3">{deal.probability || 0}%</td>
+                    <td className="py-3 text-cream/50">{deal.owner || '-'}</td>
+                    <td className="py-3 text-cream/50">{deal.daysInStage || 0}d</td>
                   </tr>
                 ))}
               </tbody>
