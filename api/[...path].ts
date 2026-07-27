@@ -648,7 +648,38 @@ async function handleCrmOverview(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleHrmStats(req: VercelRequest, res: VercelResponse) {
-  res.json({ employees: { total: 247, active: 240, onLeave: 5, onboarding: 2 }, recruitment: { openPositions: 18, totalApplicants: 373, inInterview: 41, offersExtended: 5 }, attendance: { avgRate: 96.4, lateToday: 3, absentToday: 2 }, payroll: { totalMonthly: 2847000, avgSalary: 142350, nextPayDate: '2024-07-01' }, performance: { avgScore: 4.2, reviewsDue: 12, goalsMet: 87 }, turnover: { rate: 8.2, voluntary: 5.1, involuntary: 3.1 } })
+  const overview = await getHrmOverviewData()
+  res.json({
+    employees: {
+      total: overview.stats.totalEmployees,
+      active: overview.stats.activeEmployees,
+      onLeave: overview.todaySnapshot.onLeaveToday,
+      onboarding: overview.employees.filter((employee: any) => employee.status === 'onboarding').length,
+    },
+    recruitment: {
+      openPositions: overview.stats.openPositions,
+      totalApplicants: overview.recruitment.reduce((sum: number, job: any) => sum + Number(job.applicants || 0), 0),
+      inInterview: overview.recruitment.reduce((sum: number, job: any) => sum + Number(job.pipeline?.interview || 0), 0),
+      offersExtended: overview.recruitment.reduce((sum: number, job: any) => sum + Number(job.pipeline?.offer || 0), 0),
+    },
+    attendance: {
+      avgRate: overview.stats.totalEmployees ? Number((((overview.stats.activeEmployees - overview.todaySnapshot.onLeaveToday) / overview.stats.totalEmployees) * 100).toFixed(1)) : 0,
+      lateToday: 0,
+      absentToday: 0,
+    },
+    payroll: {
+      totalMonthly: overview.stats.monthlyPayroll,
+      avgSalary: overview.employees.length ? Math.round(overview.employees.reduce((sum: number, employee: any) => sum + Number(employee.salary || 0), 0) / overview.employees.length) : 0,
+      nextPayDate: overview.lastPayroll?.period ? `${overview.lastPayroll.period}-28` : '',
+    },
+    performance: {
+      avgScore: overview.stats.avgPerformance,
+      reviewsDue: overview.upcomingReviews.length,
+      goalsMet: 0,
+    },
+    turnover: { rate: 0, voluntary: 0, involuntary: 0 },
+    todaySnapshot: overview.todaySnapshot,
+  })
 }
 
 async function handleHrmEmployees(req: VercelRequest, res: VercelResponse) {
@@ -677,27 +708,7 @@ const hrmSeedEmployees = [
 ]
 
 async function ensureHrmSeed() {
-  const employees = await mongoCollection('hrm_employees')
-  if (await employees.countDocuments()) return
-  const now = new Date()
-  const inserted = await employees.insertMany(hrmSeedEmployees.map((employee, index) => ({ ...employee, employeeId: `HM-${String(index + 1).padStart(4, '0')}`, createdAt: now, updatedAt: now })))
-  const ids = Object.values(inserted.insertedIds).map(id => String(id))
-  const tasks = await mongoCollection('hrm_tasks')
-  await tasks.insertMany([
-    { title: 'Complete profile data review', description: 'Verify personal and payroll profile data.', employeeId: ids[1], assigneeName: 'Aarav Singh', dueDate: '2026-07-25', priority: 'high', category: 'HR', status: 'todo', performanceScore: null, createdAt: now, updatedAt: now },
-    { title: 'Publish AI integration case study', description: 'Prepare service content for AI integration pages.', employeeId: ids[2], assigneeName: 'Priya Verma', dueDate: '2026-07-28', priority: 'medium', category: 'AI/ML', status: 'in_progress', performanceScore: null, createdAt: now, updatedAt: now },
-    { title: 'Local SEO keyword review', description: 'Review Hathras, Mathura, Aligarh, Agra, Vrindavan keywords.', employeeId: ids[3], assigneeName: 'Rohan Gupta', dueDate: '2026-07-30', priority: 'high', category: 'Marketing', status: 'todo', performanceScore: null, createdAt: now, updatedAt: now },
-  ])
-  const leaves = await mongoCollection('hrm_leave_requests')
-  await leaves.insertMany([
-    { employeeId: ids[4], name: 'Neha Sharma', type: 'Annual Leave', dates: 'Aug 1-2, 2026', days: 2, status: 'pending', createdAt: now, updatedAt: now },
-    { employeeId: ids[1], name: 'Aarav Singh', type: 'Sick Leave', dates: 'Jul 18, 2026', days: 1, status: 'approved', createdAt: now, updatedAt: now },
-  ])
-  const recruitment = await mongoCollection('hrm_recruitment')
-  await recruitment.insertMany([
-    { role: 'React Developer', department: 'Engineering', location: 'Noida', openings: 2, applicants: 18, status: 'open', createdAt: now, updatedAt: now },
-    { role: 'SEO Executive', department: 'Marketing', location: 'Hathras', openings: 1, applicants: 9, status: 'interview', createdAt: now, updatedAt: now },
-  ])
+  return
 }
 
 async function getHrmOverviewData() {
@@ -732,6 +743,13 @@ async function getHrmOverviewData() {
   })
   const departments = Array.from(departmentMap.values()).map((dept: any) => ({ ...dept, avgScore: dept.headcount ? Number((dept.score / dept.headcount).toFixed(1)) : 0 }))
   const avgPerformance = employees.length ? Number((employees.reduce((sum: number, employee: any) => sum + Number(employee.performanceScore || 0), 0) / employees.length).toFixed(1)) : 0
+  const todayIso = new Date().toISOString().slice(0, 10)
+  const todayLabel = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  const leaveMatchesToday = leaveRequests.filter((leave: any) => {
+    const text = String(leave.dates || '')
+    return text.includes(todayIso) || text.includes(todayLabel) || text.toLowerCase().includes(new Date().toLocaleString('en-US', { month: 'short' }).toLowerCase())
+  })
+  const onLeaveToday = leaveMatchesToday.filter((leave: any) => leave.status === 'approved').length
   return {
     employees,
     tasks,
@@ -751,6 +769,14 @@ async function getHrmOverviewData() {
       monthlyPayroll: employees.reduce((sum: number, employee: any) => sum + Math.round(Number(employee.salary || 0) / 12), 0),
     },
     lastPayroll,
+    todaySnapshot: {
+      date: todayIso,
+      label: todayLabel,
+      onLeaveToday,
+      presentToday: Math.max(0, employees.filter((employee: any) => employee.status === 'active').length - onLeaveToday),
+      pendingLeaves: leaveRequests.filter((leave: any) => leave.status === 'pending').length,
+      totalEmployees: employees.length,
+    },
   }
 }
 
@@ -760,7 +786,6 @@ async function handleHrmOverview(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleHrmPeople(req: VercelRequest, res: VercelResponse) {
-  await ensureHrmSeed()
   const employees = await mongoCollection('hrm_employees')
   if (req.method === 'GET') return res.json({ success: true, data: await employees.find({}).sort({ name: 1 }).toArray() })
   if (req.method === 'POST') {
@@ -793,7 +818,6 @@ async function handleHrmPeople(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleHrmLeave(req: VercelRequest, res: VercelResponse) {
-  await ensureHrmSeed()
   const leaves = await mongoCollection('hrm_leave_requests')
   if (req.method === 'GET') return res.json({ success: true, data: await leaves.find({}).sort({ createdAt: -1 }).toArray() })
   if (req.method === 'PUT') {
@@ -808,7 +832,6 @@ async function handleHrmLeave(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleHrmTasks(req: VercelRequest, res: VercelResponse) {
-  await ensureHrmSeed()
   const tasks = await mongoCollection('hrm_tasks')
   const employees = await mongoCollection('hrm_employees')
   if (req.method === 'GET') return res.json({ success: true, data: await tasks.find({}).sort({ dueDate: 1 }).toArray() })
@@ -836,7 +859,6 @@ async function handleHrmTasks(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleHrmPayroll(req: VercelRequest, res: VercelResponse) {
-  await ensureHrmSeed()
   const employees = await mongoCollection('hrm_employees')
   const payrollRuns = await mongoCollection('hrm_payroll_runs')
   const period = String(req.query.period || req.body?.period || new Date().toISOString().slice(0, 7))
@@ -868,7 +890,6 @@ async function handleHrmPayrollExport(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleHrmRecruitment(req: VercelRequest, res: VercelResponse) {
-  await ensureHrmSeed()
   const recruitment = await mongoCollection('hrm_recruitment')
   const applications = await mongoCollection('job_applications')
   if (req.method === 'GET') {
@@ -915,7 +936,6 @@ async function handleHrmRecruitment(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleCareers(req: VercelRequest, res: VercelResponse) {
-  await ensureHrmSeed()
   const recruitment = await mongoCollection('hrm_recruitment')
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
   const jobs = await recruitment.find({ deletedAt: { $exists: false }, status: { $ne: 'closed' } }).sort({ createdAt: -1 }).toArray()
@@ -923,7 +943,6 @@ async function handleCareers(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleJobApplications(req: VercelRequest, res: VercelResponse) {
-  await ensureHrmSeed()
   const applications = await mongoCollection('job_applications')
   const recruitment = await mongoCollection('hrm_recruitment')
   const employees = await mongoCollection('hrm_employees')

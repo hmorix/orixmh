@@ -91,6 +91,7 @@ const Deals = lazy(() => import('./pages/crm/Deals'))
 const HRMDashboard = lazy(() => import('./pages/hrm/HRMDashboard'))
 const Recruitment = lazy(() => import('./pages/hrm/Recruitment'))
 const Payroll = lazy(() => import('./pages/hrm/Payroll'))
+const Leaves = lazy(() => import('./pages/hrm/Leaves'))
 const AnalyticsDashboard = lazy(() => import('./pages/analytics/AnalyticsDashboard'))
 
 class AppErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -232,6 +233,7 @@ function App() {
           <Route path="/hrm" element={<HRMDashboard />} />
           <Route path="/hrm/recruitment" element={<Recruitment />} />
           <Route path="/hrm/payroll" element={<Payroll />} />
+          <Route path="/hrm/leaves" element={<Leaves />} />
 
           {/* Analytics */}
           <Route path="/analytics" element={<AnalyticsDashboard />} />

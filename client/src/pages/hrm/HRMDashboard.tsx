@@ -1,47 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import SEOHead from '../../components/seo/SEOHead'
-import { Users, UserPlus, UserMinus, Clock, Calendar, Award, TrendingUp, Briefcase, ArrowUpRight } from 'lucide-react'
+import { Users, UserPlus, Clock, Calendar, Award, TrendingUp, Briefcase, ArrowUpRight, BadgeAlert, ClipboardList } from 'lucide-react'
 import { config } from '../../lib/config'
-
-const stats = [
-  { label: 'Total Employees', value: '247', change: '+8', icon: Users, color: 'text-blue-400' },
-  { label: 'New Hires (Month)', value: '12', change: '+3', icon: UserPlus, color: 'text-green-400' },
-  { label: 'Open Positions', value: '18', change: '-2', icon: Briefcase, color: 'text-purple-400' },
-  { label: 'Avg. Attendance', value: '96.4%', change: '+1.2%', icon: Clock, color: 'text-yellow-400' },
-]
-
-const departments = [
-  { name: 'Engineering', headcount: 84, budget: '$12.4M', openRoles: 6, avgTenure: '2.8y' },
-  { name: 'Product', headcount: 28, budget: '$4.2M', openRoles: 3, avgTenure: '2.1y' },
-  { name: 'Marketing', headcount: 32, budget: '$3.8M', openRoles: 2, avgTenure: '1.9y' },
-  { name: 'Sales', headcount: 45, budget: '$5.6M', openRoles: 4, avgTenure: '1.5y' },
-  { name: 'AI/ML', headcount: 24, budget: '$6.8M', openRoles: 2, avgTenure: '1.8y' },
-  { name: 'Operations', headcount: 18, budget: '$2.1M', openRoles: 1, avgTenure: '3.2y' },
-  { name: 'HR', headcount: 8, budget: '$1.2M', openRoles: 0, avgTenure: '2.5y' },
-  { name: 'Finance', headcount: 8, budget: '$1.4M', openRoles: 0, avgTenure: '2.7y' },
-]
-
-const recentHires = [
-  { name: 'Alex Johnson', role: 'Senior Frontend Engineer', department: 'Engineering', startDate: '2024-06-24', status: 'onboarding' },
-  { name: 'Maria Garcia', role: 'ML Engineer', department: 'AI/ML', startDate: '2024-06-20', status: 'onboarding' },
-  { name: 'James Lee', role: 'Product Designer', department: 'Product', startDate: '2024-06-17', status: 'active' },
-  { name: 'Sophie Brown', role: 'Account Executive', department: 'Sales', startDate: '2024-06-15', status: 'active' },
-  { name: 'Ryan Patel', role: 'DevOps Engineer', department: 'Engineering', startDate: '2024-06-10', status: 'active' },
-]
-
-const leaveRequests = [
-  { name: 'Emily Chen', type: 'Annual Leave', dates: 'Jul 15-19', days: 5, status: 'pending' },
-  { name: 'Mike Johnson', type: 'Sick Leave', dates: 'Jul 1', days: 1, status: 'approved' },
-  { name: 'Lisa Martinez', type: 'Personal', dates: 'Jul 8', days: 1, status: 'pending' },
-  { name: 'David Kim', type: 'Annual Leave', dates: 'Jul 22-26', days: 5, status: 'pending' },
-]
-
-const upcomingReviews = [
-  { name: 'Alex Rivera', department: 'Engineering', dueDate: 'Jul 5', type: 'Quarterly' },
-  { name: 'Sarah Chen', department: 'Product', dueDate: 'Jul 8', type: 'Annual' },
-  { name: 'Tom Anderson', department: 'Marketing', dueDate: 'Jul 10', type: 'Quarterly' },
-]
 
 export default function HRMDashboard() {
   const [tab, setTab] = useState<'overview' | 'recruitment' | 'payroll' | 'performance'>('overview')
@@ -78,7 +39,14 @@ export default function HRMDashboard() {
 
   const liveStats = useMemo(() => {
     const s = overview?.stats
-    if (!s) return stats
+    if (!s) {
+      return [
+        { label: 'Total Employees', value: '0', change: '0 active', icon: Users, color: 'text-blue-400' },
+        { label: 'New Hires (45d)', value: '0', change: '+real', icon: UserPlus, color: 'text-green-400' },
+        { label: 'Open Positions', value: '0', change: '0 roles', icon: Briefcase, color: 'text-purple-400' },
+        { label: 'Task Completion', value: '0%', change: '0/5 avg', icon: Clock, color: 'text-yellow-400' },
+      ]
+    }
     return [
       { label: 'Total Employees', value: String(s.totalEmployees), change: `${s.activeEmployees} active`, icon: Users, color: 'text-blue-400' },
       { label: 'New Hires (45d)', value: String(s.newHires), change: '+real', icon: UserPlus, color: 'text-green-400' },
@@ -87,10 +55,12 @@ export default function HRMDashboard() {
     ]
   }, [overview])
 
-  const liveDepartments = overview?.departments || departments
-  const liveLeaveRequests = overview?.leaveRequests || leaveRequests
-  const liveRecentHires = overview?.recentHires || recentHires
-  const liveUpcomingReviews = overview?.upcomingReviews || upcomingReviews
+  const liveDepartments = overview?.departments || []
+  const liveLeaveRequests = overview?.leaveRequests || []
+  const liveRecentHires = overview?.recentHires || []
+  const liveUpcomingReviews = overview?.upcomingReviews || []
+  const liveEmployees = overview?.employees || []
+  const todaySnapshot = overview?.todaySnapshot || { onLeaveToday: 0, presentToday: 0, pendingLeaves: 0, totalEmployees: 0, label: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }
 
   return (
     <div className="pt-32 pb-20 min-h-screen">
@@ -103,6 +73,7 @@ export default function HRMDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <Link to="/hrm/recruitment" className="btn-outline text-sm">Recruitment</Link>
+            <Link to="/hrm/leaves" className="btn-outline text-sm">Leaves</Link>
             <Link to="/hrm/payroll" className="btn-primary text-sm flex items-center gap-2"><UserPlus size={14} /> Add Employee</Link>
           </div>
         </div>
@@ -130,7 +101,43 @@ export default function HRMDashboard() {
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="p-5 bg-obsidian-2 border border-glass-border rounded-[12px]">
+            <div className="flex items-center justify-between mb-3">
+              <Calendar size={18} className="text-[#C8FF00]" />
+              <span className="text-[10px] text-cream/30">{todaySnapshot.label}</span>
+            </div>
+            <div className="font-display text-2xl font-bold">{todaySnapshot.presentToday}</div>
+            <div className="text-xs text-cream/30 mt-1">Present today</div>
+          </div>
+          <div className="p-5 bg-obsidian-2 border border-glass-border rounded-[12px]">
+            <div className="flex items-center justify-between mb-3">
+              <BadgeAlert size={18} className="text-yellow-400" />
+              <span className="text-[10px] text-cream/30">Leave</span>
+            </div>
+            <div className="font-display text-2xl font-bold">{todaySnapshot.onLeaveToday}</div>
+            <div className="text-xs text-cream/30 mt-1">On leave today</div>
+          </div>
+          <div className="p-5 bg-obsidian-2 border border-glass-border rounded-[12px]">
+            <div className="flex items-center justify-between mb-3">
+              <ClipboardList size={18} className="text-blue-400" />
+              <span className="text-[10px] text-cream/30">HR</span>
+            </div>
+            <div className="font-display text-2xl font-bold">{todaySnapshot.pendingLeaves}</div>
+            <div className="text-xs text-cream/30 mt-1">Pending leaves</div>
+          </div>
+          <div className="p-5 bg-obsidian-2 border border-glass-border rounded-[12px]">
+            <div className="flex items-center justify-between mb-3">
+              <Users size={18} className="text-green-400" />
+              <span className="text-[10px] text-cream/30">Team</span>
+            </div>
+            <div className="font-display text-2xl font-bold">{todaySnapshot.totalEmployees}</div>
+            <div className="text-xs text-cream/30 mt-1">Total employees</div>
+          </div>
+        </div>
+
+        {tab === 'overview' && (
+          <div className="grid lg:grid-cols-3 gap-6 mb-8">
           {/* Departments */}
           <div className="lg:col-span-2 p-6 bg-obsidian-2 border border-glass-border rounded-[12px]">
             <h2 className="font-display text-lg font-semibold mb-4">Departments</h2>
@@ -184,9 +191,100 @@ export default function HRMDashboard() {
               ))}
             </div>
           </div>
-        </div>
+          </div>
+        )}
 
-        <div className="grid lg:grid-cols-2 gap-6">
+        {tab === 'recruitment' && (
+          <div className="grid lg:grid-cols-2 gap-6 mb-8">
+            <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px]">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-display text-lg font-semibold">Open Roles</h2>
+                <Link to="/hrm/recruitment" className="text-xs text-[#C8FF00] hover:underline">Open recruitment</Link>
+              </div>
+              <div className="space-y-3">
+                {overview?.recruitment?.length ? overview.recruitment.map((job: any, i: number) => (
+                  <div key={job._id || i} className="p-3 bg-obsidian border border-glass-border rounded-[8px]">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-sm font-medium">{job.role}</div>
+                        <div className="text-[10px] text-cream/30">{job.department} · {job.location}</div>
+                      </div>
+                      <span className="text-[10px] text-[#C8FF00]">{Number(job.applicants || 0)} applicants</span>
+                    </div>
+                  </div>
+                )) : <div className="text-sm text-cream/40">No live recruitment records yet.</div>}
+              </div>
+            </div>
+            <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px]">
+              <h2 className="font-display text-lg font-semibold mb-4">Applicants Summary</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-obsidian border border-glass-border rounded-[8px]"><div className="text-2xl font-bold">{overview?.stats?.openPositions || 0}</div><div className="text-[10px] text-cream/30">Open positions</div></div>
+                <div className="p-4 bg-obsidian border border-glass-border rounded-[8px]"><div className="text-2xl font-bold">{overview?.recruitment?.reduce((s: number, j: any) => s + Number(j.applicants || 0), 0) || 0}</div><div className="text-[10px] text-cream/30">Total applicants</div></div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab === 'payroll' && (
+          <div className="grid lg:grid-cols-2 gap-6 mb-8">
+            <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px]">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-display text-lg font-semibold">Payroll Snapshot</h2>
+                <Link to="/hrm/payroll" className="text-xs text-[#C8FF00] hover:underline">Open payroll</Link>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-obsidian border border-glass-border rounded-[8px]"><div className="text-2xl font-bold">₹{Number(overview?.stats?.monthlyPayroll || 0).toLocaleString('en-IN')}</div><div className="text-[10px] text-cream/30">Monthly payroll</div></div>
+                <div className="p-4 bg-obsidian border border-glass-border rounded-[8px]"><div className="text-2xl font-bold">{overview?.lastPayroll?.period || '—'}</div><div className="text-[10px] text-cream/30">Last payroll period</div></div>
+              </div>
+            </div>
+            <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px]">
+              <h2 className="font-display text-lg font-semibold mb-4">Current Payroll Staff</h2>
+              <div className="space-y-3">
+                {liveEmployees.length ? liveEmployees.slice(0, 5).map((emp: any, i: number) => (
+                  <div key={emp._id || i} className="flex items-center justify-between p-3 bg-obsidian border border-glass-border rounded-[8px]">
+                    <div>
+                      <div className="text-sm font-medium">{emp.name}</div>
+                      <div className="text-[10px] text-cream/30">{emp.department} · {emp.role}</div>
+                    </div>
+                    <div className="text-xs text-[#C8FF00]">₹{Math.round(Number(emp.salary || 0) / 12).toLocaleString('en-IN')}</div>
+                  </div>
+                )) : <div className="text-sm text-cream/40">No employee payroll data yet.</div>}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab === 'performance' && (
+          <div className="grid lg:grid-cols-2 gap-6 mb-8">
+            <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px]">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-display text-lg font-semibold">Leave Requests</h2>
+                <Link to="/hrm/leaves" className="text-xs text-[#C8FF00] hover:underline">Open leaves</Link>
+              </div>
+              <div className="space-y-3">
+                {liveLeaveRequests.length ? liveLeaveRequests.map((req: any, i: number) => (
+                  <div key={req._id || i} className="p-3 bg-obsidian border border-glass-border rounded-[8px]">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium">{req.name}</span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] ${req.status === 'approved' ? 'bg-green-500/20 text-green-400' : req.status === 'rejected' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{req.status}</span>
+                    </div>
+                    <div className="text-[10px] text-cream/30">{req.type} · {req.dates} ({req.days}d)</div>
+                  </div>
+                )) : <div className="text-sm text-cream/40">No leave requests yet.</div>}
+              </div>
+            </div>
+            <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px]">
+              <h2 className="font-display text-lg font-semibold mb-4">Performance Summary</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-obsidian border border-glass-border rounded-[8px]"><div className="text-2xl font-bold">{overview?.stats?.avgPerformance || 0}</div><div className="text-[10px] text-cream/30">Average score</div></div>
+                <div className="p-4 bg-obsidian border border-glass-border rounded-[8px]"><div className="text-2xl font-bold">{overview?.stats?.taskCompletionRate || 0}%</div><div className="text-[10px] text-cream/30">Task completion</div></div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab === 'overview' && (
+          <div className="grid lg:grid-cols-2 gap-6">
           {/* Recent Hires */}
           <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[12px]">
             <h2 className="font-display text-lg font-semibold mb-4">Recent Hires</h2>
@@ -237,7 +335,8 @@ export default function HRMDashboard() {
               </div>
             </div>
           </div>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   )

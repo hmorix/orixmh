@@ -3,29 +3,10 @@ import SEOHead from '../../components/seo/SEOHead'
 import { DollarSign, Download, Calendar, TrendingUp, Users } from 'lucide-react'
 import { config } from '../../lib/config'
 
-const payrollSummary = {
-  totalPayroll: '$2,847,000',
-  avgSalary: '$142,350',
-  totalBenefits: '$568,000',
-  taxWithholding: '$712,000',
-  nextPayDate: 'July 1, 2024',
-}
-
-const employees = [
-  { id: 1, name: 'Alex Rivera', department: 'Engineering', role: 'Staff Engineer', baseSalary: 195000, bonus: 20000, deductions: 48750, net: 166250, status: 'processed' },
-  { id: 2, name: 'Sarah Chen', department: 'Product', role: 'VP of Product', baseSalary: 220000, bonus: 30000, deductions: 62500, net: 187500, status: 'processed' },
-  { id: 3, name: 'Mike Johnson', department: 'Security', role: 'Head of Security', baseSalary: 185000, bonus: 15000, deductions: 50000, net: 150000, status: 'processed' },
-  { id: 4, name: 'Dr. Emily Park', department: 'AI/ML', role: 'ML Lead', baseSalary: 210000, bonus: 25000, deductions: 58750, net: 176250, status: 'processed' },
-  { id: 5, name: 'Lisa Martinez', department: 'Engineering', role: 'Frontend Lead', baseSalary: 175000, bonus: 15000, deductions: 47500, net: 142500, status: 'pending' },
-  { id: 6, name: 'David Kim', department: 'Marketing', role: 'Growth Lead', baseSalary: 155000, bonus: 12000, deductions: 41750, net: 125250, status: 'pending' },
-  { id: 7, name: 'James Wu', department: 'Security', role: 'IoT Security Lead', baseSalary: 170000, bonus: 10000, deductions: 45000, net: 135000, status: 'processed' },
-  { id: 8, name: 'Anna Petrov', department: 'Engineering', role: 'DevOps Lead', baseSalary: 180000, bonus: 18000, deductions: 49500, net: 148500, status: 'processed' },
-]
-
 export default function Payroll() {
   const [period, setPeriod] = useState(new Date().toISOString().slice(0, 7))
-  const [rows, setRows] = useState<any[]>(employees)
-  const [summary, setSummary] = useState<any>(payrollSummary)
+  const [rows, setRows] = useState<any[]>([])
+  const [summary, setSummary] = useState<any>({ totalPayroll: '₹0', avgSalary: '₹0', totalBenefits: 'Included', taxWithholding: '0%', nextPayDate: '—' })
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
@@ -44,8 +25,8 @@ export default function Payroll() {
         })
       })
       .catch(() => {
-        setRows(employees)
-        setSummary(payrollSummary)
+        setRows([])
+        setSummary({ totalPayroll: '₹0', avgSalary: '₹0', totalBenefits: 'Included', taxWithholding: '0%', nextPayDate: '—' })
       })
   }
 
@@ -85,7 +66,7 @@ export default function Payroll() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="font-display text-3xl font-bold">Payroll Management</h1>
-            <p className="text-cream/50 text-sm mt-1">Next pay date: <span className="text-[#C8FF00]">{payrollSummary.nextPayDate}</span></p>
+            <p className="text-cream/50 text-sm mt-1">Next pay date: <span className="text-[#C8FF00]">{summary.nextPayDate}</span></p>
           </div>
           <div className="flex items-center gap-3">
             <select value={period} onChange={e => setPeriod(e.target.value)} className="px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[6px] text-sm text-cream/70">
@@ -103,10 +84,10 @@ export default function Payroll() {
         {/* Summary */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           {[
-            { label: 'Total Payroll', value: payrollSummary.totalPayroll, icon: DollarSign },
-            { label: 'Avg Salary', value: payrollSummary.avgSalary, icon: TrendingUp },
-            { label: 'Benefits', value: payrollSummary.totalBenefits, icon: Users },
-            { label: 'Tax Withholding', value: payrollSummary.taxWithholding, icon: Calendar },
+            { label: 'Total Payroll', value: summary.totalPayroll, icon: DollarSign },
+            { label: 'Avg Salary', value: summary.avgSalary, icon: TrendingUp },
+            { label: 'Benefits', value: summary.totalBenefits, icon: Users },
+            { label: 'Tax Withholding', value: summary.taxWithholding, icon: Calendar },
             { label: 'Employees', value: String(rows.length), icon: Users },
           ].map((s, i) => (
             <div key={i} className="p-4 bg-obsidian-2 border border-glass-border rounded-[12px]">
@@ -120,7 +101,7 @@ export default function Payroll() {
         {/* Payroll Table */}
         <div className="bg-obsidian-2 border border-glass-border rounded-[12px] overflow-hidden">
           <div className="p-4 border-b border-glass-border flex items-center justify-between">
-            <h2 className="font-display font-semibold">Employee Payroll - June 2024</h2>
+            <h2 className="font-display font-semibold">Employee Payroll - {period}</h2>
             <div className="flex items-center gap-2">
               <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-[10px]">{rows.filter(e => e.status === 'processed').length} processed</span>
               <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-[10px]">{rows.filter(e => e.status === 'pending').length} pending</span>
@@ -159,6 +140,11 @@ export default function Payroll() {
                     <td className="p-4"><span className={`px-2 py-0.5 rounded text-[10px] ${emp.status === 'processed' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{emp.status}</span></td>
                   </tr>
                 ))}
+                {rows.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="p-8 text-center text-cream/40">No payroll data yet.</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
