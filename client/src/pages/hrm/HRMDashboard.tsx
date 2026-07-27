@@ -74,7 +74,7 @@ export default function HRMDashboard() {
           <div className="flex items-center gap-3">
             <Link to="/hrm/recruitment" className="btn-outline text-sm">Recruitment</Link>
             <Link to="/hrm/leaves" className="btn-outline text-sm">Leaves</Link>
-            <Link to="/hrm/payroll" className="btn-primary text-sm flex items-center gap-2"><UserPlus size={14} /> Add Employee</Link>
+            <Link to="/hrm/employees/new" className="btn-primary text-sm flex items-center gap-2"><UserPlus size={14} /> Add Employee</Link>
           </div>
         </div>
 

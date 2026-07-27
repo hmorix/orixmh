@@ -28,6 +28,8 @@ export default function Recruitment() {
   const [showForm, setShowForm] = useState(false)
   const [selectedJob, setSelectedJob] = useState<Job | null>(null)
   const [applications, setApplications] = useState<any[]>([])
+  const [stageFilter, setStageFilter] = useState('all')
+  const [scheduleDates, setScheduleDates] = useState<Record<string, string>>({})
   const [form, setForm] = useState({ role: '', department: 'Engineering', location: 'Hathras', type: 'Full-time', salary: '', openings: '1' })
 
   const loadJobs = async () => {
@@ -84,19 +86,31 @@ export default function Recruitment() {
     setMessage('Job closed and removed from careers')
   }
 
-  const viewApplicants = async (job: Job) => {
-    setSelectedJob(job)
-    const response = await fetch(`${config.apiUrl}/careers/applications?jobId=${encodeURIComponent(String(job._id))}`, { credentials: 'include', cache: 'no-store' })
+  const loadApplicants = async (jobId?: string | null) => {
+    const url = jobId ? `${config.apiUrl}/careers/applications?jobId=${encodeURIComponent(jobId)}` : `${config.apiUrl}/careers/applications`
+    const response = await fetch(url, { credentials: 'include', cache: 'no-store' })
     const data = await response.json().catch(() => ({}))
     setApplications(response.ok ? data.data || [] : [])
   }
 
-  const updateApplication = async (id: string, status: string, createEmployee = false) => {
+  const viewApplicants = async (job: Job) => {
+    setSelectedJob(job)
+    setStageFilter('all')
+    await loadApplicants(String(job._id))
+  }
+
+  const viewAllApplicants = async () => {
+    setSelectedJob(null)
+    setStageFilter('all')
+    await loadApplicants(null)
+  }
+
+  const updateApplication = async (id: string, status: string, options: { createEmployee?: boolean; generateOfferLetter?: boolean; generateJoiningLetter?: boolean; nextInterviewDate?: string } = {}) => {
     const response = await fetch(`${config.apiUrl}/careers/applications`, {
       method: 'PUT',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, status, createEmployee }),
+      body: JSON.stringify({ id, status, ...options }),
     })
     const data = await response.json().catch(() => ({}))
     if (!response.ok) {
@@ -104,20 +118,23 @@ export default function Recruitment() {
       return
     }
     setApplications(prev => prev.map(app => String(app._id) === id ? data.data : app))
-    setMessage(createEmployee ? 'Applicant selected and moved to employee onboarding' : 'Applicant updated')
+    setMessage(options.createEmployee ? 'Applicant selected and employee access was generated' : 'Applicant updated')
   }
 
   return (
     <div className="pt-32 pb-20 min-h-screen">
       <SEOHead title="HRM Recruitment" description="Recruitment pipeline management - track job openings, applicants, interviews, and hiring progress." keywords="recruitment, hiring, job openings, applicant tracking, ATS, talent acquisition, HR recruitment, interview pipeline" canonical="/hrm/recruitment" />
       <div className="max-w-[1400px] mx-auto px-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
+          <div className="flex items-center justify-between mb-8">
+            <div>
             <h1 className="font-display text-3xl font-bold">Recruitment</h1>
             <p className="text-cream/50 text-sm mt-1">{jobs.length} open positions · {totalApplicants} total applicants</p>
           </div>
-          <button onClick={() => setShowForm(v => !v)} className="btn-primary text-sm">+ Post New Job</button>
-        </div>
+          <div className="flex items-center gap-2">
+            <button onClick={viewAllApplicants} className="btn-outline text-sm">All Applicants</button>
+            <button onClick={() => setShowForm(v => !v)} className="btn-primary text-sm">+ Post New Job</button>
+          </div>
+          </div>
 
         {message && <div className="mb-6 p-3 bg-[#C8FF00]/10 border border-[#C8FF00]/20 rounded-[8px] text-sm text-[#C8FF00]">{message}</div>}
 
@@ -186,15 +203,20 @@ export default function Recruitment() {
           </div>
         )}
 
-        {selectedJob && (
+        {applications.length > 0 && (
           <div className="mt-8 p-6 bg-obsidian-2 border border-glass-border rounded-[12px]">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display text-lg font-semibold">Applicants - {selectedJob.role || selectedJob.title}</h2>
-              <button onClick={() => setSelectedJob(null)} className="text-xs text-cream/40 hover:text-cream">Close</button>
+              <h2 className="font-display text-lg font-semibold">Applicants - {selectedJob ? (selectedJob.role || selectedJob.title) : 'All applicants'}</h2>
+              <button onClick={() => { setSelectedJob(null); setApplications([]) }} className="text-xs text-cream/40 hover:text-cream">Close</button>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              {['all', 'applied', 'screening', 'interview_scheduled', 'interview', 'second_interview', 'final_offer', 'joining_letter', 'hired', 'rejected'].map(stage => (
+                <button key={stage} onClick={() => setStageFilter(stage)} className={`px-3 py-1.5 text-xs rounded-full capitalize transition-all ${stageFilter === stage ? 'bg-[#C8FF00] text-obsidian' : 'bg-white/[0.04] text-cream/50 hover:text-cream'}`}>{stage.replace(/_/g, ' ')}</button>
+              ))}
             </div>
             <div className="space-y-3">
-              {applications.length === 0 && <div className="text-sm text-cream/40">No applications yet.</div>}
-              {applications.map(app => (
+              {applications.filter(app => stageFilter === 'all' || String(app.status) === stageFilter).length === 0 && <div className="text-sm text-cream/40">No applications yet.</div>}
+              {applications.filter(app => stageFilter === 'all' || String(app.status) === stageFilter).map(app => (
                 <div key={app._id} className="p-4 bg-obsidian border border-glass-border rounded-[8px]">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
@@ -202,12 +224,24 @@ export default function Recruitment() {
                       <div className="text-xs text-cream/40">{app.email} · {app.phone || 'No phone'} · {app.location || 'No location'}</div>
                       {app.resumeUrl && <a href={app.resumeUrl} target="_blank" rel="noreferrer" className="text-xs text-[#C8FF00]">Open resume</a>}
                       {app.resumeText && <p className="mt-2 text-xs text-cream/50 line-clamp-2">{app.resumeText}</p>}
+                      {app.offerLetter && <div className="mt-2 p-2 bg-white/[0.03] rounded text-[10px] text-cream/50 whitespace-pre-wrap">{app.offerLetter}</div>}
+                      {app.joiningLetter && <div className="mt-2 p-2 bg-white/[0.03] rounded text-[10px] text-cream/50 whitespace-pre-wrap">{app.joiningLetter}</div>}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs">{app.status}</span>
-                      <button onClick={() => updateApplication(String(app._id), 'interview')} className="px-2 py-1 bg-white/[0.04] border border-glass-border rounded text-xs">Interview</button>
-                      <button onClick={() => updateApplication(String(app._id), 'selected', true)} className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">Select</button>
-                      <button onClick={() => updateApplication(String(app._id), 'rejected')} className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs">Reject</button>
+                    <div className="flex flex-col items-end gap-2">
+                      <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs capitalize">{String(app.status).replace(/_/g, ' ')}</span>
+                      <div className="flex items-center gap-2">
+                        <input type="date" value={scheduleDates[String(app._id)] || ''} onChange={e => setScheduleDates(prev => ({ ...prev, [String(app._id)]: e.target.value }))} className="px-2 py-1 bg-obsidian-2 border border-glass-border rounded text-xs text-cream/70" />
+                        <button onClick={() => updateApplication(String(app._id), 'interview_scheduled', { nextInterviewDate: scheduleDates[String(app._id)] })} className="px-2 py-1 bg-white/[0.04] border border-glass-border rounded text-xs">Schedule</button>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 justify-end">
+                        <button onClick={() => updateApplication(String(app._id), 'screening')} className="px-2 py-1 bg-white/[0.04] border border-glass-border rounded text-xs">Screen</button>
+                        <button onClick={() => updateApplication(String(app._id), 'interview')} className="px-2 py-1 bg-white/[0.04] border border-glass-border rounded text-xs">Interview</button>
+                        <button onClick={() => updateApplication(String(app._id), 'second_interview')} className="px-2 py-1 bg-white/[0.04] border border-glass-border rounded text-xs">Next interview</button>
+                        <button onClick={() => updateApplication(String(app._id), 'final_offer', { generateOfferLetter: true })} className="px-2 py-1 bg-white/[0.04] border border-glass-border rounded text-xs">Offer letter</button>
+                        <button onClick={() => updateApplication(String(app._id), 'joining_letter', { generateJoiningLetter: true })} className="px-2 py-1 bg-white/[0.04] border border-glass-border rounded text-xs">Joining letter</button>
+                        <button onClick={() => updateApplication(String(app._id), 'selected', { createEmployee: true })} className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">Accept</button>
+                        <button onClick={() => updateApplication(String(app._id), 'rejected')} className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs">Reject</button>
+                      </div>
                     </div>
                   </div>
                 </div>

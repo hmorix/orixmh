@@ -92,7 +92,9 @@ const HRMDashboard = lazy(() => import('./pages/hrm/HRMDashboard'))
 const Recruitment = lazy(() => import('./pages/hrm/Recruitment'))
 const Payroll = lazy(() => import('./pages/hrm/Payroll'))
 const Leaves = lazy(() => import('./pages/hrm/Leaves'))
+const AddEmployee = lazy(() => import('./pages/hrm/AddEmployee'))
 const AnalyticsDashboard = lazy(() => import('./pages/analytics/AnalyticsDashboard'))
+const EmployeeLogin = lazy(() => import('./pages/employee/EmployeeLogin'))
 
 class AppErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false }
@@ -234,6 +236,7 @@ function App() {
           <Route path="/hrm/recruitment" element={<Recruitment />} />
           <Route path="/hrm/payroll" element={<Payroll />} />
           <Route path="/hrm/leaves" element={<Leaves />} />
+          <Route path="/hrm/employees/new" element={<AddEmployee />} />
 
           {/* Analytics */}
           <Route path="/analytics" element={<AnalyticsDashboard />} />
@@ -280,6 +283,7 @@ function App() {
 
         {/* Auth Pages (no layout) */}
         <Route path="/signin" element={<SignIn />} />
+        <Route path="/employee/login" element={<EmployeeLogin />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify" element={<Verify />} />

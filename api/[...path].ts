@@ -711,6 +711,81 @@ async function ensureHrmSeed() {
   return
 }
 
+function normalizeEmployeeUsername(name: string) {
+  const base = String(name || 'employee')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '.')
+    .replace(/^\.+|\.+$/g, '')
+    .slice(0, 20)
+  return base || 'employee'
+}
+
+function generateEmployeeCredentials(name: string, email?: string, username?: string, password?: string) {
+  const baseUsername = normalizeEmployeeUsername(username || name)
+  const uniqueSuffix = randomToken(3).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 4)
+  const finalUsername = `${baseUsername}${uniqueSuffix}`.replace(/\.+$/, '')
+  const finalEmail = cleanEmail(email || `${finalUsername}@hmorix.com`)
+  const finalPassword = password || randomToken(9).slice(0, 12)
+  return { username: finalUsername, email: finalEmail, password: finalPassword }
+}
+
+async function createEmployeeAccess(employee: any, options: { email?: string; username?: string; password?: string } = {}) {
+  await ensureIndexes()
+  const users = await mongoCollection('users')
+  const profiles = await mongoCollection('profiles')
+  const credentials = generateEmployeeCredentials(employee.name, options.email || employee.email, options.username, options.password)
+  const now = new Date()
+  const passwordHash = await bcrypt.hash(credentials.password, 12)
+  const existing = await users.findOne({ email: credentials.email })
+  if (existing) {
+    await users.updateOne(
+      { _id: existing._id },
+      {
+        $set: {
+          name: employee.name,
+          displayName: employee.name,
+          username: credentials.username,
+          role: 'employee',
+          emailVerified: true,
+          passwordHash,
+          company: 'HMorix',
+          updatedAt: now,
+        },
+        $addToSet: { providers: 'email' },
+      }
+    )
+  } else {
+    await users.insertOne({
+      name: employee.name,
+      displayName: employee.name,
+      email: credentials.email,
+      username: credentials.username,
+      passwordHash,
+      role: 'employee',
+      emailVerified: true,
+      providers: ['email'],
+      company: 'HMorix',
+      createdAt: now,
+      updatedAt: now,
+    })
+  }
+  const savedUser = await users.findOne({ email: credentials.email })
+  if (savedUser) {
+    await upsertProfile(savedUser, { displayName: employee.name, username: credentials.username, company: 'HMorix' })
+  }
+  const loginUrl = `${appUrl()}/employee/login`
+  try {
+    await sendMail({
+      to: credentials.email,
+      subject: 'Your HMorix employee login',
+      text: `Welcome to HMorix. Login at ${loginUrl} with username ${credentials.username} and password ${credentials.password}`,
+      html: `<p>Welcome to HMorix.</p><p>Login at <a href="${loginUrl}">${loginUrl}</a>.</p><p><strong>Username:</strong> ${credentials.username}<br /><strong>Password:</strong> ${credentials.password}</p>`,
+    })
+  } catch {}
+  return { ...credentials, loginUrl }
+}
+
 async function getHrmOverviewData() {
   await ensureHrmSeed()
   const [employeesCol, tasksCol, leavesCol, recruitmentCol, payrollCol] = await Promise.all([
@@ -791,8 +866,9 @@ async function handleHrmPeople(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'POST') {
     const body = req.body || {}
     const name = sanitizeText(body.name, 120)
-    const email = cleanEmail(body.email)
-    if (!name || !email) return res.status(400).json({ error: 'Name and email are required' })
+    const credentials = generateEmployeeCredentials(name, body.email || '', body.username || '', body.password || '')
+    const email = credentials.email
+    if (!name) return res.status(400).json({ error: 'Name is required' })
     const now = new Date()
     const documents = [
       { name: 'Offer letter', status: 'pending', url: '' },
@@ -800,9 +876,10 @@ async function handleHrmPeople(req: VercelRequest, res: VercelResponse) {
       { name: 'Address proof', status: 'pending', url: '' },
       { name: 'Bank details', status: 'pending', url: '' },
     ]
-    const doc = { name, email, employeeId: `HM-${Date.now().toString().slice(-6)}`, department: sanitizeText(body.department || 'General', 80), role: sanitizeText(body.role || 'Employee', 100), location: sanitizeText(body.location || 'Remote', 80), phone: sanitizeText(body.phone || '', 40), status: body.status || 'active', salary: Number(body.salary || 0), performanceScore: Number(body.performanceScore || 4), startDate: body.startDate || now.toISOString().slice(0, 10), documents: body.documents || documents, emergencyContact: body.emergencyContact || {}, notes: sanitizeText(body.notes || '', 1000), createdAt: now, updatedAt: now }
+    const doc = { name, email, username: credentials.username, employeeId: `HM-${Date.now().toString().slice(-6)}`, department: sanitizeText(body.department || 'General', 80), role: sanitizeText(body.role || 'Employee', 100), location: sanitizeText(body.location || 'Remote', 80), phone: sanitizeText(body.phone || '', 40), status: body.status || 'active', salary: Number(body.salary || 0), performanceScore: Number(body.performanceScore || 4), startDate: body.startDate || now.toISOString().slice(0, 10), documents: body.documents || documents, emergencyContact: body.emergencyContact || {}, notes: sanitizeText(body.notes || '', 1000), createdAt: now, updatedAt: now }
     const result = await employees.insertOne(doc)
-    return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
+    const access = await createEmployeeAccess(doc, { email, username: credentials.username, password: credentials.password })
+    return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc, credentials: access } })
   }
   if (req.method === 'PUT') {
     const id = String(req.body?.id || '')
@@ -821,6 +898,7 @@ async function handleHrmLeave(req: VercelRequest, res: VercelResponse) {
   const leaves = await mongoCollection('hrm_leave_requests')
   if (req.method === 'GET') return res.json({ success: true, data: await leaves.find({}).sort({ createdAt: -1 }).toArray() })
   if (req.method === 'PUT') {
+    const body = req.body || {}
     const id = String(req.body?.id || '')
     const status = String(req.body?.status || '')
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid leave request id is required' })
@@ -970,17 +1048,45 @@ async function handleJobApplications(req: VercelRequest, res: VercelResponse) {
     const id = String(req.body?.id || '')
     const status = String(req.body?.status || '')
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid application id is required' })
-    if (!['applied', 'screening', 'interview', 'selected', 'rejected', 'hired'].includes(status)) return res.status(400).json({ error: 'Valid application status is required' })
-    await applications.updateOne({ _id: new ObjectId(id) }, { $set: { status, score: Number(req.body?.score || 0), notes: sanitizeText(req.body?.notes || '', 1000), updatedAt: new Date() } })
+    const validStatuses = ['applied', 'screening', 'interview_scheduled', 'interview', 'second_interview', 'final_offer', 'offer', 'joining_letter', 'selected', 'rejected', 'hired']
+    if (!validStatuses.includes(status)) return res.status(400).json({ error: 'Valid application status is required' })
+    const applicationBefore = await applications.findOne({ _id: new ObjectId(id) })
+    const now = new Date()
+    const notes = sanitizeText(req.body?.notes || '', 1000)
+    const stageEntry = { status, note: notes, createdAt: now }
+    const offerLetter = req.body?.generateOfferLetter || ['final_offer', 'offer', 'selected', 'hired'].includes(status)
+      ? `Offer Letter\n\nCandidate: ${applicationBefore?.name || 'Candidate'}\nRole: ${applicationBefore?.jobTitle || 'Employee'}\nDate: ${now.toISOString().slice(0, 10)}\n\nHMorix is pleased to offer this position subject to onboarding and documentation.`
+      : undefined
+    const joiningLetter = req.body?.generateJoiningLetter || ['joining_letter', 'hired'].includes(status)
+      ? `Joining Letter\n\nEmployee: ${applicationBefore?.name || 'Employee'}\nRole: ${applicationBefore?.jobTitle || 'Employee'}\nDate: ${now.toISOString().slice(0, 10)}\n\nThis confirms the employee is scheduled to join HMorix subject to completion of onboarding requirements.`
+      : undefined
+    await applications.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          status,
+          score: Number(req.body?.score || 0),
+          notes,
+          nextInterviewDate: sanitizeText(req.body?.nextInterviewDate || '', 40),
+          offerLetter: offerLetter || applicationBefore?.offerLetter || '',
+          joiningLetter: joiningLetter || applicationBefore?.joiningLetter || '',
+          updatedAt: now,
+        },
+        $push: { stageHistory: stageEntry },
+      }
+    )
     const application = await applications.findOne({ _id: new ObjectId(id) })
-    if ((status === 'selected' || status === 'hired') && application && req.body?.createEmployee) {
+    let credentials: any = null
+    if ((status === 'selected' || status === 'hired' || status === 'joining_letter') && application && req.body?.createEmployee) {
       const existing = await employees.findOne({ email: application.email })
       if (!existing) {
         const now = new Date()
-        await employees.insertOne({ name: application.name, email: application.email, phone: application.phone || '', employeeId: `HM-${Date.now().toString().slice(-6)}`, department: 'General', role: application.jobTitle || 'Employee', location: application.location || 'Remote', status: 'onboarding', salary: 0, performanceScore: 4, startDate: now.toISOString().slice(0, 10), documents: [{ name: 'Resume', status: application.resumeUrl ? 'received' : 'pending', url: application.resumeUrl || '' }, { name: 'Offer letter', status: 'pending', url: '' }, { name: 'Identity proof', status: 'pending', url: '' }], createdAt: now, updatedAt: now })
+        const employeeDoc = { name: application.name, email: application.email, phone: application.phone || '', employeeId: `HM-${Date.now().toString().slice(-6)}`, department: 'General', role: application.jobTitle || 'Employee', location: application.location || 'Remote', status: 'onboarding', salary: 0, performanceScore: 4, startDate: now.toISOString().slice(0, 10), documents: [{ name: 'Resume', status: application.resumeUrl ? 'received' : 'pending', url: application.resumeUrl || '' }, { name: 'Offer letter', status: offerLetter ? 'generated' : 'pending', url: '' }, { name: 'Identity proof', status: 'pending', url: '' }], createdAt: now, updatedAt: now }
+        await employees.insertOne(employeeDoc)
+        credentials = await createEmployeeAccess(employeeDoc, { email: application.email, username: body.username || '', password: body.password || '' })
       }
     }
-    return res.json({ success: true, data: application })
+    return res.json({ success: true, data: { ...application, offerLetter: offerLetter || application?.offerLetter || '', joiningLetter: joiningLetter || application?.joiningLetter || '', credentials } })
   }
   return res.status(405).json({ error: 'Method not allowed' })
 }

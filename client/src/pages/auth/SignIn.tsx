@@ -104,6 +104,9 @@ export default function SignIn() {
         <p className="text-center text-sm text-cream/40 mt-6">
           Don't have an account? <Link to="/signup" className="text-[#C8FF00] hover:underline">Get Started</Link>
         </p>
+        <p className="text-center text-xs text-cream/30 mt-3">
+          Employee access: <Link to="/employee/login" className="text-[#C8FF00] hover:underline">Sign in here</Link>
+        </p>
       </div>
     </div>
   )
