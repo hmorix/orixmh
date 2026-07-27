@@ -50,7 +50,7 @@ export default function Leaves() {
 
   return (
     <div className="pt-32 pb-20 min-h-screen">
-      <SEOHead title="HRM Leaves" description="Manage employee leave requests." canonical="/hrm/leaves" />
+      <SEOHead title="HRM Leaves" description="Manage employee leave requests." keywords="HRM leaves, leave requests, employee leave management, approvals" canonical="/hrm/leaves" />
       <div className="max-w-[1400px] mx-auto px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
