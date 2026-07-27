@@ -116,6 +116,9 @@ async function ensureIndexes() {
     db.collection('verification_tokens').createIndex({ tokenHash: 1 }, { unique: true }),
     db.collection('verification_tokens').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
     db.collection('otp_records').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
+    db.collection('employee_attendance').createIndex({ employeeId: 1, date: 1 }, { unique: true }),
+    db.collection('hrm_teams').createIndex({ name: 1 }, { unique: true }),
+    db.collection('hrm_trainings').createIndex({ title: 1, assignedTo: 1 }),
   ])
 }
 
@@ -774,6 +777,13 @@ async function createEmployeeAccess(employee: any, options: { email?: string; us
   if (savedUser) {
     await upsertProfile(savedUser, { displayName: employee.name, username: credentials.username, company: 'HMorix' })
   }
+  try {
+    const employees = await mongoCollection('hrm_employees')
+    await employees.updateOne(
+      { email: cleanEmail(employee.email || credentials.email) },
+      { $set: { userId: String(savedUser?._id || ''), username: credentials.username, updatedAt: now } }
+    )
+  } catch {}
   const loginUrl = `${appUrl()}/employee/login`
   try {
     await sendMail({
@@ -784,6 +794,308 @@ async function createEmployeeAccess(employee: any, options: { email?: string; us
     })
   } catch {}
   return { ...credentials, loginUrl }
+}
+
+function isoDateOnly(value = new Date()) {
+  return new Date(value).toISOString().slice(0, 10)
+}
+
+function monthKey(value = new Date()) {
+  return new Date(value).toISOString().slice(0, 7)
+}
+
+function hoursBetween(start?: string | Date, end?: string | Date) {
+  if (!start || !end) return 0
+  const diff = new Date(end).getTime() - new Date(start).getTime()
+  return Math.max(0, Number((diff / 36e5).toFixed(2)))
+}
+
+async function resolveEmployeeForUser(user: any) {
+  const employees = await mongoCollection('hrm_employees')
+  const query: any[] = []
+  if (user?.email) query.push({ email: cleanEmail(user.email) })
+  if (user?.username) query.push({ username: user.username })
+  if (user?.id) query.push({ userId: String(user.id) })
+  if (user?.name) query.push({ name: user.name })
+  if (!query.length) return null
+  return employees.findOne({ $or: query })
+}
+
+async function getEmployeePortalData(user: any) {
+  await ensureIndexes()
+  const employee = await resolveEmployeeForUser(user)
+  const attendanceCol = await mongoCollection('employee_attendance')
+  const leavesCol = await mongoCollection('hrm_leave_requests')
+  const tasksCol = await mongoCollection('hrm_tasks')
+  const teamsCol = await mongoCollection('hrm_teams')
+  const trainingsCol = await mongoCollection('hrm_trainings')
+  const payrollCol = await mongoCollection('hrm_payroll_runs')
+  const documentsCol = await mongoCollection('employee_documents')
+  const attendance = employee ? await attendanceCol.find({ employeeId: String(employee._id) }).sort({ date: -1, createdAt: -1 }).limit(60).toArray() : []
+  const leaveRequests = employee ? await leavesCol.find({ $or: [{ employeeId: String(employee._id) }, { email: cleanEmail(employee.email || '') }] }).sort({ createdAt: -1 }).toArray() : []
+  const tasks = employee ? await tasksCol.find({ $or: [{ employeeId: String(employee._id) }, { assigneeName: employee.name }] }).sort({ dueDate: 1 }).toArray() : []
+  const teams = employee ? await teamsCol.find({ members: { $in: [String(employee._id), employee.email, employee.name] } }).sort({ updatedAt: -1 }).toArray() : []
+  const trainings = employee ? await trainingsCol.find({ $or: [{ assignedTo: String(employee._id) }, { assignedToEmail: cleanEmail(employee.email || '') }, { assignedToName: employee.name }] }).sort({ createdAt: -1 }).toArray() : []
+  const docs = employee ? [...(Array.isArray(employee.documents) ? employee.documents : []), ...(await documentsCol.find({ $or: [{ employeeId: String(employee._id) }, { email: cleanEmail(employee.email || '') }] }).sort({ createdAt: -1 }).toArray())] : []
+  const payrollRuns = employee ? await payrollCol.find({}).sort({ createdAt: -1 }).limit(12).toArray() : []
+  const today = isoDateOnly()
+  const month = monthKey()
+  const todayAttendance = attendance.find((entry: any) => entry.date === today) || null
+  const monthAttendance = attendance.filter((entry: any) => String(entry.date || '').startsWith(month))
+  const presentDays = monthAttendance.filter((entry: any) => entry.clockIn).length
+  const lateDays = monthAttendance.filter((entry: any) => entry.late).length
+  const workedMinutes = monthAttendance.reduce((sum: number, entry: any) => sum + Number(entry.workedMinutes || 0), 0)
+  const latestPayroll = payrollRuns[0] || null
+  const latestPayrollRow = latestPayroll?.rows?.find((row: any) => String(row.employeeId) === String(employee?._id)) || null
+  let employeeProjects: any[] = []
+  try {
+    const db = getDatabase()
+    const { data } = await db.query('projects', { orderBy: { column: 'created_at', ascending: false } })
+    employeeProjects = data || []
+  } catch {}
+  return {
+    employee,
+    attendance,
+    todayAttendance,
+    monthAttendance,
+    leaveRequests,
+    tasks,
+    teams,
+    trainings,
+    documents: docs,
+    projects: employeeProjects,
+    payrollRuns,
+    latestPayroll,
+    latestPayrollRow,
+    summary: {
+      presentDays,
+      approvedLeaves: leaveRequests.filter((leave: any) => leave.status === 'approved').length,
+      pendingLeaves: leaveRequests.filter((leave: any) => leave.status === 'pending').length,
+      performanceScore: Number(employee?.performanceScore || 0),
+      taskCompletionRate: tasks.length ? Math.round((tasks.filter((task: any) => task.status === 'done').length / tasks.length) * 100) : 0,
+      monthHours: Number((workedMinutes / 60).toFixed(1)),
+      department: employee?.department || 'General',
+      teamCount: teams.length,
+    },
+    monthlySummary: {
+      presentDays,
+      lateDays,
+      totalHours: Number((workedMinutes / 60).toFixed(1)),
+      workingDays: monthAttendance.length,
+      absentDays: Math.max(0, 22 - presentDays),
+      workedMinutes,
+    },
+  }
+}
+
+async function handleEmployeeDashboard(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+  const user = await getAuthUser(req)
+  if (!user) return res.status(401).json({ error: 'Login required' })
+  const data = await getEmployeePortalData(user)
+  return res.json({ success: true, data })
+}
+
+async function handleEmployeeAttendance(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!user) return res.status(401).json({ error: 'Login required' })
+  const employee = await resolveEmployeeForUser(user)
+  if (!employee) return res.status(404).json({ error: 'Employee profile not found' })
+  const attendance = await mongoCollection('employee_attendance')
+  const date = isoDateOnly(req.body?.date || req.query?.date || new Date())
+  if (req.method === 'GET') {
+    const logs = await attendance.find({ employeeId: String(employee._id) }).sort({ date: -1, createdAt: -1 }).limit(60).toArray()
+    return res.json({ success: true, data: logs })
+  }
+  if (req.method === 'POST') {
+    const action = String(req.body?.action || '')
+    if (!['clock_in', 'clock_out'].includes(action)) return res.status(400).json({ error: 'Valid clock action is required' })
+    const now = new Date()
+    const existing = await attendance.findOne({ employeeId: String(employee._id), date })
+    if (action === 'clock_in') {
+      if (existing?.clockIn) return res.json({ success: true, data: existing })
+      const record = {
+        employeeId: String(employee._id),
+        employeeName: employee.name,
+        email: employee.email,
+        date,
+        clockIn: now,
+        clockOut: null,
+        workedMinutes: 0,
+        workedHours: 0,
+        status: 'present',
+        late: now.getHours() >= 9,
+        createdAt: now,
+        updatedAt: now,
+      }
+      await attendance.updateOne({ employeeId: String(employee._id), date }, { $set: record }, { upsert: true })
+      return res.status(201).json({ success: true, data: record })
+    }
+    if (!existing?.clockIn) return res.status(400).json({ error: 'Clock in first before clock out' })
+    const workedMinutes = Math.max(0, Math.round((now.getTime() - new Date(existing.clockIn).getTime()) / 60000))
+    const record = {
+      ...existing,
+      clockOut: now,
+      workedMinutes,
+      workedHours: Number((workedMinutes / 60).toFixed(2)),
+      status: 'complete',
+      updatedAt: now,
+    }
+    await attendance.updateOne({ employeeId: String(employee._id), date }, { $set: record })
+    return res.json({ success: true, data: record })
+  }
+  return res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function handleEmployeePayslip(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+  const user = await getAuthUser(req)
+  if (!user) return res.status(401).json({ error: 'Login required' })
+  const employee = await resolveEmployeeForUser(user)
+  if (!employee) return res.status(404).json({ error: 'Employee profile not found' })
+  const payrollRuns = await mongoCollection('hrm_payroll_runs')
+  const period = String(req.query.period || monthKey())
+  const run = await payrollRuns.findOne({ period }, { sort: { createdAt: -1 } })
+  const row = run?.rows?.find((item: any) => String(item.employeeId) === String(employee._id))
+  const baseSalary = row?.baseSalary ?? Math.round(Number(employee.salary || 0) / 12)
+  const bonus = row?.bonus ?? Math.round(baseSalary * 0.05)
+  const deductions = row?.deductions ?? Math.round((baseSalary + bonus) * 0.12)
+  const net = row?.net ?? (baseSalary + bonus - deductions)
+  const csv = [
+    'Employee,Department,Role,Period,Base Salary,Bonus,Deductions,Net Pay,Status',
+    [
+      employee.name,
+      employee.department || 'General',
+      employee.role || 'Employee',
+      period,
+      baseSalary,
+      bonus,
+      deductions,
+      net,
+      row?.status || run?.status || 'generated',
+    ].map((value: any) => `"${String(value).replace(/"/g, '""')}"`).join(','),
+  ].join('\n')
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+  res.setHeader('Content-Disposition', `attachment; filename="payslip-${period}.csv"`)
+  return res.status(200).send(csv)
+}
+
+async function handleManagerOverview(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+  const user = await getAuthUser(req)
+  if (!user) return res.status(401).json({ error: 'Login required' })
+  const db = getDatabase()
+  const [employeesCol, tasksCol, teamsCol] = await Promise.all([
+    mongoCollection('hrm_employees'),
+    mongoCollection('hrm_tasks'),
+    mongoCollection('hrm_teams'),
+  ])
+  const [employees, tasks, teams] = await Promise.all([
+    employeesCol.find({}).sort({ name: 1 }).toArray(),
+    tasksCol.find({}).sort({ updatedAt: -1 }).toArray(),
+    teamsCol.find({}).sort({ updatedAt: -1 }).toArray(),
+  ])
+  const projects = await db.query('projects', { orderBy: { column: 'created_at', ascending: false } }).then((r: any) => r.data || []).catch(() => [])
+  return res.json({
+    success: true,
+    data: {
+      employees,
+      tasks,
+      teams,
+      projects,
+      stats: {
+        employees: employees.length,
+        activeEmployees: employees.filter((employee: any) => employee.status === 'active').length,
+        tasksDue: tasks.filter((task: any) => task.status !== 'done').length,
+        teams: teams.length,
+        avgPerformance: employees.length ? Number((employees.reduce((sum: number, employee: any) => sum + Number(employee.performanceScore || 0), 0) / employees.length).toFixed(1)) : 0,
+      },
+    },
+  })
+}
+
+async function handleManagerTeams(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!user) return res.status(401).json({ error: 'Login required' })
+  const teams = await mongoCollection('hrm_teams')
+  if (req.method === 'GET') {
+    return res.json({ success: true, data: await teams.find({}).sort({ updatedAt: -1 }).toArray() })
+  }
+  if (req.method === 'POST') {
+    const body = req.body || {}
+    const name = sanitizeText(body.name || '', 120)
+    if (!name) return res.status(400).json({ error: 'Team name is required' })
+    const doc = {
+      name,
+      department: sanitizeText(body.department || 'General', 80),
+      lead: sanitizeText(body.lead || '', 120),
+      members: Array.isArray(body.members) ? body.members.map((member: any) => sanitizeText(String(member), 120)).filter(Boolean) : [],
+      projects: Array.isArray(body.projects) ? body.projects.map((project: any) => sanitizeText(String(project), 120)).filter(Boolean) : [],
+      notes: sanitizeText(body.notes || '', 1000),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    const result = await teams.insertOne(doc)
+    return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
+  }
+  if (req.method === 'PUT') {
+    const id = String(req.body?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid team id is required' })
+    const update = { ...req.body, updatedAt: new Date() }
+    delete update.id
+    await teams.updateOne({ _id: new ObjectId(id) }, { $set: update })
+    return res.json({ success: true, data: await teams.findOne({ _id: new ObjectId(id) }) })
+  }
+  if (req.method === 'DELETE') {
+    const id = String(req.query.id || req.body?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid team id is required' })
+    await teams.deleteOne({ _id: new ObjectId(id) })
+    return res.json({ success: true })
+  }
+  return res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function handleManagerTraining(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!user) return res.status(401).json({ error: 'Login required' })
+  const trainings = await mongoCollection('hrm_trainings')
+  if (req.method === 'GET') {
+    return res.json({ success: true, data: await trainings.find({}).sort({ updatedAt: -1 }).toArray() })
+  }
+  if (req.method === 'POST') {
+    const body = req.body || {}
+    const title = sanitizeText(body.title || '', 140)
+    if (!title) return res.status(400).json({ error: 'Training title is required' })
+    const doc = {
+      title,
+      description: sanitizeText(body.description || '', 1000),
+      assignedTo: sanitizeText(body.assignedTo || '', 120),
+      assignedToEmail: cleanEmail(body.assignedToEmail || ''),
+      assignedToName: sanitizeText(body.assignedToName || '', 120),
+      dueDate: sanitizeText(body.dueDate || '', 40),
+      status: sanitizeText(body.status || 'assigned', 40),
+      progress: Math.max(0, Math.min(100, Number(body.progress || 0))),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    const result = await trainings.insertOne(doc)
+    return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
+  }
+  if (req.method === 'PUT') {
+    const id = String(req.body?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid training id is required' })
+    const update = { ...req.body, updatedAt: new Date() }
+    delete update.id
+    await trainings.updateOne({ _id: new ObjectId(id) }, { $set: update })
+    return res.json({ success: true, data: await trainings.findOne({ _id: new ObjectId(id) }) })
+  }
+  if (req.method === 'DELETE') {
+    const id = String(req.query.id || req.body?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid training id is required' })
+    await trainings.deleteOne({ _id: new ObjectId(id) })
+    return res.json({ success: true })
+  }
+  return res.status(405).json({ error: 'Method not allowed' })
 }
 
 async function getHrmOverviewData() {
@@ -896,9 +1208,32 @@ async function handleHrmPeople(req: VercelRequest, res: VercelResponse) {
 
 async function handleHrmLeave(req: VercelRequest, res: VercelResponse) {
   const leaves = await mongoCollection('hrm_leave_requests')
-  if (req.method === 'GET') return res.json({ success: true, data: await leaves.find({}).sort({ createdAt: -1 }).toArray() })
-  if (req.method === 'PUT') {
+  if (req.method === 'GET') {
+    const user = await getAuthUser(req)
+    const mineOnly = String(req.query.mine || '') === '1' || String(req.query.mine || '').toLowerCase() === 'true'
+    if (mineOnly && user) {
+      const employee = await resolveEmployeeForUser(user)
+      const filter = employee ? { $or: [{ employeeId: String(employee._id) }, { email: cleanEmail(employee.email || '') }] } : {}
+      return res.json({ success: true, data: await leaves.find(filter).sort({ createdAt: -1 }).toArray() })
+    }
+    return res.json({ success: true, data: await leaves.find({}).sort({ createdAt: -1 }).toArray() })
+  }
+  if (req.method === 'POST') {
+    const user = await getAuthUser(req)
+    if (!user) return res.status(401).json({ error: 'Login required' })
+    const employee = await resolveEmployeeForUser(user)
+    if (!employee) return res.status(404).json({ error: 'Employee profile not found' })
     const body = req.body || {}
+    const type = sanitizeText(body.type || 'Leave', 60)
+    const dates = sanitizeText(body.dates || body.startDate || '', 120)
+    const reason = sanitizeText(body.reason || body.notes || '', 1000)
+    if (!dates) return res.status(400).json({ error: 'Leave dates are required' })
+    const now = new Date()
+    const doc = { employeeId: String(employee._id), name: employee.name, email: employee.email, department: employee.department || 'General', type, dates, days: Number(body.days || 1), reason, status: 'pending', createdAt: now, updatedAt: now }
+    const result = await leaves.insertOne(doc)
+    return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
+  }
+  if (req.method === 'PUT') {
     const id = String(req.body?.id || '')
     const status = String(req.body?.status || '')
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid leave request id is required' })
@@ -2135,7 +2470,25 @@ async function handleServices(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleEmployeeProfile(req: VercelRequest, res: VercelResponse) {
-  res.json({ success: true, data: { id: 'HM-0042', name: 'John Doe', email: 'john@hmorix.com', role: 'Senior Software Engineer', department: 'Engineering', location: 'San Francisco, CA', manager: 'Sarah Chen', joined: '2023-01-15', phone: '+1 (555) 123-4567' } })
+  const user = await getAuthUser(req)
+  if (!user) return res.status(401).json({ error: 'Login required' })
+  const employee = await resolveEmployeeForUser(user)
+  if (!employee) return res.json({ success: true, data: { id: user.id, name: user.name, email: user.email, role: user.role, department: '', location: '', manager: '', joined: '', phone: '' } })
+  return res.json({
+    success: true,
+    data: {
+      id: String(employee._id),
+      name: employee.name,
+      email: employee.email,
+      role: employee.role,
+      department: employee.department,
+      location: employee.location,
+      manager: employee.manager || '',
+      joined: employee.startDate || '',
+      phone: employee.phone || '',
+      employeeId: employee.employeeId || '',
+    },
+  })
 }
 
 async function handleConfigDatabase(req: VercelRequest, res: VercelResponse) {
@@ -2190,6 +2543,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'hrm/recruitment': return handleHrmRecruitment(req, res)
       case 'careers': return handleCareers(req, res)
       case 'careers/applications': return handleJobApplications(req, res)
+      case 'employee/overview': return handleEmployeeOverview(req, res)
+      case 'employee/dashboard': return handleEmployeeDashboard(req, res)
+      case 'employee/attendance': return handleEmployeeAttendance(req, res)
+      case 'employee/payslip': return handleEmployeePayslip(req, res)
+      case 'manager/overview': return handleManagerOverview(req, res)
+      case 'manager/teams': return handleManagerTeams(req, res)
+      case 'manager/trainings': return handleManagerTraining(req, res)
       case 'ai/status': return handleAiStatus(req, res)
       case 'ai/chat': return handleAiChat(req, res)
       case 'ai/playground': return handleAiPlayground(req, res)
