@@ -232,6 +232,10 @@ async function getAuthUser(req: VercelRequest) {
   } catch { return null }
 }
 
+function requireRole(user: any, roles: string[]) {
+  return Boolean(user && roles.includes(String(user.role || '').toLowerCase()))
+}
+
 function getSupabaseAdminClient() {
   return createClient(
     process.env.SUPABASE_URL || '',
@@ -733,11 +737,12 @@ function generateEmployeeCredentials(name: string, email?: string, username?: st
   return { username: finalUsername, email: finalEmail, password: finalPassword }
 }
 
-async function createEmployeeAccess(employee: any, options: { email?: string; username?: string; password?: string } = {}) {
+async function createEmployeeAccess(employee: any, options: { email?: string; username?: string; password?: string; role?: string } = {}) {
   await ensureIndexes()
   const users = await mongoCollection('users')
   const profiles = await mongoCollection('profiles')
   const credentials = generateEmployeeCredentials(employee.name, options.email || employee.email, options.username, options.password)
+  const accessRole = ['employee', 'hr', 'crm', 'manager'].includes(String(options.role || '').toLowerCase()) ? String(options.role).toLowerCase() : 'employee'
   const now = new Date()
   const passwordHash = await bcrypt.hash(credentials.password, 12)
   const existing = await users.findOne({ email: credentials.email })
@@ -749,7 +754,7 @@ async function createEmployeeAccess(employee: any, options: { email?: string; us
           name: employee.name,
           displayName: employee.name,
           username: credentials.username,
-          role: 'employee',
+          role: accessRole,
           emailVerified: true,
           passwordHash,
           company: 'HMorix',
@@ -765,7 +770,7 @@ async function createEmployeeAccess(employee: any, options: { email?: string; us
       email: credentials.email,
       username: credentials.username,
       passwordHash,
-      role: 'employee',
+      role: accessRole,
       emailVerified: true,
       providers: ['email'],
       company: 'HMorix',
@@ -784,7 +789,8 @@ async function createEmployeeAccess(employee: any, options: { email?: string; us
       { $set: { userId: String(savedUser?._id || ''), username: credentials.username, updatedAt: now } }
     )
   } catch {}
-  const loginUrl = `${appUrl()}/employee/login`
+  const loginPath = accessRole === 'hr' ? '/hrm' : accessRole === 'crm' ? '/crm' : accessRole === 'manager' ? '/manager' : '/employee/login'
+  const loginUrl = `${appUrl()}${loginPath}`
   try {
     await sendMail({
       to: credentials.email,
@@ -793,7 +799,7 @@ async function createEmployeeAccess(employee: any, options: { email?: string; us
       html: `<p>Welcome to HMorix.</p><p>Login at <a href="${loginUrl}">${loginUrl}</a>.</p><p><strong>Username:</strong> ${credentials.username}<br /><strong>Password:</strong> ${credentials.password}</p>`,
     })
   } catch {}
-  return { ...credentials, loginUrl }
+  return { ...credentials, role: accessRole, loginUrl }
 }
 
 function isoDateOnly(value = new Date()) {
@@ -1176,11 +1182,16 @@ async function handleHrmPeople(req: VercelRequest, res: VercelResponse) {
   const employees = await mongoCollection('hrm_employees')
   if (req.method === 'GET') return res.json({ success: true, data: await employees.find({}).sort({ name: 1 }).toArray() })
   if (req.method === 'POST') {
+    const actor = await getAuthUser(req)
+    if (!requireRole(actor, ['admin', 'hr'])) return res.status(403).json({ error: 'Admin or HR access required' })
     const body = req.body || {}
     const name = sanitizeText(body.name, 120)
     const credentials = generateEmployeeCredentials(name, body.email || '', body.username || '', body.password || '')
     const email = credentials.email
     if (!name) return res.status(400).json({ error: 'Name is required' })
+    const accessRole = String(body.accessRole || body.roleType || 'employee').toLowerCase()
+    if (accessRole === 'hr' && actor.role !== 'admin') return res.status(403).json({ error: 'Only admin can create HR credentials' })
+    if (!['employee', 'hr', 'crm', 'manager'].includes(accessRole)) return res.status(400).json({ error: 'Valid access role is required' })
     const now = new Date()
     const documents = [
       { name: 'Offer letter', status: 'pending', url: '' },
@@ -1188,9 +1199,9 @@ async function handleHrmPeople(req: VercelRequest, res: VercelResponse) {
       { name: 'Address proof', status: 'pending', url: '' },
       { name: 'Bank details', status: 'pending', url: '' },
     ]
-    const doc = { name, email, username: credentials.username, employeeId: `HM-${Date.now().toString().slice(-6)}`, department: sanitizeText(body.department || 'General', 80), role: sanitizeText(body.role || 'Employee', 100), location: sanitizeText(body.location || 'Remote', 80), phone: sanitizeText(body.phone || '', 40), status: body.status || 'active', salary: Number(body.salary || 0), performanceScore: Number(body.performanceScore || 4), startDate: body.startDate || now.toISOString().slice(0, 10), documents: body.documents || documents, emergencyContact: body.emergencyContact || {}, notes: sanitizeText(body.notes || '', 1000), createdAt: now, updatedAt: now }
+    const doc = { name, email, username: credentials.username, employeeId: `HM-${Date.now().toString().slice(-6)}`, department: sanitizeText(body.department || (accessRole === 'hr' ? 'HR' : accessRole === 'crm' ? 'Sales' : 'General'), 80), role: sanitizeText(body.role || (accessRole === 'hr' ? 'HR Manager' : accessRole === 'crm' ? 'CRM Executive' : 'Employee'), 100), accessRole, location: sanitizeText(body.location || 'Remote', 80), phone: sanitizeText(body.phone || '', 40), status: body.status || 'active', salary: Number(body.salary || 0), performanceScore: Number(body.performanceScore || 4), startDate: body.startDate || now.toISOString().slice(0, 10), documents: body.documents || documents, emergencyContact: body.emergencyContact || {}, notes: sanitizeText(body.notes || '', 1000), createdBy: actor.id, createdAt: now, updatedAt: now }
     const result = await employees.insertOne(doc)
-    const access = await createEmployeeAccess(doc, { email, username: credentials.username, password: credentials.password })
+    const access = await createEmployeeAccess(doc, { email, username: credentials.username, password: credentials.password, role: accessRole })
     return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc, credentials: access } })
   }
   if (req.method === 'PUT') {
@@ -1544,6 +1555,81 @@ async function handleAnalyticsTraffic(req: VercelRequest, res: VercelResponse) {
     { source: 'Referral', visitors: 42100, percentage: 5.0, sessions: 39000, bounceRate: 30, conversionRate: 1.9 },
     { source: 'Email', visitors: 27230, percentage: 3.2, sessions: 25000, bounceRate: 20, conversionRate: 5.1 },
   ], totalVisitors: 847230 })
+}
+
+async function handleAdminUsers(req: VercelRequest, res: VercelResponse) {
+  const actor = await getAuthUser(req)
+  if (!requireRole(actor, ['admin', 'hr'])) return res.status(403).json({ error: 'Admin or HR access required' })
+  const users = await mongoCollection('users')
+  const employees = await mongoCollection('hrm_employees')
+  const contacts = await mongoCollection('crm_contacts')
+  const tickets = await mongoCollection('support_tickets')
+
+  if (req.method === 'GET') {
+    const [userRows, employeeRows, crmRows, ticketRows] = await Promise.all([
+      users.find({}).project({ passwordHash: 0 }).sort({ createdAt: -1 }).limit(200).toArray(),
+      employees.find({}).sort({ createdAt: -1 }).limit(200).toArray(),
+      contacts.find({}).sort({ updatedAt: -1, createdAt: -1 }).limit(200).toArray(),
+      tickets.find({}).sort({ createdAt: -1 }).limit(100).toArray(),
+    ])
+    return res.json({
+      success: true,
+      data: {
+        users: userRows.map((row: any) => ({ ...row, id: String(row._id) })),
+        employees: employeeRows.map((row: any) => ({ ...row, id: String(row._id) })),
+        crm: crmRows.map((row: any) => ({ ...row, id: String(row._id) })),
+        tickets: ticketRows.map((row: any) => ({ ...row, id: String(row._id) })),
+      },
+    })
+  }
+
+  if (req.method === 'POST') {
+    const body = req.body || {}
+    const name = sanitizeText(body.name || '', 120)
+    const email = cleanEmail(body.email || '')
+    const password = sanitizeText(body.password || randomToken(9).slice(0, 12), 80)
+    const accessRole = String(body.role || body.accessRole || 'user').toLowerCase()
+    if (!name || !email) return res.status(400).json({ error: 'Name and email are required' })
+    if (!['user', 'employee', 'hr', 'crm', 'manager', 'admin'].includes(accessRole)) return res.status(400).json({ error: 'Valid role is required' })
+    if (accessRole === 'hr' && actor.role !== 'admin') return res.status(403).json({ error: 'Only admin can create HR credentials' })
+    if (accessRole === 'admin' && actor.role !== 'admin') return res.status(403).json({ error: 'Only admin can create admin credentials' })
+    const now = new Date()
+    const passwordHash = await bcrypt.hash(password, 12)
+    await users.updateOne(
+      { email },
+      {
+        $set: { name, displayName: name, email, username: sanitizeText(body.username || normalizeEmployeeUsername(name), 40), role: accessRole, passwordHash, emailVerified: true, company: body.company || 'HMorix', updatedAt: now },
+        $setOnInsert: { createdAt: now, providers: ['email'] },
+      },
+      { upsert: true }
+    )
+    const saved = await users.findOne({ email })
+    if (['employee', 'hr', 'crm', 'manager'].includes(accessRole)) {
+      await employees.updateOne(
+        { email },
+        {
+          $set: {
+            name,
+            email,
+            userId: String(saved?._id || ''),
+            username: body.username || normalizeEmployeeUsername(name),
+            department: sanitizeText(body.department || (accessRole === 'hr' ? 'HR' : accessRole === 'crm' ? 'Sales' : 'General'), 80),
+            role: sanitizeText(body.employeeRole || body.jobTitle || (accessRole === 'hr' ? 'HR Manager' : accessRole === 'crm' ? 'CRM Executive' : 'Employee'), 100),
+            accessRole,
+            location: sanitizeText(body.location || 'Remote', 80),
+            status: 'active',
+            updatedAt: now,
+          },
+          $setOnInsert: { employeeId: `HM-${Date.now().toString().slice(-6)}`, salary: Number(body.salary || 0), performanceScore: 4, startDate: now.toISOString().slice(0, 10), createdAt: now },
+        },
+        { upsert: true }
+      )
+    }
+    await upsertProfile(saved, { displayName: name, username: body.username || normalizeEmployeeUsername(name), company: body.company || 'HMorix' })
+    return res.status(201).json({ success: true, data: { ...publicUser(saved), generatedPassword: password } })
+  }
+
+  res.status(405).json({ error: 'Method not allowed' })
 }
 
 async function handleAdminStats(req: VercelRequest, res: VercelResponse) {
@@ -2128,6 +2214,23 @@ async function handleNotifications(req: VercelRequest, res: VercelResponse) {
     const filter = user ? { $or: [{ userId: user.id }, { userId: { $exists: false } }, { userId: 'system' }] } : {}
     await notifications.updateMany(filter, { $set: { read: true, readAt: new Date() } })
     return res.json({ success: true, message: 'All notifications marked as read' })
+  }
+  if (req.method === 'POST') {
+    if (!requireRole(user, ['admin', 'hr', 'manager'])) return res.status(403).json({ error: 'Admin, HR, or manager access required' })
+    const title = sanitizeText(req.body?.title || '', 140)
+    const message = sanitizeText(req.body?.message || '', 1000)
+    const audience = sanitizeText(req.body?.audience || 'all', 40)
+    const selectedIds = Array.isArray(req.body?.selectedIds) ? req.body.selectedIds.map((id: any) => String(id)).filter(Boolean) : []
+    if (!title || !message) return res.status(400).json({ error: 'Title and message are required' })
+    const now = new Date()
+    const docs: any[] = []
+    if (audience === 'selected' && selectedIds.length) {
+      selectedIds.forEach((id: string) => docs.push({ userId: id, title, message, audience, type: 'admin_message', read: false, createdBy: user.id, createdAt: now }))
+    } else {
+      docs.push({ title, message, audience, type: 'admin_message', read: false, createdBy: user.id, createdAt: now })
+    }
+    await notifications.insertMany(docs)
+    return res.status(201).json({ success: true, data: docs, sent: docs.length })
   }
   res.status(405).json({ error: 'Method not allowed' })
 }
