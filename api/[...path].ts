@@ -1494,18 +1494,38 @@ async function handleAiPlayground(req: VercelRequest, res: VercelResponse) {
   const type = String(req.body?.type || 'chat')
   const prompt = sanitizeText(req.body?.prompt || '', 2000)
   if (!prompt) return res.status(400).json({ error: 'Prompt is required' })
-  const connections: Record<string, string> = { website: 'Connected with Orix Labs', pdf: 'Connected with HMorix PDF Editor', invoice: 'Connected with Orix Billing Flow', workflow: 'Connected with HMorix Builder', chat: 'Connected with HMorix AI Assistant' }
-  const fallback = type === 'website'
-    ? `Status: ${connections[type]}\n\nGenerated website plan:\n- Pages: Home, About, Services, Contact\n- Stack: React, TypeScript, Tailwind, Vercel\n- SEO: sitemap, metadata, schema, analytics\n- Next step: request an Orix Labs access token for export.`
-    : type === 'pdf'
-      ? `Status: ${connections[type]}\n\nPDF automation ready:\n- Upload PDF\n- Extract text, invoices, tables, totals\n- Export JSON/CSV\n- Access token required for live PDF Editor jobs.`
-      : type === 'invoice'
-        ? `Status: ${connections[type]}\n\nInvoice workflow ready:\n- Generate invoice\n- Assign bill to user\n- Download PDF\n- Access token required for live Billing Flow sync.`
-        : type === 'workflow'
-          ? `Status: ${connections[type]}\n\nWorkflow ready:\n- Trigger\n- Conditions\n- Actions\n- Notifications\n- Access token required for HMorix Builder deployment.`
-          : siteAssistantFallback(prompt).reply
-  if (type === 'chat') return handleAiChat({ ...req, body: { message: prompt }, method: 'POST' } as any, res)
-  return res.json({ success: true, result: fallback, status: connections[type] || 'Connected', requiresAccessToken: true })
+  const connections: Record<string, string> = { website: 'Orix Labs', pdf: 'HMorix PDF Editor', invoice: 'Orix Billing Flow', workflow: 'HMorix Builder', chat: 'HMorix AI Assistant' }
+  const taskPrompts: Record<string, string> = {
+    website: 'Generate a practical website build plan with sections, UI structure, tech stack, SEO notes, and implementation steps.',
+    pdf: 'Design a PDF automation extraction plan. Include fields, validation, output JSON shape, and workflow steps.',
+    invoice: 'Generate an invoice workflow and invoice draft from the prompt. Include line items, taxes, due date handling, and sync notes.',
+    workflow: 'Design an automation workflow. Include trigger, conditions, actions, failure handling, and deployment notes.',
+    chat: 'Answer as the HMorix AI Assistant.',
+  }
+  const fallback = siteAssistantFallback(prompt).reply
+  const apiKey = nvidiaApiKey()
+  if (!apiKey) return res.json({ success: true, result: fallback, reply: fallback, status: 'NVIDIA fallback', provider: 'fallback', providerError: 'NVIDIA_API_KEY is not configured on the server. Set NVIDIA_API_KEY in Vercel Project Settings, then redeploy.' })
+  try {
+    const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: process.env.NVIDIA_MODEL || process.env.VITE_NVIDIA_MODEL || 'nvidia/deepseek-v4-flash',
+        messages: [
+          { role: 'system', content: `You power the ${connections[type] || 'HMorix AI Playground'} demo. ${taskPrompts[type] || taskPrompts.chat} Return useful dynamic output for the user's exact prompt. Do not say this is static or a template.` },
+          { role: 'user', content: prompt },
+        ],
+        temperature: 0.45,
+        max_tokens: 900,
+      }),
+    })
+    const data: any = await response.json().catch(() => ({}))
+    if (!response.ok) return res.json({ success: true, result: fallback, reply: fallback, status: 'NVIDIA fallback', provider: 'fallback', providerError: data?.error?.message || data?.message || `NVIDIA request failed with ${response.status}` })
+    const result = data?.choices?.[0]?.message?.content || fallback
+    return res.json({ success: true, result, reply: result, status: `Live NVIDIA: ${connections[type] || 'AI'}`, provider: 'nvidia' })
+  } catch (error: any) {
+    return res.json({ success: true, result: fallback, reply: fallback, status: 'NVIDIA fallback', provider: 'fallback', providerError: error?.message || 'NVIDIA request failed' })
+  }
 }
 
 async function handleAnalyticsOverview(req: VercelRequest, res: VercelResponse) {

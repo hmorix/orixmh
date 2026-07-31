@@ -16,12 +16,14 @@ export default function Playground() {
   const [result, setResult] = useState('')
   const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState('')
+  const [providerError, setProviderError] = useState('')
 
   const handleRun = async () => {
     if (!input.trim()) return
     setLoading(true)
     setResult('')
     setStatus('')
+    setProviderError('')
     try {
       const response = await fetch(`${config.apiUrl}/ai/playground`, {
         method: 'POST',
@@ -32,9 +34,11 @@ export default function Playground() {
       const data = await response.json().catch(() => ({}))
       if (!response.ok) throw new Error(data.error || 'Demo failed')
       setStatus(data.status || '')
+      setProviderError(data.providerError || '')
       setResult(data.result || data.reply || 'Demo complete.')
     } catch (error) {
-      setStatus('Local demo fallback')
+      setStatus('Request failed')
+      setProviderError(error instanceof Error ? error.message : 'Demo failed')
       setResult(error instanceof Error ? error.message : 'Demo failed')
     } finally {
       setLoading(false)
@@ -85,10 +89,15 @@ export default function Playground() {
             </button>
           </div>
           <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between gap-3 mb-4">
               <h3 className="font-display font-semibold">Result</h3>
               {status && <span className="px-2 py-1 bg-green-500/10 text-green-400 rounded text-[10px]">{status}</span>}
             </div>
+            {providerError && (
+              <div className="mb-3 p-3 bg-yellow-500/10 border border-yellow-500/25 rounded-[8px] text-xs text-yellow-200">
+                {providerError}
+              </div>
+            )}
             <div className="bg-obsidian border border-glass-border rounded-[8px] p-4 h-[280px] overflow-y-auto font-mono text-sm whitespace-pre-wrap">
               {loading ? (
                 <div className="flex items-center gap-2 text-[#C8FF00]">

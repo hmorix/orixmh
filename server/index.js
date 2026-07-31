@@ -11,6 +11,7 @@ const { healthSupabase } = require('./db/supabase')
 const authRoutes = require('./routes/auth')
 const blogRoutes = require('./routes/blogs')
 const uploadRoutes = require('./routes/upload')
+const aiRoutes = require('./routes/ai')
 
 const app = express()
 const port = Number(process.env.PORT || 5000)
@@ -40,6 +41,7 @@ app.get('/api/health', async (_req, res) => {
 app.use('/api', authRoutes)
 app.use('/api', blogRoutes)
 app.use('/api', uploadRoutes)
+app.use('/api', aiRoutes)
 
 app.use((error, _req, res, _next) => {
   console.error(error)
