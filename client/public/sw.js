@@ -1,8 +1,9 @@
-const APP_VERSION = 'hmorix-2026-07-31-1'
+const APP_VERSION = 'hmorix-2026-07-31-2'
 const APP_SHELL_CACHE = `${APP_VERSION}-shell`
 const API_CACHE = `${APP_VERSION}-api`
 const APP_SHELL = [
   '/',
+  '/offline',
   '/index.html',
   '/manifest.webmanifest',
   '/site.webmanifest',

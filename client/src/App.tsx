@@ -4,6 +4,7 @@ import { useAuth } from './lib/AuthContext'
 import MainLayout from './layouts/MainLayout'
 import CommandPalette from './components/CommandPalette'
 import OfflineStatus from './components/OfflineStatus'
+import OfflinePage from './pages/OfflinePage'
 
 const Home = lazy(() => import('./pages/Home'))
 const About = lazy(() => import('./pages/About'))
@@ -107,6 +108,7 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, { failed: bool
 
   render() {
     if (this.state.failed) {
+      if (!navigator.onLine) return <OfflinePage />
       return (
         <div className="min-h-screen bg-obsidian flex items-center justify-center px-6">
           <div className="max-w-[420px] text-center">
@@ -163,6 +165,7 @@ function App() {
       <AppErrorBoundary>
         <Suspense fallback={appLoader}>
           <Routes>
+          <Route path="/offline" element={<OfflinePage />} />
           <Route element={<MainLayout onCommandOpen={() => setCommandOpen(true)} />}>
           {/* Core Pages */}
           <Route path="/" element={<Home />} />
