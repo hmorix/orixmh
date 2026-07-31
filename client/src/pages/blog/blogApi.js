@@ -63,17 +63,13 @@ export function normalizePost(post) {
 }
 
 export async function fetchBlogList() {
-  const response = await fetch('/api/blog')
-  if (!response.ok) throw new Error('Unable to load blog posts')
-  const payload = await response.json()
+  const payload = await cachedJson('blog:list', '/api/blog')
   const data = Array.isArray(payload) ? payload : payload.data || payload.blogs || []
   return data.map(normalizePost)
 }
 
 export async function fetchBlogPost(slug) {
-  const response = await fetch(`/api/blog/${encodeURIComponent(slug)}`)
-  if (!response.ok) throw new Error('Unable to load blog post')
-  const payload = await response.json()
+  const payload = await cachedJson(`blog:post:${slug}`, `/api/blog/${encodeURIComponent(slug)}`)
   return normalizePostContent(payload.data || payload.blog || payload)
 }
 
@@ -105,3 +101,4 @@ function formatDate(value) {
 function stripHtml(value) {
   return String(value).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
 }
+import { cachedJson } from '../../lib/offlineStore'

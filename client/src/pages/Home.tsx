@@ -36,28 +36,27 @@ export default function Home() {
   return (
     <>
       {/* HERO */}
-      <section className="min-h-screen flex flex-col justify-end pt-40 pb-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_70%_40%,rgba(200,255,0,0.06)_0%,transparent_60%),radial-gradient(ellipse_40%_60%_at_20%_80%,rgba(200,255,0,0.03)_0%,transparent_50%)]" />
-        <div className="absolute inset-0 opacity-40" style={{backgroundImage:'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',backgroundSize:'80px 80px',maskImage:'radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)'}} />
+      <section className="min-h-[760px] flex flex-col justify-end pt-32 sm:pt-36 lg:pt-40 pb-12 sm:pb-16 lg:pb-20 relative overflow-hidden border-b border-glass-border">
+        <div className="absolute inset-0 opacity-25" style={{backgroundImage:'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',backgroundSize:'80px 80px'}} />
         
-        <div className="max-w-[1280px] mx-auto px-8 relative z-10">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <div className="max-w-[680px]">
-            <div className="flex items-center gap-3 mb-8">
+            <div className="flex items-center gap-3 mb-6 sm:mb-8">
               <div className="w-2 h-2 bg-[#C8FF00] rounded-full animate-pulse-glow" />
               <span className="label-mono">Creative Technology</span>
             </div>
-            <h1 className="font-display text-[clamp(3rem,7vw,7rem)] font-bold leading-[0.95] tracking-[-0.03em] mb-8">
+            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[0.96] tracking-tight mb-6 sm:mb-8">
               Build the<br/>future with<br/><em className="not-italic text-[#C8FF00]">HMorix</em>
             </h1>
-            <p className="text-lg text-cream/60 leading-relaxed max-w-[560px] mb-12">
+            <p className="text-base sm:text-lg text-cream/60 leading-relaxed max-w-[560px] mb-8 sm:mb-12">
               Enterprise-grade software, AI agents, and digital transformation solutions that scale with your ambition.
             </p>
-            <div className="flex items-center gap-4 flex-wrap mb-20">
-              <Link to="/contact" className="px-8 py-3.5 bg-[#C8FF00] text-obsidian font-display font-semibold rounded-[4px] hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(200,255,0,0.25)] transition-all">Start a Project</Link>
-              <Link to="/playground" className="px-8 py-3.5 border border-glass-border text-cream/60 font-display rounded-[4px] hover:border-cream hover:text-cream hover:bg-white/[0.04] transition-all">Explore Products</Link>
+            <div className="grid grid-cols-1 sm:flex sm:items-center gap-3 sm:gap-4 mb-12 sm:mb-16 lg:mb-20">
+              <Link to="/contact" className="px-8 py-3.5 bg-[#C8FF00] text-obsidian font-display font-semibold rounded-[4px] text-center hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(200,255,0,0.25)] transition-all">Start a Project</Link>
+              <Link to="/playground" className="px-8 py-3.5 border border-glass-border text-cream/60 font-display rounded-[4px] text-center hover:border-cream hover:text-cream hover:bg-white/[0.04] transition-all">Explore Products</Link>
             </div>
           </div>
-          <div className="flex gap-12 pt-12 border-t border-glass-border">
+          <div className="grid grid-cols-2 lg:flex gap-6 lg:gap-12 pt-8 sm:pt-12 border-t border-glass-border">
             <div>
               <div className="font-display text-3xl font-bold tracking-tight"><CounterNumber target={120} suffix="+" /></div>
               <div className="text-xs text-cream/35 mt-1">Enterprise Clients</div>
@@ -114,13 +113,13 @@ export default function Home() {
       </section>
 
       {/* SERVICES GRID */}
-      <section className="py-28">
-        <div className="max-w-[1280px] mx-auto px-8">
+      <section className="py-20 lg:py-28">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[640px]">
             <span className="label-mono">What We Build</span>
             <h2 className="section-title mt-3">Enterprise solutions<br/>for modern business</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-glass-border border border-glass-border rounded-[16px] overflow-hidden mt-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-glass-border border border-glass-border rounded-[8px] overflow-hidden mt-10 sm:mt-16">
             {[
   { icon: Globe, title: 'Enterprise Websites', desc: 'High-performance, scalable web applications built with modern frameworks.' },
   { icon: Bot, title: 'AI Agents', desc: 'Custom AI solutions that automate workflows and generate content.' },
@@ -135,7 +134,7 @@ export default function Home() {
   { icon: BarChart3, title: 'Analytics', desc: 'Real-time business intelligence and data visualization.' },
   { icon: Cloud, title: 'Cloud Solutions', desc: 'Scalable infrastructure and deployment pipelines.' },
 ].map((s, i) => (
-              <div key={i} className="bg-obsidian p-8 hover:bg-obsidian-2 transition-colors group">
+              <div key={i} className="bg-obsidian p-6 sm:p-8 hover:bg-obsidian-2 transition-colors group">
                 <div className="mb-4 text-[#C8FF00]">
   <s.icon className="w-8 h-8 stroke-[1.8]" />
 </div>
@@ -149,7 +148,7 @@ export default function Home() {
 
       {/* STATS */}
       <section className="bg-obsidian-2 border-y border-glass-border py-12">
-        <div className="max-w-[1280px] mx-auto px-8">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4">
             {[
               { num: '12+', label: 'Enterprise Clients' },
@@ -157,7 +156,7 @@ export default function Home() {
               { num: '98%', label: 'Client Satisfaction' },
               { num: '3+', label: 'Years of Innovation' },
             ].map((s, i) => (
-              <div key={i} className="py-8 px-6 text-center border-r border-glass-border last:border-r-0">
+              <div key={i} className="py-6 sm:py-8 px-4 sm:px-6 text-center border-r border-glass-border even:border-r-0 md:even:border-r md:last:border-r-0">
                 <div className="font-display text-4xl font-bold tracking-tight">{s.num.replace(/[+%]/,'')}<span className="text-[#C8FF00]">{s.num.match(/[+%]/)?.[0]}</span></div>
                 <div className="text-sm text-cream/35 mt-2">{s.label}</div>
               </div>
@@ -167,12 +166,12 @@ export default function Home() {
       </section>
 
       {/* WHY HMORIX */}
-      <section className="py-28">
-        <div className="max-w-[1280px] mx-auto px-8">
+      <section className="py-20 lg:py-28">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
           <span className="label-mono">Why HMorix</span>
           <h2 className="section-title mt-3">Technology that works<br/>as hard as you do</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-16">
-            <div className="md:col-span-2 p-8 border border-glass-border rounded-[16px] bg-white/[0.04] hover:border-[rgba(200,255,0,0.2)] hover:bg-obsidian-2 transition-all">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10 sm:mt-16">
+            <div className="md:col-span-2 p-6 sm:p-8 border border-glass-border rounded-[8px] bg-white/[0.04] hover:border-[rgba(200,255,0,0.2)] hover:bg-obsidian-2 transition-all">
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div>
                 <div className="mb-4 text-[#C8FF00]">
@@ -213,7 +212,7 @@ export default function Home() {
     desc: 'Lasting relationships with ongoing maintenance and support.'
   },
 ].map((item, i) => (
-              <div key={i} className="p-8 border border-glass-border rounded-[16px] bg-white/[0.04] hover:border-[rgba(200,255,0,0.2)] hover:bg-obsidian-2 transition-all">
+              <div key={i} className="p-6 sm:p-8 border border-glass-border rounded-[8px] bg-white/[0.04] hover:border-[rgba(200,255,0,0.2)] hover:bg-obsidian-2 transition-all">
                 <div className="mb-4 text-[#C8FF00]">
   <item.icon className="w-8 h-8 stroke-[1.8]" />
 </div>
@@ -227,7 +226,7 @@ export default function Home() {
 
       {/* TECH STACK */}
       <section className="py-12 border-t border-glass-border">
-        <div className="max-w-[1280px] mx-auto px-8 text-center">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <span className="label-mono">Technology Stack</span>
           <h2 className="font-display text-2xl font-bold tracking-tight mt-3 mb-8">Built with the best tools</h2>
           <div className="flex flex-wrap gap-3 justify-center">
@@ -239,12 +238,11 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="py-28 bg-obsidian-2">
-        <div className="max-w-[1280px] mx-auto px-8">
-          <div className="border border-glass-border rounded-[24px] p-12 md:p-20 text-center relative overflow-hidden bg-gradient-to-br from-obsidian-3 to-obsidian-2">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[radial-gradient(ellipse,rgba(200,255,0,0.06)_0%,transparent_70%)] pointer-events-none" />
+      <section className="py-20 lg:py-28 bg-obsidian-2">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="border border-glass-border rounded-[8px] p-8 md:p-16 lg:p-20 text-center relative overflow-hidden bg-obsidian-3">
             <span className="label-mono">Ready to Begin?</span>
-            <h2 className="font-display text-[clamp(2rem,4vw,4rem)] font-bold tracking-tight mt-6 mb-4">Let's build something<br/><em className="not-italic text-[#C8FF00]">remarkable</em></h2>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight mt-6 mb-4">Let's build something<br/><em className="not-italic text-[#C8FF00]">remarkable</em></h2>
             <p className="text-cream/60 max-w-[520px] mx-auto mb-10">Join 12+ enterprise clients who trust HMorix to power their technology.</p>
             <div className="flex gap-4 justify-center flex-wrap">
               <Link to="/contact" className="px-8 py-3.5 bg-[#C8FF00] text-obsidian font-display font-semibold rounded-[4px] hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(200,255,0,0.25)] transition-all">Schedule a Call</Link>

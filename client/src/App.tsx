@@ -3,6 +3,7 @@ import { Component, lazy, Suspense, useState, useEffect, type ReactNode } from '
 import { useAuth } from './lib/AuthContext'
 import MainLayout from './layouts/MainLayout'
 import CommandPalette from './components/CommandPalette'
+import OfflineStatus from './components/OfflineStatus'
 
 const Home = lazy(() => import('./pages/Home'))
 const About = lazy(() => import('./pages/About'))
@@ -158,6 +159,7 @@ function App() {
   return (
     <>
       <CommandPalette isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
+      <OfflineStatus />
       <AppErrorBoundary>
         <Suspense fallback={appLoader}>
           <Routes>
