@@ -81,9 +81,69 @@ export default function Footer() {
             <Link to="/contact" className="hover:text-cream transition-colors">Contact</Link>
           </div>
           <div className="flex gap-3">
-            <a href="https://twitter.com/hmorix" className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all">𝕏</a>
-            <a href="https://linkedin.com/company/hmorix" className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all">in</a>
-            <a href="https://github.com/hmorix" className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all">GH</a>
+            <a
+  href="https://twitter.com/hm_orix"
+  className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all"
+>
+  𝕏
+</a>
+
+<a
+  href="https://linkedin.com/company/hmorix"
+  className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all"
+>
+  in
+</a>
+
+<a
+  href="https://github.com/hmorix"
+  className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all"
+>
+  GH
+</a>
+
+<a
+  href="https://youtube.com/@hmorix"
+  className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all"
+>
+  YT
+</a>
+
+<a
+  href="https://www.threads.net/@hmorix"
+  className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all"
+>
+  @
+</a>
+
+<a
+  href="https://facebook.com/hmorix"
+  className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all"
+>
+  f
+</a>
+
+<a
+  href="https://instagram.com/hmorix"
+  className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all"
+>
+  IG
+</a>
+
+<a
+  href="https://discord.gg/hmorix"
+  className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all"
+>
+  DC
+</a>
+
+<a
+  href="https://t.me/hmorix"
+  className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all"
+>
+  TG
+</a>
+
           </div>
         </div>
       </div>
