@@ -110,7 +110,7 @@ export default function Footer() {
 </a>
 
 <a
-  href="https://www.threads.net/@hmorix"
+  href="https://www.threads.net/@hm_orix"
   className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all"
 >
   @
@@ -124,7 +124,7 @@ export default function Footer() {
 </a>
 
 <a
-  href="https://instagram.com/hmorix_offical"
+  href="https://instagram.com/hm_orix"
   className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all"
 >
   IG
