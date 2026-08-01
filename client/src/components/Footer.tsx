@@ -117,14 +117,14 @@ export default function Footer() {
 </a>
 
 <a
-  href="https://facebook.com/hmorix"
+  href="https://www.facebook.com/share/1FAa8Z87Vr/"
   className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all"
 >
   f
 </a>
 
 <a
-  href="https://instagram.com/hmorix"
+  href="https://instagram.com/hmorix_offical"
   className="w-8 h-8 border border-glass-border rounded-[4px] flex items-center justify-center hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all"
 >
   IG
