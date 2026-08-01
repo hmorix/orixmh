@@ -58,7 +58,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-2 lg:flex gap-6 lg:gap-12 pt-8 sm:pt-12 border-t border-glass-border">
             <div>
-              <div className="font-display text-3xl font-bold tracking-tight"><CounterNumber target={120} suffix="+" /></div>
+              <div className="font-display text-3xl font-bold tracking-tight"><CounterNumber target={12} suffix="+" /></div>
               <div className="text-xs text-cream/35 mt-1">Enterprise Clients</div>
             </div>
             <div>
@@ -66,11 +66,11 @@ export default function Home() {
               <div className="text-xs text-cream/35 mt-1">Client Satisfaction</div>
             </div>
             <div>
-              <div className="font-display text-3xl font-bold tracking-tight"><CounterNumber target={5} suffix="+" /></div>
+              <div className="font-display text-3xl font-bold tracking-tight"><CounterNumber target={3} suffix="+" /></div>
               <div className="text-xs text-cream/35 mt-1">Years Experience</div>
             </div>
             <div>
-              <div className="font-display text-3xl font-bold tracking-tight"><CounterNumber target={300} suffix="+" /></div>
+              <div className="font-display text-3xl font-bold tracking-tight"><CounterNumber target={180} suffix="+" /></div>
               <div className="text-xs text-cream/35 mt-1">Projects Delivered</div>
             </div>
           </div>
