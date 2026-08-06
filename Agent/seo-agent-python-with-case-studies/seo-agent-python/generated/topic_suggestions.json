@@ -1,0 +1,86 @@
+{
+  "generated_at": "2026-08-06T09:32:46.920924+00:00",
+  "based_on_published_count": 0,
+  "used_ranking_data": false,
+  "competitor_context": {
+    "commonAngles": [
+      "Cost Savings through AI Automation",
+      "Increased Efficiency and Productivity",
+      "Overview of AI Tools for SMEs (e.g., Zoho, Zapier)",
+      "Basic How-To Guides for Implementing AI",
+      "Future of Work: AI Adoption Trends in Indian SMEs",
+      "Case Studies of Large Indian Enterprises Using AI"
+    ],
+    "contentGaps": [
+      "Sector-Specific AI Automation Solutions for Indian SMEs (e.g., retail, textiles)",
+      "Addressing Unique Indian Infrastructure Challenges (e.g., intermittent internet)",
+      "Practical AI Literacy for Non-Tech SME Owners",
+      "Step-by-Step Migration Plans from Manual to AI-Driven Processes",
+      "Regulatory Compliance and AI in Indian SMEs",
+      "Success Metrics and ROI Calculation for AI Investments in Small Scales"
+    ],
+    "recommendedDifferentiator": "Empowering Indian SMEs with AI: A Grounded, Sector-Agnostic, and Infrastructure-Resilient Approach"
+  },
+  "suggestions": [
+    {
+      "title": "5 Essential AI Automation Tools for Small Businesses in India",
+      "targetKeyword": "AI automation for small businesses India",
+      "secondaryKeywords": [
+        "Business process automation tools",
+        "Indian SME digital transformation"
+      ],
+      "contentType": "blog",
+      "searchIntent": "informational",
+      "estimatedDifficulty": "medium",
+      "rationale": "Targets HMorix's primary audience with a relevant, localized topic, addressing the growing interest in AI among Indian SMEs."
+    },
+    {
+      "title": "Comparing Custom vs. Off-the-Shelf E-commerce Solutions for Retail",
+      "targetKeyword": "custom e-commerce development vs off-the-shelf",
+      "secondaryKeywords": [
+        "Retail e-commerce platform comparison",
+        "bespoke vs SaaS e-commerce"
+      ],
+      "contentType": "comparison",
+      "searchIntent": "informational/commercial",
+      "estimatedDifficulty": "high",
+      "rationale": "Speaks to HMorix's e-commerce service, helping retailers make informed decisions, a segment with high purchase intent."
+    },
+    {
+      "title": "A Beginner\u2019s Guide to Implementing AI in Mobile App Development",
+      "targetKeyword": "introducing AI in mobile app development",
+      "secondaryKeywords": [
+        "AI-powered mobile apps",
+        "mobile app development with AI for beginners"
+      ],
+      "contentType": "tutorial",
+      "searchIntent": "informational",
+      "estimatedDifficulty": "low",
+      "rationale": "Caters to developers and startups, a key audience for HMorix, with a practical, entry-level resource on a trending topic."
+    },
+    {
+      "title": "Why Small Businesses Fail at SEO (And How to Fix It with Simple Strategies)",
+      "targetKeyword": "common SEO mistakes small businesses make",
+      "secondaryKeywords": [
+        "SEO strategies for small businesses",
+        "improving local SEO"
+      ],
+      "contentType": "blog",
+      "searchIntent": "informational",
+      "estimatedDifficulty": "medium",
+      "rationale": "Addresses a pain point for HMorix's SEO service clients, offering solutions and positioning the company as an expert."
+    },
+    {
+      "title": "Case Study: How AI-Powered Website Development Boosted [Industry] Business Efficiency",
+      "targetKeyword": "AI website development case study [industry]",
+      "secondaryKeywords": [
+        "Benefits of AI in web development",
+        "industry-specific web development success stories"
+      ],
+      "contentType": "landing-page",
+      "searchIntent": "transactional",
+      "estimatedDifficulty": "high",
+      "rationale": "Though challenging without a real case study, crafting a hypothetical or partnering with a client for a real one could attract high-intent traffic seeking proven solutions."
+    }
+  ]
+}
