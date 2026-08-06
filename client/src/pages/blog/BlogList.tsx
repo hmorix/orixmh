@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Clock, User, Tag, ArrowRight, Search } from 'lucide-react'
+import SEOHead from '../../components/seo/SEOHead'
 // @ts-ignore - blogApi is intentionally plain JavaScript for the blog conversion.
 import { fallbackPosts, fetchBlogList } from './blogApi'
 
@@ -46,6 +47,13 @@ export default function BlogList() {
 
   return (
     <div className="pt-32 pb-20 min-h-screen">
+      <SEOHead
+        title="HMorix Blog, Articles & AI Automation Insights"
+        description="Read HMorix blog articles on AI automation, software development, BillingFlow, PDF automation, SEO, GEO, and enterprise technology."
+        keywords="HMorix blog, HMorix articles, AI automation blog, GEO optimization, SEO articles, AI agents, BillingFlow, PDF automation, business automation, long tail keywords"
+        canonical="/blog"
+        type="website"
+      />
       <div className="max-w-[1280px] mx-auto px-8">
         {/* Header */}
         <div className="text-center mb-16">

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { FileText, Download, Clock } from 'lucide-react'
 import generatedWhitepapers from '../generated/whitepapersIndex.json'
+import SEOHead from '../components/seo/SEOHead'
 
 export default function Whitepapers() {
   const seededPapers = [
@@ -27,6 +28,12 @@ export default function Whitepapers() {
 
   return (
     <div className="pt-32 pb-20">
+      <SEOHead
+        title="HMorix Whitepapers & Research PDFs"
+        description="Download HMorix whitepapers and research-backed PDF guides on AI automation, document processing, security, software architecture, and enterprise growth."
+        keywords="HMorix whitepapers, AI automation whitepaper, research PDF, enterprise AI report, PDF automation guide, software architecture whitepaper"
+        canonical="/whitepapers"
+      />
       <div className="max-w-[1280px] mx-auto px-8">
         <span className="label-mono">Whitepapers</span>
         <h1 className="section-title mt-3 mb-6">Technical deep dives</h1>

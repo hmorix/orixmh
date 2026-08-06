@@ -99,6 +99,7 @@ def submit(job_type, fn, meta=None):
             "result": None,
             "error": None,
             "key_label": None,
+            "_fn": fn,
         }
     _get_executor().submit(_run_job, job_id, fn)
     return job_id
@@ -107,13 +108,35 @@ def submit(job_type, fn, meta=None):
 def get_job(job_id):
     with _lock:
         job = _jobs.get(job_id)
-        return dict(job) if job else None
+        return _public_job(job) if job else None
 
 
 def list_jobs():
     with _lock:
-        return [dict(j) for j in sorted(_jobs.values(), key=lambda j: j["created_at"], reverse=True)]
+        return [_public_job(j) for j in sorted(_jobs.values(), key=lambda j: j["created_at"], reverse=True)]
 
 
 def pool_size():
     return max(len(nvidia.KEY_POOL), 1)
+
+
+def retry_job(job_id):
+    with _lock:
+        job = _jobs.get(job_id)
+        if not job:
+            return None, "not found"
+        if job.get("status") != "error":
+            return None, "only failed jobs can be retried"
+        fn = job.get("_fn")
+        if not fn:
+            return None, "retry function is not available for this job"
+        job_type = job.get("type", "job")
+        meta = dict(job.get("meta") or {})
+        meta["retry_of"] = job_id
+    return submit(job_type, fn, meta=meta), None
+
+
+def _public_job(job):
+    out = dict(job)
+    out.pop("_fn", None)
+    return out

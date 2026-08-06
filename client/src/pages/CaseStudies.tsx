@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import generatedCaseStudies from '../generated/caseStudiesIndex.json'
+import SEOHead from '../components/seo/SEOHead'
 
 export default function CaseStudies() {
   const seededCases = [
@@ -26,6 +27,12 @@ export default function CaseStudies() {
 
   return (
     <div className="pt-32 pb-20">
+      <SEOHead
+        title="HMorix Case Studies & Client Results"
+        description="Explore HMorix case studies showing AI automation, web development, e-commerce, PDF automation, and enterprise software results."
+        keywords="HMorix case studies, client results, AI automation case study, software development case study, ecommerce case study, business automation results"
+        canonical="/case-studies"
+      />
       <div className="max-w-[1280px] mx-auto px-8">
         <span className="label-mono">Case Studies</span>
         <h1 className="section-title mt-3 mb-6">Real results from real companies</h1>

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import posts from '../generated/postsIndex.json'
 import caseStudies from '../generated/caseStudiesIndex.json'
 import whitepapers from '../generated/whitepapersIndex.json'
+import SEOHead from '../components/seo/SEOHead'
 
 export default function KnowledgeBase() {
   const [search, setSearch] = useState('')
@@ -15,6 +16,12 @@ export default function KnowledgeBase() {
 
   return (
     <div className="pt-32 pb-20">
+      <SEOHead
+        title="HMorix Knowledge Base, Guides & Tutorials"
+        description="Search HMorix guides, tutorials, articles, case studies, whitepapers, and product documentation for AI automation and business software."
+        keywords="HMorix knowledge base, AI automation guides, HMorix tutorials, product documentation, AI agent docs, BillingFlow guide, PDF automation help"
+        canonical="/knowledge-base"
+      />
       <div className="max-w-[1280px] mx-auto px-8">
         <div className="text-center mb-12">
           <span className="label-mono">Knowledge Base</span>

@@ -4,7 +4,6 @@ import { blogPageRegistry } from '../../generated/blog-pages/registry'
 import { caseStudyPageRegistry } from '../../generated/case-study-pages/registry'
 import { whitepaperPageRegistry } from '../../generated/whitepaper-pages/registry'
 import { pressPageRegistry } from '../../generated/press-pages/registry'
-import BlogPost from '../blog/BlogPost'
 
 type GeneratedRegistry = Record<string, ReturnType<typeof lazy>>
 
@@ -27,7 +26,7 @@ function NotFoundGenerated({ backTo, label }: { backTo: string; label: string })
 export function GeneratedBlogPost() {
   const { slug } = useParams()
   const Generated = slug ? blogPageRegistry[slug] as ComponentType | undefined : undefined
-  return Generated ? <Generated /> : <BlogPost />
+  return Generated ? <Generated /> : <NotFoundGenerated backTo="/blog" label="Blog post" />
 }
 
 export function GeneratedContentPage({ type }: { type: keyof typeof registries }) {

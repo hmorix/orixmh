@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Calendar, ExternalLink } from 'lucide-react'
 import generatedPress from '../generated/pressIndex.json'
+import SEOHead from '../components/seo/SEOHead'
 
 export default function PressReleases() {
   const seededReleases = [
@@ -24,6 +25,13 @@ export default function PressReleases() {
 
   return (
     <div className="pt-32 pb-20">
+      <SEOHead
+        title="HMorix Press Releases & Company News"
+        description="Official HMorix press releases, company announcements, product updates, media resources, and downloadable press PDFs."
+        keywords="HMorix press release, HMorix news, company announcements, AI product launch, press PDF, media kit"
+        canonical="/press"
+        type="article"
+      />
       <div className="max-w-[1280px] mx-auto px-8">
         <span className="label-mono">Press Releases</span>
         <h1 className="section-title mt-3 mb-6">Latest News</h1>

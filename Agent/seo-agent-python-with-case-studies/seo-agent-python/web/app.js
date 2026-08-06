@@ -190,7 +190,10 @@ async function loadJobs() {
           el("strong", {}, `${j.type}: `),
           el("span", {}, String(title)),
         ]),
-        el("span", { class: `status-pill status-${j.status}` }, j.status),
+        el("div", { class: "card-actions" }, [
+          el("span", { class: `status-pill status-${j.status}` }, j.status),
+          j.status === "error" ? el("button", { class: "btn-accent", onclick: () => retryJob(j.id) }, "Retry") : "",
+        ]),
       ]),
       el("div", { class: "job-progress" }, [
         j.key_label ? `${j.key_label} · ` : "",
@@ -203,6 +206,18 @@ async function loadJobs() {
     ]);
     list.appendChild(card);
   });
+}
+
+async function retryJob(jobId) {
+  try {
+    const res = await api(`/api/jobs/${encodeURIComponent(jobId)}/retry`, { method: "POST" });
+    document.querySelector('.tab-btn[data-tab="jobs"]').click();
+    await pollUntilDone(res.job_id);
+    await loadJobs();
+  } catch (err) {
+    alert(`Retry failed: ${err.message}`);
+    loadJobs();
+  }
 }
 
 function startJobsPolling() {
@@ -243,6 +258,9 @@ async function loadCaseStudiesTab() {
         el("div", { class: "card-actions" }, [
           item.view_url ? el("a", { href: item.view_url }, [el("button", {}, "View")]) : "",
           item.download_url ? el("a", { href: item.download_url }, [el("button", {}, "Download HTML")]) : "",
+          item.state === "published" ? el("a", { href: editUrl("case-study", "published", item.slug) }, [el("button", {}, "Edit")]) : "",
+          item.state === "published" ? el("button", { class: "btn-accent", onclick: () => retryPublishedContent("case-study", item.slug, loadCaseStudiesTab) }, "Regenerate") : "",
+          item.state === "draft" ? el("a", { href: editUrl("case-study", "draft", item.file) }, [el("button", {}, "Edit")]) : "",
           item.state === "draft" ? el("button", { class: "btn-accent", onclick: () => approvePendingCaseStudy(item.file) }, "Approve & Publish") : "",
         ]),
       ]);
@@ -299,6 +317,9 @@ async function loadWhitepapersTab() {
         el("div", { class: "card-actions" }, [
           item.view_url ? el("a", { href: item.view_url }, [el("button", {}, "View")]) : "",
           item.pdf_url ? el("a", { href: item.pdf_url }, [el("button", {}, "Download PDF")]) : "",
+          item.state === "published" ? el("a", { href: editUrl("whitepaper", "published", item.slug) }, [el("button", {}, "Edit")]) : "",
+          item.state === "published" ? el("button", { class: "btn-accent", onclick: () => retryPublishedContent("whitepaper", item.slug, loadWhitepapersTab) }, "Regenerate") : "",
+          item.state === "draft" ? el("a", { href: editUrl("whitepaper", "draft", item.file) }, [el("button", {}, "Edit")]) : "",
           item.state === "draft" ? el("button", { class: "btn-accent", onclick: () => approvePendingWhitepaper(item.file) }, "Approve & Publish") : "",
         ]),
       ]);
@@ -355,6 +376,9 @@ async function loadPressTab() {
         el("div", { class: "card-actions" }, [
           item.view_url ? el("a", { href: item.view_url }, [el("button", {}, "View")]) : "",
           item.pdf_url ? el("a", { href: item.pdf_url }, [el("button", {}, "Download PDF")]) : "",
+          item.state === "published" ? el("a", { href: editUrl("press", "published", item.slug) }, [el("button", {}, "Edit")]) : "",
+          item.state === "published" ? el("button", { class: "btn-accent", onclick: () => retryPublishedContent("press", item.slug, loadPressTab) }, "Regenerate") : "",
+          item.state === "draft" ? el("a", { href: editUrl("press", "draft", item.file) }, [el("button", {}, "Edit")]) : "",
           item.state === "draft" ? el("button", { class: "btn-accent", onclick: () => approvePendingPress(item.file) }, "Approve & Publish") : "",
         ]),
       ]);
@@ -402,6 +426,7 @@ async function loadPending() {
         ]),
       ]),
       el("div", { class: "card-actions" }, [
+        el("a", { href: editUrl("blog", "draft", p.file) }, [el("button", {}, "Edit")]),
         el("button", { onclick: () => convertPending(p.file) }, "Convert to Page"),
         el("button", { onclick: () => uploadPending(p.file) }, "Upload to Supabase"),
         el("button", { class: "btn-accent", onclick: () => approvePending(p.file) }, "Approve & Publish"),
@@ -507,6 +532,8 @@ async function loadUploaded() {
         ]),
       ]),
       el("div", { class: "card-actions" }, [
+        el("a", { href: editUrl("blog", "published", p.slug) }, [el("button", {}, "Edit")]),
+        el("button", { class: "btn-accent", onclick: () => retryPublishedContent("blog", p.slug, loadUploaded) }, "Regenerate"),
         el("button", { onclick: () => convertUploaded(p.slug) }, "Convert to HTML"),
         el("button", { onclick: () => downloadUploaded(p.slug) }, "Download HTML"),
         el("button", { onclick: () => showImagesModal(p.slug, "uploaded") }, "Image Ideas"),
@@ -514,6 +541,26 @@ async function loadUploaded() {
     ]);
     list.appendChild(card);
   });
+}
+
+function editUrl(type, state, id) {
+  return `/edit?type=${encodeURIComponent(type)}&state=${encodeURIComponent(state)}&id=${encodeURIComponent(id || "")}`;
+}
+
+async function retryPublishedContent(type, slug, after) {
+  if (!slug) return;
+  try {
+    const res = await api(`/api/content/${encodeURIComponent(type)}/published/${encodeURIComponent(slug)}/retry`, { method: "POST" });
+    const failed = (res.regenerated || []).filter((step) => !step.ok);
+    if (failed.length) {
+      alert(`Regenerated with ${failed.length} failed step(s): ${failed.map((s) => `${s.step}: ${s.error}`).join("; ")}`);
+    } else {
+      alert("Regenerated page assets.");
+    }
+    if (after) after();
+  } catch (err) {
+    alert(`Regenerate failed: ${err.message}`);
+  }
 }
 
 async function convertUploaded(slug) {

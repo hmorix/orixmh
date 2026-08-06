@@ -18,7 +18,7 @@ const seededPosts = [
 
 export const fallbackPosts = mergePosts(
   generatedPosts.map((post, index) => ({ ...post, author: 'HMorix AI', readTime: post.readTime || '5 min', featured: index === 0 })),
-  seededPosts,
+  shouldUseLegacyBlogApi() ? seededPosts : [],
 )
 
 export const fallbackPostsContent = {
@@ -71,12 +71,14 @@ export function normalizePost(post) {
 }
 
 export async function fetchBlogList() {
+  if (!shouldUseLegacyBlogApi()) return fallbackPosts
   const payload = await cachedJson('blog:list', '/api/blog')
   const data = Array.isArray(payload) ? payload : payload.data || payload.blogs || []
-  return mergePosts(data, generatedPosts)
+  return mergePosts(generatedPosts, data)
 }
 
 export async function fetchBlogPost(slug) {
+  if (!shouldUseLegacyBlogApi()) throw new Error('Legacy blog API disabled')
   const payload = await cachedJson(`blog:post:${slug}`, `/api/blog/${encodeURIComponent(slug)}`)
   return normalizePostContent(payload.data || payload.blog || payload)
 }
@@ -117,4 +119,8 @@ function mergePosts(...groups) {
     seen.add(post.slug)
     return true
   }).sort((a, b) => new Date(b.publishedAt || b.date || 0) - new Date(a.publishedAt || a.date || 0))
+}
+
+function shouldUseLegacyBlogApi() {
+  return import.meta.env.VITE_ENABLE_LEGACY_BLOG_API === 'true'
 }

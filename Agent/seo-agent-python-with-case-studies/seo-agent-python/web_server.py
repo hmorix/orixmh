@@ -1048,6 +1048,14 @@ class Handler(BaseHTTPRequestHandler):
                 )
                 self._send_json({"job_id": job_id})
 
+            elif path.startswith("/api/jobs/") and path.endswith("/retry"):
+                job_id = path[len("/api/jobs/"):-len("/retry")]
+                new_job_id, error = job_queue.retry_job(job_id)
+                if error:
+                    self._send_json({"error": error}, 400 if error != "not found" else 404)
+                else:
+                    self._send_json({"job_id": new_job_id, "retry_of": job_id})
+
             elif path == "/api/generate":
                 ideas = body.get("ideas") or []
                 if not ideas:
