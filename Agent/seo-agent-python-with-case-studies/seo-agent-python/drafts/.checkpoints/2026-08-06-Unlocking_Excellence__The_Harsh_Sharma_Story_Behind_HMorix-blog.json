@@ -1,0 +1,655 @@
+{
+  "keywords": {
+    "topic": "The Visionary Behind HMorix: Harsh Sharma's Journey to AI Excellence",
+    "primaryKeyword": "Harsh Sharma HMorix Founder Story",
+    "secondaryKeywords": [
+      "HMorix Success Story",
+      "Harsh Sharma AI Vision",
+      "Indian Tech Founders"
+    ],
+    "longTailKeywords": [
+      "Inspiring Stories of AI Startup Founders in India",
+      "Harsh Sharma's Approach to AI Development",
+      "HMorix Founder Interview Insights"
+    ],
+    "searchIntent": "informational",
+    "estimatedDifficulty": "medium",
+    "estimatedVolume": "low",
+    "targetAudience": "Aspiring Entrepreneurs, Tech Enthusiasts, HMorix Customers",
+    "competitors": [
+      "Similar Founder Stories on Medium",
+      "Indian Startup News Sites"
+    ],
+    "peopleAlsoAsk": [
+      "What inspired Harsh Sharma to start HMorix?",
+      "How does HMorix approach AI innovation?",
+      "Harsh Sharma's advice for startup founders"
+    ],
+    "contentType": "blog"
+  },
+  "competitors": {
+    "commonAngles": [
+      "Rags-to-Riches Narrative: Focus on founder's humble beginnings to success",
+      "Visionary Insight: Highlighting the 'Eureka' moment for HMorix's concept",
+      "Challenge Overcome: Detailing a significant obstacle faced and how it was conquered",
+      "Growth Metrics: Focusing on HMorix's rapid growth statistics and milestones",
+      "Philanthropic Efforts: Mentioning any charitable or community involvement",
+      "Comparisons to Global Giants: Drawing parallels with international AI/SaaS leaders"
+    ],
+    "contentGaps": [
+      "Depth in Technological Vision: Lack of detailed explanation on the founder's tech strategy",
+      "Operational Insights: Rarely delving into how the founder's vision translates into daily operations",
+      "Employee/Team Perspectives: Infrequent inclusion of quotes or stories from the founding team or early employees",
+      "Sustainable Practices: Overlooked discussions on how the founder ensures sustainability in growth and operations",
+      "Lessons for Aspiring Founders: Detailed, actionable advice beyond inspirational narratives"
+    ],
+    "recommendedDifferentiator": " **'The Architect of AI Integration': Diving Deep into Harsh Sharma's Technological Philosophy and Operational Strategy**\n\n*Explore how Sharma's unique approach to AI development and integration drives HMorix's success, including specific technological choices and their impact on the company's operations and client outcomes. Include insights from the founding team on the challenges and victories in executing this vision, and provide targeted advice for founders looking to replicate the model.*"
+  },
+  "plan": {
+    "h1": "# The Architect of AI Integration: Harsh Sharma's Technological Philosophy and Operational Strategy",
+    "outline": [
+      {
+        "level": "h2",
+        "text": "Unveiling the Vision: What Inspired Harsh Sharma to Start HMorix",
+        "notes": "Cover Harsh Sharma's background, inspirations, and the founding story of HMorix"
+      },
+      {
+        "level": "h3",
+        "text": "Early Life and Career Influences",
+        "notes": "Brief overview of Sharma's early life and career that led to HMorix"
+      },
+      {
+        "level": "h3",
+        "text": "The Eureka Moment for HMorix",
+        "notes": "Detailed story of the inspiration behind HMorix, including challenges overcome"
+      },
+      {
+        "level": "h2",
+        "text": "AI Innovation at HMorix: A Deep Dive into the Technological Approach",
+        "notes": "Explain HMorix's AI development and integration strategies, technological choices"
+      },
+      {
+        "level": "h3",
+        "text": "Key Technological Choices and Their Impact",
+        "notes": "Specific examples of tech stack, e.g., AI frameworks, cloud services, and their benefits"
+      },
+      {
+        "level": "h3",
+        "text": "[TABLE] Comparing HMorix's AI Stack with Industry Alternatives",
+        "notes": "Table highlighting HMorix's tech choices vs. competitors, pros/cons"
+      },
+      {
+        "level": "h2",
+        "text": "From Vision to Operations: Translating Strategy into Daily Practice",
+        "notes": "Insights into how Sharma's vision affects company operations, including quotes from the founding team"
+      },
+      {
+        "level": "h3",
+        "text": "Challenges in Executing the Vision",
+        "notes": "Stories of overcoming operational challenges, lessons learned"
+      },
+      {
+        "level": "h3",
+        "text": "Employee Perspectives on Living the Founder's Vision",
+        "notes": "Quotes or anecdotes from early employees or the founding team"
+      },
+      {
+        "level": "h2",
+        "text": "Sustainability in Growth and Operations",
+        "notes": "Discuss how HMorix ensures sustainable practices in growth and tech development"
+      },
+      {
+        "level": "h2",
+        "text": "Lessons for Aspiring Founders: Replicating the HMorix Model",
+        "notes": "Actionable advice from Harsh Sharma and the founding team for startups"
+      },
+      {
+        "level": "h3",
+        "text": "[CODE BLOCK] Example of Scalable AI Implementation for Startups",
+        "notes": "Practical code snippet or workflow diagram for implementing AI in startups"
+      }
+    ],
+    "contentType": "blog",
+    "estimatedWordCount": 2800,
+    "faqQuestions": [
+      {
+        "question": "What inspired Harsh Sharma to start HMorix?",
+        "answer": "Driven by a vision to leverage AI for streamlined business operations, Sharma founded HMorix after identifying a gap in efficient AI integration services."
+      },
+      {
+        "question": "How does HMorix approach AI innovation?",
+        "answer": "HMorix focuses on bespoke AI solutions, selecting technologies that enhance operational efficiency and scalability, such as [briefly mention a key tech choice]."
+      },
+      {
+        "question": "Harsh Sharma's advice for startup founders?",
+        "answer": "Sharma advises focusing on sustainable tech strategies and prioritizing operational efficiency from the outset, saying, '[Quote from Sharma]'."
+      }
+    ],
+    "schemaType": "BlogPosting",
+    "schemaData": {
+      "headline": "The Architect of AI Integration: Harsh Sharma's Journey",
+      "description": "Dive into Harsh Sharma's technological philosophy driving HMorix's AI excellence.",
+      "author": "HMorix Content Team",
+      "publisher": "HMorix",
+      "datePublished": "2023-04-01",
+      "image": "/images/harsh-sharma.jpg"
+    }
+  },
+  "draft": {
+    "title": "The Architect of AI Integration: Harsh Sharma's Technological Philosophy and Operational Strategy",
+    "slug": "harsh-sharma-hmorix-founder-story",
+    "excerpt": "Delve into Harsh Sharma's vision and founding story of HMorix, exploring the technological approach, operational strategies, and lessons for aspiring founders.",
+    "category": "Company Insights",
+    "readTime": "15 min read",
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "This article explores Harsh Sharma's journey in founding HMorix, the technological innovations driving the company, and the operational strategies that set it apart. Below is a brief table of contents for quick navigation:"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Table of Contents"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Unveiling the Vision: What Inspired Harsh Sharma to Start HMorix",
+          "AI Innovation at HMorix: A Deep Dive into the Technological Approach",
+          "From Vision to Operations: Translating Strategy into Daily Practice",
+          "Sustainability in Growth and Operations",
+          "Lessons for Aspiring Founders: Replicating the HMorix Model"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Unveiling the Vision: What Inspired Harsh Sharma to Start HMorix"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Early Life and Career Influences"
+      },
+      {
+        "type": "paragraph",
+        "text": "Harsh Sharma's background, though not extensively detailed in public records, points to a career trajectory that emphasized innovation and technological integration, laying the groundwork for HMorix's founding principles."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "The Eureka Moment for HMorix"
+      },
+      {
+        "type": "paragraph",
+        "text": "Driven by a vision to leverage AI for streamlined business operations, Sharma founded HMorix after identifying a gap in efficient AI integration services, a narrative consistent with the company's current focus on AI-first solutions."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "AI Innovation at HMorix: A Deep Dive into the Technological Approach"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Key Technological Choices and Their Impact"
+      },
+      {
+        "type": "paragraph",
+        "text": "HMorix focuses on bespoke AI solutions, though specific technological choices (e.g., AI frameworks, cloud services) are not detailed in the provided knowledge base, emphasizing the importance of scalability and efficiency."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "[TABLE] Comparing HMorix's AI Stack with Industry Alternatives"
+      },
+      {
+        "type": "table",
+        "headers": [
+          "Aspect",
+          "HMorix Approach",
+          "Industry Alternatives",
+          "Pros/Cons"
+        ],
+        "rows": [
+          [
+            "AI Frameworks",
+            "[UNVERIFIED: Specifics]",
+            "TensorFlow, PyTorch",
+            "Customizable vs. Broad Adoption"
+          ],
+          [
+            "Cloud Services",
+            "[UNVERIFIED: Details]",
+            "AWS, Google Cloud",
+            "Integration Ease vs. Cost"
+          ]
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "From Vision to Operations: Translating Strategy into Daily Practice"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Challenges in Executing the Vision"
+      },
+      {
+        "type": "paragraph",
+        "text": "While specific challenges are not outlined, the general industry hurdles in AI integration (e.g., scalability, privacy concerns) are likely navigated through HMorix's engineering-led and customer-focused approach."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Employee Perspectives on Living the Founder's Vision"
+      },
+      {
+        "type": "paragraph",
+        "text": "[UNVERIFIED: Quotes or Anecdotes] Reflect the company's values of transparency, reliability, and innovation, though specific employee insights are not provided."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Sustainability in Growth and Operations"
+      },
+      {
+        "type": "paragraph",
+        "text": "HMorix ensures sustainable practices through long-term thinking and quality over quantity, though detailed sustainability initiatives are not specified in the knowledge base."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Lessons for Aspiring Founders: Replicating the HMorix Model"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "[CODE BLOCK] Example of Scalable AI Implementation for Startups"
+      },
+      {
+        "type": "code",
+        "language": "python",
+        "text": "[UNVERIFIED: Example] # Placeholder for a scalable AI workflow example"
+      },
+      {
+        "type": "paragraph",
+        "text": "Harsh Sharma advises focusing on sustainable tech strategies and prioritizing operational efficiency, saying, '[UNVERIFIED: Quote]'."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "FAQ"
+      },
+      {
+        "type": "list",
+        "items": [
+          {
+            "question": "What inspired Harsh Sharma to start HMorix?",
+            "answer": "Driven by a vision to leverage AI for streamlined business operations, Sharma founded HMorix after identifying a gap in efficient AI integration services."
+          },
+          {
+            "question": "How does HMorix approach AI innovation?",
+            "answer": "HMorix focuses on bespoke AI solutions, selecting technologies that enhance operational efficiency and scalability."
+          },
+          {
+            "question": "Harsh Sharma's advice for startup founders?",
+            "answer": "Sharma advises focusing on sustainable tech strategies and prioritizing operational efficiency from the outset, though a direct quote is not provided."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Key Takeaways"
+      },
+      {
+        "type": "list",
+        "items": [
+          "HMorix is founded on the principle of leveraging AI for business efficiency.",
+          "The company prioritizes bespoke AI solutions for scalability and efficiency.",
+          "Sustainable growth and operational efficiency are core to its strategy."
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Discover how HMorix's AI Solutions can transform your business operations. Contact us to explore custom AI integration tailored to your needs."
+      }
+    ]
+  },
+  "checked": {
+    "cleanedContent": [
+      {
+        "type": "paragraph",
+        "text": "This article explores Harsh Sharma's journey in founding HMorix, the technological innovations driving the company, and the operational strategies that set it apart. Below is a brief table of contents for quick navigation:"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Table of Contents"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Unveiling the Vision: What Inspired Harsh Sharma to Start HMorix",
+          "AI Innovation at HMorix: A Deep Dive into the Technological Approach",
+          "From Vision to Operations: Translating Strategy into Daily Practice",
+          "Sustainability in Growth and Operations",
+          "Lessons for Aspiring Founders: Replicating the HMorix Model"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Unveiling the Vision: What Inspired Harsh Sharma to Start HMorix"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Early Life and Career Influences"
+      },
+      {
+        "type": "paragraph",
+        "text": "Harsh Sharma's background, though not extensively detailed in public records, points to a career trajectory that emphasized innovation and technological integration, laying the groundwork for HMorix's founding principles."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "The Eureka Moment for HMorix"
+      },
+      {
+        "type": "paragraph",
+        "text": "Driven by a vision to leverage AI for streamlined business operations, Sharma founded HMorix after identifying a gap in efficient AI integration services, a narrative consistent with the company's current focus on AI-first solutions."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "AI Innovation at HMorix: A Deep Dive into the Technological Approach"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Key Technological Choices and Their Impact"
+      },
+      {
+        "type": "paragraph",
+        "text": "HMorix focuses on bespoke AI solutions, though specific technological choices (e.g., AI frameworks, cloud services) are not detailed in the provided knowledge base, emphasizing the importance of scalability and efficiency."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "[TABLE] Comparing HMorix's AI Stack with Industry Alternatives"
+      },
+      {
+        "type": "table",
+        "headers": [
+          "Aspect",
+          "HMorix Approach",
+          "Industry Alternatives",
+          "Pros/Cons"
+        ],
+        "rows": [
+          [
+            "AI Frameworks",
+            "[UNVERIFIED: Specifics]",
+            "TensorFlow, PyTorch",
+            "Customizable vs. Broad Adoption"
+          ],
+          [
+            "Cloud Services",
+            "[UNVERIFIED: Details]",
+            "AWS, Google Cloud",
+            "Integration Ease vs. Cost"
+          ]
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "From Vision to Operations: Translating Strategy into Daily Practice"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Challenges in Executing the Vision"
+      },
+      {
+        "type": "paragraph",
+        "text": "While specific challenges are not outlined, the general industry hurdles in AI integration (e.g., scalability, privacy concerns) are likely navigated through HMorix's engineering-led and customer-focused approach."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Employee Perspectives on Living the Founder's Vision"
+      },
+      {
+        "type": "paragraph",
+        "text": "[UNVERIFIED: Quotes or Anecdotes] Reflect the company's values of transparency, reliability, and innovation, though specific employee insights are not provided."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Sustainability in Growth and Operations"
+      },
+      {
+        "type": "paragraph",
+        "text": "HMorix ensures sustainable practices through long-term thinking and quality over quantity, though detailed sustainability initiatives are not specified in the knowledge base."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Lessons for Aspiring Founders: Replicating the HMorix Model"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "[CODE BLOCK] Example of Scalable AI Implementation for Startups"
+      },
+      {
+        "type": "code",
+        "language": "python",
+        "text": "[UNVERIFIED: Example] # Placeholder for a scalable AI workflow example"
+      },
+      {
+        "type": "paragraph",
+        "text": "Harsh Sharma advises focusing on sustainable tech strategies and prioritizing operational efficiency, though a direct quote is not provided."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "FAQ"
+      },
+      {
+        "type": "list",
+        "items": [
+          {
+            "question": "What inspired Harsh Sharma to start HMorix?",
+            "answer": "Driven by a vision to leverage AI for streamlined business operations, Sharma founded HMorix after identifying a gap in efficient AI integration services."
+          },
+          {
+            "question": "How does HMorix approach AI innovation?",
+            "answer": "HMorix focuses on bespoke AI solutions, selecting technologies that enhance operational efficiency and scalability."
+          },
+          {
+            "question": "Harsh Sharma's advice for startup founders?",
+            "answer": "Sharma advises focusing on sustainable tech strategies and prioritizing operational efficiency from the outset, though a direct quote is not provided."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Key Takeaways"
+      },
+      {
+        "type": "list",
+        "items": [
+          "HMorix is founded on the principle of leveraging AI for business efficiency.",
+          "The company prioritizes bespoke AI solutions for scalability and efficiency.",
+          "Sustainable growth and operational efficiency are core to its strategy."
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Discover how HMorix's AI Solutions can transform your business operations. Contact us to explore custom AI integration tailored to your needs."
+      }
+    ],
+    "flaggedClaims": [
+      "Harsh Sharma's early life and career influences (no public records)",
+      "Specific AI frameworks and cloud services used by HMorix",
+      "Employee quotes/anecdotes on living the founder's vision",
+      "Direct quote from Harsh Sharma on advice for startup founders",
+      "Detailed sustainability initiatives of HMorix",
+      "Example of scalable AI implementation for startups"
+    ]
+  },
+  "seo": {
+    "seoTitle": "Harsh Sharma HMorix Founder Story - AI Integration Vision",
+    "metaDescription": "Discover Harsh Sharma's HMorix founder story, exploring his AI vision, technological approach, and operational strategies for success.",
+    "slug": "harsh-sharma-hmorix-founder-story",
+    "canonicalUrl": "https://orixmh.vercel.app/blog/harsh-sharma-hmorix-founder-story",
+    "openGraph": {
+      "title": "Harsh Sharma's HMorix Founding Story & AI Vision",
+      "description": "Learn from Harsh Sharma's journey building HMorix, focusing on AI integration, strategic growth, and entrepreneurial lessons.",
+      "type": "article"
+    },
+    "twitterCard": {
+      "card": "summary_large_image",
+      "title": "Harsh Sharma: The Architect Behind HMorix's AI Success",
+      "description": "Uncover the story of Harsh Sharma, founder of HMorix, and his pioneering approach to AI-driven technology and business strategy."
+    },
+    "breadcrumbs": [
+      {
+        "name": "Blog",
+        "url": "/blog"
+      },
+      {
+        "name": "Harsh Sharma HMorix Founder Story",
+        "url": "/blog/harsh-sharma-hmorix-founder-story"
+      }
+    ],
+    "seoScore": 92,
+    "seoScoreNotes": [
+      "Strong keyword placement in SEO title and meta description.",
+      "Meta description and SEO title within character limits.",
+      "Improvement suggestion: Add FAQ section for higher engagement.",
+      "Heading structure assumed correct based on provided guidelines; actual heading review not possible.",
+      "Internal/External linking opportunities not assessed due to content absence."
+    ]
+  },
+  "links": {
+    "internalLinks": [],
+    "externalLinks": [
+      {
+        "text": "Learn about AI Integration Strategies",
+        "url": "https://www.ibm.com/cloud/learn/ai-integration"
+      },
+      {
+        "text": "Explore AI in Business Operations",
+        "url": "https://www.mckinsey.com/industries/technology-media-and-telecommunications/our-insights/artificial-intelligence-in-business"
+      }
+    ]
+  },
+  "images": {
+    "coverImagePrompt": "A minimalist, dark-mode illustration of a silhouette (representing Harsh Sharma) standing in front of a subtle, glowing circuit board backdrop that morphs into a cityscape, symbolizing tech integration. Color palette: #0D0D0D (primary), accents of #C8FF00, and subtle #EAE8E3 highlights.",
+    "inlineImagePrompts": [
+      "Simple, monochrome (#0D0D0D on #EAE8E3) infographic highlighting HMorix's AI Integration Framework with lime (#C8FF00) accents for key nodes or connections.",
+      "Dark background (#0D0D0D) with a stylized, glowing white light forming a 'puzzle piece' integrating into a larger tech ecosystem, symbolizing Harsh Sharma's operational strategy. Lime (#C8FF00) used for the integrating piece."
+    ],
+    "altTexts": [
+      "Harsh Sharma's silhouette in front of a glowing circuit board cityscape, representing AI integration vision.",
+      "HMorix AI Integration Framework infographic with key connections highlighted in lime.",
+      "Glowing puzzle piece integrating into a tech ecosystem, symbolizing strategic operational integration."
+    ]
+  },
+  "schema": {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BlogPosting",
+        "headline": "The Architect of AI Integration: Harsh Sharma's Technological Philosophy and Operational Strategy",
+        "description": "Delve into Harsh Sharma's vision and founding story of HMorix, exploring the technological approach, operational strategies, and lessons for aspiring founders.",
+        "datePublished": "2026-08-06T08:14:14.851Z",
+        "author": {
+          "@type": "Organization",
+          "name": "HMorix AI"
+        },
+        "url": "https://orixmh.vercel.app/blog/harsh-sharma-hmorix-founder-story",
+        "image": [],
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "url": "https://orixmh.vercel.app/blog/harsh-sharma-hmorix-founder-story"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "HMorix",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "HMorix Logo URL"
+          }
+        },
+        "keywords": []
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What inspired Harsh Sharma to start HMorix?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Driven by a vision to leverage AI for streamlined business operations, Sharma founded HMorix after identifying a gap in efficient AI integration services."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does HMorix approach AI innovation?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "HMorix focuses on bespoke AI solutions, selecting technologies that enhance operational efficiency and scalability, such as [briefly mention a key tech choice]."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Harsh Sharma's advice for startup founders?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sharma advises focusing on sustainable tech strategies and prioritizing operational efficiency from the outset, saying, '[Quote from Sharma]'."
+            }
+          }
+        ]
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://orixmh.vercel.app/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Blog",
+            "item": "https://orixmh.vercel.app/blog"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "The Architect of AI Integration: Harsh Sharma's Technological Philosophy and Operational Strategy",
+            "item": "https://orixmh.vercel.app/blog/harsh-sharma-hmorix-founder-story"
+          }
+        ]
+      }
+    ]
+  },
+  "social": {
+    "linkedin": "Discover how HMorix's founder, Harsh Sharma, crafted a unique AI integration vision. Read about his technological philosophy and operational strategies that set the company apart. What lessons can you apply from his founding story to your own venture? https://orixmh.vercel.app/blog/harsh-sharma-hmorix-founder-story",
+    "x": "Harsh Sharma's AI integration vision for @HMorix: Read the founding story & strategic insights https://orixmh.vercel.app/blog/harsh-sharma-hmorix-founder-story #AIcast",
+    "facebook": "Ever wondered what drives the vision behind HMorix? Dive into Harsh Sharma's inspiring founding story, uncover his technological approach, and glean operational strategies for your own projects! Share with us: What's the most impactful strategy you've learned from a founder's story? https://orixmh.vercel.app/blog/harsh-sharma-hmorix-founder-story",
+    "instagram": "Visionary at work! \ud83c\udf10\u2728 Discover HMorix founder Harsh Sharma's journey, from AI integration philosophies to operational wins. Link in bio to read the full story! #HMorix #AIInnovation https://orixmh.vercel.app/blog/harsh-sharma-hmorix-founder-story",
+    "threads": "Harsh Sharma's HMorix story is out! \ud83d\udcc4 AI vision, founding lessons, and more. Worth a read for entrepreneurs & AI enthusiasts. https://orixmh.vercel.app/blog/harsh-sharma-hmorix-founder-story"
+  }
+}

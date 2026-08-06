@@ -1,0 +1,50 @@
+{
+  "keywords": {
+    "topic": "What is HMorix? Your Comprehensive Guide to AI-Driven Business Solutions",
+    "primaryKeyword": "HMorix AI Business Solutions",
+    "secondaryKeywords": [
+      "AI-Driven Business Automation",
+      "HMorix Company Overview",
+      "AI Solutions for Enterprises",
+      "Business Technology HMorix"
+    ],
+    "longTailKeywords": [
+      "How HMorix Uses AI for Business Growth",
+      "HMorix Enterprise AI Solutions for Small Businesses",
+      "Understanding HMorix's AI Technology Stack"
+    ],
+    "searchIntent": "informational",
+    "estimatedDifficulty": "medium",
+    "estimatedVolume": "low",
+    "targetAudience": "Small Businesses, Entrepreneurs, IT Managers",
+    "competitors": [
+      "Generic AI Tech Blogs",
+      "Local IT Service Providers' Websites"
+    ],
+    "peopleAlsoAsk": [
+      "Does HMorix Offer Custom AI Development?",
+      "What Industries Does HMorix Primarily Serve?",
+      "How Does HMorix Ensure AI Solution Security?"
+    ],
+    "contentType": "blog"
+  },
+  "competitors": {
+    "commonAngles": [
+      "Overview of AI in Business (generic use cases)",
+      "Listing Features of AI Solutions (tech specs without context)",
+      "Case Studies with Vague Success Metrics (e.g., 'increased efficiency')",
+      "Comparisons Focused Solely on Technology Stack",
+      "Basic 'How AI Works' Explanations",
+      "Promising 'Revolutionary' or 'Magic' Solutions"
+    ],
+    "contentGaps": [
+      "Practical Implementation Roadmaps for SMEs",
+      "Detailed ROI Analysis for Specific AI Implementations",
+      "Addressing AI Ethics and Data Privacy in Business Contexts",
+      "Industry-Specific AI Solutions (beyond general examples)",
+      "Realistic Expectations Setting (limiting AI capabilities)",
+      "Continuous Monitoring and Optimization of AI Solutions"
+    ],
+    "recommendedDifferentiator": "Practical AI for Scalable SMEs: Focusing on Measurable Outcomes, Implementation Strategies, and Ongoing Optimization for Small to Medium Enterprises, Highlighting HMorix's Expertise in Tailored, Data-Driven Solutions"
+  }
+}
