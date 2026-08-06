@@ -1,13 +1,28 @@
+import { Link } from 'react-router-dom'
 import { FileText, Download, Clock } from 'lucide-react'
+import generatedWhitepapers from '../generated/whitepapersIndex.json'
 
 export default function Whitepapers() {
-  const papers = [
+  const seededPapers = [
     { title: 'The Future of Enterprise AI Automation', desc: 'How AI agents are transforming business operations across industries.', pages: 42, readTime: '25 min', category: 'AI & Automation', date: 'Jun 2024' },
     { title: 'Zero-Trust Security Architecture for SaaS', desc: 'A comprehensive guide to implementing zero-trust security in modern cloud applications.', pages: 38, readTime: '20 min', category: 'Security', date: 'May 2024' },
     { title: 'Intelligent Document Processing at Scale', desc: 'Best practices for automating document workflows with AI-powered extraction.', pages: 28, readTime: '15 min', category: 'PDF Automation', date: 'Apr 2024' },
     { title: 'Building Enterprise Billing Systems', desc: 'Architecture patterns for scalable, compliant billing and invoicing platforms.', pages: 35, readTime: '18 min', category: 'BillingFlow', date: 'Mar 2024' },
     { title: 'Smart Home IoT Security Standards', desc: 'Security considerations and best practices for connected home devices.', pages: 24, readTime: '12 min', category: 'Smart Home', date: 'Feb 2024' },
     { title: 'Cloud-Native Architecture Patterns', desc: 'Modern approaches to building resilient, scalable enterprise applications.', pages: 46, readTime: '28 min', category: 'Architecture', date: 'Jan 2024' },
+  ].map((item) => ({ ...item, slug: '', pdfGenerated: false }))
+  const papers = [
+    ...generatedWhitepapers.map((item) => ({
+      title: item.title,
+      desc: item.excerpt,
+      pages: Math.max(1, Math.ceil((item.wordCount || 0) / 450)),
+      readTime: `${Math.max(1, Math.ceil((item.wordCount || 0) / 220))} min`,
+      category: item.topic || 'Whitepaper',
+      date: formatMonth(item.publishedAt),
+      slug: item.slug,
+      pdfGenerated: Boolean(item.pdfGenerated),
+    })),
+    ...seededPapers,
   ]
 
   return (
@@ -19,7 +34,7 @@ export default function Whitepapers() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {papers.map((p, i) => (
-            <div key={i} className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px] hover:border-[rgba(200,255,0,0.2)] transition-all group">
+            <Link key={`${p.slug || p.title}-${i}`} to={p.slug ? `/whitepapers/${p.slug}` : '/contact'} className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px] hover:border-[rgba(200,255,0,0.2)] transition-all group">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-14 bg-[#C8FF00]/10 rounded-[4px] flex items-center justify-center flex-shrink-0">
                   <FileText size={20} className="text-[#C8FF00]" />
@@ -34,16 +49,23 @@ export default function Whitepapers() {
                       <span className="flex items-center gap-1"><Clock size={10} /> {p.readTime}</span>
                       <span>{p.date}</span>
                     </div>
-                    <button className="flex items-center gap-1.5 text-xs text-[#C8FF00] hover:underline">
-                      <Download size={12} /> Download PDF
-                    </button>
+                    <span className="flex items-center gap-1.5 text-xs text-[#C8FF00] hover:underline">
+                      <Download size={12} /> {p.pdfGenerated ? 'Open PDF page' : 'View'}
+                    </span>
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
     </div>
   )
+}
+
+function formatMonth(value?: string) {
+  if (!value) return 'Recent'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return 'Recent'
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
 }

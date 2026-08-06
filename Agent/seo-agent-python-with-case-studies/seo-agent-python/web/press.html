@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HMorix Content — Press Studio</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">Press Studio <span class="dot"></span></div>
+    <div class="topbar-right">
+      <a href="/" style="font-size:0.8rem;color:rgba(var(--cream),0.5);text-decoration:none;">← Control Panel</a>
+      <a href="/whitepapers" style="font-size:0.8rem;color:rgba(var(--cream),0.5);text-decoration:none;">White Papers</a>
+      <a href="/case-studies" style="font-size:0.8rem;color:rgba(var(--cream),0.5);text-decoration:none;">Case Studies</a>
+      <a href="/dashboard" style="font-size:0.8rem;color:rgba(var(--cream),0.5);text-decoration:none;">Dashboard</a>
+      <button id="themeToggle" class="theme-toggle" title="Toggle light/dark theme">🌙</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="create">Create</button>
+    <button class="tab-btn" data-tab="list">All Press Releases</button>
+  </div>
+
+  <main>
+    <div class="tab-panel active" id="tab-create">
+      <div class="last-updated-banner">🕒 <span id="lastUpdatedText">Loading last update…</span></div>
+
+      <div class="mode-switch">
+        <button id="modeUploadBtn" class="active">📤 Upload JSON (no interaction)</button>
+        <button id="modeFormBtn">✍️ Guided Form (with suggestions)</button>
+      </div>
+
+      <div id="uploadMode">
+        <div class="hint">Drop a press-release input JSON (same shape as <code>knowledge/press-input-template.json</code>) and it runs immediately. Anything missing stays a placeholder; no quote or third-party claim is ever invented.</div>
+        <label class="dropzone" id="dropzone">
+          <div class="dz-icon">📰</div>
+          <div class="dz-title">Tap to choose a file, or drag one here</div>
+          <div class="dz-hint">.json only</div>
+          <input type="file" id="fileInput" accept="application/json,.json" />
+        </label>
+        <div id="uploadPreview"></div>
+      </div>
+
+      <div id="formMode" style="display:none;">
+        <div class="hint">If <b>is_commentary</b> is checked, every claim about a real third-party company must trace to a source (auto-researched via Google CSE, or a URL you add). A quote only appears if you supply the exact text — it's never written for you.</div>
+
+        <div class="form-section-title">📰 The News</div>
+        <div class="form-grid two-col" id="formBasics"></div>
+        <label class="field-group" style="display:flex;align-items:center;gap:0.5rem;flex-direction:row;">
+          <input type="checkbox" id="isCommentary" style="width:auto;" />
+          <span style="font-size:0.85rem;">This discusses/cites other real companies (commentary — every claim needs a source)</span>
+        </label>
+
+        <hr class="section-divider" />
+        <div class="form-section-title">📋 Facts & Sources <span style="font-weight:400;color:rgba(var(--cream),0.4);font-size:0.75rem;">— one per line; used as given, never embellished</span></div>
+        <div class="form-grid" id="formFacts"></div>
+
+        <hr class="section-divider" />
+        <div class="form-section-title">💬 Quote <span style="font-weight:400;color:rgba(var(--cream),0.4);font-size:0.75rem;">— optional; leave blank rather than let it be invented</span></div>
+        <div class="form-grid two-col" id="formQuote"></div>
+
+        <hr class="section-divider" />
+        <div class="form-section-title">📞 Media Contact</div>
+        <div class="form-grid two-col" id="formContact"></div>
+
+        <hr class="section-divider" />
+        <div class="form-section-title">🖼️ Cover Image & CTA</div>
+        <div class="form-grid two-col" id="formCta"></div>
+
+        <div class="panel-footer">
+          <div class="hint" style="margin:0;">Target length: <input type="number" id="targetWords" value="600" style="width:6rem;" /> words</div>
+          <div style="display:flex;gap:0.5rem;">
+            <button id="btnGetQuestions">🤖 What's missing?</button>
+            <button id="btnGenerate" class="btn-accent">Generate Press Release</button>
+          </div>
+        </div>
+        <div id="questionsBox"></div>
+      </div>
+
+      <div id="progressArea" style="display:none;margin-top:1.5rem;">
+        <div class="panel-header"><h2 style="font-size:1rem;">Generating…</h2></div>
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:5%;"></div></div>
+        <div class="job-progress" id="progressStatus">Starting…</div>
+        <div class="job-log" id="progressLog"></div>
+        <div id="progressResult"></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-list">
+      <div class="panel-header">
+        <h2>All Press Releases</h2>
+        <div class="controls"><button id="btnRefreshList">Refresh</button></div>
+      </div>
+      <div class="last-updated-banner">🕒 <span id="lastUpdatedText2">Loading…</span></div>
+      <div class="cards" id="prList"></div>
+    </div>
+  </main>
+</div>
+<script src="/press.js"></script>
+</body>
+</html>

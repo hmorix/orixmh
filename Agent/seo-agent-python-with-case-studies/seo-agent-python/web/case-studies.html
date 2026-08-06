@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HMorix Content — Case Studies Studio</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">Case Studies Studio <span class="dot"></span></div>
+    <div class="topbar-right">
+      <a href="/" style="font-size:0.8rem;color:rgba(var(--cream),0.5);text-decoration:none;">← Control Panel</a>
+      <a href="/dashboard" style="font-size:0.8rem;color:rgba(var(--cream),0.5);text-decoration:none;">Dashboard</a>
+      <button id="themeToggle" class="theme-toggle" title="Toggle light/dark theme">🌙</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="create">Create</button>
+    <button class="tab-btn" data-tab="list">All Case Studies</button>
+    <button class="tab-btn" data-tab="knowledge">Company & Products</button>
+  </div>
+
+  <main>
+    <!-- ============ CREATE TAB ============ -->
+    <div class="tab-panel active" id="tab-create">
+      <div class="last-updated-banner">🕒 <span id="lastUpdatedText">Loading last update…</span></div>
+
+      <div class="mode-switch">
+        <button id="modeUploadBtn" class="active">📤 Upload JSON (no interaction)</button>
+        <button id="modeFormBtn">✍️ Guided Form (with suggestions)</button>
+      </div>
+
+      <!-- Upload mode -->
+      <div id="uploadMode">
+        <div class="hint">Drop a case-study input JSON (same shape as <code>knowledge/case-study-input-template.json</code>) and it runs immediately — no further clicks needed. Unrecognized/missing fields stay as placeholders; nothing is invented.</div>
+        <label class="dropzone" id="dropzone">
+          <div class="dz-icon">📄</div>
+          <div class="dz-title">Tap to choose a file, or drag one here</div>
+          <div class="dz-hint">.json only</div>
+          <input type="file" id="fileInput" accept="application/json,.json" />
+        </label>
+        <div id="uploadPreview"></div>
+      </div>
+
+      <!-- Guided form mode -->
+      <div id="formMode" style="display:none;">
+        <div class="hint">Fill in what you actually know. Leave the rest — the generator keeps unfilled fields as visible placeholders rather than inventing them. Use <b>Suggest</b> to get a clarifying question, or <b>Polish</b> to clean up wording you already wrote (never adds new facts).</div>
+
+        <div class="form-section-title">🏢 Client & Project</div>
+        <div class="form-grid two-col" id="formBasics"></div>
+
+        <hr class="section-divider" />
+        <div class="form-section-title">📝 Challenge & Solution</div>
+        <div class="form-grid" id="formNarrative"></div>
+
+        <hr class="section-divider" />
+        <div class="form-section-title">📊 Results <span style="font-weight:400;color:rgba(var(--cream),0.4);font-size:0.75rem;">— leave blank/placeholder if you don't have real numbers</span></div>
+        <div class="results-editor" id="resultsEditor"></div>
+        <div class="card-actions"><button id="addResultRow">+ Add metric</button></div>
+
+        <hr class="section-divider" />
+        <div class="form-section-title">💬 Testimonial <span style="font-weight:400;color:rgba(var(--cream),0.4);font-size:0.75rem;">— only fill if you have a real quote</span></div>
+        <div class="form-grid two-col" id="formTestimonial"></div>
+
+        <hr class="section-divider" />
+        <div class="form-section-title">🖼️ Poster / Gallery attachments <span style="font-weight:400;color:rgba(var(--cream),0.4);font-size:0.75rem;">— paste image URLs (hosted images), left blank = placeholder box on the page</span></div>
+        <div class="field-group" style="margin-bottom:0.75rem;">
+          <label>Hero / poster image URL</label>
+          <input type="text" id="heroImageUrl" placeholder="https://…  (1200×630 recommended)" />
+        </div>
+        <div class="gallery-editor" id="galleryEditor"></div>
+
+        <hr class="section-divider" />
+        <div class="form-section-title">🔗 Back link & CTA</div>
+        <div class="form-grid two-col" id="formCta"></div>
+
+        <div class="panel-footer">
+          <div class="hint" style="margin:0;">Target length: <input type="number" id="targetWords" value="10000" style="width:6rem;" /> words</div>
+          <div style="display:flex;gap:0.5rem;">
+            <button id="btnGetQuestions">🤖 What's missing?</button>
+            <button id="btnGenerate" class="btn-accent">Generate Case Study</button>
+          </div>
+        </div>
+        <div id="questionsBox"></div>
+      </div>
+
+      <!-- Shared progress area (both modes) -->
+      <div id="progressArea" style="display:none;margin-top:1.5rem;">
+        <div class="panel-header"><h2 style="font-size:1rem;">Generating…</h2></div>
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:5%;"></div></div>
+        <div class="job-progress" id="progressStatus">Starting…</div>
+        <div class="job-log" id="progressLog"></div>
+        <div id="progressResult"></div>
+      </div>
+    </div>
+
+    <!-- ============ LIST TAB ============ -->
+    <div class="tab-panel" id="tab-list">
+      <div class="panel-header">
+        <h2>All Case Studies</h2>
+        <div class="controls"><button id="btnRefreshList">Refresh</button></div>
+      </div>
+      <div class="last-updated-banner">🕒 <span id="lastUpdatedText2">Loading…</span></div>
+      <div class="cards" id="csList"></div>
+    </div>
+
+    <!-- ============ KNOWLEDGE TAB ============ -->
+    <div class="tab-panel" id="tab-knowledge">
+      <div class="panel-header">
+        <h2>Company & Product Info</h2>
+        <div class="controls hint" style="margin:0;">Feeds every case study & blog post the generator writes — keep it accurate.</div>
+      </div>
+      <div class="tabs" style="padding:0;border-bottom:none;margin-bottom:1rem;">
+        <button class="tab-btn active" data-kfile="company">Company</button>
+        <button class="tab-btn" data-kfile="products">Products</button>
+        <button class="tab-btn" data-kfile="services">Services</button>
+        <button class="tab-btn" data-kfile="audience">Audience</button>
+        <button class="tab-btn" data-kfile="brand-voice">Brand Voice</button>
+        <button class="tab-btn" data-kfile="faq">FAQ</button>
+      </div>
+      <textarea id="knowledgeEditor" style="min-height:50vh;font-family:monospace;font-size:0.85rem;"></textarea>
+      <div class="panel-footer">
+        <div class="hint" id="knowledgeStatus" style="margin:0;">—</div>
+        <button id="btnSaveKnowledge" class="btn-accent">Save</button>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="/case-studies.js"></script>
+</body>
+</html>

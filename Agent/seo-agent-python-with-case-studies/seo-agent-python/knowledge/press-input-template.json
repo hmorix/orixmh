@@ -1,0 +1,31 @@
+{
+  "_instructions": "Copy this file, fill in what you know. Anything left blank/bracketed stays a visible placeholder. The writer never invents a quote — if quote_text is blank, the release runs without one rather than making one up. If is_commentary is true, every claim about a real third party must trace to a source (auto-researched via Google CSE, or a URL you add below).",
+
+  "category": "Company News",
+  "headline": "",
+  "subheadline": "",
+  "dateline_city": "[City, State/Country]",
+  "is_commentary": false,
+
+  "key_facts": [
+    "[The actual news — what happened, launched, was announced. One fact per line.]"
+  ],
+  "source_urls": [],
+
+  "quote_text": "",
+  "quote_attribution": "",
+  "quote_role": "",
+
+  "media_contact_name": "",
+  "media_contact_email": "",
+  "media_contact_phone": "",
+
+  "cover_image_url": "",
+  "reference_links": [
+    { "label": "[Related resource]", "url": "" }
+  ],
+  "cta_text": "Learn more about HMorix",
+  "cta_url": "/contact",
+
+  "target_word_count": 600
+}

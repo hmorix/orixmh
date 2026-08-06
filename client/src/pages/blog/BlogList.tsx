@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Clock, User, Tag, ArrowRight, Search } from 'lucide-react'
 // @ts-ignore - blogApi is intentionally plain JavaScript for the blog conversion.
 import { fallbackPosts, fetchBlogList } from './blogApi'
-
-const categories = ['All', 'Engineering', 'AI & ML', 'Product Updates', 'Security', 'Company', 'Tutorials', 'Case Studies']
 
 type BlogSummary = {
   id: string
@@ -23,6 +21,7 @@ export default function BlogList() {
   const [activeCategory, setActiveCategory] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [posts, setPosts] = useState<BlogSummary[]>(fallbackPosts)
+  const categories = useMemo(() => ['All', ...Array.from(new Set(posts.map(p => p.category).filter(Boolean)))], [posts])
 
   useEffect(() => {
     let active = true

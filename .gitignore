@@ -5,6 +5,9 @@ dist/
 .env
 .env.local
 *.db
+__pycache__/
+*.pyc
+Agent/**/generated/social-images/
 .DS_Store
 .vercel
 server/data/

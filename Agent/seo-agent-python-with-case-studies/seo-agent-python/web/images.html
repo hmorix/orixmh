@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HMorix Content — Image Studio</title>
+<link rel="stylesheet" href="/style.css" />
+<style>
+  .img-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-top: 1rem; }
+  @media (min-width: 700px) { .img-grid { grid-template-columns: repeat(5, 1fr); } }
+  .img-tile { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: rgba(255,255,255,0.02); }
+  .img-tile img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
+  .img-tile .img-fail { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #ff6b6b; padding: 0.5rem; text-align: center; }
+  .img-tile .img-actions { padding: 0.4rem; display: flex; justify-content: center; }
+  .caption-panel { border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-top: 0.75rem; }
+  .caption-panel h4 { margin: 0 0 0.5rem; font-size: 0.85rem; }
+  .caption-panel .tags { font-family: monospace; font-size: 0.75rem; color: rgba(var(--cream),0.5); margin-top: 0.4rem; }
+  .caption-panel button.copy { font-size: 0.7rem; padding: 0.2rem 0.5rem; margin-left: 0.5rem; }
+  .set-card { border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">Image Studio <span class="dot"></span></div>
+    <div class="topbar-right">
+      <a href="/" style="font-size:0.8rem;color:rgba(var(--cream),0.5);text-decoration:none;">← Control Panel</a>
+      <a href="/dashboard" style="font-size:0.8rem;color:rgba(var(--cream),0.5);text-decoration:none;">Dashboard</a>
+      <button id="themeToggle" class="theme-toggle" title="Toggle light/dark theme">🌙</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="create">Create</button>
+    <button class="tab-btn" data-tab="gallery">Gallery</button>
+  </div>
+
+  <main>
+    <div class="tab-panel active" id="tab-create">
+      <div class="hint">Free image generation via <a href="https://pollinations.ai" target="_blank" style="color:var(--accent);">pollinations.ai</a> — no API key needed. Generates 10 varied images plus ready-to-post captions/tags for Instagram, LinkedIn, Facebook, X, and Reddit.</div>
+
+      <div class="mode-switch">
+        <button id="modeContentBtn" class="active">📄 From existing content</button>
+        <button id="modePromptBtn">✍️ Custom prompt</button>
+      </div>
+
+      <div id="contentMode">
+        <div class="field-group">
+          <label>Pick a published item</label>
+          <select id="sourceSelect"><option value="">Loading…</option></select>
+        </div>
+      </div>
+
+      <div id="promptMode" style="display:none;">
+        <div class="field-group">
+          <label>Describe the image</label>
+          <textarea id="customPromptInput" rows="3" placeholder="e.g. A friendly robot assistant helping a small business owner, modern flat illustration"></textarea>
+        </div>
+        <div class="field-group">
+          <label>Title (used for captions, optional)</label>
+          <input type="text" id="customTitle" placeholder="e.g. HMorix AI Assistant" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Number of images</label>
+        <input type="number" id="imgCount" value="10" min="1" max="10" style="width:6rem;" />
+      </div>
+
+      <div class="panel-footer">
+        <div></div>
+        <button id="btnGenerate" class="btn-accent">🎨 Generate</button>
+      </div>
+
+      <div id="progressArea" style="display:none;margin-top:1.5rem;">
+        <div class="panel-header"><h2 style="font-size:1rem;">Generating…</h2></div>
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:5%;"></div></div>
+        <div class="job-progress" id="progressStatus">Starting…</div>
+        <div class="job-log" id="progressLog"></div>
+        <div id="resultArea"></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-gallery">
+      <div class="panel-header">
+        <h2>Generated Sets</h2>
+        <div class="controls"><button id="btnRefreshGallery">Refresh</button></div>
+      </div>
+      <div id="gallerySets"></div>
+    </div>
+  </main>
+</div>
+<script src="/images.js"></script>
+</body>
+</html>

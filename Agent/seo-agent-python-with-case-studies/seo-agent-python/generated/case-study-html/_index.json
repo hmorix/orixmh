@@ -1,0 +1,16 @@
+[
+  {
+    "slug": "demo-ecommerce-platform-rebuild",
+    "title": "Rebuilding an Online Store for a [Industry] Brand \u2014 Sample Case Study",
+    "is_demo": true,
+    "canonical_url": "https://orixmh.vercel.app/case-studies/demo-ecommerce-platform-rebuild",
+    "rendered_at": "2026-07-27T04:02:09.211004+00:00"
+  },
+  {
+    "slug": "demo-ai-agent-support-automation",
+    "title": "How a [Industry] Company Used AI Agents to Automate Support Workflows \u2014 Sample Case Study",
+    "is_demo": true,
+    "canonical_url": "https://orixmh.vercel.app/case-studies/demo-ai-agent-support-automation",
+    "rendered_at": "2026-07-27T04:02:09.157561+00:00"
+  }
+]

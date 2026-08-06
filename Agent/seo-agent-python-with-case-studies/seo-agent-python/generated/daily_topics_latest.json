@@ -1,0 +1,213 @@
+{
+  "date": "2026-07-23",
+  "generated_at": "2026-07-23T14:33:47.980987+00:00",
+  "pool": [
+    {
+      "title": "Who is Harsh Sharma? Founder & CEO of HMorix",
+      "targetKeyword": "Harsh Sharma HMorix",
+      "contentType": "blog",
+      "searchIntent": "informational",
+      "rationale": "This article will provide a detailed bio of Harsh Sharma, establishing his connection to HMorix and enhancing brand authority.",
+      "category": "brand",
+      "job_id": "40bffe266bff"
+    },
+    {
+      "title": "What is HMorix? A Complete Guide to Our AI Solutions",
+      "targetKeyword": "HMorix",
+      "contentType": "blog",
+      "searchIntent": "informational",
+      "rationale": "This comprehensive guide will explain HMorix's services, products, and mission, helping users understand the brand's offerings.",
+      "category": "brand",
+      "job_id": "bf4495dd6232"
+    },
+    {
+      "title": "HMorix vs Competitor AI Platforms: How to Choose the Right Solution",
+      "targetKeyword": "HMorix AI solutions",
+      "contentType": "comparison",
+      "searchIntent": "commercial",
+      "rationale": "This comparison article will position HMorix against other AI platforms, highlighting its unique strengths and value proposition.",
+      "category": "brand",
+      "job_id": "64835f58e492"
+    },
+    {
+      "title": "The Story Behind HMorix: Our Journey and Vision",
+      "targetKeyword": "HMorix company story",
+      "contentType": "blog",
+      "searchIntent": "informational",
+      "rationale": "Sharing the origin story and vision of HMorix will humanize the brand and build a stronger connection with potential customers.",
+      "category": "brand"
+    },
+    {
+      "title": "Frequently Asked Questions About HMorix: Answers to Your Queries",
+      "targetKeyword": "HMorix FAQ",
+      "contentType": "blog",
+      "searchIntent": "informational",
+      "rationale": "This FAQ page will address common questions about HMorix, providing clarity and establishing the brand as a trusted authority.",
+      "category": "brand"
+    },
+    {
+      "title": "How AI-Powered Automation Can Transform Your Business Operations",
+      "targetKeyword": "AI business automation",
+      "contentType": "blog",
+      "searchIntent": "informational",
+      "rationale": "Explains the benefits and practical applications of AI automation in business, aligning with HMorix's AI solutions service.",
+      "category": "product",
+      "job_id": "7ad4b8e373ae"
+    },
+    {
+      "title": "5 Ways HMorix's BillingFlow Can Simplify Your Invoicing Process",
+      "targetKeyword": "automated billing software",
+      "contentType": "blog",
+      "searchIntent": "commercial",
+      "rationale": "Highlights specific features and benefits of BillingFlow, demonstrating its value to potential customers.",
+      "category": "product",
+      "job_id": "231b10381f0b"
+    },
+    {
+      "title": "Comparing Manual PDF Processing vs. HMorix's PDF Automation Solution",
+      "targetKeyword": "PDF automation tools",
+      "contentType": "comparison",
+      "searchIntent": "informational",
+      "rationale": "Contrasts manual PDF processing with HMorix's automated solution, showcasing efficiency gains and potential ROI.",
+      "category": "product"
+    },
+    {
+      "title": "Maximizing ROI with Custom AI Solutions: A Guide for Businesses",
+      "targetKeyword": "custom AI solutions ROI",
+      "contentType": "blog",
+      "searchIntent": "informational",
+      "rationale": "Discusses how custom AI solutions can improve business outcomes, aligning with HMorix's AI solutions service.",
+      "category": "product"
+    },
+    {
+      "title": "Streamlining Business Operations with HMorix's AI Agent Platform",
+      "targetKeyword": "AI agent for business",
+      "contentType": "blog",
+      "searchIntent": "commercial",
+      "rationale": "Explains the capabilities and benefits of HMorix's AI Agent platform, targeting businesses looking to automate workflows.",
+      "category": "product"
+    },
+    {
+      "title": "How AI is Revolutionizing Business Automation in 2024",
+      "targetKeyword": "AI business automation",
+      "contentType": "blog",
+      "searchIntent": "informational",
+      "rationale": "As AI continues to advance, businesses are increasingly looking for ways to automate processes, making this a timely and relevant topic.",
+      "category": "trending",
+      "job_id": "7d2f53b17fbe"
+    },
+    {
+      "title": "Top 5 AI-Powered Tools for Small Business Productivity",
+      "targetKeyword": "AI tools for small business",
+      "contentType": "comparison",
+      "searchIntent": "commercial",
+      "rationale": "Small businesses are constantly seeking ways to improve productivity, and AI-powered tools are becoming increasingly popular.",
+      "category": "trending",
+      "job_id": "f1c34b47315a"
+    },
+    {
+      "title": "The Future of Web Development: Trends to Watch in [Current Year + 1]",
+      "targetKeyword": "future of web development",
+      "contentType": "blog",
+      "searchIntent": "informational",
+      "rationale": "Web development trends are always in demand, and forecasting future trends is particularly relevant for developers and businesses planning for the next year. [TIME-SENSITIVE: Current Year + 1]",
+      "category": "trending"
+    },
+    {
+      "title": "A Step-by-Step Guide to Implementing AI in Your Business Workflow",
+      "targetKeyword": "implementing AI in business",
+      "contentType": "tutorial",
+      "searchIntent": "informational",
+      "rationale": "As more businesses consider adopting AI, practical guides on implementation are highly sought after.",
+      "category": "trending"
+    },
+    {
+      "title": "Comparing Cloud Platforms for AI and Machine Learning Applications",
+      "targetKeyword": "cloud platforms for AI",
+      "contentType": "comparison",
+      "searchIntent": "commercial",
+      "rationale": "Businesses looking to deploy AI and ML solutions need to choose the right cloud platform, making comparisons valuable.",
+      "category": "trending"
+    }
+  ],
+  "queued": {
+    "brand": [
+      {
+        "title": "Who is Harsh Sharma? Founder & CEO of HMorix",
+        "targetKeyword": "Harsh Sharma HMorix",
+        "contentType": "blog",
+        "searchIntent": "informational",
+        "rationale": "This article will provide a detailed bio of Harsh Sharma, establishing his connection to HMorix and enhancing brand authority.",
+        "category": "brand",
+        "job_id": "40bffe266bff"
+      },
+      {
+        "title": "What is HMorix? A Complete Guide to Our AI Solutions",
+        "targetKeyword": "HMorix",
+        "contentType": "blog",
+        "searchIntent": "informational",
+        "rationale": "This comprehensive guide will explain HMorix's services, products, and mission, helping users understand the brand's offerings.",
+        "category": "brand",
+        "job_id": "bf4495dd6232"
+      },
+      {
+        "title": "HMorix vs Competitor AI Platforms: How to Choose the Right Solution",
+        "targetKeyword": "HMorix AI solutions",
+        "contentType": "comparison",
+        "searchIntent": "commercial",
+        "rationale": "This comparison article will position HMorix against other AI platforms, highlighting its unique strengths and value proposition.",
+        "category": "brand",
+        "job_id": "64835f58e492"
+      }
+    ],
+    "product": [
+      {
+        "title": "How AI-Powered Automation Can Transform Your Business Operations",
+        "targetKeyword": "AI business automation",
+        "contentType": "blog",
+        "searchIntent": "informational",
+        "rationale": "Explains the benefits and practical applications of AI automation in business, aligning with HMorix's AI solutions service.",
+        "category": "product",
+        "job_id": "7ad4b8e373ae"
+      },
+      {
+        "title": "5 Ways HMorix's BillingFlow Can Simplify Your Invoicing Process",
+        "targetKeyword": "automated billing software",
+        "contentType": "blog",
+        "searchIntent": "commercial",
+        "rationale": "Highlights specific features and benefits of BillingFlow, demonstrating its value to potential customers.",
+        "category": "product",
+        "job_id": "231b10381f0b"
+      }
+    ],
+    "trending_needs_approval": [
+      {
+        "title": "How AI is Revolutionizing Business Automation in 2024",
+        "targetKeyword": "AI business automation",
+        "contentType": "blog",
+        "searchIntent": "informational",
+        "rationale": "As AI continues to advance, businesses are increasingly looking for ways to automate processes, making this a timely and relevant topic.",
+        "category": "trending",
+        "job_id": "7d2f53b17fbe"
+      },
+      {
+        "title": "Top 5 AI-Powered Tools for Small Business Productivity",
+        "targetKeyword": "AI tools for small business",
+        "contentType": "comparison",
+        "searchIntent": "commercial",
+        "rationale": "Small businesses are constantly seeking ways to improve productivity, and AI-powered tools are becoming increasingly popular.",
+        "category": "trending",
+        "job_id": "f1c34b47315a"
+      }
+    ]
+  },
+  "job_ids": [
+    "40bffe266bff",
+    "bf4495dd6232",
+    "64835f58e492",
+    "7ad4b8e373ae",
+    "231b10381f0b",
+    "7d2f53b17fbe",
+    "f1c34b47315a"
+  ]
+}

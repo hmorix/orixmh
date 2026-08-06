@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SEO Agent — Control Panel</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">SEO Agent <span class="dot"></span></div>
+    <div class="topbar-right">
+      <a href="/case-studies" style="font-size:0.8rem;color:rgba(var(--cream),0.5);text-decoration:none;">Case Studies →</a>
+      <a href="/images" style="font-size:0.8rem;color:rgba(var(--cream),0.5);text-decoration:none;">Images</a>
+      <a href="/dashboard" style="font-size:0.8rem;color:rgba(var(--cream),0.5);text-decoration:none;">Dashboard →</a>
+      <div id="configInfo" class="config-info">loading…</div>
+      <button id="themeToggle" class="theme-toggle" title="Toggle light/dark theme">🌙</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="daily">Daily Plan</button>
+    <button class="tab-btn" data-tab="suggestions">Topic Ideas</button>
+    <button class="tab-btn" data-tab="jobs">Jobs</button>
+    <button class="tab-btn" data-tab="pending">Pending Drafts</button>
+    <button class="tab-btn" data-tab="casestudies">Case Studies</button>
+    <button class="tab-btn" data-tab="whitepapers">White Papers</button>
+    <button class="tab-btn" data-tab="press">Press</button>
+    <button class="tab-btn" data-tab="uploaded">Uploaded Blogs</button>
+    <button class="tab-btn" data-tab="pages">Pages</button>
+    <button class="tab-btn" data-tab="rankings">Rankings &amp; Competitors</button>
+  </nav>
+
+  <main>
+    <section id="tab-daily" class="tab-panel active">
+      <div class="panel-header">
+        <h2>Today's Daily Plan</h2>
+        <div class="controls">
+          <button id="btnRunDailyBatch" class="btn-accent">Run Today's Batch Now</button>
+        </div>
+      </div>
+      <div id="dailyHint" class="hint"></div>
+      <div id="dailyGroups"></div>
+    </section>
+
+    <section id="tab-suggestions" class="tab-panel">
+      <div class="panel-header">
+        <h2>Topic Ideas</h2>
+        <div class="controls">
+          <label>Count <input id="suggestCount" type="number" min="1" max="20" value="10" /></label>
+          <button id="btnGenerateSuggestions" class="btn-accent">Generate Ideas</button>
+        </div>
+      </div>
+      <div id="suggestionsMeta" class="hint"></div>
+      <div id="suggestionsList" class="cards"></div>
+      <div class="panel-footer">
+        <span id="selectedCount">0 selected</span>
+        <button id="btnGenerateSelected" class="btn-accent" disabled>Generate Selected Blogs</button>
+      </div>
+    </section>
+
+    <section id="tab-jobs" class="tab-panel">
+      <div class="panel-header"><h2>Jobs</h2></div>
+      <div id="jobsList" class="jobs-list"></div>
+    </section>
+
+    <section id="tab-pending" class="tab-panel">
+      <div class="panel-header"><h2>Pending Drafts (saved locally)</h2></div>
+      <div id="pendingList" class="cards"></div>
+    </section>
+
+    <section id="tab-casestudies" class="tab-panel">
+      <div class="panel-header">
+        <h2>Case Studies</h2>
+        <div class="controls">
+          <a href="/case-studies"><button class="btn-accent">Open Case Studies Studio →</button></a>
+          <button id="btnRefreshCaseStudies">Refresh</button>
+        </div>
+      </div>
+      <div class="hint" id="caseStudiesLastUpdated">Loading…</div>
+      <div id="caseStudiesList" class="cards"></div>
+    </section>
+
+    <section id="tab-whitepapers" class="tab-panel">
+      <div class="panel-header">
+        <h2>White Papers</h2>
+        <div class="controls">
+          <a href="/whitepapers"><button class="btn-accent">Open White Papers Studio →</button></a>
+          <button id="btnRefreshWhitepapers">Refresh</button>
+        </div>
+      </div>
+      <div class="hint" id="whitepapersLastUpdated">Loading…</div>
+      <div id="whitepapersList" class="cards"></div>
+    </section>
+
+    <section id="tab-press" class="tab-panel">
+      <div class="panel-header">
+        <h2>Press Releases</h2>
+        <div class="controls">
+          <a href="/press"><button class="btn-accent">Open Press Studio →</button></a>
+          <button id="btnRefreshPress">Refresh</button>
+        </div>
+      </div>
+      <div class="hint" id="pressLastUpdated">Loading…</div>
+      <div id="pressList" class="cards"></div>
+    </section>
+
+
+    <section id="tab-uploaded" class="tab-panel">
+      <div class="panel-header">
+        <h2>Uploaded Blogs (from Supabase)</h2>
+        <div class="controls">
+          <button id="btnRefreshUploaded">Refresh</button>
+        </div>
+      </div>
+      <div id="uploadedHint" class="hint"></div>
+      <div id="uploadedList" class="cards"></div>
+    </section>
+
+    <section id="tab-pages" class="tab-panel">
+      <div class="panel-header"><h2>Rendered Pages</h2></div>
+      <div id="pagesList" class="cards"></div>
+    </section>
+
+    <section id="tab-rankings" class="tab-panel">
+      <div class="panel-header">
+        <h2>Keyword Rankings</h2>
+        <div class="controls">
+          <button id="btnCheckRankings" class="btn-accent">Check Real Rankings</button>
+        </div>
+      </div>
+      <div id="rankingsHint" class="hint"></div>
+      <div id="rankingsTable"></div>
+      <div class="panel-header" style="margin-top:2rem;">
+        <h2>Competitor Context</h2>
+      </div>
+      <div id="competitorInfo" class="hint"></div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <button id="modalClose" class="modal-close">&times;</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+</div>
+<script src="/app.js"></script>
+</body>
+</html>

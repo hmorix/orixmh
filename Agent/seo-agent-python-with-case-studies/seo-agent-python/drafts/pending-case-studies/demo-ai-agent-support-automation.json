@@ -1,0 +1,309 @@
+{
+  "title": "How a [Industry] Company Used AI Agents to Automate Support Workflows \u2014 Sample Case Study",
+  "slug": "demo-ai-agent-support-automation",
+  "excerpt": "A sample/demo case study showing the layout and structure HMorix uses for AI Solutions engagements. [Excerpt Placeholder \u2014 replace with a real summary once client data is available.]",
+  "category": "Case Study",
+  "author": "HMorix",
+  "author_role": "Case Studies Team",
+  "read_time": "9 min read",
+  "is_demo": true,
+  "client_name": "[Client Name]",
+  "client_logo_url": "",
+  "industry": "[Industry]",
+  "company_size": "[Company Size]",
+  "location": "[Location]",
+  "service_used": "AI Solutions",
+  "timeline": "[Project Timeline]",
+  "challenge": "[Describe the client's real problem here \u2014 e.g. what was manual, slow, or breaking before HMorix got involved.]",
+  "solution": "[Describe what HMorix actually built/did here \u2014 which product or custom build, and why.]",
+  "results": [
+    {
+      "metric": "[Metric \u2014 e.g. Support ticket response time]",
+      "value": "[Result Placeholder]",
+      "is_placeholder": true
+    },
+    {
+      "metric": "[Metric \u2014 e.g. Manual hours saved per week]",
+      "value": "[Result Placeholder]",
+      "is_placeholder": true
+    },
+    {
+      "metric": "[Metric \u2014 e.g. Customer satisfaction change]",
+      "value": "[Result Placeholder]",
+      "is_placeholder": true
+    }
+  ],
+  "testimonial_quote": "",
+  "testimonial_author": "",
+  "testimonial_role": "",
+  "hero_image_url": "",
+  "gallery_images": [
+    {
+      "url": "",
+      "alt": "[Gallery image 1 placeholder \u2014 e.g. dashboard screenshot]",
+      "caption": "[Caption Placeholder]"
+    },
+    {
+      "url": "",
+      "alt": "[Gallery image 2 placeholder \u2014 e.g. workflow diagram]",
+      "caption": "[Caption Placeholder]"
+    },
+    {
+      "url": "",
+      "alt": "[Gallery image 3 placeholder \u2014 e.g. before/after metric chart]",
+      "caption": "[Caption Placeholder]"
+    },
+    {
+      "url": "",
+      "alt": "[Gallery image 4 placeholder \u2014 e.g. team/client photo]",
+      "caption": "[Caption Placeholder]"
+    }
+  ],
+  "cta_text": "Ready to build something like this?",
+  "cta_url": "/contact",
+  "published_at": "2026-07-24T00:00:00+00:00",
+  "updated_at": "2026-07-24T00:00:00+00:00",
+  "seo_title": "AI Agent Support Automation Case Study (Sample) | HMorix",
+  "meta_description": "A sample HMorix case study template for an AI Solutions engagement. Placeholder content \u2014 replace with real client data before publishing.",
+  "canonical_url": "https://orixmh.vercel.app/case-studies/demo-ai-agent-support-automation",
+  "open_graph": {
+    "title": "AI Agent Support Automation \u2014 Sample Case Study | HMorix",
+    "description": "Sample case study layout for an AI Solutions engagement.",
+    "type": "article"
+  },
+  "twitter_card": {
+    "card": "summary_large_image",
+    "title": "AI Agent Support Automation \u2014 Sample Case Study",
+    "description": "Sample case study layout for an AI Solutions engagement."
+  },
+  "breadcrumbs": [
+    {
+      "name": "Case Studies",
+      "url": "/case-studies"
+    },
+    {
+      "name": "AI Agent Support Automation (Sample)",
+      "url": "/case-studies/demo-ai-agent-support-automation"
+    }
+  ],
+  "keywords": [
+    "AI Solutions",
+    "AI agent",
+    "support automation",
+    "HMorix"
+  ],
+  "schema_jsonld": {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Article",
+        "headline": "How a [Industry] Company Used AI Agents to Automate Support Workflows \u2014 Sample Case Study",
+        "description": "A sample/demo case study showing the layout HMorix uses for AI Solutions engagements.",
+        "articleSection": "Case Study",
+        "author": {
+          "@type": "Organization",
+          "name": "HMorix"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "HMorix"
+        },
+        "datePublished": "2026-07-24T00:00:00+00:00",
+        "dateModified": "2026-07-24T00:00:00+00:00",
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "https://orixmh.vercel.app/case-studies/demo-ai-agent-support-automation"
+        },
+        "about": {
+          "@type": "Organization",
+          "name": "[Client Name]",
+          "industry": "[Industry]"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Case Studies",
+            "item": "/case-studies"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "AI Agent Support Automation (Sample)",
+            "item": "/case-studies/demo-ai-agent-support-automation"
+          }
+        ]
+      }
+    ]
+  },
+  "seo_score": 82,
+  "word_count": 1180,
+  "status": "pending",
+  "content": [
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Executive Summary"
+    },
+    {
+      "type": "paragraph",
+      "text": "This is a sample case study demonstrating the page structure HMorix uses for AI Solutions engagements. All client-specific details below \u2014 the company name, industry, challenge specifics, and results \u2014 are placeholders. Nothing on this page describes a real, verified project until those placeholders are replaced with confirmed client data."
+    },
+    {
+      "type": "paragraph",
+      "text": "In an engagement of this kind, a [Industry] company with [Company Size] would typically approach HMorix looking to reduce manual workload in a specific operational area \u2014 commonly customer support, internal ticketing, or repetitive data entry \u2014 using HMorix's AI Solutions service, which covers AI-powered applications, business automation systems, and AI assistants."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "About the Client"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Client Name] is a [Company Size] company in the [Industry] industry, based in [Location]. [Add one or two real sentences here about what the client does, once available \u2014 do not describe their business in detail until confirmed.]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "The Challenge"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Describe the client's real problem here.] In a typical engagement of this shape, the challenge usually centers on a process that scales poorly with headcount \u2014 support volume growing faster than the support team, or a workflow that depends on someone manually reading, sorting, and responding to the same category of request every day."
+    },
+    {
+      "type": "paragraph",
+      "text": "Below is the kind of structure this section would carry once real details are added: what the team was doing manually, how much time it consumed, what broke down as volume grew, and why existing tools weren't enough."
+    },
+    {
+      "type": "list",
+      "items": [
+        "[Placeholder] Volume or scale that triggered the need for automation",
+        "[Placeholder] Specific bottleneck or manual process being replaced",
+        "[Placeholder] Constraints \u2014 budget, timeline, existing systems to integrate with",
+        "[Placeholder] Why previous attempts (if any) hadn't solved it"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Goals & Success Criteria"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Describe the client's actual goals here.] Success criteria for this type of engagement are usually defined jointly at kickoff \u2014 for example, a target response-time reduction, a target reduction in manual hours per week, or a specific automation coverage percentage. Those numbers should only appear here once they're real and confirmed, not estimated."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Why HMorix"
+    },
+    {
+      "type": "paragraph",
+      "text": "HMorix is an AI-first technology company that designs and develops intelligent software, modern web applications, AI agents, automation platforms, and digital business solutions, with the stated mission of making advanced AI and software technology accessible through reliable, scalable, secure, and innovative digital solutions."
+    },
+    {
+      "type": "paragraph",
+      "text": "For an AI Solutions engagement specifically, that means HMorix's AI Agent product \u2014 a customizable AI assistant platform for business automation, customer interaction, and workflow assistance \u2014 or a custom-built automation system, depending on what the client's existing stack requires."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "The Solution \u2014 Overview"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Describe what HMorix actually built here.] At a high level, solutions in this category typically involve: mapping the existing manual workflow, identifying which steps can be safely automated versus which require human review, building and configuring the AI assistant or automation layer, and integrating it with the client's existing tools (helpdesk, CRM, or internal dashboards)."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Implementation"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Phase 1 \u2014 Discovery & Scoping"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Placeholder \u2014 describe the actual discovery process for this client: stakeholder interviews, workflow audits, data review.]"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Phase 2 \u2014 Build & Configuration"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Placeholder \u2014 describe what was actually built: which AI models, integrations, and business logic were configured.]"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Phase 3 \u2014 Testing & Rollout"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Placeholder \u2014 describe the actual rollout: pilot group, staged rollout, feedback loop, go-live date.]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Technology & Approach"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Placeholder \u2014 list the actual technologies, integrations, and architecture used for this specific client, grounded in what was really built rather than a generic tech-stack list.]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Results"
+    },
+    {
+      "type": "paragraph",
+      "text": "The results below are placeholders. Do not publish this page with placeholder results presented as real outcomes \u2014 replace each one with a verified number before this case study goes live."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Client Testimonial"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Testimonial Placeholder \u2014 to be added once the client provides a quote]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Lessons Learned"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Placeholder \u2014 once the engagement is real, this section should reflect genuine takeaways: what worked, what the team would do differently, and what this suggests for similar companies facing the same challenge.]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Conclusion & Next Steps"
+    },
+    {
+      "type": "paragraph",
+      "text": "This sample demonstrates the case study page structure \u2014 hero image, client meta strip, results grid, long-form narrative, photo gallery, testimonial block, and CTA. Replace every bracketed placeholder above with real, confirmed data before publishing, and set is_demo to false once that's done."
+    }
+  ],
+  "reference_links": [
+    {
+      "label": "[Client website]",
+      "url": ""
+    },
+    {
+      "label": "HMorix \u2014 AI Solutions",
+      "url": "/services/ai-solutions"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Edit Content — HMorix</title>
+<link rel="stylesheet" href="/style.css" />
+<style>
+  .edit-wrap { max-width: 900px; margin: 0 auto; padding: 1rem; }
+  #jsonEditor {
+    width: 100%; min-height: 60vh; font-family: monospace; font-size: 0.8rem;
+    background: rgba(255,255,255,0.02); color: rgb(var(--cream)); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem; line-height: 1.5; white-space: pre; resize: vertical;
+  }
+  .edit-toolbar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0; }
+  .edit-toolbar button.danger { border-color: #ff6b6b; color: #ff6b6b; }
+  .regen-results { margin-top: 1rem; }
+  .regen-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0; font-size: 0.85rem; }
+  .regen-row .ok { color: var(--accent); }
+  .regen-row .fail { color: #ff6b6b; }
+  #statusMsg { margin: 0.75rem 0; font-size: 0.85rem; }
+  #statusMsg.ok { color: var(--accent); }
+  #statusMsg.error { color: #ff6b6b; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">Edit Content <span class="dot"></span></div>
+    <div class="topbar-right">
+      <a href="/" style="font-size:0.8rem;color:rgba(var(--cream),0.5);text-decoration:none;">← Control Panel</a>
+      <button id="themeToggle" class="theme-toggle" title="Toggle light/dark theme">🌙</button>
+    </div>
+  </header>
+  <main class="edit-wrap">
+    <div class="panel-header">
+      <h2 id="editTitle">Loading…</h2>
+    </div>
+    <div class="hint" id="editMeta"></div>
+    <div id="statusMsg"></div>
+
+    <textarea id="jsonEditor" spellcheck="false" placeholder="Loading record…"></textarea>
+
+    <div class="edit-toolbar">
+      <button id="btnSave" class="btn-accent">💾 Save</button>
+      <button id="btnRetry" style="display:none;">🔁 Retry (regenerate TSX/HTML/PDF)</button>
+      <a id="viewLink" href="#" target="_blank" style="display:none;"><button>👁 View live page</button></a>
+      <button id="btnDelete" class="danger">🗑 Delete</button>
+    </div>
+
+    <div class="regen-results" id="regenResults"></div>
+  </main>
+</div>
+<script src="/edit.js"></script>
+</body>
+</html>

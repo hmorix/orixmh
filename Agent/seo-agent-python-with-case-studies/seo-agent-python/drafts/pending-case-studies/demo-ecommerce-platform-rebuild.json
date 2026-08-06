@@ -1,0 +1,301 @@
+{
+  "title": "Rebuilding an Online Store for a [Industry] Brand — Sample Case Study",
+  "slug": "demo-ecommerce-platform-rebuild",
+  "excerpt": "A sample/demo case study showing the layout and structure HMorix uses for E-commerce engagements. [Excerpt Placeholder — replace with a real summary once client data is available.]",
+  "category": "Case Study",
+  "author": "HMorix",
+  "author_role": "Case Studies Team",
+  "read_time": "8 min read",
+  "is_demo": true,
+  "client_name": "[Client Name]",
+  "client_logo_url": "",
+  "industry": "[Industry]",
+  "company_size": "[Company Size]",
+  "location": "[Location]",
+  "service_used": "E-commerce",
+  "timeline": "[Project Timeline]",
+  "challenge": "[Describe the client's real problem here — e.g. what was slow, hard to manage, or losing sales before HMorix got involved.]",
+  "solution": "[Describe what HMorix actually built/did here — new storefront, migration, custom features.]",
+  "results": [
+    {
+      "metric": "[Metric — e.g. Page load time]",
+      "value": "[Result Placeholder]",
+      "is_placeholder": true
+    },
+    {
+      "metric": "[Metric — e.g. Checkout conversion rate]",
+      "value": "[Result Placeholder]",
+      "is_placeholder": true
+    },
+    {
+      "metric": "[Metric — e.g. Mobile traffic share]",
+      "value": "[Result Placeholder]",
+      "is_placeholder": true
+    }
+  ],
+  "testimonial_quote": "",
+  "testimonial_author": "",
+  "testimonial_role": "",
+  "hero_image_url": "",
+  "gallery_images": [
+    {
+      "url": "",
+      "alt": "[Gallery image 1 placeholder — e.g. homepage screenshot]",
+      "caption": "[Caption Placeholder]"
+    },
+    {
+      "url": "",
+      "alt": "[Gallery image 2 placeholder — e.g. product page]",
+      "caption": "[Caption Placeholder]"
+    },
+    {
+      "url": "",
+      "alt": "[Gallery image 3 placeholder — e.g. mobile checkout flow]",
+      "caption": "[Caption Placeholder]"
+    },
+    {
+      "url": "",
+      "alt": "[Gallery image 4 placeholder — e.g. admin dashboard]",
+      "caption": "[Caption Placeholder]"
+    }
+  ],
+  "cta_text": "Ready to build something like this?",
+  "cta_url": "/contact",
+  "published_at": "2026-07-24T00:00:00+00:00",
+  "updated_at": "2026-07-24T00:00:00+00:00",
+  "seo_title": "E-commerce Platform Rebuild Case Study (Sample) | HMorix",
+  "meta_description": "A sample HMorix case study template for an E-commerce engagement. Placeholder content — replace with real client data before publishing.",
+  "canonical_url": "https://orixmh.vercel.app/case-studies/demo-ecommerce-platform-rebuild",
+  "open_graph": {
+    "title": "E-commerce Platform Rebuild — Sample Case Study | HMorix",
+    "description": "Sample case study layout for an E-commerce engagement.",
+    "type": "article"
+  },
+  "twitter_card": {
+    "card": "summary_large_image",
+    "title": "E-commerce Platform Rebuild — Sample Case Study",
+    "description": "Sample case study layout for an E-commerce engagement."
+  },
+  "breadcrumbs": [
+    {
+      "name": "Case Studies",
+      "url": "/case-studies"
+    },
+    {
+      "name": "E-commerce Platform Rebuild (Sample)",
+      "url": "/case-studies/demo-ecommerce-platform-rebuild"
+    }
+  ],
+  "keywords": [
+    "E-commerce",
+    "web design",
+    "platform rebuild",
+    "HMorix"
+  ],
+  "schema_jsonld": {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Article",
+        "headline": "Rebuilding an Online Store for a [Industry] Brand — Sample Case Study",
+        "description": "A sample/demo case study showing the layout HMorix uses for E-commerce engagements.",
+        "articleSection": "Case Study",
+        "author": {
+          "@type": "Organization",
+          "name": "HMorix"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "HMorix"
+        },
+        "datePublished": "2026-07-24T00:00:00+00:00",
+        "dateModified": "2026-07-24T00:00:00+00:00",
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "https://orixmh.vercel.app/case-studies/demo-ecommerce-platform-rebuild"
+        },
+        "about": {
+          "@type": "Organization",
+          "name": "[Client Name]",
+          "industry": "[Industry]"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Case Studies",
+            "item": "/case-studies"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "E-commerce Platform Rebuild (Sample)",
+            "item": "/case-studies/demo-ecommerce-platform-rebuild"
+          }
+        ]
+      }
+    ]
+  },
+  "seo_score": 80,
+  "word_count": 1050,
+  "status": "pending",
+  "content": [
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Executive Summary"
+    },
+    {
+      "type": "paragraph",
+      "text": "This is a sample case study demonstrating the page structure HMorix uses for E-commerce engagements. All client-specific details below are placeholders and should be replaced with confirmed data before this page is published as a real result."
+    },
+    {
+      "type": "paragraph",
+      "text": "In an engagement of this kind, a [Industry] retail brand would typically come to HMorix with an existing online store that's become slow, hard to update, or poorly optimized for mobile, and use HMorix's E-commerce service to rebuild it on modern infrastructure."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "About the Client"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Client Name] is a [Company Size] [Industry] business based in [Location]. [Add real details here once available.]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "The Challenge"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Describe the client's real problem here.] Common challenges in this category include slow page loads hurting conversion, a checkout flow with too much friction, an admin/inventory system the team has outgrown, or a site that isn't properly optimized for search or mobile."
+    },
+    {
+      "type": "list",
+      "items": [
+        "[Placeholder] What was slow, broken, or costing sales",
+        "[Placeholder] Platform/technology being migrated away from, if any",
+        "[Placeholder] Constraints — catalog size, existing integrations, timeline",
+        "[Placeholder] Business impact of the problem (in the client's own terms)"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Goals & Success Criteria"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Describe the client's actual goals here — e.g. target load time, target conversion rate improvement, or a hard launch deadline tied to a sales season.]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Why HMorix"
+    },
+    {
+      "type": "paragraph",
+      "text": "HMorix's Web Design and E-commerce services cover designing and developing modern, responsive websites and building online stores and custom e-commerce platforms with modern technologies, for small businesses, startups, agencies, brands, and content creators."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "The Solution — Overview"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Describe what HMorix actually built here — new storefront architecture, design system, payment integration, inventory/admin tooling, and how it addressed the challenge above.]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Implementation"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Phase 1 — Audit & Design"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Placeholder — describe the actual audit of the old site and the design process for the new one.]"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Phase 2 — Build & Migration"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Placeholder — describe the actual build: platform, catalog/data migration, integrations with payment/shipping providers.]"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Phase 3 — Launch"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Placeholder — describe the actual launch: soft launch, cutover plan, monitoring after go-live.]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Technology & Approach"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Placeholder — list the actual technologies and integrations used for this specific storefront.]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Results"
+    },
+    {
+      "type": "paragraph",
+      "text": "The results below are placeholders. Replace each one with a verified, real number before this page is published as an actual case study."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Client Testimonial"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Testimonial Placeholder — to be added once the client provides a quote]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Lessons Learned"
+    },
+    {
+      "type": "paragraph",
+      "text": "[Placeholder — genuine takeaways from the real engagement, once it exists.]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Conclusion & Next Steps"
+    },
+    {
+      "type": "paragraph",
+      "text": "This sample demonstrates the full case study page structure — hero image, client meta strip, results grid, long-form narrative, photo gallery, testimonial block, and CTA. Replace every bracketed placeholder with real, confirmed data and set is_demo to false before publishing."
+    }
+  ],
+  "reference_links": [
+    {
+      "label": "[Client website]",
+      "url": ""
+    },
+    {
+      "label": "HMorix — AI Solutions",
+      "url": "/services/ai-solutions"
+    }
+  ]
+}

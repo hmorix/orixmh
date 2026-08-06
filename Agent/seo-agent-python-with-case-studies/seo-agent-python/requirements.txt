@@ -1,0 +1,13 @@
+# Almost entirely stdlib (http.client, urllib, json, os, ssl, datetime, etc.)
+# — nothing else to install for blog/case-study/press generation.
+#
+# ONE real dependency: reportlab, used only by scripts/whitepaper_pdf.py to
+# produce actual PDF binaries (cover page, native-drawn diagrams, embedded
+# images, clickable citation/internal links). Writing a PDF byte-stream by
+# hand in pure stdlib is possible but not something worth hand-rolling —
+# reportlab is a long-standing, well-tested library:
+#
+#   pip install reportlab --break-system-packages   (or inside a venv)
+#
+# Everything else in this repo has zero dependencies beyond this.
+reportlab>=4.0

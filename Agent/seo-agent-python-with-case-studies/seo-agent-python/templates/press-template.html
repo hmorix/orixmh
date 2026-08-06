@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{{SEO_TITLE}}</title>
+<meta name="description" content="{{META_DESCRIPTION}}" />
+<link rel="canonical" href="{{CANONICAL_URL}}" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="{{OG_TITLE}}" />
+<meta property="og:description" content="{{OG_DESCRIPTION}}" />
+<meta property="og:url" content="{{CANONICAL_URL}}" />
+<meta property="og:image" content="{{COVER_IMAGE_URL}}" />
+<script type="application/ld+json">
+{{SCHEMA_JSONLD}}
+</script>
+<style>
+  :root { --obsidian: #0a0a0b; --obsidian-2: #131316; --cream: 245, 240, 232; --accent: #C8FF00; --glass-border: rgba(255,255,255,0.08); --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif; --font-body: 'Inter', system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--obsidian); color: rgb(var(--cream)); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+  .wrap { padding: 8rem 0 5rem; min-height: 100vh; }
+  .container { max-width: 800px; margin: 0 auto; padding: 0 2rem; }
+  a { color: inherit; text-decoration: none; }
+  .back-link { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: rgba(var(--cream), 0.4); margin-bottom: 1.5rem; }
+  .back-link:hover { color: var(--accent); }
+  .category-badge { display: inline-block; padding: 0.125rem 0.5rem; background: rgba(200,255,0,0.1); color: var(--accent); font-family: monospace; font-size: 0.75rem; border-radius: 4px; margin-bottom: 0.75rem; }
+  .dateline { font-family: monospace; font-size: 0.75rem; color: rgba(var(--cream), 0.4); margin-bottom: 0.75rem; }
+  h1.title { font-family: var(--font-display); font-weight: 700; font-size: 2rem; line-height: 1.25; margin: 0 0 0.5rem; }
+  @media (min-width: 768px) { h1.title { font-size: 2.25rem; } }
+  .subheadline { font-size: 1.1rem; color: rgba(var(--cream), 0.5); margin-bottom: 2rem; }
+  .cover { width: 100%; aspect-ratio: 1200/630; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border); margin-bottom: 2rem; }
+  .cover img { width: 100%; height: 100%; object-fit: cover; }
+  article.content p { color: rgba(var(--cream), 0.6); line-height: 1.75; margin: 0 0 1rem; white-space: pre-line; }
+  article.content ul { color: rgba(var(--cream), 0.6); line-height: 1.75; padding-left: 1.25rem; margin: 0 0 1rem; }
+  .quote { margin: 2.5rem 0; padding: 1.5rem; border-left: 4px solid var(--accent); background: var(--obsidian-2); border-radius: 0 8px 8px 0; }
+  .quote p { font-family: var(--font-display); font-size: 1.1rem; color: rgba(var(--cream), 0.8); margin: 0 0 0.5rem; }
+  .quote .attribution { font-size: 0.875rem; color: rgba(var(--cream), 0.5); }
+  .boilerplate { margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); }
+  .boilerplate h3 { font-family: var(--font-display); font-weight: 700; font-size: 0.875rem; color: rgba(var(--cream), 0.7); margin-bottom: 0.5rem; }
+  .boilerplate p { font-size: 0.875rem; color: rgba(var(--cream), 0.5); line-height: 1.7; }
+  .contact { margin-top: 2rem; padding: 1.25rem; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--obsidian-2); }
+  .contact .label { font-family: monospace; font-size: 0.75rem; color: rgba(var(--cream), 0.3); text-transform: uppercase; margin-bottom: 0.5rem; }
+  .contact div { font-size: 0.875rem; color: rgba(var(--cream), 0.6); margin-top: 0.25rem; }
+  .sources { margin-top: 2.5rem; }
+  .sources h3 { font-family: var(--font-display); font-weight: 700; font-size: 0.875rem; color: rgba(var(--cream), 0.7); margin-bottom: 0.75rem; }
+  .sources ol { padding-left: 1.25rem; margin: 0; }
+  .sources a { color: var(--accent); font-size: 0.875rem; }
+  .btn-download { display: inline-block; margin-top: 1.5rem; padding: 0.6rem 1.1rem; border: 1px solid var(--glass-border); border-radius: 8px; font-size: 0.875rem; color: rgba(var(--cream), 0.7); }
+  .btn-download:hover { border-color: var(--accent); color: var(--accent); }
+  .cta { margin-top: 3.5rem; padding: 2.5rem; border-radius: 16px; background: rgba(200,255,0,0.05); border: 1px solid rgba(200,255,0,0.2); text-align: center; }
+  .cta h3 { font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; margin: 0 0 1rem; }
+  .cta a.btn { display: inline-block; margin-top: 0.5rem; padding: 0.75rem 1.5rem; background: var(--accent); color: var(--obsidian); font-weight: 600; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="container">
+    <a href="{{PRESS_INDEX_URL}}" class="back-link">← Back to Press</a>
+    <span class="category-badge">{{CATEGORY}}</span>
+    <div class="dateline">{{DATELINE_CITY}} — {{DATELINE_DATE}}</div>
+    <h1 class="title">{{HEADLINE}}</h1>
+    {{SUBHEADLINE_BLOCK}}
+    {{COVER_BLOCK}}
+    <article class="content">
+      {{ARTICLE_CONTENT}}
+    </article>
+    {{QUOTE_BLOCK}}
+    {{BOILERPLATE_BLOCK}}
+    {{CONTACT_BLOCK}}
+    {{SOURCES_BLOCK}}
+    {{PDF_LINK_BLOCK}}
+    <div class="cta">
+      <h3>{{CTA_TEXT}}</h3>
+      <a class="btn" href="{{CTA_URL}}">Get in touch</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

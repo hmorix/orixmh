@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{{SEO_TITLE}}</title>
+<meta name="description" content="{{META_DESCRIPTION}}" />
+<link rel="canonical" href="{{CANONICAL_URL}}" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="{{OG_TITLE}}" />
+<meta property="og:description" content="{{OG_DESCRIPTION}}" />
+<meta property="og:url" content="{{CANONICAL_URL}}" />
+<meta property="og:image" content="{{COVER_IMAGE_URL}}" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="{{OG_TITLE}}" />
+<meta name="twitter:description" content="{{OG_DESCRIPTION}}" />
+<script type="application/ld+json">
+{{SCHEMA_JSONLD}}
+</script>
+<style>
+  :root {
+    --obsidian: #0a0a0b; --obsidian-2: #131316; --cream: 245, 240, 232;
+    --accent: #C8FF00; --glass-border: rgba(255,255,255,0.08);
+    --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--obsidian); color: rgb(var(--cream)); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+  .wrap { padding: 8rem 0 5rem; min-height: 100vh; }
+  .container { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
+  a { color: inherit; text-decoration: none; }
+  .back-link { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: rgba(var(--cream), 0.4); margin-bottom: 1.5rem; }
+  .back-link:hover { color: var(--accent); }
+  .category-badge { display: inline-block; padding: 0.125rem 0.5rem; background: rgba(200,255,0,0.1); color: var(--accent); font-family: monospace; font-size: 0.75rem; border-radius: 4px; margin-bottom: 1rem; }
+  h1.title { font-family: var(--font-display); font-weight: 700; font-size: 2rem; line-height: 1.25; margin: 0 0 0.75rem; }
+  @media (min-width: 768px) { h1.title { font-size: 2.5rem; } }
+  .excerpt { color: rgba(var(--cream), 0.5); margin-bottom: 1.5rem; }
+  .meta-row { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem; font-size: 0.75rem; color: rgba(var(--cream), 0.3); }
+  .btn-download { margin-left: auto; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.1rem; background: var(--accent); color: var(--obsidian); font-weight: 600; border-radius: 8px; font-size: 0.875rem; }
+  .cover { width: 100%; aspect-ratio: 1200/630; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border); margin-bottom: 2.5rem; }
+  .cover img { width: 100%; height: 100%; object-fit: cover; }
+  .toc { margin-bottom: 2.5rem; padding: 1.25rem; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--obsidian-2); }
+  .toc .label { font-family: monospace; font-size: 0.75rem; color: rgba(var(--cream), 0.3); text-transform: uppercase; margin-bottom: 0.5rem; }
+  .toc ol { margin: 0; padding-left: 1.25rem; color: rgba(var(--cream), 0.6); font-size: 0.875rem; line-height: 1.9; }
+  article.content p { color: rgba(var(--cream), 0.6); line-height: 1.75; margin: 0 0 1rem; white-space: pre-line; }
+  article.content h2 { font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; margin: 2.5rem 0 1rem; }
+  article.content h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; margin: 2rem 0 0.75rem; }
+  article.content ul { color: rgba(var(--cream), 0.6); line-height: 1.75; padding-left: 1.25rem; margin: 0 0 1rem; }
+  .sources, .related, .reference-links { margin-top: 3rem; }
+  .sources h3, .related h3, .reference-links h3 { font-family: var(--font-display); font-weight: 700; font-size: 0.875rem; color: rgba(var(--cream), 0.7); margin-bottom: 0.75rem; }
+  .sources ol { padding-left: 1.25rem; margin: 0; }
+  .sources li { margin-bottom: 0.5rem; font-size: 0.875rem; }
+  .sources a, .related a, .reference-links a { color: var(--accent); font-size: 0.875rem; }
+  .sources a:hover, .related a:hover, .reference-links a:hover { text-decoration: underline; }
+  .related ul, .reference-links ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+  .cta { margin-top: 3.5rem; padding: 2.5rem; border-radius: 16px; background: rgba(200,255,0,0.05); border: 1px solid rgba(200,255,0,0.2); text-align: center; }
+  .cta h3 { font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; margin: 0 0 1rem; }
+  .cta a.btn { display: inline-block; margin-top: 0.5rem; padding: 0.75rem 1.5rem; background: var(--accent); color: var(--obsidian); font-weight: 600; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="container">
+    <a href="{{WHITEPAPERS_INDEX_URL}}" class="back-link">← Back to White Papers</a>
+    <span class="category-badge">White Paper</span>
+    <h1 class="title">{{TITLE}}</h1>
+    <p class="excerpt">{{EXCERPT}}</p>
+
+    <div class="meta-row">
+      <span>{{READ_TIME}}</span>
+      <span>Topic: {{TOPIC}}</span>
+      {{PDF_BUTTON}}
+    </div>
+
+    {{COVER_BLOCK}}
+    {{TOC_BLOCK}}
+
+    <article class="content">
+      {{ARTICLE_CONTENT}}
+    </article>
+
+    {{SOURCES_BLOCK}}
+    {{RELATED_BLOCK}}
+    {{REFERENCE_LINKS_BLOCK}}
+
+    <div class="cta">
+      <h3>{{CTA_TEXT}}</h3>
+      <a class="btn" href="{{CTA_URL}}">Get in touch</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

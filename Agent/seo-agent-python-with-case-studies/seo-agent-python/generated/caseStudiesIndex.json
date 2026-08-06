@@ -1,0 +1,24 @@
+[
+  {
+    "slug": "demo-ai-agent-support-automation",
+    "title": "How a [Industry] Company Used AI Agents to Automate Support Workflows — Sample Case Study",
+    "excerpt": "A sample/demo case study showing the layout and structure HMorix uses for AI Solutions engagements. [Excerpt Placeholder — replace with a real summary once client data is available.]",
+    "clientName": "[Client Name]",
+    "industry": "[Industry]",
+    "isDemo": true,
+    "canonicalUrl": "https://orixmh.vercel.app/case-studies/demo-ai-agent-support-automation",
+    "publishedAt": "2026-07-24T00:00:00+00:00",
+    "wordCount": 1180
+  },
+  {
+    "slug": "demo-ecommerce-platform-rebuild",
+    "title": "Rebuilding an Online Store for a [Industry] Brand — Sample Case Study",
+    "excerpt": "A sample/demo case study showing the layout and structure HMorix uses for E-commerce engagements. [Excerpt Placeholder — replace with a real summary once client data is available.]",
+    "clientName": "[Client Name]",
+    "industry": "[Industry]",
+    "isDemo": true,
+    "canonicalUrl": "https://orixmh.vercel.app/case-studies/demo-ecommerce-platform-rebuild",
+    "publishedAt": "2026-07-24T00:00:00+00:00",
+    "wordCount": 1050
+  }
+]

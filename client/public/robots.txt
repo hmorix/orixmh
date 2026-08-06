@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Allow: /sitemap.xml
+Allow: /rss.xml
 Allow: /manifest.webmanifest
 Allow: /site.webmanifest
 Allow: /security.txt
@@ -15,6 +16,7 @@ Disallow: /employee
 Disallow: /crm
 Disallow: /hrm
 Disallow: /retry
+Disallow: /generated
 Disallow: /*.json
 Disallow: /*?*
 Disallow: /*#*
@@ -25,6 +27,10 @@ Sitemap: https://orixmh.vercel.app/sitemap.xml
 
 User-agent: Googlebot
 Allow: /
+Allow: /blog/
+Allow: /case-studies/
+Allow: /whitepapers/
+Allow: /press/
 Crawl-delay: 0
 
 User-agent: Bingbot

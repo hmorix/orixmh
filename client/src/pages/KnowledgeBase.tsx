@@ -1,8 +1,17 @@
 import { Search, Book, FileText, Video, MessageCircle } from 'lucide-react'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import posts from '../generated/postsIndex.json'
+import caseStudies from '../generated/caseStudiesIndex.json'
+import whitepapers from '../generated/whitepapersIndex.json'
 
 export default function KnowledgeBase() {
   const [search, setSearch] = useState('')
+  const generatedArticles = [
+    ...posts.map((item) => ({ title: item.title, category: item.category || 'Blog', views: 'New', url: `/blog/${item.slug}` })),
+    ...caseStudies.map((item) => ({ title: item.title, category: 'Case Study', views: item.isDemo ? 'Demo' : 'New', url: `/case-studies/${item.slug}` })),
+    ...whitepapers.map((item) => ({ title: item.title, category: 'Whitepaper', views: item.pdfGenerated ? 'PDF' : 'New', url: `/whitepapers/${item.slug}` })),
+  ]
 
   return (
     <div className="pt-32 pb-20">
@@ -35,14 +44,18 @@ export default function KnowledgeBase() {
         <h2 className="font-display text-2xl font-bold mb-6">Popular Articles</h2>
         <div className="space-y-3">
           {[
-            { title: 'How to set up BillingFlow for your business', category: 'Getting Started', views: '2.4k' },
-            { title: 'Integrating AI Agent with your existing workflow', category: 'Tutorials', views: '1.8k' },
-            { title: 'Understanding API rate limits and quotas', category: 'API Reference', views: '1.5k' },
-            { title: 'Setting up webhooks for real-time notifications', category: 'API Reference', views: '1.2k' },
-            { title: 'Smart Home device compatibility guide', category: 'Getting Started', views: '980' },
-            { title: 'Troubleshooting PDF processing errors', category: 'FAQ', views: '870' },
-          ].map((article, i) => (
-            <div key={i} className="flex items-center justify-between p-4 bg-obsidian-2 border border-glass-border rounded-[12px] hover:border-[rgba(200,255,0,0.2)] transition-all cursor-pointer">
+            ...generatedArticles,
+            { title: 'How to set up BillingFlow for your business', category: 'Getting Started', views: '2.4k', url: '/billingflow/docs' },
+            { title: 'Integrating AI Agent with your existing workflow', category: 'Tutorials', views: '1.8k', url: '/agent/docs' },
+            { title: 'Understanding API rate limits and quotas', category: 'API Reference', views: '1.5k', url: '/developers' },
+            { title: 'Setting up webhooks for real-time notifications', category: 'API Reference', views: '1.2k', url: '/developers' },
+            { title: 'Smart Home device compatibility guide', category: 'Getting Started', views: '980', url: '/smart-home' },
+            { title: 'Troubleshooting PDF processing errors', category: 'FAQ', views: '870', url: '/pdf-automation/docs' },
+          ].filter((article) => {
+            const query = search.toLowerCase()
+            return !query || article.title.toLowerCase().includes(query) || article.category.toLowerCase().includes(query)
+          }).slice(0, 12).map((article, i) => (
+            <Link key={`${article.title}-${i}`} to={article.url || '/support'} className="flex items-center justify-between p-4 bg-obsidian-2 border border-glass-border rounded-[12px] hover:border-[rgba(200,255,0,0.2)] transition-all">
               <div className="flex items-center gap-3">
                 <FileText size={16} className="text-cream/30" />
                 <div>
@@ -51,7 +64,7 @@ export default function KnowledgeBase() {
                 </div>
               </div>
               <span className="text-xs text-cream/30">{article.views} views</span>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

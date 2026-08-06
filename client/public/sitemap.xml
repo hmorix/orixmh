@@ -22,8 +22,17 @@
   <url><loc>https://orixmh.vercel.app/trust</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://orixmh.vercel.app/compliance</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://orixmh.vercel.app/blog</loc><priority>0.8</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/blog/what-is-hmorix-ai-solutions-guide</loc><lastmod>2026-07-23T14:50:43.581Z</lastmod><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/blog/ai-business-automation-solutions</loc><lastmod>2026-07-23T14:49:40.155Z</lastmod><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/blog/billingflow-invoicing-simplification</loc><lastmod>2026-07-23T14:46:04.897Z</lastmod><priority>0.7</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://orixmh.vercel.app/case-studies</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/case-studies/demo-ai-agent-support-automation</loc><lastmod>2026-07-24T00:00:00+00:00</lastmod><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/case-studies/demo-ecommerce-platform-rebuild</loc><lastmod>2026-07-24T00:00:00+00:00</lastmod><priority>0.6</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://orixmh.vercel.app/whitepapers</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/whitepapers/demo-ai-support-automation-whitepaper</loc><lastmod>2026-07-25T00:00:00+00:00</lastmod><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/whitepaper-pdfs/demo-ai-support-automation-whitepaper.pdf</loc><lastmod>2026-07-25T00:00:00+00:00</lastmod><priority>0.4</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/press/demo-hmorix-ai-agent-launch</loc><lastmod>2026-07-28T00:00:00+00:00</lastmod><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://orixmh.vercel.app/press-pdfs/demo-hmorix-ai-agent-launch.pdf</loc><lastmod>2026-07-28T00:00:00+00:00</lastmod><priority>0.4</priority><changefreq>yearly</changefreq></url>
   <url><loc>https://orixmh.vercel.app/certifications</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://orixmh.vercel.app/careers</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://orixmh.vercel.app/contact</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>

@@ -5,6 +5,7 @@ import MainLayout from './layouts/MainLayout'
 import CommandPalette from './components/CommandPalette'
 import OfflineStatus from './components/OfflineStatus'
 import OfflinePage from './pages/OfflinePage'
+import { GeneratedBlogPost, GeneratedContentPage } from './pages/generated/GeneratedContentPage'
 
 const Home = lazy(() => import('./pages/Home'))
 const About = lazy(() => import('./pages/About'))
@@ -58,7 +59,6 @@ const PressReleases = lazy(() => import('./pages/PressReleases'))
 const Certifications = lazy(() => import('./pages/Certifications'))
 const ActivityFeed = lazy(() => import('./pages/ActivityFeed'))
 const BlogList = lazy(() => import('./pages/blog/BlogList'))
-const BlogPost = lazy(() => import('./pages/blog/BlogPost'))
 const AdminBlogManager = lazy(() => import('./pages/blog/AdminBlogManager'))
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
@@ -185,7 +185,7 @@ function App() {
 
           {/* Blog */}
           <Route path="/blog" element={<BlogList />} />
-          <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/blog/:slug" element={<GeneratedBlogPost />} />
 
           {/* Enterprise Trust Layer */}
           <Route path="/security" element={<Security />} />
@@ -195,7 +195,9 @@ function App() {
           <Route path="/support" element={<Support />} />
           <Route path="/knowledge-base" element={<KnowledgeBase />} />
           <Route path="/case-studies" element={<CaseStudies />} />
+          <Route path="/case-studies/:slug" element={<GeneratedContentPage type="caseStudies" />} />
           <Route path="/whitepapers" element={<Whitepapers />} />
+          <Route path="/whitepapers/:slug" element={<GeneratedContentPage type="whitepapers" />} />
           <Route path="/certifications" element={<Certifications />} />
 
           {/* BillingFlow Product Ecosystem */}
@@ -256,6 +258,7 @@ function App() {
           <Route path="/roadmap" element={<Roadmap />} />
           <Route path="/media-kit" element={<MediaKit />} />
           <Route path="/press" element={<PressReleases />} />
+          <Route path="/press/:slug" element={<GeneratedContentPage type="press" />} />
 
           {/* SEO & Marketing Pages */}
           <Route path="/faq" element={<FAQ />} />

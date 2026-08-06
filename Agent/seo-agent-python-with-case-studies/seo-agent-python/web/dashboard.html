@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HMorix Content — Dashboard</title>
+<link rel="stylesheet" href="/style.css" />
+<style>
+  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; margin-bottom: 1.5rem; }
+  @media (min-width: 640px) { .stat-grid { grid-template-columns: repeat(4, 1fr); } }
+  .stat-card {
+    border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.1rem;
+    background: rgba(255,255,255,0.02);
+  }
+  .stat-card .value { font-size: 1.6rem; font-weight: 700; font-family: monospace; }
+  .stat-card .label { font-size: 0.75rem; color: rgba(var(--cream), 0.45); margin-top: 0.2rem; }
+  .stat-card .sub { font-size: 0.7rem; color: rgba(var(--cream), 0.3); margin-top: 0.3rem; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 0.4rem; }
+  .status-dot.idle { background: rgba(var(--cream), 0.3); }
+  .status-dot.running { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .status-dot.queued { background: var(--warn); }
+  .section-title { font-size: 0.9rem; font-weight: 600; margin: 1.5rem 0 0.6rem; color: rgba(var(--cream), 0.7); }
+  .warn-banner {
+    border: 1px solid rgba(255,180,84,0.3); background: rgba(255,180,84,0.08); color: var(--warn);
+    border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.8rem; margin-bottom: 1rem;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">HMorix Content <span class="dot"></span></div>
+    <div class="topbar-right">
+      <a href="/case-studies" style="font-size:0.8rem;color:rgba(var(--cream),0.5);text-decoration:none;">Case Studies →</a>
+      <a href="/" style="font-size:0.8rem;color:rgba(var(--cream),0.5);text-decoration:none;">← Control Panel</a>
+      <div id="lastUpdated" class="config-info">loading…</div>
+      <button id="themeToggle" class="theme-toggle" title="Toggle light/dark theme">🌙</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="panel-header">
+      <h2>Dashboard</h2>
+      <div class="controls">
+        <button id="btnRefresh">Refresh</button>
+      </div>
+    </div>
+
+    <div id="supabaseWarning"></div>
+
+    <div class="stat-grid" id="statGrid">
+      <div class="stat-card"><div class="value">—</div><div class="label">Total Case Studies</div></div>
+      <div class="stat-card"><div class="value">—</div><div class="label">Published</div></div>
+      <div class="stat-card"><div class="value">—</div><div class="label">Drafts Pending</div></div>
+      <div class="stat-card"><div class="value">—</div><div class="label">Pipeline Status</div></div>
+    </div>
+
+    <div class="section-title">Case Studies Breakdown</div>
+    <div class="stat-grid">
+      <div class="stat-card" id="csDemoCard"><div class="value">—</div><div class="label">Demo / Placeholder</div></div>
+      <div class="stat-card" id="csRealCard"><div class="value">—</div><div class="label">Real (published)</div></div>
+      <div class="stat-card" id="blogPublishedCard"><div class="value">—</div><div class="label">Blog Posts Published</div></div>
+      <div class="stat-card" id="blogDraftsCard"><div class="value">—</div><div class="label">Blog Drafts Pending</div></div>
+    </div>
+
+    <div class="section-title">White Papers</div>
+    <div class="stat-grid">
+      <div class="stat-card" id="wpTotalCard"><div class="value">—</div><div class="label">Total White Papers</div></div>
+      <div class="stat-card" id="wpPublishedCard"><div class="value">—</div><div class="label">Published</div></div>
+      <div class="stat-card" id="wpDraftsCard"><div class="value">—</div><div class="label">Drafts Pending</div></div>
+      <div class="stat-card" id="wpPdfCard"><div class="value">—</div><div class="label">With PDF Generated</div></div>
+    </div>
+
+    <div class="section-title">Press Releases</div>
+    <div class="stat-grid">
+      <div class="stat-card" id="prTotalCard"><div class="value">—</div><div class="label">Total Press Releases</div></div>
+      <div class="stat-card" id="prPublishedCard"><div class="value">—</div><div class="label">Published</div></div>
+      <div class="stat-card" id="prDraftsCard"><div class="value">—</div><div class="label">Drafts Pending</div></div>
+      <div class="stat-card" id="prPdfCard"><div class="value">—</div><div class="label">With PDF Generated</div></div>
+    </div>
+
+    <div class="section-title">Last Generation</div>
+    <div class="cards" id="lastRunCard"></div>
+
+    <div class="section-title">Recent Pipeline Jobs</div>
+    <div class="jobs-list" id="recentJobs"></div>
+  </main>
+</div>
+<script src="/dashboard.js"></script>
+</body>
+</html>

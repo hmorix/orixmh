@@ -1,0 +1,62 @@
+{
+  "headline": "HMorix Launches New AI Agent Platform — Sample Press Release",
+  "subheadline": "[Subheadline Placeholder]",
+  "slug": "demo-hmorix-ai-agent-launch",
+  "category": "Product Launch",
+  "dateline_city": "[City, State/Country]",
+  "dateline_date": "July 28, 2026",
+  "excerpt": "A sample press release demonstrating HMorix's release layout. Replace placeholders with real news before publishing.",
+  "is_commentary": false,
+  "content": [
+    { "type": "paragraph", "text": "[Placeholder] HMorix today announced the launch of its next-generation AI Agent platform, designed to help businesses automate customer support, internal workflows, and repetitive operational tasks." },
+    { "type": "paragraph", "text": "[Placeholder] The platform builds on HMorix's existing AI Solutions offering, adding configurable workflow templates and expanded integration options for small and mid-sized teams." },
+    { "type": "paragraph", "text": "[Placeholder] Availability and pricing details will be announced separately." }
+  ],
+  "key_facts": [],
+  "sources": [],
+  "quote_text": "",
+  "quote_attribution": "",
+  "quote_role": "",
+  "boilerplate": "HMorix is an AI-first technology company that designs and develops intelligent software, modern web applications, AI agents, automation platforms, and digital business solutions, with a mission to make advanced AI and software technology accessible through reliable, scalable, secure, and innovative digital solutions.",
+  "media_contact_name": "[Media Contact Name]",
+  "media_contact_email": "[press@example.com]",
+  "media_contact_phone": "",
+  "cover_image_url": "",
+  "reference_links": [],
+  "cta_text": "Learn more about HMorix",
+  "cta_url": "/contact",
+  "author": "HMorix",
+  "read_time": "3 min read",
+  "word_count": 95,
+  "seo_title": "HMorix Launches New AI Agent Platform (Sample) | HMorix",
+  "meta_description": "Sample press release layout for HMorix. Placeholder content — replace before publishing.",
+  "canonical_url": "https://orixmh.vercel.app/press/demo-hmorix-ai-agent-launch",
+  "open_graph": { "title": "HMorix Launches New AI Agent Platform — Sample", "description": "Sample press release layout.", "type": "article" },
+  "twitter_card": { "card": "summary_large_image", "title": "HMorix Launches New AI Agent Platform — Sample", "description": "Sample press release layout." },
+  "breadcrumbs": [
+    { "name": "Press", "url": "/press" },
+    { "name": "HMorix Launches New AI Agent Platform (Sample)", "url": "/press/demo-hmorix-ai-agent-launch" }
+  ],
+  "keywords": ["Product Launch"],
+  "schema_jsonld": {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "NewsArticle",
+        "headline": "HMorix Launches New AI Agent Platform — Sample Press Release",
+        "description": "A sample press release demonstrating HMorix's release layout.",
+        "articleSection": "Product Launch",
+        "author": { "@type": "Organization", "name": "HMorix" },
+        "publisher": { "@type": "Organization", "name": "HMorix" },
+        "datePublished": "2026-07-28T00:00:00+00:00",
+        "dateModified": "2026-07-28T00:00:00+00:00",
+        "citation": []
+      }
+    ]
+  },
+  "seo_score": 75,
+  "published_at": "2026-07-28T00:00:00+00:00",
+  "updated_at": "2026-07-28T00:00:00+00:00",
+  "pdf_generated": false,
+  "status": "pending"
+}

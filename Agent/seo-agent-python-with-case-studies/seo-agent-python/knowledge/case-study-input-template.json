@@ -1,0 +1,43 @@
+{
+  "_instructions": "Copy this file, fill in what you actually know, and leave the rest as-is. Any field left as a bracketed placeholder (or omitted) stays a visible placeholder in the generated case study — the writer will NOT invent a value for it. Set is_demo to false only once every client-facing fact below is real and you have permission to publish it.",
+
+  "is_demo": true,
+  "client_name": "[Client Name]",
+  "client_logo_url": "[client-logo.png]",
+  "industry": "[Industry]",
+  "company_size": "[Company Size, e.g. 50-200 employees]",
+  "location": "[City, Country]",
+  "service_used": "[Which HMorix service — must match knowledge/products.md, e.g. \"AI Solutions\" or \"Web Design\"]",
+  "timeline": "[Project Timeline, e.g. \"8 weeks\"]",
+
+  "challenge": "[Describe the real problem the client came to HMorix with. One or two paragraphs. Leave as placeholder if unknown.]",
+  "solution": "[Describe what HMorix actually built/did. One or two paragraphs. Leave as placeholder if unknown.]",
+
+  "results": [
+    { "metric": "[Metric name, e.g. \"Page load time\"]", "value": "[Result Placeholder]", "is_placeholder": true },
+    { "metric": "[Metric name]", "value": "[Result Placeholder]", "is_placeholder": true },
+    { "metric": "[Metric name]", "value": "[Result Placeholder]", "is_placeholder": true }
+  ],
+
+  "testimonial_quote": "[Testimonial Placeholder — do not write one; leave blank or bracketed until the client gives you a real quote]",
+  "testimonial_author": "[Testimonial Author Name]",
+  "testimonial_role": "[Title, Company]",
+
+  "hero_image_url": "",
+  "gallery_images": [
+    { "url": "", "alt": "[Gallery image 1 placeholder]", "caption": "[Caption Placeholder]" },
+    { "url": "", "alt": "[Gallery image 2 placeholder]", "caption": "[Caption Placeholder]" },
+    { "url": "", "alt": "[Gallery image 3 placeholder]", "caption": "[Caption Placeholder]" },
+    { "url": "", "alt": "[Gallery image 4 placeholder]", "caption": "[Caption Placeholder]" }
+  ],
+
+  "cta_text": "Ready to build something like this?",
+  "cta_url": "/contact",
+
+  "reference_links": [
+    { "label": "[Client website]", "url": "" },
+    { "label": "[Live project / product]", "url": "" }
+  ],
+
+  "target_word_count": 10000
+}

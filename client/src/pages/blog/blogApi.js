@@ -1,4 +1,7 @@
-export const fallbackPosts = [
+import generatedPosts from '../../generated/postsIndex.json'
+import { cachedJson } from '../../lib/offlineStore'
+
+const seededPosts = [
   { id: 'building-ai-agents-at-scale', slug: 'building-ai-agents-at-scale', title: 'Building AI Agents at Scale: Lessons from 10,000 Deployments', excerpt: 'How we architected our AI agent platform to handle enterprise-grade workloads with sub-second response times and 99.99% reliability.', category: 'Engineering', author: 'Hamza Morix', date: 'Jun 28, 2024', publishedAt: '2024-06-28', readTime: '12 min', tags: ['Engineering', 'AI Agents'], featured: true },
   { id: 'introducing-billingflow-v3', slug: 'introducing-billingflow-v3', title: 'Introducing BillingFlow v3: The Future of Automated Invoicing', excerpt: 'A complete rewrite with real-time sync, multi-currency support, and AI-powered anomaly detection.', category: 'Product Updates', author: 'Sarah Chen', date: 'Jun 25, 2024', publishedAt: '2024-06-25', readTime: '8 min', tags: ['BillingFlow', 'Product'], featured: true },
   { id: 'zero-trust-architecture', slug: 'zero-trust-architecture', title: 'Implementing Zero-Trust Architecture in Enterprise SaaS', excerpt: 'Our journey to implementing zero-trust security across all HMorix services, reducing attack surface by 94%.', category: 'Security', author: 'Mike Johnson', date: 'Jun 22, 2024', publishedAt: '2024-06-22', readTime: '15 min', tags: ['Security'], featured: false },
@@ -12,6 +15,11 @@ export const fallbackPosts = [
   { id: 'kubernetes-deployment-patterns', slug: 'kubernetes-deployment-patterns', title: 'Advanced Kubernetes Deployment Patterns for AI Workloads', excerpt: 'GPU scheduling, model serving, and auto-scaling strategies for production ML systems.', category: 'Engineering', author: 'Alex Rivera', date: 'Jun 3, 2024', publishedAt: '2024-06-03', readTime: '16 min', tags: ['Engineering'], featured: false },
   { id: 'gdpr-compliance-automation', slug: 'gdpr-compliance-automation', title: 'Automating GDPR Compliance with AI-Powered Data Discovery', excerpt: 'How our compliance engine automatically identifies, classifies, and manages personal data across systems.', category: 'Security', author: 'Mike Johnson', date: 'Jun 1, 2024', publishedAt: '2024-06-01', readTime: '13 min', tags: ['Security'], featured: false },
 ]
+
+export const fallbackPosts = mergePosts(
+  generatedPosts.map((post, index) => ({ ...post, author: 'HMorix AI', readTime: post.readTime || '5 min', featured: index === 0 })),
+  seededPosts,
+)
 
 export const fallbackPostsContent = {
   'building-ai-agents-at-scale': {
@@ -65,7 +73,7 @@ export function normalizePost(post) {
 export async function fetchBlogList() {
   const payload = await cachedJson('blog:list', '/api/blog')
   const data = Array.isArray(payload) ? payload : payload.data || payload.blogs || []
-  return data.map(normalizePost)
+  return mergePosts(data, generatedPosts)
 }
 
 export async function fetchBlogPost(slug) {
@@ -101,4 +109,12 @@ function formatDate(value) {
 function stripHtml(value) {
   return String(value).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
 }
-import { cachedJson } from '../../lib/offlineStore'
+
+function mergePosts(...groups) {
+  const seen = new Set()
+  return groups.flat().map(normalizePost).filter((post) => {
+    if (!post.slug || seen.has(post.slug)) return false
+    seen.add(post.slug)
+    return true
+  }).sort((a, b) => new Date(b.publishedAt || b.date || 0) - new Date(a.publishedAt || a.date || 0))
+}

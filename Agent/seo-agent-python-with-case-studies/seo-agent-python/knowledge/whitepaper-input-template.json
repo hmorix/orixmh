@@ -1,0 +1,40 @@
+{
+  "_instructions": "Copy this file, fill in what you know. Anything you leave blank stays a visible placeholder — the writer will not invent facts, statistics, or claims about real companies. If is_research is true, every claim about a third party must come from 'sources' (auto-researched via Google CSE if configured, or add your own URLs below) — the writer is instructed to cite, not assert from memory.",
+
+  "topic": "[Topic — e.g. \"The State of AI Customer Support in E-commerce, 2026\"]",
+  "title": "",
+  "target_audience": "[Who this is for — e.g. \"E-commerce operations leaders evaluating AI support tools\"]",
+  "is_research": false,
+
+  "key_facts": [
+    "[A real fact you already know and want included — one per line. Leave the array empty if you have none yet.]"
+  ],
+
+  "source_urls": [
+    "[Optional: URLs you specifically want cited/referenced, in addition to whatever Google CSE research turns up]"
+  ],
+
+  "stats": [
+    { "label": "[Metric name]", "value": "[Real number]", "source": "[Where this number came from]" }
+  ],
+
+  "comparison_table": {
+    "headers": ["[Column 1]", "[Column 2]", "[Column 3]"],
+    "rows": [["[Row 1 Col 1]", "[Row 1 Col 2]", "[Row 1 Col 3]"]]
+  },
+
+  "related_whitepapers": [],
+
+  "cover_image_url": "",
+  "images": [
+    { "url": "", "caption": "[Supporting visual 1 caption]" },
+    { "url": "", "caption": "[Supporting visual 2 caption]" }
+  ],
+  "cta_text": "Talk to HMorix about your project",
+  "cta_url": "/contact",
+  "reference_links": [
+    { "label": "[Related resource]", "url": "" }
+  ],
+
+  "target_word_count": 6000
+}
