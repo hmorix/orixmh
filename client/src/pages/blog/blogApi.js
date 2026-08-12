@@ -18,7 +18,6 @@ const seededPosts = [
 
 export const fallbackPosts = mergePosts(
   generatedPosts.map((post, index) => ({ ...post, author: 'HMorix AI', readTime: post.readTime || '5 min', featured: index === 0 })),
-  shouldUseLegacyBlogApi() ? seededPosts : [],
 )
 
 export const fallbackPostsContent = {
@@ -74,7 +73,7 @@ export async function fetchBlogList() {
   if (!shouldUseLegacyBlogApi()) return fallbackPosts
   const payload = await cachedJson('blog:list', '/api/blog')
   const data = Array.isArray(payload) ? payload : payload.data || payload.blogs || []
-  return mergePosts(generatedPosts, data)
+  return mergePosts(generatedPosts, data.filter((post) => !isSeededOrDemo(post)))
 }
 
 export async function fetchBlogPost(slug) {
@@ -119,6 +118,11 @@ function mergePosts(...groups) {
     seen.add(post.slug)
     return true
   }).sort((a, b) => new Date(b.publishedAt || b.date || 0) - new Date(a.publishedAt || a.date || 0))
+}
+
+function isSeededOrDemo(post) {
+  const text = `${post.title || ''} ${post.excerpt || ''}`.toLowerCase()
+  return text.includes('sample') || text.includes('demo') || text.includes('placeholder')
 }
 
 function shouldUseLegacyBlogApi() {

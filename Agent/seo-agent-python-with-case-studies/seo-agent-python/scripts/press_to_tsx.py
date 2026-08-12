@@ -5,6 +5,10 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from lib.env import load_env  # noqa: E402
+
+load_env()
+
 OUTPUT_DIR = os.environ.get(
     "PRESS_PAGES_OUTPUT_DIR", os.path.join(os.getcwd(), "generated", "press-pages")
 )
@@ -222,6 +226,9 @@ def main():
     with open(sys.argv[1], "r", encoding="utf-8") as f:
         record = json.load(f)
     slug, out_path = generate_press_page(record)
+    from scripts.sync_frontend_content import sync_frontend_content
+
+    sync_frontend_content()
     print(f"[press-to-tsx] Generated {out_path} (slug: {slug})")
 
 

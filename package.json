@@ -8,6 +8,7 @@
     "dev:api": "node server/index.js",
     "dev:vercel": "vercel dev",
     "build": "cd client && npm run build",
+    "sync:content": "python Agent/seo-agent-python-with-case-studies/seo-agent-python/scripts/sync_frontend_content.py",
     "install:all": "npm install && cd client && npm install"
   },
   "dependencies": {

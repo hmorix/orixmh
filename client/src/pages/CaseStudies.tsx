@@ -4,26 +4,17 @@ import generatedCaseStudies from '../generated/caseStudiesIndex.json'
 import SEOHead from '../components/seo/SEOHead'
 
 export default function CaseStudies() {
-  const seededCases = [
-    { title: 'How Meridian Corp Reduced Invoice Processing by 87%', client: 'Meridian Corp', industry: 'Financial Services', product: 'BillingFlow', result: '87% faster processing', image: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' },
-    { title: 'NovaTech Automated 10,000+ Documents with AI', client: 'NovaTech Industries', industry: 'Manufacturing', product: 'PDF Automation', result: '10x throughput increase', image: 'linear-gradient(135deg, #0f3443 0%, #34e89e20 100%)' },
-    { title: 'Apex Corp Deployed AI Agents Across 50 Teams', client: 'Apex Corp', industry: 'Technology', product: 'AI Agent', result: '340 hours saved/month', image: 'linear-gradient(135deg, #2d1b69 0%, #6c63ff20 100%)' },
-    { title: 'SmartLiving Homes Connected 5,000 Devices', client: 'SmartLiving Homes', industry: 'Real Estate', product: 'Smart Home', result: '30% energy savings', image: 'linear-gradient(135deg, #1a4332 0%, #C8FF0020 100%)' },
-    { title: 'FinanceHub Achieved SOC 2 Compliance in 6 Weeks', client: 'FinanceHub', industry: 'FinTech', product: 'Security & Compliance', result: 'SOC 2 Type II certified', image: 'linear-gradient(135deg, #3d1c02 0%, #f5920020 100%)' },
-    { title: 'GlobalRetail Unified 12 Systems Into One Platform', client: 'GlobalRetail Inc', industry: 'E-Commerce', product: 'HMorix Cloud', result: '60% cost reduction', image: 'linear-gradient(135deg, #1c1c3d 0%, #ff6b6b20 100%)' },
-  ].map((item) => ({ ...item, slug: '' }))
-  const cases = [
-    ...generatedCaseStudies.map((item) => ({
+  const cases = generatedCaseStudies
+    .filter(isPublishable)
+    .map((item) => ({
       title: item.title,
       client: item.clientName || 'HMorix',
       industry: item.industry || 'Technology',
-      product: item.isDemo ? 'Sample Case Study' : 'Case Study',
+      product: 'Case Study',
       result: `${item.wordCount || 0} words`,
       image: 'linear-gradient(135deg, #10231f 0%, #C8FF0020 100%)',
       slug: item.slug,
-    })),
-    ...seededCases,
-  ]
+    }))
 
   return (
     <div className="pt-32 pb-20">
@@ -40,7 +31,7 @@ export default function CaseStudies() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cases.map((c, i) => (
-            <Link key={`${c.slug || c.title}-${i}`} to={c.slug ? `/case-studies/${c.slug}` : '/contact'} className="group bg-obsidian-2 border border-glass-border rounded-[16px] overflow-hidden hover:border-[rgba(200,255,0,0.2)] transition-all">
+            <Link key={`${c.slug || c.title}-${i}`} to={`/case-studies/${c.slug}`} className="group bg-obsidian-2 border border-glass-border rounded-[16px] overflow-hidden hover:border-[rgba(200,255,0,0.2)] transition-all">
               <div className="h-40 relative" style={{background: c.image}}>
                 <div className="absolute top-4 left-4">
                   <span className="px-2 py-1 bg-black/40 backdrop-blur-sm text-[10px] text-cream/80 rounded-full">{c.product}</span>
@@ -62,6 +53,12 @@ export default function CaseStudies() {
           ))}
         </div>
 
+        {cases.length === 0 && (
+          <div className="py-16 text-center text-cream/35 border border-glass-border rounded-[8px] bg-obsidian-2">
+            No published case studies yet.
+          </div>
+        )}
+
         <div className="mt-16 p-8 bg-obsidian-2 border border-glass-border rounded-[16px] text-center">
           <h3 className="font-display text-xl font-bold mb-3">Want to be our next success story?</h3>
           <p className="text-sm text-cream/50 mb-6">Join 120+ enterprise companies already using HMorix.</p>
@@ -70,4 +67,10 @@ export default function CaseStudies() {
       </div>
     </div>
   )
+}
+
+function isPublishable(item: any) {
+  if (!item.slug || item.isDemo) return false
+  const text = `${item.title || ''} ${item.excerpt || ''} ${item.clientName || ''}`.toLowerCase()
+  return !['sample', 'demo', 'placeholder', '['].some((token) => text.includes(token))
 }

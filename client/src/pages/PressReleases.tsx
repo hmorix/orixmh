@@ -4,24 +4,15 @@ import generatedPress from '../generated/pressIndex.json'
 import SEOHead from '../components/seo/SEOHead'
 
 export default function PressReleases() {
-  const seededReleases = [
-    { title: 'HMorix Launches AI Agent 2.0 with Multi-Modal Support', date: 'Jul 15, 2024', category: 'Product Launch', excerpt: 'The latest version of HMorix AI Agent introduces multi-modal capabilities, enabling businesses to process text, images, and documents in unified workflows.' },
-    { title: 'HMorix Achieves SOC 2 Type II Certification', date: 'Jun 28, 2024', category: 'Security', excerpt: 'HMorix has completed SOC 2 Type II certification, demonstrating our commitment to the highest standards of data security and privacy.' },
-    { title: 'HMorix Raises Series A to Accelerate Enterprise AI', date: 'May 10, 2024', category: 'Funding', excerpt: 'HMorix announces successful Series A funding round to expand enterprise AI capabilities and accelerate product development.' },
-    { title: 'BillingFlow 2.0: AI-Powered Invoice Processing', date: 'Apr 22, 2024', category: 'Product Launch', excerpt: 'New BillingFlow release features AI-powered invoice generation, smart categorization, and automated reconciliation.' },
-    { title: 'HMorix Partners with AWS for Enhanced Cloud Services', date: 'Mar 15, 2024', category: 'Partnership', excerpt: 'Strategic partnership with Amazon Web Services brings enhanced cloud infrastructure and global deployment capabilities to HMorix customers.' },
-    { title: 'HMorix Smart Home Division Launches', date: 'Feb 1, 2024', category: 'Company News', excerpt: 'HMorix expands into the smart home market with a comprehensive IoT platform for residential and commercial properties.' },
-  ].map((item) => ({ ...item, slug: '' }))
-  const releases = [
-    ...generatedPress.map((item) => ({
+  const releases = generatedPress
+    .filter(isPublishable)
+    .map((item) => ({
       title: item.headline,
       date: formatDate(item.publishedAt),
       category: item.category || 'Press',
       excerpt: item.excerpt,
       slug: item.slug,
-    })),
-    ...seededReleases,
-  ]
+    }))
 
   return (
     <div className="pt-32 pb-20">
@@ -39,7 +30,7 @@ export default function PressReleases() {
 
         <div className="space-y-6">
           {releases.map((r, i) => (
-            <Link key={`${r.slug || r.title}-${i}`} to={r.slug ? `/press/${r.slug}` : '/media-kit'} className="block p-6 bg-obsidian-2 border border-glass-border rounded-[16px] hover:border-[rgba(200,255,0,0.2)] transition-all group">
+            <Link key={`${r.slug || r.title}-${i}`} to={`/press/${r.slug}`} className="block p-6 bg-obsidian-2 border border-glass-border rounded-[16px] hover:border-[rgba(200,255,0,0.2)] transition-all group">
               <div className="flex items-start justify-between gap-6">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-3">
@@ -55,6 +46,12 @@ export default function PressReleases() {
           ))}
         </div>
 
+        {releases.length === 0 && (
+          <div className="py-16 text-center text-cream/35 border border-glass-border rounded-[8px] bg-obsidian-2">
+            No published press releases yet.
+          </div>
+        )}
+
         <div className="mt-12 text-center">
           <p className="text-sm text-cream/40 mb-4">For media inquiries, please contact:</p>
           <a href="mailto:press@hmorix.com" className="text-[#C8FF00] hover:underline">press@hmorix.com</a>
@@ -62,6 +59,12 @@ export default function PressReleases() {
       </div>
     </div>
   )
+}
+
+function isPublishable(item: any) {
+  if (!item.slug) return false
+  const text = `${item.headline || ''} ${item.excerpt || ''}`.toLowerCase()
+  return !['sample', 'demo', 'placeholder', '['].some((token) => text.includes(token))
 }
 
 function formatDate(value?: string) {
