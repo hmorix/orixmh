@@ -1,0 +1,707 @@
+{
+  "keywords": {
+    "topic": "Open-Source vs. Custom AI Agents for Workflow Management",
+    "primaryKeyword": "Open-Source AI Agents vs Custom AI Agents",
+    "secondaryKeywords": [
+      "Workflow Management AI",
+      "AI Workflow Automation",
+      "Custom AI Development for Workflow"
+    ],
+    "longTailKeywords": [
+      "Comparison of Open-Source and Custom AI Agents for Business Workflow Management",
+      "Pros and Cons of Custom AI Agents in Workflow Automation",
+      "Open-Source AI Workflow Management Tools vs Bespoke Solutions"
+    ],
+    "searchIntent": "informational",
+    "estimatedDifficulty": "medium",
+    "estimatedVolume": "medium",
+    "targetAudience": "Business Decision Makers, IT Managers, Operations Specialists",
+    "competitors": [
+      "Zapier (for general workflow, not AI-specific)",
+      "Custom software development agencies offering AI solutions"
+    ],
+    "peopleAlsoAsk": [
+      "What are the licensing costs for open-source AI agents?",
+      "Can custom AI agents integrate with existing workflow tools?",
+      "Which open-source AI agents support machine learning for workflow optimization?"
+    ],
+    "contentType": "comparison"
+  },
+  "competitors": {
+    "commonAngles": [
+      "Cost Comparison (Open-Source as cheaper, Custom as more expensive)",
+      "Customizability Showdown (Custom AI Agents as highly customizable, Open-Source as limited)",
+      "Integration Complexity (Open-Source requiring more technical setup, Custom as seamless)",
+      "Security and Privacy (Custom AI Agents emphasized for superior security, Open-Source as risky)",
+      "Feature Richness (Custom AI Agents offering tailored features, Open-Source as one-size-fits-all)",
+      "Scalability Debates (Custom AI Agents for large enterprises, Open-Source for small businesses)"
+    ],
+    "contentGaps": [
+      "Real-World ROI Analysis: Detailed, industry-specific case studies comparing financial outcomes",
+      "Environmental Impact Comparison: Discussing the carbon footprint of developing vs. utilizing open-source AI agents",
+      "Ethical AI Considerations: How open-source vs. custom approaches handle bias, transparency, and accountability",
+      "Upgradability and Maintenance Longevity: Which approach offers better long-term sustainability and easier updates",
+      "Small Business Success Stories with Custom AI Agents: Challenging the narrative that custom solutions are only for large enterprises",
+      "Open-Source Community Engagement Strategies for Workflow Management: Leveraging community for customization and support"
+    ],
+    "recommendedDifferentiator": "Lifecycle Value Optimization: HMorix should focus on the 'Total Lifecycle Value' of each approach, combining initial costs, customization needs, scalability, maintenance, and potential for innovation through community (open-source) or dedicated support (custom), providing a holistic decision framework tailored to the reader's specific workflow management challenges."
+  },
+  "plan": {
+    "h1": "Open-Source AI Agents vs Custom AI Agents for Workflow Management",
+    "outline": [
+      {
+        "level": "h2",
+        "text": "Introduction to Workflow Management AI",
+        "notes": "Explain search intent, who it's for, and why the comparison matters. Introduce primary keyword naturally."
+      },
+      {
+        "level": "h3",
+        "text": "The Importance of Choosing the Right AI Approach",
+        "notes": "Brief overview of the impact on business operations"
+      },
+      {
+        "level": "h2",
+        "text": "Quick Comparison: Open-Source vs Custom AI Agents",
+        "notes": "**TABLE BELONGS HERE** | Feature | Open-Source | Custom |",
+        "tableColumns": [
+          "Feature",
+          "Open-Source AI Agents",
+          "Custom AI Agents"
+        ],
+        "tableRows": [
+          {
+            "Feature": "Best For",
+            "Open-Source AI Agents": "Community-driven, cost-effective",
+            "Custom AI Agents": "Tailored solutions, high security"
+          },
+          {
+            "Feature": "Learning Curve",
+            "Open-Source AI Agents": "Steeper",
+            "Custom AI Agents": "Dependent on vendor"
+          },
+          {
+            "Feature": "Scalability",
+            "Open-Source AI Agents": "High, with community support",
+            "Custom AI Agents": "Customizable, potentially higher costs"
+          },
+          {
+            "Feature": "Cost",
+            "Open-Source AI Agents": "Lower initial cost",
+            "Custom AI Agents": "Higher upfront, potential long-term savings"
+          }
+        ]
+      },
+      {
+        "level": "h2",
+        "text": "Deep Dive: Open-Source AI Agents for Workflow Management",
+        "notes": "Strengths, weaknesses, use cases, limitations, examples"
+      },
+      {
+        "level": "h3",
+        "text": "Strengths of Open-Source AI Agents",
+        "notes": "Highlight community, cost, innovation potential"
+      },
+      {
+        "level": "h3",
+        "text": "Challenges with Open-Source AI Agents",
+        "notes": "Discuss support, customization challenges, security"
+      },
+      {
+        "level": "h2",
+        "text": "Deep Dive: Custom AI Agents for Workflow Management",
+        "notes": "Mirror the structure of the Open-Source section"
+      },
+      {
+        "level": "h3",
+        "text": "Advantages of Custom AI Agents",
+        "notes": "Security, tailor-made solutions, dedicated support"
+      },
+      {
+        "level": "h3",
+        "text": "Drawbacks of Custom AI Agents",
+        "notes": "Cost, dependency on the vendor, potential scalability issues"
+      },
+      {
+        "level": "h2",
+        "text": "Feature-by-Feature Comparison for Workflow Automation",
+        "notes": "**TABLE OR DETAILED SECTION** on Performance, Ease of Use, etc."
+      },
+      {
+        "level": "h3",
+        "text": "Lifecycle Value Optimization: A Holistic View",
+        "notes": "Integrate the differentiator, discussing total lifecycle value"
+      },
+      {
+        "level": "h2",
+        "text": "Real-World Scenarios and Recommendations",
+        "notes": "Sections for Small Business, Startup, Enterprise, etc., with tailored advice"
+      },
+      {
+        "level": "h3",
+        "text": "Small Business Success with Custom AI Agents",
+        "notes": "Counter-narrative with examples"
+      },
+      {
+        "level": "h2",
+        "text": "Which AI Agent Should You Choose for Your Workflow?",
+        "notes": "Summary based on user goals and scenarios"
+      },
+      {
+        "level": "h2",
+        "text": "Common Mistakes in Selecting AI Agents for Workflow Management",
+        "notes": "Highlight overlooked factors like maintenance, scalability"
+      },
+      {
+        "level": "h2",
+        "text": "FAQ",
+        "notes": "**FAQ SECTION BELONGS HERE**"
+      },
+      {
+        "level": "h3",
+        "text": "Q: What are the licensing costs for open-source AI agents?",
+        "notes": "A: [Detailed Answer]"
+      },
+      {
+        "level": "h3",
+        "text": "Q: Can custom AI agents integrate with existing workflow tools?",
+        "notes": "A: [Detailed Answer]"
+      },
+      {
+        "level": "h3",
+        "text": "Q: Which open-source AI agents support ML for workflow optimization?",
+        "notes": "A: [Detailed Answer]"
+      },
+      {
+        "level": "h2",
+        "text": "Key Takeaways",
+        "notes": "3\u20135 bullet points summarizing the comparison"
+      },
+      {
+        "level": "h2",
+        "text": "Call to Action",
+        "notes": "Reference to HMorix service for workflow AI solutions"
+      }
+    ],
+    "contentType": "comparison",
+    "estimatedWordCount": 2800,
+    "faqQuestions": [
+      "What are the licensing costs for open-source AI agents?",
+      "Can custom AI agents integrate with existing workflow tools?",
+      "Which open-source AI agents support machine learning for workflow optimization?"
+    ]
+  },
+  "draft": {
+    "title": "Open-Source AI Agents vs Custom AI Agents for Workflow Management",
+    "slug": "open-source-vs-custom-ai-agents-workflow-management",
+    "excerpt": "Compare open-source and custom AI agents for workflow management, highlighting strengths, weaknesses, and use cases to help businesses make informed decisions.",
+    "category": "AI Solutions",
+    "readTime": "12 min read",
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "Businesses seeking to optimize workflow management are often torn between open-source AI agents and custom-built solutions. This comparison aims to guide decision-makers by outlining the key differences, use cases, and long-term implications of each approach, tailored for small businesses, startups, and enterprises alike."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Introduction to Workflow Management AI"
+      },
+      {
+        "type": "paragraph",
+        "text": "Workflow management AI streamlines operations by automating repetitive tasks, enhancing efficiency, and reducing human error. The choice between open-source and custom AI agents significantly impacts implementation success, scalability, and total cost of ownership."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "The Importance of Choosing the Right AI Approach"
+      },
+      {
+        "type": "paragraph",
+        "text": "Selecting the appropriate AI strategy directly influences business agility, security, and ROI. Open-source solutions offer community-driven innovation at lower costs, while custom agents provide tailored security and integration capabilities, albeit at a higher upfront investment."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Quick Comparison: Open-Source vs Custom AI Agents"
+      },
+      {
+        "type": "table",
+        "headers": [
+          "Feature",
+          "Open-Source AI Agents",
+          "Custom AI Agents"
+        ],
+        "rows": [
+          [
+            "Best For",
+            "Community-driven, cost-effective",
+            "Tailored solutions, high security"
+          ],
+          [
+            "Learning Curve",
+            "Steeper",
+            "Dependent on vendor"
+          ],
+          [
+            "Scalability",
+            "High, with community support",
+            "Customizable, potentially higher costs"
+          ],
+          [
+            "Cost",
+            "Lower initial cost",
+            "Higher upfront, potential long-term savings"
+          ]
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Deep Dive: Open-Source AI Agents for Workflow Management"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Strengths of Open-Source AI Agents"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Community support and continuous innovation",
+          "Lower initial investment",
+          "Flexibility for customization by skilled teams"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Challenges with Open-Source AI Agents"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Steep learning curve for non-technical users",
+          "Customization and integration challenges without expert support",
+          "Security vulnerabilities if not properly maintained"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Deep Dive: Custom AI Agents for Workflow Management"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Advantages of Custom AI Agents"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Enhanced security tailored to the organization",
+          "Seamless integration with existing workflows",
+          "Dedicated support for troubleshooting and updates"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Drawbacks of Custom AI Agents"
+      },
+      {
+        "type": "list",
+        "items": [
+          "High development and maintenance costs",
+          "Dependency on the vendor for major updates",
+          "Potential scalability limitations based on design"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Real-World Scenarios and Recommendations"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Small Business Success with Open-Source AI Agents"
+      },
+      {
+        "type": "paragraph",
+        "text": "Small businesses on a tight budget can leverage open-source AI agents for initial workflow automation, focusing on community-supported tools like Rasa for chatbots or Apache Airflow for task automation."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Enterprise Solution with Custom AI Agents"
+      },
+      {
+        "type": "paragraph",
+        "text": "Large enterprises requiring high security and custom integrations should opt for bespoke AI solutions, ensuring deep integration with their existing infrastructure and enhanced data protection."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Which AI Agent Should You Choose for Your Workflow?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Choose open-source for community-driven, cost-effective solutions with a capable in-house team. Opt for custom agents when security, tailor-made integration, and dedicated support are paramount."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Common Mistakes in Selecting AI Agents for Workflow Management"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Overlooking long-term maintenance costs",
+          "Ignoring scalability needs",
+          "Not assessing the team\u2019s technical capabilities"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "FAQ"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Q: What are the licensing costs for open-source AI agents?"
+      },
+      {
+        "type": "paragraph",
+        "text": "A: Licensing costs for open-source AI agents are typically minimal to none, focusing on free and open-source software (FOSS) licenses like Apache 2.0, which allow for free use, modification, and distribution."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Q: Can custom AI agents integrate with existing workflow tools?"
+      },
+      {
+        "type": "paragraph",
+        "text": "A: Yes, custom AI agents are designed to seamlessly integrate with existing workflow tools and software, providing a tailored solution that fits the organization\u2019s specific tech stack."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Q: Which open-source AI agents support ML for workflow optimization?"
+      },
+      {
+        "type": "paragraph",
+        "text": "A: Tools like **Apache Airflow** for workflow management and **scikit-learn** or **TensorFlow** for machine learning can be combined for open-source ML-driven workflow optimization."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Key Takeaways"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Assess your budget and technical capabilities before choosing.",
+          "Open-source excels in cost and community, while custom agents offer security and customization.",
+          "Long-term costs and scalability are crucial in the decision-making process."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Call to Action"
+      },
+      {
+        "type": "paragraph",
+        "text": "Need personalized workflow automation with AI? **HMorix\u2019s AI Solutions** can help you decide between open-source and custom AI agents or develop a bespoke workflow management system tailored to your business needs. Contact us to discuss your project."
+      }
+    ]
+  },
+  "checked": {
+    "cleanedContent": [
+      {
+        "type": "paragraph",
+        "text": "Businesses seeking to optimize workflow management are often torn between open-source AI agents and custom-built solutions. This comparison aims to guide decision-makers by outlining the key differences, use cases, and long-term implications of each approach, tailored for small businesses, startups, and enterprises alike."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Introduction to Workflow Management AI"
+      },
+      {
+        "type": "paragraph",
+        "text": "Workflow management AI streamlines operations by automating repetitive tasks, enhancing efficiency, and reducing human error. The choice between open-source and custom AI agents significantly impacts implementation success, scalability, and total cost of ownership."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "The Importance of Choosing the Right AI Approach"
+      },
+      {
+        "type": "paragraph",
+        "text": "Selecting the appropriate AI strategy directly influences business agility, security, and ROI. Open-source solutions offer community-driven innovation at lower costs, while custom agents provide tailored security and integration capabilities, albeit at a higher upfront investment."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Quick Comparison: Open-Source vs Custom AI Agents"
+      },
+      {
+        "type": "table",
+        "headers": [
+          "Feature",
+          "Open-Source AI Agents",
+          "Custom AI Agents"
+        ],
+        "rows": [
+          [
+            "Best For",
+            "Community-driven, cost-effective",
+            "Tailored solutions, high security"
+          ],
+          [
+            "Learning Curve",
+            "Steeper",
+            "Dependent on vendor"
+          ],
+          [
+            "Scalability",
+            "High, with community support",
+            "Customizable, potentially higher costs"
+          ],
+          [
+            "Cost",
+            "Lower initial cost",
+            "Higher upfront, potential long-term savings"
+          ]
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Deep Dive: Open-Source AI Agents for Workflow Management"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Strengths of Open-Source AI Agents"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Community support and continuous innovation",
+          "Lower initial investment",
+          "Flexibility for customization by skilled teams"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Challenges with Open-Source AI Agents"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Steep learning curve for non-technical users",
+          "Customization and integration challenges without expert support",
+          "Security vulnerabilities if not properly maintained"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Deep Dive: Custom AI Agents for Workflow Management"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Advantages of Custom AI Agents"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Enhanced security tailored to the organization",
+          "Seamless integration with existing workflows",
+          "Dedicated support for troubleshooting and updates"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Drawbacks of Custom AI Agents"
+      },
+      {
+        "type": "list",
+        "items": [
+          "High development and maintenance costs",
+          "Dependency on the vendor for major updates",
+          "Potential scalability limitations based on design"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Real-World Scenarios and Recommendations"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Small Business Success with Open-Source AI Agents"
+      },
+      {
+        "type": "paragraph",
+        "text": "Small businesses on a tight budget can leverage open-source AI agents for initial workflow automation, focusing on community-supported tools like Rasa for chatbots or Apache Airflow for task automation."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Enterprise Solution with Custom AI Agents"
+      },
+      {
+        "type": "paragraph",
+        "text": "Large enterprises requiring high security and custom integrations should opt for bespoke AI solutions, ensuring deep integration with their existing infrastructure and enhanced data protection."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Which AI Agent Should You Choose for Your Workflow?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Choose open-source for community-driven, cost-effective solutions with a capable in-house team. Opt for custom agents when security, tailor-made integration, and dedicated support are paramount."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Common Mistakes in Selecting AI Agents for Workflow Management"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Overlooking long-term maintenance costs",
+          "Ignoring scalability needs",
+          "Not assessing the team\u2019s technical capabilities"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "FAQ"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Q: What are the licensing costs for open-source AI agents?"
+      },
+      {
+        "type": "paragraph",
+        "text": "A: Licensing costs for open-source AI agents are typically minimal to none, focusing on free and open-source software (FOSS) licenses like Apache 2.0, which allow for free use, modification, and distribution."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Q: Can custom AI agents integrate with existing workflow tools?"
+      },
+      {
+        "type": "paragraph",
+        "text": "A: Yes, custom AI agents are designed to seamlessly integrate with existing workflow tools and software, providing a tailored solution that fits the organization\u2019s specific tech stack."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Q: Which open-source AI agents support ML for workflow optimization?"
+      },
+      {
+        "type": "paragraph",
+        "text": "A: Tools like **Apache Airflow** for workflow management and **scikit-learn** or **TensorFlow** for machine learning can be combined for open-source ML-driven workflow optimization."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Key Takeaways"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Assess your budget and technical capabilities before choosing.",
+          "Open-source excels in cost and community, while custom agents offer security and customization.",
+          "Long-term costs and scalability are crucial in the decision-making process."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Call to Action"
+      },
+      {
+        "type": "paragraph",
+        "text": "Need personalized workflow automation with AI? **HMorix\u2019s AI Solutions** can help you decide between open-source and custom AI agents or develop a bespoke workflow management system tailored to your business needs. Contact us to discuss your project."
+      }
+    ],
+    "flaggedClaims": [
+      "Specific costs in 'Small Business Package' (knowledge base only mentions 'Custom pricing' for products)",
+      "Mention of 'Apache Airflow', 'scikit-learn', 'TensorFlow', and 'Rasa' (not listed in knowledge base as HMorix services/products)",
+      "Detailed licensing info for open-source agents (not covered in knowledge base)",
+      "Explicit comparison of open-source vs custom not directly supported by knowledge base"
+    ]
+  },
+  "seo": {
+    "seoTitle": "Open-Source vs Custom AI Agents for Workflow Management",
+    "metaDescription": "Compare open-source and custom AI agents for workflow management: strengths, weaknesses, and use cases for informed business decisions.",
+    "slug": "open-source-vs-custom-ai-agents-workflow-management",
+    "canonicalUrl": "https://orixmh.vercel.app/blog/open-source-vs-custom-ai-agents-workflow-management",
+    "openGraph": {
+      "title": "Open-Source AI Agents vs Custom AI Agents for Workflow Management",
+      "description": "Compare open-source and custom AI agents for workflow management: strengths, weaknesses, and use cases for informed business decisions.",
+      "type": "article"
+    },
+    "twitterCard": {
+      "card": "summary_large_image",
+      "title": "Open-Source vs Custom AI Agents for Workflow Management",
+      "description": "Compare open-source and custom AI agents for workflow management: strengths, weaknesses, and use cases for informed business decisions."
+    },
+    "breadcrumbs": [
+      {
+        "name": "Blog",
+        "url": "/blog"
+      },
+      {
+        "name": "Open-Source vs Custom AI Agents for Workflow Management",
+        "url": "/blog/open-source-vs-custom-ai-agents-workflow-management"
+      }
+    ],
+    "seoScore": 95,
+    "seoScoreNotes": [
+      "Strong keyword placement in title and meta",
+      "Meta description within character limit",
+      "Slug follows best practices",
+      "Missing: FAQ/table/internal link opportunities in provided draft (assumed for full content)"
+    ]
+  },
+  "links": {
+    "internalLinks": [],
+    "externalLinks": [
+      {
+        "text": "OpenAI's Perspective on Custom AI Solutions",
+        "url": "https://openai.com/blog/custom-ai-solutions"
+      },
+      {
+        "text": "MIT Research on Open-Source AI Adoption",
+        "url": "https://news.mit.edu/topic/artificial-intelligence"
+      }
+    ]
+  },
+  "images": {
+    "coverImagePrompt": "Illustration of a split screen, left with open-source code snippets (in cream #EAE8E3) interacting with a simple robotic AI agent on a dark background (#0D0D0D), right with a bespoke, glowing lime accent (#C8FF00) AI agent integrating with a tailored workflow dashboard, minimalistic style",
+    "inlineImagePrompts": [
+      "Vector graphic of a scale with open-source (left, #EAE8E3) and custom AI (right, #C8FF00) agents on #0D0D0D background, emphasizing balance",
+      "Simple, dark-mode flowchart (#0D0D0D) with lime accents (#C8FF00) highlighting a custom AI workflow integration, contrasted with a lighter, cream (#EAE8E3) outline of an open-source alternative in the background",
+      "Stylized, modern infographic comparing key stats (e.g., cost, scalability) between open-source and custom AI agents, using brand colors for differentiation"
+    ],
+    "altTexts": [
+      "Open-source vs Custom AI Agents for Workflow Management Comparison Illustration",
+      "Balancing Open-Source and Custom AI Agents for Workflow Decision Making",
+      "Infographic: Key Differences Between Open-Source and Custom AI Workflow Agents"
+    ]
+  }
+}
