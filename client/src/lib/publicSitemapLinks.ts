@@ -223,6 +223,10 @@ export const publicSitemapSections: SitemapSection[] = [
         label: "Technical Architecture"
       },
       {
+        to: "/blog/custom-ai-vs-off-the-shelf-for-enterprises",
+        label: "Custom AI Solutions vs Off-the-Shelf AI for Enterprises: Strategic Alignment and Innovation"
+      },
+      {
         to: "/blog/what-is-hmorix-ai-solutions-guide",
         label: "What is HMorix? A Complete Guide to Our AI Solutions for Practical Business Adoption"
       },

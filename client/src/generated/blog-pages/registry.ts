@@ -5,5 +5,6 @@ import { lazy } from 'react'
 export const blogPageRegistry: Record<string, ReturnType<typeof lazy>> = {
   'ai-business-automation-solutions': lazy(() => import('./ai-business-automation-solutions')),
   'billingflow-invoicing-simplification': lazy(() => import('./billingflow-invoicing-simplification')),
+  'custom-ai-vs-off-the-shelf-for-enterprises': lazy(() => import('./custom-ai-vs-off-the-shelf-for-enterprises')),
   'what-is-hmorix-ai-solutions-guide': lazy(() => import('./what-is-hmorix-ai-solutions-guide')),
 }
