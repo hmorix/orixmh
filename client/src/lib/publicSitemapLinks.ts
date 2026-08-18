@@ -262,6 +262,10 @@ export const publicSitemapSections: SitemapSection[] = [
       {
         to: "/harsh-sharma",
         label: "Harsh Sharma"
+      },
+      {
+        to: "/harsh-sharma-developer",
+        label: "Harsh Sharma Developer"
       }
     ]
   },

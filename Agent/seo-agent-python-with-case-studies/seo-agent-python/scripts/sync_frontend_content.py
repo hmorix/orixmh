@@ -110,6 +110,7 @@ STATIC_SECTIONS = [
             {"to": "/roadmap", "label": "Roadmap", "priority": "0.5"},
             {"to": "/media-kit", "label": "Media Kit", "priority": "0.5"},
             {"to": "/harsh-sharma", "label": "Harsh Sharma", "priority": "0.7"},
+            {"to": "/harsh-sharma-developer", "label": "Harsh Sharma Developer", "priority": "0.7"},
         ],
     },
     {

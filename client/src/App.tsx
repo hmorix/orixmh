@@ -37,6 +37,7 @@ const Developers = lazy(() => import('./pages/Developers'))
 const Playground = lazy(() => import('./pages/Playground'))
 const SmartHome = lazy(() => import('./pages/SmartHome'))
 const HarshSharma = lazy(() => import('./pages/HarshSharma'))
+const HarshSharmaDeveloper = lazy(() => import('./pages/HarshSharmaDeveloper'))
 const LocalServices = lazy(() => import('./pages/LocalServices'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Architecture = lazy(() => import('./pages/Architecture'))
@@ -228,6 +229,7 @@ function App() {
           <Route path="/playground" element={<Playground />} />
           <Route path="/smart-home" element={<SmartHome />} />
           <Route path="/harsh-sharma" element={<HarshSharma />} />
+          <Route path="/harsh-sharma-developer" element={<HarshSharmaDeveloper />} />
           <Route path="/locations/:city/:service" element={<LocalServices />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/architecture" element={<Architecture />} />
