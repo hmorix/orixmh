@@ -11,3 +11,4 @@ Agent/**/generated/social-images/
 .DS_Store
 .vercel
 server/data/
+.git-credentials
