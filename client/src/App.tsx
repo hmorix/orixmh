@@ -113,10 +113,10 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, { failed: bool
       return (
         <div className="min-h-screen bg-obsidian flex items-center justify-center px-6">
           <div className="max-w-[420px] text-center">
-            <h1 className="font-display text-2xl font-bold text-cream mb-2">Session expired</h1>
-            <p className="text-sm text-cream/50 mb-6">Please login again</p>
+            <h1 className="font-display text-2xl font-bold text-cream mb-2">Something went wrong</h1>
+            <p className="text-sm text-cream/50 mb-6">Refresh the page or sign in again if your session has expired.</p>
             <div className="flex justify-center gap-3">
-              <a href="/signin" className="btn-primary">Retry Login</a>
+              <a href={window.location.pathname} className="btn-primary">Refresh</a>
               <a href="/" className="btn-outline">Return Home</a>
             </div>
           </div>

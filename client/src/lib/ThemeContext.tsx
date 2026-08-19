@@ -14,7 +14,6 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<'dark' | 'light' | 'system'>('dark')
   const [accentColor, setAccentColorState] = useState('#C8FF00')
-  const [loading, setLoading] = useState(true)
 
   // Load theme from settings on mount
   useEffect(() => {
@@ -27,7 +26,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           const savedColor = localStorage.getItem('accentColor') || '#C8FF00'
           if (savedTheme) setThemeState(savedTheme)
           setAccentColorState(savedColor)
-          setLoading(false)
           return
         }
 
@@ -45,8 +43,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         }
       } catch (error) {
         console.error('Failed to load theme:', error)
-      } finally {
-        setLoading(false)
       }
     }
 
@@ -109,10 +105,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Failed to save accent color:', error)
     }
-  }
-
-  if (loading) {
-    return <>{children}</>
   }
 
   return (
