@@ -3,7 +3,7 @@ import SEOHead from '../../components/seo/SEOHead'
 export default function Privacy() {
   return (
     <div className="pt-32 pb-20 min-h-screen">
-      <SEOHead title="Privacy Policy" description="HMorix Privacy Policy — learn how we collect, use, and protect your personal data. GDPR and CCPA compliant." keywords="privacy policy, data protection, GDPR, CCPA, personal data, data privacy, HMorix privacy, cookie policy, data security" canonical="/privacy" />
+      <SEOHead title="HMorix Privacy Policy" description="HMorix Privacy Policy — learn how we collect, use, and protect your personal data. GDPR and CCPA compliant." keywords="privacy policy, data protection, GDPR, CCPA, personal data, data privacy, HMorix privacy, cookie policy, data security" canonical="/privacy" />
       <div className="max-w-[800px] mx-auto px-8">
         <h1 className="font-display text-4xl font-bold mb-8">Privacy Policy</h1>
         <div className="prose prose-invert max-w-none space-y-6 text-cream/60 text-sm leading-relaxed">

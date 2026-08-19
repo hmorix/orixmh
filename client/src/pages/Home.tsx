@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
+import SEOHead from '../components/seo/SEOHead'
 import {
   Globe,
   Bot,
@@ -35,6 +36,12 @@ function CounterNumber({ target, suffix }: { target: number; suffix: string }) {
 export default function Home() {
   return (
     <>
+      <SEOHead
+        title="HMorix – Enterprise AI Software & Digital Solutions"
+        description="HMorix builds enterprise AI software, web applications, mobile apps, automation, digital marketing, and secure technology solutions for modern businesses."
+        keywords="HMorix, enterprise AI software, digital solutions, web development, mobile app development, AI automation, digital marketing, business software"
+        canonical="/"
+      />
       {/* HERO */}
       <section className="min-h-[760px] flex flex-col justify-end pt-32 sm:pt-36 lg:pt-40 pb-12 sm:pb-16 lg:pb-20 relative overflow-hidden border-b border-glass-border">
         <div className="absolute inset-0 opacity-25" style={{backgroundImage:'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',backgroundSize:'80px 80px'}} />

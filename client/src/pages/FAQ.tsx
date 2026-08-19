@@ -47,7 +47,7 @@ export default function FAQ() {
   return (
     <div className="pt-32 pb-20 min-h-screen">
       <SEOHead
-        title="Frequently Asked Questions"
+        title="HMorix FAQ – AI, Web Development & Digital Solutions"
         description="Find answers to common questions about HMorix services, products, pricing, web design, mobile app development, AI solutions, SEO, security, and support."
         keywords="HMorix FAQ, frequently asked questions, HMorix pricing, HMorix services, web design FAQ, mobile app FAQ, AI solutions FAQ, SEO FAQ, enterprise software FAQ, BillingFlow FAQ, customer support, help center"
         canonical="/faq"

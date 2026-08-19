@@ -1,8 +1,15 @@
 import { Link } from 'react-router-dom'
+import SEOHead from '../components/seo/SEOHead'
 
 export default function Pricing() {
   return (
     <div className="pt-32 pb-20">
+      <SEOHead
+        title="HMorix Pricing – AI Software & Web Development Plans"
+        description="Explore HMorix pricing for AI software, web development, mobile apps, automation, SEO, and enterprise digital solution plans."
+        keywords="HMorix pricing, AI software pricing, web development plans, mobile app pricing, enterprise software plans, digital solutions pricing"
+        canonical="/pricing"
+      />
       <div className="max-w-[1280px] mx-auto px-8">
         <div className="text-center mb-16">
           <span className="label-mono">Pricing</span>

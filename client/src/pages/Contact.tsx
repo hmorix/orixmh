@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Mail, MapPin, Phone } from 'lucide-react'
 import { config } from '../lib/config'
+import SEOHead from '../components/seo/SEOHead'
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false)
@@ -25,6 +26,12 @@ export default function Contact() {
 
   return (
     <div className="pt-32 pb-20">
+      <SEOHead
+        title="Contact HMorix – AI Software & Digital Solutions"
+        description="Contact HMorix for AI software, web development, mobile apps, automation, SEO, cybersecurity, smart home, and digital transformation projects."
+        keywords="contact HMorix, AI software company contact, web development agency India, digital solutions, HMorix support, project inquiry"
+        canonical="/contact"
+      />
       <div className="max-w-[1280px] mx-auto px-8">
         <span className="label-mono">Contact</span>
         <h1 className="section-title mt-3 mb-16">Let's talk</h1>

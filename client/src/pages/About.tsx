@@ -1,4 +1,5 @@
 import { Award, ShieldCheck, Handshake } from "lucide-react";
+import SEOHead from '../components/seo/SEOHead'
 
 const values = [
   {
@@ -20,8 +21,14 @@ const values = [
 
 export default function About() {
   return (
-   
-    <div className="pt-32 pb-20">
+    <>
+      <SEOHead
+        title="About HMorix – AI Software & Technology Company"
+        description="Learn about HMorix, an AI software and technology company building enterprise software, automation, web apps, mobile apps, and digital solutions."
+        keywords="About HMorix, HMorix company, AI software company, technology company India, enterprise software, digital transformation"
+        canonical="/about"
+      />
+      <div className="pt-32 pb-20">
       <div className="max-w-[1280px] mx-auto px-8">
         <div className="mb-16">
           <span className="label-mono">About HMorix</span>
@@ -88,7 +95,8 @@ export default function About() {
           ))}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 	

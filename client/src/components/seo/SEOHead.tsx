@@ -13,7 +13,8 @@ export default function SEOHead({ title, description, keywords, canonical, ogIma
   useEffect(() => {
     const siteUrl = import.meta.env.VITE_APP_URL || 'https://orixmh.vercel.app'
     const pageUrl = `${siteUrl.replace(/\/$/, '')}${canonical || ''}`
-    document.title = `${title} | HMorix`
+    const fullTitle = title.toLowerCase().includes('hmorix') ? title : `${title} | HMorix`
+    document.title = fullTitle
     
     const setMeta = (name: string, content: string, property = false) => {
       const attr = property ? 'property' : 'name'
@@ -28,12 +29,12 @@ export default function SEOHead({ title, description, keywords, canonical, ogIma
 
     setMeta('description', description)
     setMeta('keywords', keywords)
-    setMeta('og:title', `${title} | HMorix`, true)
+    setMeta('og:title', fullTitle, true)
     setMeta('og:description', description, true)
     setMeta('og:type', type, true)
     setMeta('og:url', pageUrl, true)
     if (ogImage) setMeta('og:image', ogImage, true)
-    setMeta('twitter:title', `${title} | HMorix`, true)
+    setMeta('twitter:title', fullTitle, true)
     setMeta('twitter:description', description, true)
 
     if (canonical) {
