@@ -37,6 +37,11 @@ function appUrl() {
   return raw.replace(/\/$/, '')
 }
 
+function redirectSigninError(res: VercelResponse, message: string) {
+  res.writeHead(302, { Location: `${appUrl()}/signin?error=${encodeURIComponent(message)}` })
+  res.end()
+}
+
 function cleanEmail(email: string) {
   return String(email || '').trim().toLowerCase()
 }
@@ -1896,11 +1901,14 @@ async function handleSearchAccount(req: VercelRequest, res: VercelResponse) {
 
 async function handleOAuthStart(req: VercelRequest, res: VercelResponse, provider: 'google' | 'github') {
   const redirectUri = `${appUrl()}/api/auth/${provider}/callback`
+  const clientId = provider === 'google' ? process.env.GOOGLE_CLIENT_ID : process.env.GITHUB_CLIENT_ID
+  const clientSecret = provider === 'google' ? process.env.GOOGLE_CLIENT_SECRET : process.env.GITHUB_CLIENT_SECRET
+  if (!clientId || !clientSecret) {
+    return redirectSigninError(res, `${provider} login is not configured on the server. Add ${provider === 'google' ? 'GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET' : 'GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET'} to the backend environment.`)
+  }
   const state = randomToken(16)
   const states = await mongoCollection('oauth_states')
   await states.insertOne({ state: tokenHash(state), provider, expiresAt: new Date(Date.now() + 10 * 60 * 1000), createdAt: new Date() })
-  const clientId = provider === 'google' ? process.env.GOOGLE_CLIENT_ID : process.env.GITHUB_CLIENT_ID
-  if (!clientId) return res.status(500).json({ error: `${provider} OAuth is not configured` })
   const url = provider === 'google'
     ? `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent('openid email profile')}&state=${encodeURIComponent(state)}`
     : `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent('read:user user:email')}&state=${encodeURIComponent(state)}`
