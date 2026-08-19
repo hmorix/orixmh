@@ -579,6 +579,7 @@ async function handleCrmContacts(req: VercelRequest, res: VercelResponse) {
     return res.status(201).json({ success: true, data: { _id: result.insertedId, id: String(result.insertedId), ...doc } })
   }
   if (req.method === 'PUT') {
+    const body = req.body || {}
     const id = String(req.body?.id || '')
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid contact id is required' })
     const update = { ...req.body, updatedAt: new Date() }
@@ -839,8 +840,17 @@ async function getEmployeePortalData(user: any) {
   const documentsCol = await mongoCollection('employee_documents')
   const attendance = employee ? await attendanceCol.find({ employeeId: String(employee._id) }).sort({ date: -1, createdAt: -1 }).limit(60).toArray() : []
   const leaveRequests = employee ? await leavesCol.find({ $or: [{ employeeId: String(employee._id) }, { email: cleanEmail(employee.email || '') }] }).sort({ createdAt: -1 }).toArray() : []
-  const tasks = employee ? await tasksCol.find({ $or: [{ employeeId: String(employee._id) }, { assigneeName: employee.name }] }).sort({ dueDate: 1 }).toArray() : []
-  const teams = employee ? await teamsCol.find({ members: { $in: [String(employee._id), employee.email, employee.name] } }).sort({ updatedAt: -1 }).toArray() : []
+  const employeeKeys = employee ? [String(employee._id), employee.email, cleanEmail(employee.email || ''), employee.name].filter(Boolean) : []
+  const teams = employee ? await teamsCol.find({ members: { $in: employeeKeys } }).sort({ updatedAt: -1 }).toArray() : []
+  const teamProjectIds = teams.flatMap((team: any) => Array.isArray(team.projectIds) ? team.projectIds : []).filter(Boolean)
+  const tasks = employee ? await tasksCol.find({
+    $or: [
+      { employeeId: String(employee._id) },
+      { assigneeName: employee.name },
+      { assignedEmployees: { $in: employeeKeys } },
+      { projectId: { $in: teamProjectIds } },
+    ],
+  }).sort({ dueDate: 1 }).toArray() : []
   const trainings = employee ? await trainingsCol.find({ $or: [{ assignedTo: String(employee._id) }, { assignedToEmail: cleanEmail(employee.email || '') }, { assignedToName: employee.name }] }).sort({ createdAt: -1 }).toArray() : []
   const docs = employee ? [...(Array.isArray(employee.documents) ? employee.documents : []), ...(await documentsCol.find({ $or: [{ employeeId: String(employee._id) }, { email: cleanEmail(employee.email || '') }] }).sort({ createdAt: -1 }).toArray())] : []
   const payrollRuns = employee ? await payrollCol.find({}).sort({ createdAt: -1 }).limit(12).toArray() : []
@@ -853,12 +863,14 @@ async function getEmployeePortalData(user: any) {
   const workedMinutes = monthAttendance.reduce((sum: number, entry: any) => sum + Number(entry.workedMinutes || 0), 0)
   const latestPayroll = payrollRuns[0] || null
   const latestPayrollRow = latestPayroll?.rows?.find((row: any) => String(row.employeeId) === String(employee?._id)) || null
-  let employeeProjects: any[] = []
-  try {
-    const db = getDatabase()
-    const { data } = await db.query('projects', { orderBy: { column: 'created_at', ascending: false } })
-    employeeProjects = data || []
-  } catch {}
+  const projectsCol = await mongoCollection('client_projects')
+  const projectObjectIds = teamProjectIds.filter(ObjectId.isValid).map((id: string) => new ObjectId(id))
+  const employeeProjects = employee ? await projectsCol.find({
+    $or: [
+      ...(projectObjectIds.length ? [{ _id: { $in: projectObjectIds } }] : []),
+      { assignedTeamName: { $in: teams.map((team: any) => team.name).filter(Boolean) } },
+    ],
+  }).sort({ updatedAt: -1, createdAt: -1 }).toArray() : []
   return {
     employee,
     attendance,
@@ -869,7 +881,7 @@ async function getEmployeePortalData(user: any) {
     teams,
     trainings,
     documents: docs,
-    projects: employeeProjects,
+    projects: employeeProjects.map(projectPublic),
     payrollRuns,
     latestPayroll,
     latestPayrollRow,
@@ -900,6 +912,10 @@ async function handleEmployeeDashboard(req: VercelRequest, res: VercelResponse) 
   if (!user) return res.status(401).json({ error: 'Login required' })
   const data = await getEmployeePortalData(user)
   return res.json({ success: true, data })
+}
+
+async function handleEmployeeOverview(req: VercelRequest, res: VercelResponse) {
+  return handleEmployeeDashboard(req, res)
 }
 
 async function handleEmployeeAttendance(req: VercelRequest, res: VercelResponse) {
@@ -990,25 +1006,25 @@ async function handleManagerOverview(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
   const user = await getAuthUser(req)
   if (!user) return res.status(401).json({ error: 'Login required' })
-  const db = getDatabase()
-  const [employeesCol, tasksCol, teamsCol] = await Promise.all([
+  const [employeesCol, tasksCol, teamsCol, projectsCol] = await Promise.all([
     mongoCollection('hrm_employees'),
     mongoCollection('hrm_tasks'),
     mongoCollection('hrm_teams'),
+    mongoCollection('client_projects'),
   ])
-  const [employees, tasks, teams] = await Promise.all([
+  const [employees, tasks, teams, projects] = await Promise.all([
     employeesCol.find({}).sort({ name: 1 }).toArray(),
     tasksCol.find({}).sort({ updatedAt: -1 }).toArray(),
     teamsCol.find({}).sort({ updatedAt: -1 }).toArray(),
+    projectsCol.find({}).sort({ updatedAt: -1, createdAt: -1 }).toArray(),
   ])
-  const projects = await db.query('projects', { orderBy: { column: 'created_at', ascending: false } }).then((r: any) => r.data || []).catch(() => [])
   return res.json({
     success: true,
     data: {
       employees,
       tasks,
       teams,
-      projects,
+      projects: projects.map(projectPublic),
       stats: {
         employees: employees.length,
         activeEmployees: employees.filter((employee: any) => employee.status === 'active').length,
@@ -1037,12 +1053,22 @@ async function handleManagerTeams(req: VercelRequest, res: VercelResponse) {
       lead: sanitizeText(body.lead || '', 120),
       members: Array.isArray(body.members) ? body.members.map((member: any) => sanitizeText(String(member), 120)).filter(Boolean) : [],
       projects: Array.isArray(body.projects) ? body.projects.map((project: any) => sanitizeText(String(project), 120)).filter(Boolean) : [],
+      projectIds: Array.isArray(body.projectIds) ? body.projectIds.map((project: any) => sanitizeText(String(project), 80)).filter(Boolean) : [],
+      clients: Array.isArray(body.clients) ? body.clients.map((client: any) => cleanEmail(String(client))).filter(Boolean) : [],
       notes: sanitizeText(body.notes || '', 1000),
       createdAt: new Date(),
       updatedAt: new Date(),
     }
     const result = await teams.insertOne(doc)
-    return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
+    if (doc.projectIds.length) {
+      const projectsCol = await mongoCollection('client_projects')
+      await projectsCol.updateMany(
+        { _id: { $in: doc.projectIds.filter(ObjectId.isValid).map((id: string) => new ObjectId(id)) } },
+        { $set: { assignedTeamId: String(result.insertedId), assignedTeamName: doc.name, updatedAt: new Date() } }
+      )
+    }
+    await createPortalActivity(user.id, 'team_created', { title: 'Team created', message: doc.name }, req)
+    return res.status(201).json({ success: true, data: { _id: result.insertedId, id: String(result.insertedId), ...doc } })
   }
   if (req.method === 'PUT') {
     const id = String(req.body?.id || '')
@@ -1245,6 +1271,7 @@ async function handleHrmLeave(req: VercelRequest, res: VercelResponse) {
     return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
   }
   if (req.method === 'PUT') {
+    const body = req.body || {}
     const id = String(req.body?.id || '')
     const status = String(req.body?.status || '')
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid leave request id is required' })
@@ -1391,6 +1418,7 @@ async function handleJobApplications(req: VercelRequest, res: VercelResponse) {
     return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
   }
   if (req.method === 'PUT') {
+    const body = req.body || {}
     const id = String(req.body?.id || '')
     const status = String(req.body?.status || '')
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid application id is required' })
@@ -1418,7 +1446,7 @@ async function handleJobApplications(req: VercelRequest, res: VercelResponse) {
           joiningLetter: joiningLetter || applicationBefore?.joiningLetter || '',
           updatedAt: now,
         },
-        $push: { stageHistory: stageEntry },
+        $push: { stageHistory: stageEntry } as any,
       }
     )
     const application = await applications.findOne({ _id: new ObjectId(id) })
@@ -1922,7 +1950,7 @@ async function handleOAuthCallback(req: VercelRequest, res: VercelResponse, prov
   if (!oauthUser.email) return redirectRetry(res)
   const user = await linkOAuthUser(provider, oauthUser)
   await createSession(res, user, req)
-  res.writeHead(302, { Location: `${appUrl()}/dashboard` })
+  res.writeHead(302, { Location: `${appUrl()}${routeForUser(user)}` })
   res.end()
 }
 
@@ -2406,6 +2434,14 @@ function sanitizeText(value: string, max = 160) {
 
 function roleKey(user: any) {
   return String(user?.role || 'user').toLowerCase()
+}
+
+function routeForUser(user: any) {
+  const role = roleKey(user)
+  if (['admin', 'manager'].includes(role)) return '/manager'
+  if (['sales', 'crm'].includes(role)) return '/sales'
+  if (['employee', 'hr'].includes(role)) return '/employee'
+  return '/portal'
 }
 
 function privilegedPortalRole(user: any) {
@@ -3008,6 +3044,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'account/billing': return handleBilling(req, res)
       case 'employee/assign-bill': return handleAssignBill(req, res)
       case 'upload': return handleUpload(req, res)
+      case 'portal': return handleClientPortal(req, res)
+      case 'sales/projects': return handleSalesProjects(req, res)
       case 'projects': return handleProjects(req, res)
       case 'invoices': return handleInvoices(req, res)
       case 'tickets': return handleTickets(req, res)

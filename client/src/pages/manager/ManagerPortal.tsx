@@ -10,7 +10,7 @@ export default function ManagerPortal() {
   const [error, setError] = useState('')
   const [tab, setTab] = useState<'overview' | 'employees' | 'tasks' | 'teams' | 'training'>('overview')
   const [search, setSearch] = useState('')
-  const [teamForm, setTeamForm] = useState({ name: '', department: 'General', lead: '', members: '', projects: '', notes: '' })
+  const [teamForm, setTeamForm] = useState({ name: '', department: 'General', lead: '', members: '', clients: '', projectIds: [] as string[], notes: '' })
   const [trainingForm, setTrainingForm] = useState({ title: '', description: '', assignedTo: '', assignedToName: '', assignedToEmail: '', dueDate: '', progress: '0' })
   const [taskForm, setTaskForm] = useState({ employeeId: '', title: '', description: '', dueDate: '', priority: 'medium', category: 'General' })
   const [performance, setPerformance] = useState<Record<string, string>>({})
@@ -89,7 +89,9 @@ export default function ManagerPortal() {
       body: JSON.stringify({
         ...teamForm,
         members: teamForm.members.split(',').map(item => item.trim()).filter(Boolean),
-        projects: teamForm.projects.split(',').map(item => item.trim()).filter(Boolean),
+        clients: teamForm.clients.split(',').map(item => item.trim()).filter(Boolean),
+        projectIds: teamForm.projectIds,
+        projects: projects.filter((project: any) => teamForm.projectIds.includes(String(project.id || project._id))).map((project: any) => project.name),
       }),
     })
     const result = await response.json().catch(() => ({}))
@@ -98,7 +100,7 @@ export default function ManagerPortal() {
       return
     }
     setMessage('Team created')
-    setTeamForm({ name: '', department: 'General', lead: '', members: '', projects: '', notes: '' })
+    setTeamForm({ name: '', department: 'General', lead: '', members: '', clients: '', projectIds: [], notes: '' })
     load()
   }
 
@@ -279,8 +281,11 @@ export default function ManagerPortal() {
                   <input required value={teamForm.name} onChange={e => setTeamForm({ ...teamForm, name: e.target.value })} placeholder="Team name" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm" />
                   <input value={teamForm.department} onChange={e => setTeamForm({ ...teamForm, department: e.target.value })} placeholder="Department" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm" />
                   <input value={teamForm.lead} onChange={e => setTeamForm({ ...teamForm, lead: e.target.value })} placeholder="Team lead" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm" />
-                  <input value={teamForm.members} onChange={e => setTeamForm({ ...teamForm, members: e.target.value })} placeholder="Members separated by comma" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm" />
-                  <input value={teamForm.projects} onChange={e => setTeamForm({ ...teamForm, projects: e.target.value })} placeholder="Projects separated by comma" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm" />
+                  <input value={teamForm.members} onChange={e => setTeamForm({ ...teamForm, members: e.target.value })} placeholder="Employee ids, names, or emails separated by comma" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm" />
+                  <input value={teamForm.clients} onChange={e => setTeamForm({ ...teamForm, clients: e.target.value })} placeholder="Client emails separated by comma" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm" />
+                  <select multiple value={teamForm.projectIds} onChange={e => setTeamForm({ ...teamForm, projectIds: Array.from(e.target.selectedOptions).map(option => option.value) })} className="w-full min-h-[120px] px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm">
+                    {projects.map((project: any) => <option key={project.id || project._id} value={String(project.id || project._id)}>{project.name} - {project.client_name || project.clientName || project.businessName || 'Client'}</option>)}
+                  </select>
                   <textarea value={teamForm.notes} onChange={e => setTeamForm({ ...teamForm, notes: e.target.value })} rows={3} placeholder="Notes" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm resize-none" />
                   <button type="submit" className="btn-primary text-sm">Save Team</button>
                 </form>
@@ -293,6 +298,8 @@ export default function ManagerPortal() {
                         <div className="text-sm font-medium">{team.name}</div>
                         <div className="text-[10px] text-cream/30">{team.department} · Lead: {team.lead || '—'}</div>
                         <div className="text-[10px] text-cream/20 mt-1">Members: {Array.isArray(team.members) ? team.members.length : 0}</div>
+                        <div className="text-[10px] text-cream/20 mt-1">Clients: {Array.isArray(team.clients) ? team.clients.join(', ') : '—'}</div>
+                        <div className="text-[10px] text-cream/20 mt-1">Projects: {Array.isArray(team.projects) && team.projects.length ? team.projects.join(', ') : '—'}</div>
                       </div>
                     ))}
                   </div>
