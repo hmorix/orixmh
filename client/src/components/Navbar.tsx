@@ -163,7 +163,7 @@ export default function Navbar({ onCommandOpen }: NavbarProps) {
                   {unreadCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#C8FF00] rounded-full text-[8px] text-obsidian font-bold flex items-center justify-center">{unreadCount}</span>}
                 </button>
                 {notifOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-80 bg-obsidian-2 border border-glass-border rounded-[8px] p-4 backdrop-blur-[20px]">
+                  <div className="fixed right-4 top-[72px] z-[80] w-[min(20rem,calc(100vw-2rem))] max-h-[70vh] overflow-y-auto bg-obsidian-2 border border-glass-border rounded-[8px] p-4 shadow-2xl backdrop-blur-[20px]">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-sm font-semibold">Notifications</span>
                       <button onClick={markNotificationsRead} className="text-[10px] text-[#C8FF00]">Mark all read</button>
@@ -189,12 +189,12 @@ export default function Navbar({ onCommandOpen }: NavbarProps) {
 
             {/* User Menu */}
             {user ? (
-              <div className="relative hidden md:block">
+              <div className="relative">
                 <button onClick={() => { setUserOpen(!userOpen); setNotifOpen(false) }} className="w-9 h-9 bg-obsidian-3 border border-glass-border rounded-full flex items-center justify-center text-cream/60 hover:text-cream hover:border-cream transition-all">
                   <User size={16} />
                 </button>
                 {userOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-56 bg-obsidian-2 border border-glass-border rounded-[8px] p-2 backdrop-blur-[20px]">
+                  <div className="fixed right-4 top-[72px] z-[80] w-[min(14rem,calc(100vw-2rem))] bg-obsidian-2 border border-glass-border rounded-[8px] p-2 shadow-2xl backdrop-blur-[20px]">
                     <div className="px-3 py-2 border-b border-glass-border mb-1">
                       <div className="text-sm font-medium">{user.user_metadata?.name || 'User'}</div>
                       <div className="text-[10px] text-cream/30">{user.email}</div>
