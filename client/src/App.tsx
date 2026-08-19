@@ -91,6 +91,7 @@ const Privacy = lazy(() => import('./pages/legal/Privacy'))
 const CRMDashboard = lazy(() => import('./pages/crm/CRMDashboard'))
 const Contacts = lazy(() => import('./pages/crm/Contacts'))
 const Deals = lazy(() => import('./pages/crm/Deals'))
+const SalesPortal = lazy(() => import('./pages/sales/SalesPortal'))
 const HRMDashboard = lazy(() => import('./pages/hrm/HRMDashboard'))
 const Recruitment = lazy(() => import('./pages/hrm/Recruitment'))
 const Payroll = lazy(() => import('./pages/hrm/Payroll'))
@@ -240,6 +241,7 @@ function App() {
           <Route path="/crm/contacts" element={<Contacts />} />
           <Route path="/crm/deals" element={<Deals />} />
           <Route path="/crm/pipeline" element={<Deals />} />
+          <Route path="/sales" element={<SalesPortal />} />
 
           {/* HRM */}
           <Route path="/hrm" element={<HRMDashboard />} />

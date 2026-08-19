@@ -4,6 +4,14 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useAuth } from '../../lib/AuthContext'
 import { config } from '../../lib/config'
 
+function routeAfterLogin(role?: string) {
+  const normalized = String(role || '').toLowerCase()
+  if (['admin', 'manager'].includes(normalized)) return '/manager'
+  if (['sales', 'crm'].includes(normalized)) return '/sales'
+  if (['employee', 'hr'].includes(normalized)) return '/employee'
+  return '/portal'
+}
+
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState('')
@@ -35,7 +43,8 @@ export default function SignIn() {
     if (authError) {
       setError(authError.message || 'Invalid credentials')
     } else {
-      navigate('/dashboard')
+      const saved = await fetch(`${config.apiUrl}/auth/me`, { credentials: 'include', cache: 'no-store' }).then(r => r.json()).catch(() => ({}))
+      navigate(routeAfterLogin(saved.user?.role))
     }
   }
 

@@ -2404,6 +2404,93 @@ function sanitizeText(value: string, max = 160) {
   return String(value || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, max)
 }
 
+function roleKey(user: any) {
+  return String(user?.role || 'user').toLowerCase()
+}
+
+function privilegedPortalRole(user: any) {
+  return ['admin', 'manager', 'sales', 'crm', 'hr', 'employee'].includes(roleKey(user))
+}
+
+function projectPublic(project: any) {
+  return {
+    ...project,
+    id: String(project._id || project.id),
+    name: project.name || project.businessName || 'Untitled project',
+    client_name: project.clientName || project.businessName || project.client_name || '',
+    client_email: project.clientEmail || project.ownerEmail || project.client_email || '',
+  }
+}
+
+async function createPortalActivity(userId: string, action: string, details: any, req?: VercelRequest) {
+  await logActivity(userId || 'system', action, details, req)
+  const notifications = await mongoCollection('notifications')
+  await notifications.insertOne({
+    userId: details.userId || userId || 'system',
+    title: details.title || action.replace(/_/g, ' '),
+    message: details.message || details.description || details.subject || 'Portal activity updated',
+    type: action,
+    read: false,
+    createdAt: new Date(),
+  })
+}
+
+async function getVisibleProjectFilter(user: any) {
+  if (privilegedPortalRole(user)) return {}
+  return { $or: [{ userId: user.id }, { clientEmail: cleanEmail(user.email || '') }, { ownerEmail: cleanEmail(user.email || '') }] }
+}
+
+async function getClientPortalData(user: any) {
+  const [projectsCol, ticketsCol, teamsCol, activityCol, invoicesCol] = await Promise.all([
+    mongoCollection('client_projects'),
+    mongoCollection('support_tickets'),
+    mongoCollection('hrm_teams'),
+    mongoCollection('activity_log'),
+    mongoCollection('billing_invoices'),
+  ])
+  const email = cleanEmail(user.email || '')
+  const projectFilter = await getVisibleProjectFilter(user)
+  const projects = await projectsCol.find(projectFilter).sort({ updatedAt: -1, createdAt: -1 }).toArray()
+  const projectIds = projects.map((project: any) => String(project._id))
+  const tickets = await ticketsCol.find({
+    $or: [
+      { userId: user.id },
+      { clientEmail: email },
+      { projectId: { $in: projectIds } },
+    ],
+  }).sort({ updatedAt: -1, createdAt: -1 }).toArray()
+  const teams = await teamsCol.find({
+    $or: [
+      { clients: { $in: [email, user.id] } },
+      { projectIds: { $in: projectIds } },
+      { projects: { $in: projects.map((project: any) => project.name || project.businessName).filter(Boolean) } },
+    ],
+  }).sort({ updatedAt: -1 }).toArray()
+  const activities = await activityCol.find({
+    $or: [
+      { userId: user.id },
+      { 'details.clientEmail': email },
+      { 'details.projectId': { $in: projectIds } },
+    ],
+  }).sort({ createdAt: -1 }).limit(30).toArray()
+  const invoices = await invoicesCol.find({ $or: [{ userId: user.id }, { email }] }).sort({ createdAt: -1 }).limit(20).toArray()
+  const dueTotal = invoices.filter((invoice: any) => ['due', 'open', 'pending'].includes(invoice.status)).reduce((sum: number, invoice: any) => sum + Number(invoice.amount || 0), 0)
+  return {
+    user,
+    projects: projects.map(projectPublic),
+    tickets: tickets.map((ticket: any) => ({ ...ticket, id: String(ticket._id) })),
+    teams: teams.map((team: any) => ({ ...team, id: String(team._id) })),
+    activities,
+    invoices,
+    stats: {
+      activeProjects: projects.filter((project: any) => !['complete', 'completed', 'closed_lost'].includes(project.status)).length,
+      openTickets: tickets.filter((ticket: any) => !['resolved', 'closed'].includes(ticket.status)).length,
+      invoicesDue: dueTotal,
+      teamMembers: teams.reduce((sum: number, team: any) => sum + (Array.isArray(team.members) ? team.members.length : 0), 0),
+    },
+  }
+}
+
 async function readRawBody(req: VercelRequest): Promise<Buffer> {
   if (Buffer.isBuffer(req.body)) return req.body
   if (typeof req.body === 'string') return Buffer.from(req.body)
@@ -2489,13 +2576,62 @@ async function handleUpload(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleProjects(req: VercelRequest, res: VercelResponse) {
-  const db = getDatabase()
+  const user = await getAuthUser(req)
+  if (!user) return res.status(401).json({ error: 'Login required' })
+  const projects = await mongoCollection('client_projects')
   if (req.method === 'GET') {
-    try { const { data } = await db.query('projects', { orderBy: { column: 'created_at', ascending: false } }); return res.json({ success: true, data }) } catch { return res.json({ success: true, data: [{ id: 1, name: 'BillingFlow v3.0', client_name: 'Internal', status: 'in_progress', progress: 78 }, { id: 2, name: 'Meridian Corp Website', client_name: 'Meridian Corp', status: 'in_progress', progress: 45 }, { id: 3, name: 'AI Agent Platform', client_name: 'Internal', status: 'planning', progress: 20 }] }) }
+    const data = await projects.find(await getVisibleProjectFilter(user)).sort({ updatedAt: -1, createdAt: -1 }).toArray()
+    return res.json({ success: true, data: data.map(projectPublic) })
   }
   if (req.method === 'POST') {
-    const { name, client_name, description, deadline } = req.body || {}
-    try { const { data } = await db.insert('projects', { name, client_name, description, deadline, status: 'planning', progress: 0 }); return res.json({ success: true, data }) } catch { return res.json({ success: true, id: Date.now() }) }
+    const body = req.body || {}
+    const name = sanitizeText(body.name || body.businessName || '', 160)
+    if (!name) return res.status(400).json({ error: 'Project name is required' })
+    const now = new Date()
+    const doc = {
+      userId: body.userId || user.id,
+      clientEmail: cleanEmail(body.clientEmail || body.ownerEmail || user.email || ''),
+      clientName: sanitizeText(body.clientName || body.client_name || body.businessName || user.name || '', 160),
+      name,
+      businessName: sanitizeText(body.businessName || name, 160),
+      placeType: sanitizeText(body.placeType || 'Company', 60),
+      ownerName: sanitizeText(body.ownerName || body.clientName || user.name || '', 120),
+      ownerEmail: cleanEmail(body.ownerEmail || body.clientEmail || user.email || ''),
+      phone: sanitizeText(body.phone || '', 40),
+      location: sanitizeText(body.location || '', 120),
+      address: sanitizeText(body.address || '', 240),
+      services: Array.isArray(body.services) ? body.services.map((service: any) => sanitizeText(String(service), 80)).filter(Boolean) : [],
+      description: sanitizeText(body.description || body.projectDetails || '', 2000),
+      projectDetails: sanitizeText(body.projectDetails || body.description || '', 2000),
+      budget: Number(body.budget || body.value || 0),
+      paymentDuration: sanitizeText(body.paymentDuration || 'monthly', 60),
+      deadline: sanitizeText(body.deadline || body.followUpDate || '', 40),
+      status: sanitizeText(body.status || 'planning', 40),
+      progress: Number(body.progress || 0),
+      assignedTeamId: sanitizeText(body.assignedTeamId || '', 80),
+      assignedTeamName: sanitizeText(body.assignedTeamName || '', 120),
+      source: sanitizeText(body.source || 'portal', 60),
+      createdBy: user.id,
+      createdAt: now,
+      updatedAt: now,
+    }
+    const result = await projects.insertOne(doc)
+    await createPortalActivity(user.id, 'project_created', { projectId: String(result.insertedId), clientEmail: doc.clientEmail, title: 'Project created', message: doc.name }, req)
+    return res.status(201).json({ success: true, data: projectPublic({ _id: result.insertedId, ...doc }) })
+  }
+  if (req.method === 'PUT') {
+    const id = String(req.body?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid project id is required' })
+    const update = { ...req.body, updatedAt: new Date() }
+    delete update.id
+    if (update.clientEmail) update.clientEmail = cleanEmail(update.clientEmail)
+    if (update.ownerEmail) update.ownerEmail = cleanEmail(update.ownerEmail)
+    if (update.budget !== undefined) update.budget = Number(update.budget || 0)
+    if (update.progress !== undefined) update.progress = Number(update.progress || 0)
+    await projects.updateOne({ _id: new ObjectId(id) }, { $set: update })
+    const project = await projects.findOne({ _id: new ObjectId(id) })
+    await createPortalActivity(user.id, 'project_updated', { projectId: id, clientEmail: project?.clientEmail, title: 'Project updated', message: project?.name || id }, req)
+    return res.json({ success: true, data: projectPublic(project) })
   }
   res.status(405).json({ error: 'Method not allowed' })
 }
@@ -2511,13 +2647,192 @@ async function handleInvoices(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleTickets(req: VercelRequest, res: VercelResponse) {
-  const db = getDatabase()
-  if (req.method === 'GET') { try { const { data } = await db.query('support_tickets', { orderBy: { column: 'created_at', ascending: false }, limit: 50 }); return res.json({ success: true, data }) } catch { return res.json({ success: true, data: [] }) } }
+  const user = await getAuthUser(req)
+  if (!user) return res.status(401).json({ error: 'Login required' })
+  const tickets = await mongoCollection('support_tickets')
+  const projects = await mongoCollection('client_projects')
+  const teams = await mongoCollection('hrm_teams')
+  if (req.method === 'GET') {
+    const projectRows = await projects.find(await getVisibleProjectFilter(user)).project({ _id: 1 }).toArray()
+    const projectIds = projectRows.map((project: any) => String(project._id))
+    const filter = privilegedPortalRole(user) ? {} : { $or: [{ userId: user.id }, { clientEmail: cleanEmail(user.email || '') }, { projectId: { $in: projectIds } }, { assignedEmployees: { $in: [user.id, user.email, user.name] } }] }
+    const data = await tickets.find(filter).sort({ updatedAt: -1, createdAt: -1 }).limit(100).toArray()
+    return res.json({ success: true, data: data.map((ticket: any) => ({ ...ticket, id: String(ticket._id) })) })
+  }
   if (req.method === 'POST') {
-    const { subject, description, priority } = req.body || {}
-    try { const user = await getAuthUser(req); const { data } = await db.insert('support_tickets', { subject, description, priority: priority || 'medium', status: 'open', user_id: user?.id }); return res.json({ success: true, data }) } catch { return res.json({ success: true, id: Date.now(), message: 'Ticket created' }) }
+    const { subject, description, priority, projectId } = req.body || {}
+    if (!subject || !description) return res.status(400).json({ error: 'Subject and description are required' })
+    const project = ObjectId.isValid(String(projectId || '')) ? await projects.findOne({ _id: new ObjectId(String(projectId)) }) : null
+    const team = project?.assignedTeamId && ObjectId.isValid(String(project.assignedTeamId)) ? await teams.findOne({ _id: new ObjectId(String(project.assignedTeamId)) }) : null
+    const now = new Date()
+    const doc = {
+      number: `TKT-${Date.now().toString().slice(-6)}`,
+      userId: user.id,
+      clientEmail: cleanEmail(project?.clientEmail || user.email || ''),
+      clientName: sanitizeText(project?.clientName || user.name || '', 120),
+      projectId: project ? String(project._id) : '',
+      projectName: project?.name || '',
+      subject: sanitizeText(subject, 180),
+      description: sanitizeText(description, 2000),
+      priority: sanitizeText(priority || 'medium', 40),
+      status: 'open',
+      assignedTeamId: team ? String(team._id) : project?.assignedTeamId || '',
+      assignedTeamName: team?.name || project?.assignedTeamName || '',
+      assignedEmployees: Array.isArray(team?.members) ? team.members : [],
+      updates: [{ authorId: user.id, authorName: user.name || user.email, message: sanitizeText(description, 1000), createdAt: now }],
+      createdAt: now,
+      updatedAt: now,
+    }
+    const result = await tickets.insertOne(doc)
+    await createPortalActivity(user.id, 'ticket_created', { ticketId: String(result.insertedId), projectId: doc.projectId, clientEmail: doc.clientEmail, title: 'Ticket created', message: doc.subject }, req)
+    if (doc.assignedEmployees.length) {
+      const tasks = await mongoCollection('hrm_tasks')
+      await tasks.insertOne({
+        title: `Support ticket: ${doc.subject}`,
+        description: doc.description,
+        employeeId: '',
+        assigneeName: doc.assignedTeamName || 'Assigned team',
+        assignedEmployees: doc.assignedEmployees,
+        projectId: doc.projectId,
+        ticketId: String(result.insertedId),
+        dueDate: now.toISOString().slice(0, 10),
+        priority: doc.priority,
+        category: 'Client Support',
+        status: 'todo',
+        createdAt: now,
+        updatedAt: now,
+      })
+    }
+    return res.status(201).json({ success: true, data: { id: String(result.insertedId), _id: result.insertedId, ...doc } })
+  }
+  if (req.method === 'PUT') {
+    const id = String(req.body?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid ticket id is required' })
+    const update: any = { updatedAt: new Date() }
+    for (const key of ['status', 'priority', 'assignedTeamId', 'assignedTeamName']) if (req.body?.[key] !== undefined) update[key] = sanitizeText(req.body[key], 120)
+    if (req.body?.message) {
+      update.$push = { updates: { authorId: user.id, authorName: user.name || user.email, message: sanitizeText(req.body.message, 1000), createdAt: new Date() } }
+    }
+    if (update.$push) {
+      const { $push, ...set } = update
+      await tickets.updateOne({ _id: new ObjectId(id) }, { $set: set, $push })
+    } else {
+      await tickets.updateOne({ _id: new ObjectId(id) }, { $set: update })
+    }
+    const ticket = await tickets.findOne({ _id: new ObjectId(id) })
+    await createPortalActivity(user.id, 'ticket_updated', { ticketId: id, clientEmail: ticket?.clientEmail, title: 'Ticket updated', message: ticket?.subject || id }, req)
+    return res.json({ success: true, data: { ...ticket, id: String(ticket?._id) } })
   }
   res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function handleClientPortal(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!user) return res.status(401).json({ error: 'Login required' })
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+  return res.json({ success: true, data: await getClientPortalData(user) })
+}
+
+async function handleSalesProjects(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!user) return res.status(401).json({ error: 'Login required' })
+  if (!['admin', 'manager', 'sales', 'crm'].includes(roleKey(user))) return res.status(403).json({ error: 'Sales or manager access required' })
+  const projects = await mongoCollection('client_projects')
+  const contacts = await mongoCollection('crm_contacts')
+  const deals = await mongoCollection('crm_deals')
+  if (req.method === 'GET') {
+    const rows = await projects.find({ source: 'sales' }).sort({ updatedAt: -1, createdAt: -1 }).limit(100).toArray()
+    return res.json({ success: true, data: rows.map(projectPublic) })
+  }
+  if (req.method === 'POST') {
+    const body = req.body || {}
+    const businessName = sanitizeText(body.businessName || '', 160)
+    const ownerName = sanitizeText(body.ownerName || '', 120)
+    const ownerEmail = cleanEmail(body.ownerEmail || '')
+    if (!businessName || !ownerName || !ownerEmail) return res.status(400).json({ error: 'Business name, owner name, and owner email are required' })
+    const now = new Date()
+    const services = Array.isArray(body.services) ? body.services.map((service: any) => sanitizeText(String(service), 80)).filter(Boolean) : []
+    const budget = Number(body.budget || 0)
+    const contactDoc = {
+      name: ownerName,
+      email: ownerEmail,
+      phone: sanitizeText(body.phone || '', 40),
+      company: businessName,
+      role: 'Owner',
+      status: sanitizeText(body.status || 'lead', 40),
+      tags: [sanitizeText(body.placeType || 'Business', 60), ...services].filter(Boolean),
+      notes: sanitizeText(body.projectDetails || '', 1000),
+      location: sanitizeText(body.location || '', 120),
+      address: sanitizeText(body.address || '', 240),
+      ownerId: user.id,
+      owner: user.name || user.email,
+      lastContact: now,
+      createdAt: now,
+      updatedAt: now,
+    }
+    const contactResult = await contacts.insertOne(contactDoc)
+    const dealDoc = {
+      name: `${businessName} - ${services[0] || 'Project'}`,
+      value: budget,
+      stage: sanitizeText(body.status === 'closed_won' ? 'closed_won' : 'lead', 40),
+      probability: body.status === 'closed_won' ? 100 : 20,
+      contactId: String(contactResult.insertedId),
+      contact: ownerName,
+      company: businessName,
+      owner: user.name || user.email || 'HMorix Sales',
+      expectedClose: sanitizeText(body.followUpDate || '', 40),
+      createdAt: now,
+      updatedAt: now,
+    }
+    const dealResult = await deals.insertOne(dealDoc)
+    const projectDoc = {
+      userId: '',
+      clientEmail: ownerEmail,
+      clientName: businessName,
+      name: dealDoc.name,
+      businessName,
+      placeType: sanitizeText(body.placeType || 'Business', 60),
+      ownerName,
+      ownerEmail,
+      phone: contactDoc.phone,
+      location: contactDoc.location,
+      address: contactDoc.address,
+      services,
+      description: sanitizeText(body.projectDetails || '', 2000),
+      projectDetails: sanitizeText(body.projectDetails || '', 2000),
+      budget,
+      paymentDuration: sanitizeText(body.paymentDuration || 'monthly', 60),
+      followUpDate: sanitizeText(body.followUpDate || '', 40),
+      status: sanitizeText(body.status || 'lead', 40),
+      progress: body.status === 'closed_won' ? 10 : 0,
+      source: 'sales',
+      salesOwnerId: user.id,
+      salesOwner: user.name || user.email,
+      crmContactId: String(contactResult.insertedId),
+      crmDealId: String(dealResult.insertedId),
+      createdAt: now,
+      updatedAt: now,
+    }
+    const projectResult = await projects.insertOne(projectDoc)
+    await createPortalActivity(user.id, 'sales_project_created', { projectId: String(projectResult.insertedId), clientEmail: ownerEmail, title: 'Sales project created', message: businessName }, req)
+    return res.status(201).json({ success: true, data: projectPublic({ _id: projectResult.insertedId, ...projectDoc }), crm: { contactId: String(contactResult.insertedId), dealId: String(dealResult.insertedId) } })
+  }
+  if (req.method === 'PUT') {
+    const id = String(req.body?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid project id is required' })
+    const project = await projects.findOne({ _id: new ObjectId(id) })
+    if (!project) return res.status(404).json({ error: 'Project not found' })
+    const update: any = { updatedAt: new Date() }
+    if (req.body.status) update.status = sanitizeText(req.body.status, 40)
+    if (req.body.dealStage && project.crmDealId && ObjectId.isValid(project.crmDealId)) {
+      await deals.updateOne({ _id: new ObjectId(project.crmDealId) }, { $set: { stage: sanitizeText(req.body.dealStage, 40), probability: req.body.dealStage === 'closed_won' ? 100 : 50, updatedAt: new Date() } })
+    }
+    await projects.updateOne({ _id: new ObjectId(id) }, { $set: update })
+    const saved = await projects.findOne({ _id: new ObjectId(id) })
+    await createPortalActivity(user.id, 'sales_project_updated', { projectId: id, clientEmail: saved?.clientEmail, title: 'Sales project updated', message: saved?.name || id }, req)
+    return res.json({ success: true, data: projectPublic(saved) })
+  }
+  return res.status(405).json({ error: 'Method not allowed' })
 }
 
 async function handleSettings(req: VercelRequest, res: VercelResponse) {
