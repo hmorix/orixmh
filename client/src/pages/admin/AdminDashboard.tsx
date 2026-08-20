@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Users, DollarSign, Activity, Shield, Server, AlertTriangle, TrendingUp, Clock, FileText, Zap, Settings, Database, Globe, Lock } from 'lucide-react'
+import { Users, DollarSign, Activity, Shield, Server, AlertTriangle, TrendingUp, Clock, FileText, Zap, Settings, Database, Globe, Lock, Bell } from 'lucide-react'
 
 const tabs = ['Overview', 'Users', 'Revenue', 'System', 'Security', 'Content', 'Logs']
 
@@ -44,6 +44,7 @@ export default function AdminDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <Link to="/admin/blogs" className="btn-outline text-sm flex items-center gap-2"><FileText size={14} />Blog CMS</Link>
+            <Link to="/admin/notifications" className="btn-outline text-sm flex items-center gap-2"><Bell size={14} />Notifications</Link>
             <Link to="/admin/settings" className="btn-outline text-sm flex items-center gap-2"><Settings size={14} />System Settings</Link>
             <Link to="/admin/logs" className="btn-primary text-sm flex items-center gap-2"><Activity size={14} />View Logs</Link>
           </div>

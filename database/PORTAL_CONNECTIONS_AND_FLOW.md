@@ -2,6 +2,8 @@
 
 This file documents how the portals connect today and how to keep the data layer portable between Supabase and a direct PostgreSQL service.
 
+For the full end-to-end business workflow, role routing, ID generation, hiring process, sales-to-CRM flow, client project flow, and verification checklist, read [PROJECT_WORKFLOW.md](../PROJECT_WORKFLOW.md).
+
 ## Portal Map
 
 | Portal | Routes | Primary users | Main work |

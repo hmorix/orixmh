@@ -65,6 +65,7 @@ const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'))
 const AdminLogs = lazy(() => import('./pages/admin/AdminLogs'))
+const AdminNotifications = lazy(() => import('./pages/admin/AdminNotifications'))
 const EmployeePortal = lazy(() => import('./pages/employee/EmployeePortal'))
 const Directory = lazy(() => import('./pages/employee/Directory'))
 const Requests = lazy(() => import('./pages/employee/Requests'))
@@ -283,6 +284,7 @@ function App() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/blogs" element={<AdminBlogManager />} />
           <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/notifications" element={<AdminNotifications />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="/admin/logs" element={<AdminLogs />} />
 

@@ -2234,12 +2234,19 @@ async function handleNotifications(req: VercelRequest, res: VercelResponse) {
   const user = await getAuthUser(req)
   const notifications = await mongoCollection('notifications')
   if (req.method === 'GET') {
-    const filter = user ? { $or: [{ userId: user.id }, { userId: { $exists: false } }, { userId: 'system' }] } : { userId: { $exists: false } }
+    const role = String(user?.role || '').toLowerCase()
+    const audienceFilters: any[] = [{ audience: 'all', userId: { $exists: false } }, { userId: 'system' }, { audience: { $exists: false }, userId: { $exists: false } }]
+    if (role === 'user') audienceFilters.push({ audience: 'users', userId: { $exists: false } })
+    if (['employee', 'hr', 'manager', 'crm'].includes(role)) audienceFilters.push({ audience: 'employees', userId: { $exists: false } })
+    if (['employee', 'hr', 'manager'].includes(role)) audienceFilters.push({ audience: 'team', userId: { $exists: false } })
+    if (role === 'crm') audienceFilters.push({ audience: 'sales', userId: { $exists: false } })
+    if (role === 'admin') audienceFilters.push({ audience: { $in: ['users', 'employees', 'team', 'sales'] }, userId: { $exists: false } })
+    const filter = user ? { $or: [{ userId: user.id }, ...audienceFilters] } : { $or: [{ audience: 'all', userId: { $exists: false } }, { audience: { $exists: false }, userId: { $exists: false } }] }
     const data = await notifications.find(filter).sort({ createdAt: -1 }).limit(30).toArray()
     return res.json({ success: true, data })
   }
   if (req.method === 'PUT') {
-    const filter = user ? { $or: [{ userId: user.id }, { userId: { $exists: false } }, { userId: 'system' }] } : {}
+    const filter = user ? { $or: [{ userId: user.id }, { audience: 'all', userId: { $exists: false } }, { userId: 'system' }] } : {}
     await notifications.updateMany(filter, { $set: { read: true, readAt: new Date() } })
     return res.json({ success: true, message: 'All notifications marked as read' })
   }
@@ -2248,14 +2255,17 @@ async function handleNotifications(req: VercelRequest, res: VercelResponse) {
     const title = sanitizeText(req.body?.title || '', 140)
     const message = sanitizeText(req.body?.message || '', 1000)
     const audience = sanitizeText(req.body?.audience || 'all', 40)
+    const priority = sanitizeText(req.body?.priority || 'normal', 20)
+    const channel = sanitizeText(req.body?.channel || 'in-app', 40)
     const selectedIds = Array.isArray(req.body?.selectedIds) ? req.body.selectedIds.map((id: any) => String(id)).filter(Boolean) : []
+    if (!['all', 'users', 'employees', 'team', 'sales', 'selected'].includes(audience)) return res.status(400).json({ error: 'Valid audience is required' })
     if (!title || !message) return res.status(400).json({ error: 'Title and message are required' })
     const now = new Date()
     const docs: any[] = []
     if (audience === 'selected' && selectedIds.length) {
-      selectedIds.forEach((id: string) => docs.push({ userId: id, title, message, audience, type: 'admin_message', read: false, createdBy: user.id, createdAt: now }))
+      selectedIds.forEach((id: string) => docs.push({ userId: id, title, message, audience, priority, channel, type: 'admin_message', read: false, createdBy: user.id, createdAt: now }))
     } else {
-      docs.push({ title, message, audience, type: 'admin_message', read: false, createdBy: user.id, createdAt: now })
+      docs.push({ title, message, audience, priority, channel, type: 'admin_message', read: false, createdBy: user.id, createdAt: now })
     }
     await notifications.insertMany(docs)
     return res.status(201).json({ success: true, data: docs, sent: docs.length })
@@ -3030,6 +3040,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'analytics/overview': return handleAnalyticsOverview(req, res)
       case 'analytics/traffic': return handleAnalyticsTraffic(req, res)
       case 'admin/stats': return handleAdminStats(req, res)
+      case 'admin/users': return handleAdminUsers(req, res)
       case 'admin/logs': return handleAdminLogs(req, res)
       case 'blogs': return handleBlogs(req, res)
       case 'blog': return handleBlog(req, res)

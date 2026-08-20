@@ -4,6 +4,7 @@ import { Search, Menu, X, Moon, Sun, Bell, User, LogOut } from 'lucide-react'
 import { useAuth } from '../lib/AuthContext'
 import { useTheme } from '../lib/ThemeContext'
 import { config } from '../lib/config'
+import { getLocalNotifications, markLocalNotificationsRead, notificationMatchesContext, NOTIFICATION_EVENT, type AppNotification } from '../lib/notificationStore'
 
 interface NavbarProps {
   onCommandOpen: () => void
@@ -14,7 +15,7 @@ export default function Navbar({ onCommandOpen }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const [userOpen, setUserOpen] = useState(false)
-  const [notifications, setNotifications] = useState<any[]>([])
+  const [notifications, setNotifications] = useState<AppNotification[]>([])
   const location = useLocation()
   const { user, signOut } = useAuth()
   const { theme, setTheme } = useTheme()
@@ -29,18 +30,26 @@ export default function Navbar({ onCommandOpen }: NavbarProps) {
 
   useEffect(() => {
     if (!user) return
-    fetch(`${config.apiUrl}/notifications`, { credentials: 'include', cache: 'no-store' })
-      .then(async response => {
-        const data = await response.json().catch(() => ({}))
-        if (response.ok) setNotifications(data.data || [])
-      })
-      .catch(() => setNotifications([]))
-  }, [user])
+    const loadNotifications = () => {
+      const local = getLocalNotifications().filter(item => notificationMatchesContext(item, user.role, location.pathname))
+      fetch(`${config.apiUrl}/notifications`, { credentials: 'include', cache: 'no-store' })
+        .then(async response => {
+          const data = await response.json().catch(() => ({}))
+          const remote = response.ok ? data.data || [] : []
+          setNotifications([...remote, ...local].slice(0, 30))
+        })
+        .catch(() => setNotifications(local))
+    }
+    loadNotifications()
+    window.addEventListener(NOTIFICATION_EVENT, loadNotifications)
+    return () => window.removeEventListener(NOTIFICATION_EVENT, loadNotifications)
+  }, [user, location.pathname])
 
   const unreadCount = notifications.filter(item => !item.read).length
 
   const markNotificationsRead = async () => {
     await fetch(`${config.apiUrl}/notifications`, { method: 'PUT', credentials: 'include' }).catch(() => null)
+    markLocalNotificationsRead()
     setNotifications(prev => prev.map(item => ({ ...item, read: true })))
   }
 
@@ -172,8 +181,12 @@ export default function Navbar({ onCommandOpen }: NavbarProps) {
                       {notifications.length === 0 && <div className="p-2 text-xs text-cream/40">No notifications yet.</div>}
                       {notifications.map((n, i) => (
                         <div key={n._id || i} className={`p-2 rounded-[4px] hover:bg-white/[0.04] cursor-pointer ${n.read ? 'bg-white/[0.01]' : 'bg-white/[0.03]'}`}>
-                          <div className="text-xs font-medium">{n.title}</div>
-                          <div className="text-[10px] text-cream/30">{n.message} · {new Date(n.createdAt).toLocaleString()}</div>
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="text-xs font-medium">{n.title}</div>
+                            {n.priority && n.priority !== 'normal' && <span className={`px-1.5 py-0.5 rounded-[3px] text-[9px] uppercase ${n.priority === 'urgent' ? 'bg-red-500/15 text-red-300' : 'bg-[#C8FF00]/10 text-[#C8FF00]'}`}>{n.priority}</span>}
+                          </div>
+                          <div className="text-[10px] text-cream/30">{n.message} · {n.createdAt ? new Date(n.createdAt).toLocaleString() : 'just now'}</div>
+                          {n.audience && <div className="text-[9px] text-cream/20 mt-1 uppercase">{n.audience}</div>}
                         </div>
                       ))}
                     </div>
