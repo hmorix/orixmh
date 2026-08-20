@@ -4,7 +4,7 @@ import { Search, Menu, X, Moon, Sun, Bell, User, LogOut } from 'lucide-react'
 import { useAuth } from '../lib/AuthContext'
 import { useTheme } from '../lib/ThemeContext'
 import { config } from '../lib/config'
-import { getLocalNotifications, markLocalNotificationsRead, notificationMatchesContext, NOTIFICATION_EVENT, type AppNotification } from '../lib/notificationStore'
+import { getLocalNotifications, markLocalNotificationsRead, notificationMatchesContext, notifyUnseenBrowserNotifications, NOTIFICATION_EVENT, type AppNotification } from '../lib/notificationStore'
 
 interface NavbarProps {
   onCommandOpen: () => void
@@ -36,9 +36,14 @@ export default function Navbar({ onCommandOpen }: NavbarProps) {
         .then(async response => {
           const data = await response.json().catch(() => ({}))
           const remote = response.ok ? data.data || [] : []
-          setNotifications([...remote, ...local].slice(0, 30))
+          const nextNotifications = [...remote, ...local].slice(0, 30)
+          setNotifications(nextNotifications)
+          notifyUnseenBrowserNotifications(nextNotifications)
         })
-        .catch(() => setNotifications(local))
+        .catch(() => {
+          setNotifications(local)
+          notifyUnseenBrowserNotifications(local)
+        })
     }
     loadNotifications()
     window.addEventListener(NOTIFICATION_EVENT, loadNotifications)

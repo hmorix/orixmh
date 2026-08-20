@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Bell, CheckCircle2, Search, Send, Shield, Users, UserCheck, BriefcaseBusiness, UserRoundCheck } from 'lucide-react'
+import { Bell, CheckCircle2, Search, Send, Shield, Users, UserCheck, BriefcaseBusiness, UserRoundCheck, MonitorCheck } from 'lucide-react'
 import { config } from '../../lib/config'
-import { saveLocalNotification, type AppNotification, type NotificationAudience, type NotificationPriority } from '../../lib/notificationStore'
+import { getBrowserNotificationPermission, requestBrowserNotificationPermission, saveLocalNotification, showBrowserNotification, supportsBrowserNotifications, type AppNotification, type NotificationAudience, type NotificationPriority } from '../../lib/notificationStore'
 
 type Recipient = {
   id: string
@@ -40,6 +40,7 @@ export default function AdminNotifications() {
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
+  const [browserPermission, setBrowserPermission] = useState(getBrowserNotificationPermission())
 
   useEffect(() => {
     fetch(`${config.apiUrl}/admin/users`, { credentials: 'include', cache: 'no-store' })
@@ -104,9 +105,11 @@ export default function AdminNotifications() {
       const data = await response.json().catch(() => ({}))
       if (!response.ok) throw new Error(data.error || 'Unable to send notification')
       setHistory(prev => [...(data.data || []), ...prev].slice(0, 20))
+      showBrowserNotification({ ...payload, id: `sent-${Date.now()}`, createdAt: new Date().toISOString() })
       setStatus(`Notification sent to ${audience === 'selected' ? selectedIds.length : recipientCount || 'the selected audience'} recipient${recipientCount === 1 ? '' : 's'}.`)
     } catch (err) {
       const local = saveLocalNotification(payload)
+      showBrowserNotification(local)
       setHistory(prev => [local, ...prev].slice(0, 20))
       setStatus('Notification saved locally and is visible in the portal inbox.')
     } finally {
@@ -114,6 +117,25 @@ export default function AdminNotifications() {
       setTitle('')
       setMessage('')
       setSelectedIds([])
+    }
+  }
+
+  const enableBrowserNotifications = async () => {
+    const permission = await requestBrowserNotificationPermission()
+    setBrowserPermission(permission)
+    if (permission === 'granted') {
+      showBrowserNotification({
+        id: 'browser-notifications-enabled',
+        title: 'Chrome notifications enabled',
+        message: 'HMorix portal notifications will now appear on your desktop while the app is open.',
+        priority: 'normal',
+        createdAt: new Date().toISOString(),
+      })
+      setStatus('Chrome notifications are enabled for this browser.')
+    } else if (permission === 'denied') {
+      setError('Chrome notification permission is blocked. Enable it from the browser site settings.')
+    } else if (permission === 'unsupported') {
+      setError('This browser does not support desktop notifications.')
     }
   }
 
@@ -126,9 +148,15 @@ export default function AdminNotifications() {
             <h1 className="font-display text-3xl font-bold">Send Notification</h1>
             <p className="text-cream/40 text-sm">Broadcast in-app updates to users, employees, teams, sales, or selected people.</p>
           </div>
-          <div className="hidden md:flex items-center gap-3 px-4 py-3 bg-obsidian-2 border border-glass-border rounded-[8px]">
-            <span className="text-xs text-cream/40">Ready recipients</span>
-            <span className="font-display text-xl font-bold text-[#C8FF00]">{recipientCount}</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <button onClick={enableBrowserNotifications} className="btn-outline text-sm flex items-center gap-2" type="button">
+              <MonitorCheck size={14} />
+              {browserPermission === 'granted' ? 'Chrome Enabled' : 'Enable Chrome Alerts'}
+            </button>
+            <div className="hidden md:flex items-center gap-3 px-4 py-3 bg-obsidian-2 border border-glass-border rounded-[8px]">
+              <span className="text-xs text-cream/40">Ready recipients</span>
+              <span className="font-display text-xl font-bold text-[#C8FF00]">{recipientCount}</span>
+            </div>
           </div>
         </div>
 
@@ -195,6 +223,21 @@ export default function AdminNotifications() {
 
           <aside className="space-y-6">
             <div className="bg-obsidian-2 border border-glass-border rounded-[16px] p-5">
+              <div className="flex items-start gap-3 p-3 bg-white/[0.02] rounded-[8px] mb-5">
+                <MonitorCheck size={17} className={browserPermission === 'granted' ? 'text-[#C8FF00]' : 'text-cream/35'} />
+                <div>
+                  <div className="text-sm font-semibold">Chrome notification status</div>
+                  <div className="text-[10px] text-cream/35">
+                    {supportsBrowserNotifications()
+                      ? browserPermission === 'granted'
+                        ? 'Allowed for this browser'
+                        : browserPermission === 'denied'
+                          ? 'Blocked in browser settings'
+                          : 'Permission not requested'
+                      : 'Not supported by this browser'}
+                  </div>
+                </div>
+              </div>
               <h2 className="font-display font-semibold mb-4">Live Preview</h2>
               <div className="p-4 bg-obsidian border border-glass-border rounded-[8px]">
                 <div className="flex items-start gap-3">
