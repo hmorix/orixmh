@@ -37,6 +37,25 @@ function appUrl() {
   return raw.replace(/\/$/, '')
 }
 
+function googleDriveRedirectUri() {
+  return process.env.GOOGLE_DRIVE_REDIRECT_URI || `${appUrl()}/api/settings/google-drive/callback`
+}
+
+function requireGoogleDriveConfig() {
+  const clientId = process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_DRIVE_CLIENT_ID
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_DRIVE_CLIENT_SECRET
+  if (!clientId || !clientSecret) {
+    throw Object.assign(new Error('Google Drive is not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.'), { status: 500 })
+  }
+  return { clientId, clientSecret }
+}
+
+function redirect(res: VercelResponse, location: string) {
+  res.statusCode = 302
+  res.setHeader('Location', location)
+  res.end()
+}
+
 function cleanEmail(email: string) {
   return String(email || '').trim().toLowerCase()
 }
@@ -115,6 +134,8 @@ async function ensureIndexes() {
     db.collection('sessions').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
     db.collection('verification_tokens').createIndex({ tokenHash: 1 }, { unique: true }),
     db.collection('verification_tokens').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
+    db.collection('oauth_states').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
+    db.collection('user_integrations').createIndex({ userId: 1, provider: 1 }, { unique: true }),
     db.collection('otp_records').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
     db.collection('employee_attendance').createIndex({ employeeId: 1, date: 1 }, { unique: true }),
     db.collection('hrm_teams').createIndex({ name: 1 }, { unique: true }),
@@ -2908,6 +2929,7 @@ async function handleSettings(req: VercelRequest, res: VercelResponse) {
     dateFormat: 'DD/MM/YYYY',
     currency: 'INR',
     storageLimitGb: 10,
+    keyboardShortcuts: true,
     integrations: {},
   }
   if (req.method === 'GET') {
@@ -2915,7 +2937,7 @@ async function handleSettings(req: VercelRequest, res: VercelResponse) {
     return res.json({ success: true, data: { ...defaults, ...(saved || {}) } })
   }
   if (req.method === 'PUT') {
-    const allowed = ['displayName', 'username', 'company', 'emailNotifications', 'pushNotifications', 'securityAlerts', 'productUpdates', 'marketingEmails', 'weeklyDigest', 'ticketUpdates', 'invoiceReminders', 'theme', 'accentColor', 'fontSize', 'sidebarExpanded', 'language', 'timezone', 'dateFormat', 'currency', 'integrations']
+    const allowed = ['displayName', 'username', 'company', 'emailNotifications', 'pushNotifications', 'securityAlerts', 'productUpdates', 'marketingEmails', 'weeklyDigest', 'ticketUpdates', 'invoiceReminders', 'theme', 'accentColor', 'fontSize', 'sidebarExpanded', 'language', 'timezone', 'dateFormat', 'currency', 'keyboardShortcuts', 'integrations']
     const update: any = {}
     for (const key of allowed) if (req.body?.[key] !== undefined) update[key] = req.body[key]
     await settings.updateOne({ userId: user.id }, { $set: { ...update, userId: user.id, updatedAt: new Date() }, $setOnInsert: { createdAt: new Date() } }, { upsert: true })
@@ -2926,6 +2948,140 @@ async function handleSettings(req: VercelRequest, res: VercelResponse) {
     return res.json({ success: true, data: await settings.findOne({ userId: user.id }), message: 'Settings updated' })
   }
   res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function handleGoogleDrive(req: VercelRequest, res: VercelResponse, action: string) {
+  const user = await findSessionUser(req, res)
+  if (!user) return res.status(401).json({ error: 'Not authenticated' })
+  const integrations = await mongoCollection('user_integrations')
+
+  if (action === 'connect') {
+    if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+    const { clientId } = requireGoogleDriveConfig()
+    const states = await mongoCollection('oauth_states')
+    const state = randomToken(24)
+    await states.insertOne({ state, userId: user.id, provider: 'google_drive', createdAt: new Date(), expiresAt: new Date(Date.now() + 10 * 60 * 1000) })
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: googleDriveRedirectUri(),
+      response_type: 'code',
+      access_type: 'offline',
+      prompt: 'consent',
+      scope: 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/userinfo.email',
+      state,
+    })
+    return res.json({ success: true, authUrl: `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}` })
+  }
+
+  if (action === 'callback') {
+    if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+    const code = String(req.query.code || '')
+    const state = String(req.query.state || '')
+    const states = await mongoCollection('oauth_states')
+    const savedState = await states.findOne({ state, userId: user.id, provider: 'google_drive', expiresAt: { $gt: new Date() } })
+    if (!code || !savedState) return redirect(res, `${appUrl()}/settings?section=data&drive=error`)
+    await states.deleteOne({ _id: savedState._id })
+    try {
+      const tokens = await exchangeGoogleDriveCode(code)
+      const profile = await googleUserInfo(tokens.access_token)
+      await integrations.updateOne(
+        { userId: user.id, provider: 'google_drive' },
+        { $set: { userId: user.id, provider: 'google_drive', email: profile.email || '', accessToken: tokens.access_token, refreshToken: tokens.refresh_token, expiresAt: new Date(Date.now() + Number(tokens.expires_in || 3600) * 1000), updatedAt: new Date() }, $setOnInsert: { createdAt: new Date() } },
+        { upsert: true },
+      )
+      await logActivity(user.id, 'google_drive_connected', { email: profile.email || '' }, req)
+      return redirect(res, `${appUrl()}/settings?section=data&drive=connected`)
+    } catch {
+      return redirect(res, `${appUrl()}/settings?section=data&drive=error`)
+    }
+  }
+
+  if (action === 'status') {
+    if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+    const saved = await integrations.findOne({ userId: user.id, provider: 'google_drive' })
+    if (!saved) return res.json({ success: true, data: { connected: false } })
+    try {
+      const accessToken = await getGoogleDriveAccessToken(saved)
+      const storage = await googleDriveStorage(accessToken)
+      await integrations.updateOne({ _id: saved._id }, { $set: { storage, updatedAt: new Date() } })
+      return res.json({ success: true, data: { connected: true, email: saved.email, ...storage, updatedAt: new Date().toISOString() } })
+    } catch (error: any) {
+      return res.json({ success: true, data: { connected: true, email: saved.email, error: error.message || 'Unable to read Google Drive storage' } })
+    }
+  }
+
+  if (action === 'root' && req.method === 'DELETE') {
+    await integrations.deleteOne({ userId: user.id, provider: 'google_drive' })
+    await logActivity(user.id, 'google_drive_disconnected', {}, req)
+    return res.json({ success: true })
+  }
+
+  return res.status(404).json({ error: 'Not found' })
+}
+
+async function exchangeGoogleDriveCode(code: string) {
+  const { clientId, clientSecret } = requireGoogleDriveConfig()
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      code,
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: googleDriveRedirectUri(),
+      grant_type: 'authorization_code',
+    }),
+  })
+  const payload: any = await response.json()
+  if (!response.ok) throw new Error(payload.error_description || payload.error || 'Google token exchange failed')
+  return payload
+}
+
+async function refreshGoogleDriveToken(refreshToken: string) {
+  const { clientId, clientSecret } = requireGoogleDriveConfig()
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      refresh_token: refreshToken,
+      client_id: clientId,
+      client_secret: clientSecret,
+      grant_type: 'refresh_token',
+    }),
+  })
+  const payload: any = await response.json()
+  if (!response.ok) throw new Error(payload.error_description || payload.error || 'Google token refresh failed')
+  return payload
+}
+
+async function getGoogleDriveAccessToken(saved: any) {
+  if (saved.accessToken && saved.expiresAt && new Date(saved.expiresAt).getTime() > Date.now() + 60 * 1000) return saved.accessToken
+  if (!saved.refreshToken) throw new Error('Google Drive needs to be reconnected')
+  const refreshed = await refreshGoogleDriveToken(saved.refreshToken)
+  const integrations = await mongoCollection('user_integrations')
+  await integrations.updateOne({ _id: saved._id }, { $set: { accessToken: refreshed.access_token, expiresAt: new Date(Date.now() + Number(refreshed.expires_in || 3600) * 1000), updatedAt: new Date() } })
+  return refreshed.access_token
+}
+
+async function googleUserInfo(accessToken: string) {
+  const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', { headers: { Authorization: `Bearer ${accessToken}` } })
+  const payload: any = await response.json()
+  if (!response.ok) return {}
+  return payload
+}
+
+async function googleDriveStorage(accessToken: string) {
+  const response = await fetch('https://www.googleapis.com/drive/v3/about?fields=storageQuota', { headers: { Authorization: `Bearer ${accessToken}` } })
+  const payload: any = await response.json()
+  if (!response.ok) throw new Error(payload.error?.message || 'Unable to read Google Drive storage')
+  const quota = payload.storageQuota || {}
+  const usedBytes = Number(quota.usage || 0)
+  const limitBytes = Number(quota.limit || 0)
+  return {
+    usedBytes,
+    limitBytes,
+    remainingBytes: limitBytes > 0 ? Math.max(0, limitBytes - usedBytes) : 0,
+  }
 }
 
 async function handleStatus(req: VercelRequest, res: VercelResponse) {
@@ -3061,6 +3217,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'invoices': return handleInvoices(req, res)
       case 'tickets': return handleTickets(req, res)
       case 'settings': return handleSettings(req, res)
+      case 'settings/google-drive': return handleGoogleDrive(req, res, 'root')
+      case 'settings/google-drive/connect': return handleGoogleDrive(req, res, 'connect')
+      case 'settings/google-drive/callback': return handleGoogleDrive(req, res, 'callback')
+      case 'settings/google-drive/status': return handleGoogleDrive(req, res, 'status')
       case 'status': return handleStatus(req, res)
       case 'services': return handleServices(req, res)
       case 'employee/profile': return handleEmployeeProfile(req, res)

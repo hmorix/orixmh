@@ -20,8 +20,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const loadTheme = async () => {
       try {
         const session = await supabase.auth.getSession()
-        if (!session.data.session) {
-          // Use localStorage for anonymous users
+        const response = await fetch(api.settings.get, {
+          credentials: 'include',
+          headers: session.data.session ? { 'Authorization': `Bearer ${session.data.session.access_token}` } : {},
+        })
+
+        if (!response.ok) {
           const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | 'system' | null
           const savedColor = localStorage.getItem('accentColor') || '#C8FF00'
           if (savedTheme) setThemeState(savedTheme)
@@ -29,18 +33,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           return
         }
 
-        // Fetch from API for authenticated users
-        const response = await fetch(api.settings.get, {
-          headers: {
-            'Authorization': `Bearer ${session.data.session.access_token}`,
-          },
-        })
-
-        if (response.ok) {
-          const data = await response.json()
-          if (data.data?.theme) setThemeState(data.data.theme)
-          if (data.data?.accent_color) setAccentColorState(data.data.accent_color)
-        }
+        const data = await response.json()
+        if (data.data?.theme) setThemeState(data.data.theme)
+        if (data.data?.accentColor) setAccentColorState(data.data.accentColor)
       } catch (error) {
         console.error('Failed to load theme:', error)
       }
@@ -74,6 +69,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       if (session.data.session) {
         await fetch(api.settings.update, {
           method: 'PUT',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.data.session.access_token}`,
@@ -95,11 +91,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       if (session.data.session) {
         await fetch(api.settings.update, {
           method: 'PUT',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.data.session.access_token}`,
           },
-          body: JSON.stringify({ accent_color: color }),
+          body: JSON.stringify({ accentColor: color }),
         })
       }
     } catch (error) {

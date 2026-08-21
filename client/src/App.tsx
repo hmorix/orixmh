@@ -1,6 +1,8 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import { Component, lazy, Suspense, useState, useEffect, type ReactNode } from 'react'
 import { useAuth } from './lib/AuthContext'
+import { useTheme } from './lib/ThemeContext'
+import { config } from './lib/config'
 import MainLayout from './layouts/MainLayout'
 import CommandPalette from './components/CommandPalette'
 import OfflineStatus from './components/OfflineStatus'
@@ -131,18 +133,56 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, { failed: bool
 
 function App() {
   const [commandOpen, setCommandOpen] = useState(false)
+  const [shortcutsEnabled, setShortcutsEnabled] = useState(() => localStorage.getItem('keyboardShortcuts') !== 'false')
+  const navigate = useNavigate()
+  const { theme, setTheme } = useTheme()
+
+  useEffect(() => {
+    fetch(`${config.apiUrl}/settings`, { credentials: 'include', cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(payload => {
+        if (payload?.data?.keyboardShortcuts !== undefined) {
+          const enabled = Boolean(payload.data.keyboardShortcuts)
+          localStorage.setItem('keyboardShortcuts', String(enabled))
+          setShortcutsEnabled(enabled)
+        }
+      })
+      .catch(() => null)
+
+    const handleSettingsChange = (event: Event) => {
+      const customEvent = event as CustomEvent<{ keyboardShortcuts?: boolean }>
+      if (customEvent.detail?.keyboardShortcuts !== undefined) {
+        setShortcutsEnabled(Boolean(customEvent.detail.keyboardShortcuts))
+      }
+    }
+    window.addEventListener('hm-settings-change', handleSettingsChange)
+    return () => window.removeEventListener('hm-settings-change', handleSettingsChange)
+  }, [])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (!shortcutsEnabled && e.key !== 'Escape') return
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
         setCommandOpen(prev => !prev)
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'd') {
+        e.preventDefault()
+        navigate('/dashboard')
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === ',') {
+        e.preventDefault()
+        navigate('/settings')
+      }
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 't') {
+        e.preventDefault()
+        setTheme(theme === 'dark' ? 'light' : 'dark')
       }
       if (e.key === 'Escape') setCommandOpen(false)
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [navigate, setTheme, shortcutsEnabled, theme])
 
   const { loading } = useAuth()
 
