@@ -11,7 +11,7 @@ from lib.env import load_env  # noqa: E402
 
 load_env()
 
-SITE_URL = os.environ.get("SITE_URL", "https://orixmh.vercel.app").rstrip("/")
+SITE_URL = os.environ.get("SITE_URL", "https://hmorix.in").rstrip("/")
 SITEMAP_OUTPUT_PATH = os.environ.get(
     "SITEMAP_OUTPUT_PATH",
     os.path.join(os.getcwd(), "generated", "sitemap.xml"),

@@ -211,7 +211,7 @@
       "read_time": "12 min read",
       "seo_title": "AI Automation for Small Business Efficiency",
       "meta_description": "Boost small business operational efficiency with AI automation. Practical steps, industry examples, and realistic expectations.",
-      "canonical_url": "https://orixmh.vercel.app/blog/ai-automation-for-small-business",
+      "canonical_url": "https://hmorix.in/blog/ai-automation-for-small-business",
       "open_graph": {
         "type": "article",
         "title": "AI Automation for Small Business Efficiency",
@@ -241,7 +241,7 @@
       "schema_jsonld": {
         "@graph": [
           {
-            "url": "https://orixmh.vercel.app/blog/ai-automation-for-small-business",
+            "url": "https://hmorix.in/blog/ai-automation-for-small-business",
             "@type": "BlogPosting",
             "image": [],
             "author": {
@@ -257,7 +257,7 @@
             "description": "Discover how AI automation boosts operational efficiency in small businesses, with practical steps, industry examples, and realistic expectations.",
             "datePublished": "2026-07-28T20:04:36.223Z",
             "mainEntityOfPage": {
-              "@id": "https://orixmh.vercel.app/blog/ai-automation-for-small-business"
+              "@id": "https://hmorix.in/blog/ai-automation-for-small-business"
             }
           },
           {
@@ -293,19 +293,19 @@
             "@type": "BreadcrumbList",
             "itemListElement": [
               {
-                "item": "https://orixmh.vercel.app/",
+                "item": "https://hmorix.in/",
                 "name": "Home",
                 "@type": "ListItem",
                 "position": 1
               },
               {
-                "item": "https://orixmh.vercel.app/blog/",
+                "item": "https://hmorix.in/blog/",
                 "name": "Blog",
                 "@type": "ListItem",
                 "position": 2
               },
               {
-                "item": "https://orixmh.vercel.app/blog/ai-automation-for-small-business",
+                "item": "https://hmorix.in/blog/ai-automation-for-small-business",
                 "name": "Unlocking Efficiency: AI Automation for Small Business Operations",
                 "@type": "ListItem",
                 "position": 3
@@ -316,11 +316,11 @@
         "@context": "https://schema.org"
       },
       "social_posts": {
-        "x": "AI Automation for Small Business? Learn how to boost efficiency with practical steps & examples! https://orixmh.vercel.app/blog/ai-automation-for-small-business #AIforBusiness",
-        "threads": "Automate to Dominate! Learn how small businesses can leverage AI for operational efficiency in our latest article https://orixmh.vercel.app/blog/ai-automation-for-small-business",
-        "facebook": "Ready to supercharge your small business's efficiency? Our latest article dives into the world of AI automation, sharing real-world examples and straightforward steps to get you started. Check it out and let us know: What\u2019s one task you wish you could automate today? https://orixmh.vercel.app/blog/ai-automation-for-small-business",
-        "linkedin": "Enhance operational efficiency in your small business with AI automation. Discover practical steps and industry examples in our latest article, including how to identify automatable tasks and implement AI solutions effectively. [Link: https://orixmh.vercel.app/blog/ai-automation-for-small-business] What's the first operational task you'd automate in your business?",
-        "instagram": "Efficiency Hack Alert! Discover how AI automation can transform your small business operations [Image: Suggested - A minimalist infographic highlighting AI automation benefits] Read the full story in our bio link! #AIAutomation #SmallBusinessTips https://orixmh.vercel.app/blog/ai-automation-for-small-business"
+        "x": "AI Automation for Small Business? Learn how to boost efficiency with practical steps & examples! https://hmorix.in/blog/ai-automation-for-small-business #AIforBusiness",
+        "threads": "Automate to Dominate! Learn how small businesses can leverage AI for operational efficiency in our latest article https://hmorix.in/blog/ai-automation-for-small-business",
+        "facebook": "Ready to supercharge your small business's efficiency? Our latest article dives into the world of AI automation, sharing real-world examples and straightforward steps to get you started. Check it out and let us know: What\u2019s one task you wish you could automate today? https://hmorix.in/blog/ai-automation-for-small-business",
+        "linkedin": "Enhance operational efficiency in your small business with AI automation. Discover practical steps and industry examples in our latest article, including how to identify automatable tasks and implement AI solutions effectively. [Link: https://hmorix.in/blog/ai-automation-for-small-business] What's the first operational task you'd automate in your business?",
+        "instagram": "Efficiency Hack Alert! Discover how AI automation can transform your small business operations [Image: Suggested - A minimalist infographic highlighting AI automation benefits] Read the full story in our bio link! #AIAutomation #SmallBusinessTips https://hmorix.in/blog/ai-automation-for-small-business"
       },
       "published_at": "2026-07-28T20:08:27.745+00:00",
       "updated_at": "2026-07-28T20:08:27.746+00:00",
@@ -575,7 +575,7 @@
       "read_time": "12 min read",
       "seo_title": "Integrating AI into Web Apps - Beginner's Guide",
       "meta_description": "Learn to integrate AI into existing web applications with our step-by-step guide, covering AI library selection, integration steps, and building a business case.",
-      "canonical_url": "https://orixmh.vercel.app/blog/integrating-ai-into-web-apps",
+      "canonical_url": "https://hmorix.in/blog/integrating-ai-into-web-apps",
       "open_graph": {
         "type": "article",
         "title": "A Beginner's Guide to Integrating AI into Existing Web Applications",
@@ -605,10 +605,10 @@
       "schema_jsonld": {
         "@graph": [
           {
-            "url": "https://orixmh.vercel.app/blog/integrating-ai-into-web-apps",
+            "url": "https://hmorix.in/blog/integrating-ai-into-web-apps",
             "@type": "BlogPosting",
             "image": {
-              "url": "https://orixmh.vercel.app/blog/integrating-ai-into-web-apps/featured-image.jpg",
+              "url": "https://hmorix.in/blog/integrating-ai-into-web-apps/featured-image.jpg",
               "@type": "ImageObject"
             },
             "author": {
@@ -622,7 +622,7 @@
             ],
             "publisher": {
               "logo": {
-                "url": "https://orixmh.vercel.app/logo.png",
+                "url": "https://hmorix.in/logo.png",
                 "@type": "ImageObject"
               },
               "name": "HMorix",
@@ -631,7 +631,7 @@
             "description": "Learn how to integrate AI into your existing web applications with this step-by-step guide, covering choosing the right AI library, integration steps, and building a business case.",
             "datePublished": "2026-07-28T20:02:29.932Z",
             "mainEntityOfPage": {
-              "url": "https://orixmh.vercel.app/blog/integrating-ai-into-web-apps",
+              "url": "https://hmorix.in/blog/integrating-ai-into-web-apps",
               "@type": "WebPage"
             }
           },
@@ -668,13 +668,13 @@
             "@type": "BreadcrumbList",
             "itemListElement": [
               {
-                "item": "https://orixmh.vercel.app/blog",
+                "item": "https://hmorix.in/blog",
                 "name": "Blog",
                 "@type": "ListItem",
                 "position": 1
               },
               {
-                "item": "https://orixmh.vercel.app/blog/integrating-ai-into-web-apps",
+                "item": "https://hmorix.in/blog/integrating-ai-into-web-apps",
                 "name": "A Beginner's Guide to Integrating AI into Existing Web Applications",
                 "@type": "ListItem",
                 "position": 2
@@ -685,10 +685,10 @@
         "@context": "https://schema.org"
       },
       "social_posts": {
-        "x": "AI for web apps made easy! Step-by-step integration guide: https://orixmh.vercel.app/blog/integrating-ai-into-web-apps #AIIntegration",
-        "threads": "New Guide: Integrating AI into Web Apps Step-by-Step! From choosing libraries to making a business case. Check it out: https://orixmh.vercel.app/blog/integrating-ai-into-web-apps",
-        "facebook": "Ready to future-proof your web app with AI? Check out our beginner's guide to learn how to choose the right AI library, integrate it seamlessly, and make a strong business case for it. Share with us - what AI feature would you love to see in your favorite web app? Read now: https://orixmh.vercel.app/blog/integrating-ai-into-web-apps",
-        "linkedin": "Enhance your web applications with AI! Our latest guide provides a step-by-step approach to integrating AI libraries, outlining key integration steps, and crafting a compelling business case. What's the most significant challenge you've faced in AI integration? Discover solutions here: https://orixmh.vercel.app/blog/integrating-ai-into-web-apps",
+        "x": "AI for web apps made easy! Step-by-step integration guide: https://hmorix.in/blog/integrating-ai-into-web-apps #AIIntegration",
+        "threads": "New Guide: Integrating AI into Web Apps Step-by-Step! From choosing libraries to making a business case. Check it out: https://hmorix.in/blog/integrating-ai-into-web-apps",
+        "facebook": "Ready to future-proof your web app with AI? Check out our beginner's guide to learn how to choose the right AI library, integrate it seamlessly, and make a strong business case for it. Share with us - what AI feature would you love to see in your favorite web app? Read now: https://hmorix.in/blog/integrating-ai-into-web-apps",
+        "linkedin": "Enhance your web applications with AI! Our latest guide provides a step-by-step approach to integrating AI libraries, outlining key integration steps, and crafting a compelling business case. What's the most significant challenge you've faced in AI integration? Discover solutions here: https://hmorix.in/blog/integrating-ai-into-web-apps",
         "instagram": "AI just got closer to your web app! Swipe to learn from our latest guide [ASSUME IMAGE WITH SWIPE-UP LINK] or tap the link in our bio to dive into integrating AI into your existing web applications effortlessly. #AIforWeb #TechSolutions"
       },
       "published_at": "2026-07-28T20:06:22.114+00:00",
@@ -932,7 +932,7 @@
       "read_time": "12 min read",
       "seo_title": "AI Invoicing Software vs Generic Tools | Efficiency & Cost",
       "meta_description": "Compare AI Invoicing Software (BillingFlow) with generic tools for efficiency, cost, and scalability to find the best for your business.",
-      "canonical_url": "https://orixmh.vercel.app/blog/ai-invoicing-software-vs-generic-tools",
+      "canonical_url": "https://hmorix.in/blog/ai-invoicing-software-vs-generic-tools",
       "open_graph": {
         "type": "article",
         "title": "AI Invoicing Software vs Generic Tools: A Detailed Comparison",
@@ -962,7 +962,7 @@
       "schema_jsonld": {
         "@graph": [
           {
-            "url": "https://orixmh.vercel.app/blog/ai-invoicing-software-vs-generic-tools",
+            "url": "https://hmorix.in/blog/ai-invoicing-software-vs-generic-tools",
             "@type": "BlogPosting",
             "image": [],
             "author": {
@@ -977,7 +977,7 @@
             ],
             "publisher": {
               "logo": {
-                "url": "https://orixmh.vercel.app/logo.png",
+                "url": "https://hmorix.in/logo.png",
                 "@type": "ImageObject"
               },
               "name": "HMorix",
@@ -986,7 +986,7 @@
             "description": "Compare AI Invoicing Software (BillingFlow) with generic invoicing tools for efficiency, cost, and scalability.",
             "datePublished": "2026-07-27T05:04:21.890Z",
             "mainEntityOfPage": {
-              "url": "https://orixmh.vercel.app/blog/ai-invoicing-software-vs-generic-tools",
+              "url": "https://hmorix.in/blog/ai-invoicing-software-vs-generic-tools",
               "@type": "WebPage"
             }
           },
@@ -1023,19 +1023,19 @@
             "@type": "BreadcrumbList",
             "itemListElement": [
               {
-                "item": "https://orixmh.vercel.app/",
+                "item": "https://hmorix.in/",
                 "name": "Home",
                 "@type": "ListItem",
                 "position": 1
               },
               {
-                "item": "https://orixmh.vercel.app/blog",
+                "item": "https://hmorix.in/blog",
                 "name": "Blog",
                 "@type": "ListItem",
                 "position": 2
               },
               {
-                "item": "https://orixmh.vercel.app/blog/ai-invoicing-software-vs-generic-tools",
+                "item": "https://hmorix.in/blog/ai-invoicing-software-vs-generic-tools",
                 "name": "AI Invoicing Software vs Generic Tools: A Feature & Cost Comparison",
                 "@type": "ListItem",
                 "position": 3
@@ -1046,8 +1046,8 @@
         "@context": "https://schema.org"
       },
       "social_posts": {
-        "x": "AI Invoicing (BillingFlow) vs Generic Tools: Efficiency, Cost & Scalability Compared https://orixmh.vercel.app/blog/ai-invoicing-software-vs-generic-tools #AIInvoicing",
-        "threads": "BillingFlow (AI Invoicing) vs Generic Invoicing Tools - which is better for your business? Efficiency, cost, and scalability compared. Check the link for the breakdown! https://orixmh.vercel.app/blog/ai-invoicing-software-vs-generic-tools",
+        "x": "AI Invoicing (BillingFlow) vs Generic Tools: Efficiency, Cost & Scalability Compared https://hmorix.in/blog/ai-invoicing-software-vs-generic-tools #AIInvoicing",
+        "threads": "BillingFlow (AI Invoicing) vs Generic Invoicing Tools - which is better for your business? Efficiency, cost, and scalability compared. Check the link for the breakdown! https://hmorix.in/blog/ai-invoicing-software-vs-generic-tools",
         "facebook": "Tired of invoice headaches? We've got you covered! Check out our in-depth comparison of AI-powered invoicing software (BillingFlow) and generic invoicing tools. Which one comes out on top for your business needs? Read to find out and share with us: What\u2019s the biggest invoicing challenge you\u2019re facing right now?",
         "linkedin": "Optimize your billing process! Our latest comparison breaks down the efficiency, cost, and scalability of AI invoicing software (like BillingFlow) versus generic tools. Discover which suits your business best and join the discussion: What's your top priority when choosing invoicing software - automation, cost, or scalability?",
         "instagram": "Invoice, Simplified! [Image Suggestion: Modern invoice on a screen with a subtle AI hint] Discover how AI invoicing software like BillingFlow transforms your billing process compared to generic tools. Efficiency, cost, and scalability laid bare. Link in bio! #InvoicingSimplified"
@@ -1334,7 +1334,7 @@
       "read_time": "13 min read",
       "seo_title": "AI Business Automation: Efficiency Redefined",
       "meta_description": "Discover AI business automation benefits, strategies, and best practices for enhanced efficiency and reduced costs.",
-      "canonical_url": "https://orixmh.vercel.app/blog/ai-business-automation",
+      "canonical_url": "https://hmorix.in/blog/ai-business-automation",
       "open_graph": {
         "type": "article",
         "title": "AI Business Automation: Efficiency Redefined",
@@ -1364,7 +1364,7 @@
       "schema_jsonld": {
         "@graph": [
           {
-            "url": "https://orixmh.vercel.app/blog/ai-business-automation",
+            "url": "https://hmorix.in/blog/ai-business-automation",
             "@type": "BlogPosting",
             "image": [],
             "author": {
@@ -1388,7 +1388,7 @@
             "description": "Discover how AI business automation is transforming operations by enhancing efficiency, reducing costs, and improving customer satisfaction.",
             "datePublished": "2026-07-26T08:12:26.864Z",
             "mainEntityOfPage": {
-              "url": "https://orixmh.vercel.app/blog/ai-business-automation",
+              "url": "https://hmorix.in/blog/ai-business-automation",
               "@type": "WebPage"
             }
           },
@@ -1441,19 +1441,19 @@
             "@type": "BreadcrumbList",
             "itemListElement": [
               {
-                "item": "https://orixmh.vercel.app/",
+                "item": "https://hmorix.in/",
                 "name": "Home",
                 "@type": "ListItem",
                 "position": 1
               },
               {
-                "item": "https://orixmh.vercel.app/blog",
+                "item": "https://hmorix.in/blog",
                 "name": "Blog",
                 "@type": "ListItem",
                 "position": 2
               },
               {
-                "item": "https://orixmh.vercel.app/blog/ai-business-automation",
+                "item": "https://hmorix.in/blog/ai-business-automation",
                 "name": "AI Business Automation: Transforming Operations with Human-Centric Efficiency",
                 "@type": "ListItem",
                 "position": 3
@@ -1464,11 +1464,11 @@
         "@context": "https://schema.org"
       },
       "social_posts": {
-        "x": "AI Business Automation: Boost efficiency, cut costs, & enhance CX! Discover how: https://orixmh.vercel.app/blog/ai-business-automation #AIautomation",
-        "threads": "AI business automation isn't just for big corps! Small businesses can leverage it too. Check out how: https://orixmh.vercel.app/blog/ai-business-automation",
-        "facebook": "Ready to future-proof your business? AI business automation is the key! From streamlined operations to delighted customers, dive into the benefits and get started with our expert guide: https://orixmh.vercel.app/blog/ai-business-automation Share with us: What\u2019s one challenge you think AI could solve for your business?",
-        "linkedin": "Unlock operational excellence with AI business automation! Enhance efficiency, cut costs, and boost customer satisfaction. Learn how to harness its power in our latest article: https://orixmh.vercel.app/blog/ai-business-automation What's the first process you'd automate in your organization?",
-        "instagram": "Automate. Elevate. Thrive. Explore how AI is revolutionizing business operations [Image: Futuristic workspace with AI elements] Read the full story: https://orixmh.vercel.app/blog/ai-business-automation #AIinBusiness"
+        "x": "AI Business Automation: Boost efficiency, cut costs, & enhance CX! Discover how: https://hmorix.in/blog/ai-business-automation #AIautomation",
+        "threads": "AI business automation isn't just for big corps! Small businesses can leverage it too. Check out how: https://hmorix.in/blog/ai-business-automation",
+        "facebook": "Ready to future-proof your business? AI business automation is the key! From streamlined operations to delighted customers, dive into the benefits and get started with our expert guide: https://hmorix.in/blog/ai-business-automation Share with us: What\u2019s one challenge you think AI could solve for your business?",
+        "linkedin": "Unlock operational excellence with AI business automation! Enhance efficiency, cut costs, and boost customer satisfaction. Learn how to harness its power in our latest article: https://hmorix.in/blog/ai-business-automation What's the first process you'd automate in your organization?",
+        "instagram": "Automate. Elevate. Thrive. Explore how AI is revolutionizing business operations [Image: Futuristic workspace with AI elements] Read the full story: https://hmorix.in/blog/ai-business-automation #AIinBusiness"
       },
       "published_at": "2026-07-26T08:13:57.277+00:00",
       "updated_at": "2026-07-26T08:13:57.277+00:00",

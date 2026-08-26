@@ -10,7 +10,7 @@ from agent.prompt_loader import load_system_prompt
 
 def social_post_generator(draft, seo):  # `seo` kept for call-site parity with the JS version (unused there too)
     system = load_system_prompt()
-    site_url = os.environ.get("SITE_URL", "https://orix-pink.vercel.app")
+    site_url = os.environ.get("SITE_URL", "https://hmorix.in")
     url = f"{site_url}/blog/{draft['slug']}"
 
     user_prompt = f"""

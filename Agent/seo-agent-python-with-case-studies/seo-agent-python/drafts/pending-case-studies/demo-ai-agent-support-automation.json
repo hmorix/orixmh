@@ -65,7 +65,7 @@
   "updated_at": "2026-07-24T00:00:00+00:00",
   "seo_title": "AI Agent Support Automation Case Study (Sample) | HMorix",
   "meta_description": "A sample HMorix case study template for an AI Solutions engagement. Placeholder content \u2014 replace with real client data before publishing.",
-  "canonical_url": "https://orixmh.vercel.app/case-studies/demo-ai-agent-support-automation",
+  "canonical_url": "https://hmorix.in/case-studies/demo-ai-agent-support-automation",
   "open_graph": {
     "title": "AI Agent Support Automation \u2014 Sample Case Study | HMorix",
     "description": "Sample case study layout for an AI Solutions engagement.",
@@ -112,7 +112,7 @@
         "dateModified": "2026-07-24T00:00:00+00:00",
         "mainEntityOfPage": {
           "@type": "WebPage",
-          "@id": "https://orixmh.vercel.app/case-studies/demo-ai-agent-support-automation"
+          "@id": "https://hmorix.in/case-studies/demo-ai-agent-support-automation"
         },
         "about": {
           "@type": "Organization",

@@ -201,7 +201,7 @@ const post = {
   "updatedAt": "2026-07-23T14:49:40.155Z",
   "seoTitle": "AI Business Automation Solutions | Boost Operational Efficiency",
   "metaDescription": "Discover AI Business Automation Solutions to transform operations, enhance decision-making, and drive efficiency across industries.",
-  "canonicalUrl": "https://orixmh.vercel.app/blog/ai-business-automation-solutions",
+  "canonicalUrl": "https://hmorix.in/blog/ai-business-automation-solutions",
   "openGraph": {
     "title": "AI Business Automation Solutions for Efficient Operations",
     "description": "Transform your business with AI-powered automation solutions, enhancing decision-making and operational efficiency.",
@@ -231,19 +231,19 @@ const post = {
         "description": "Discover how AI-powered automation can transform business operations, enhance decision-making, and drive efficiency across various industries.",
         "author": "HMORIX AI",
         "datePublished": "2026-07-23T14:45:18.857Z",
-        "url": "https://orixmh.vercel.app/blog/ai-business-automation-solutions",
+        "url": "https://hmorix.in/blog/ai-business-automation-solutions",
         "image": [],
         "publisher": {
           "@type": "Organization",
           "name": "HMORIX",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://orixmh.vercel.app/logo.png"
+            "url": "https://hmorix.in/logo.png"
           }
         },
         "mainEntityOfPage": {
           "@type": "WebPage",
-          "url": "https://orixmh.vercel.app/blog/ai-business-automation-solutions"
+          "url": "https://hmorix.in/blog/ai-business-automation-solutions"
         }
       },
       {
@@ -290,13 +290,13 @@ const post = {
             "@type": "ListItem",
             "position": 1,
             "name": "Blog",
-            "item": "https://orixmh.vercel.app/blog"
+            "item": "https://hmorix.in/blog"
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "Leveraging AI-Powered Automation for Efficient Business Operations",
-            "item": "https://orixmh.vercel.app/blog/ai-business-automation-solutions"
+            "item": "https://hmorix.in/blog/ai-business-automation-solutions"
           }
         ]
       }

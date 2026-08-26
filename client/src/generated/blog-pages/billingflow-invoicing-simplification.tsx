@@ -236,7 +236,7 @@ const post = {
   "updatedAt": "2026-07-23T14:46:04.897Z",
   "seoTitle": "BillingFlow Invoicing Simplification | AI-Driven Small Business Solutions",
   "metaDescription": "Streamline invoicing with HMorix's BillingFlow, utilizing AI for automated billing solutions, reducing administrative tasks for small businesses.",
-  "canonicalUrl": "https://orixmh.vercel.app/blog/billingflow-invoicing-simplification",
+  "canonicalUrl": "https://hmorix.in/blog/billingflow-invoicing-simplification",
   "openGraph": {
     "title": "BillingFlow Invoicing Simplification | HMorix AI Solutions",
     "description": "Discover how BillingFlow by HMorix simplifies invoicing for small businesses with AI-driven proactive payment strategies.",
@@ -269,19 +269,19 @@ const post = {
           "@type": "Organization",
           "name": "HMorix AI"
         },
-        "url": "https://orixmh.vercel.app/blog/billingflow-invoicing-simplification",
+        "url": "https://hmorix.in/blog/billingflow-invoicing-simplification",
         "image": [],
         "publisher": {
           "@type": "Organization",
           "name": "HMorix",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://orixmh.vercel.app/logo.png"
+            "url": "https://hmorix.in/logo.png"
           }
         },
         "mainEntityOfPage": {
           "@type": "WebPage",
-          "url": "https://orixmh.vercel.app/blog/billingflow-invoicing-simplification"
+          "url": "https://hmorix.in/blog/billingflow-invoicing-simplification"
         }
       },
       {
@@ -300,7 +300,7 @@ const post = {
             "name": "How does BillingFlow automate invoice reminders?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "BillingFlow automates invoice reminders through AI-driven scheduling, sending tailored notifications to clients at optimal times for higher response rates. <a href=\"https://orixmh.vercel.app/products/BillingFlow\">Learn more about BillingFlow features</a>."
+              "text": "BillingFlow automates invoice reminders through AI-driven scheduling, sending tailored notifications to clients at optimal times for higher response rates. <a href=\"https://hmorix.in/products/BillingFlow\">Learn more about BillingFlow features</a>."
             }
           },
           {
@@ -308,7 +308,7 @@ const post = {
             "name": "Can BillingFlow integrate with existing accounting software?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "BillingFlow supports integration with QuickBooks, Xero, and Zoho Books. <a href=\"https://orixmh.vercel.app/products/BillingFlow/integrations\">View all integrations</a>."
+              "text": "BillingFlow supports integration with QuickBooks, Xero, and Zoho Books. <a href=\"https://hmorix.in/products/BillingFlow/integrations\">View all integrations</a>."
             }
           }
         ]
@@ -320,19 +320,19 @@ const post = {
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": "https://orixmh.vercel.app/"
+            "item": "https://hmorix.in/"
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "Blog",
-            "item": "https://orixmh.vercel.app/blog"
+            "item": "https://hmorix.in/blog"
           },
           {
             "@type": "ListItem",
             "position": 3,
             "name": "5 Ways HMorix's BillingFlow Simplifies Invoicing with AI-Driven Proactive Payment Strategies",
-            "item": "https://orixmh.vercel.app/blog/billingflow-invoicing-simplification"
+            "item": "https://hmorix.in/blog/billingflow-invoicing-simplification"
           }
         ]
       }

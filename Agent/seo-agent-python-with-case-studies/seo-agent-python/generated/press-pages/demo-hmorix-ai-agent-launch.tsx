@@ -40,7 +40,7 @@ const pr = {
   "pdfUrl": "/press/demo-hmorix-ai-agent-launch/pdf",
   "seoTitle": "HMorix Launches New AI Agent Platform (Sample) | HMorix",
   "metaDescription": "Sample press release layout for HMorix. Placeholder content — replace before publishing.",
-  "canonicalUrl": "https://orixmh.vercel.app/press/demo-hmorix-ai-agent-launch",
+  "canonicalUrl": "https://hmorix.in/press/demo-hmorix-ai-agent-launch",
   "openGraph": {
     "title": "HMorix Launches New AI Agent Platform — Sample",
     "description": "Sample press release layout.",

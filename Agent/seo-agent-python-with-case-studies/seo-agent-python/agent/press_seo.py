@@ -6,7 +6,7 @@ from agent.prompt_loader import load_system_prompt
 
 def press_seo(draft, press_input):
     system = load_system_prompt()
-    site_url = os.environ.get("SITE_URL", "https://orix-pink.vercel.app")
+    site_url = os.environ.get("SITE_URL", "https://hmorix.in")
 
     user_prompt = f"""
 Headline: {draft['headline']}

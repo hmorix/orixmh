@@ -2,12 +2,12 @@
 <rss version="2.0">
 <channel>
   <title>HMorix</title>
-  <link>https://orixmh.vercel.app/blog</link>
+  <link>https://hmorix.in/blog</link>
   <description>HMorix — latest posts</description>
   <item>
     <title>Unlocking Efficiency: AI Automation for Small Business Operations</title>
-    <link>https://orixmh.vercel.app/blog/ai-automation-for-small-business</link>
-    <guid isPermaLink="true">https://orixmh.vercel.app/blog/ai-automation-for-small-business</guid>
+    <link>https://hmorix.in/blog/ai-automation-for-small-business</link>
+    <guid isPermaLink="true">https://hmorix.in/blog/ai-automation-for-small-business</guid>
     <description>Discover how AI automation boosts operational efficiency in small businesses, with practical steps, industry examples, and realistic expectations.</description>
     <pubDate>Tue, 28 Jul 2026 20:08:27 +0000</pubDate>
     <category>AI Solutions</category>
@@ -15,8 +15,8 @@
   </item>
   <item>
     <title>A Beginner's Guide to Integrating AI into Existing Web Applications</title>
-    <link>https://orixmh.vercel.app/blog/integrating-ai-into-web-apps</link>
-    <guid isPermaLink="true">https://orixmh.vercel.app/blog/integrating-ai-into-web-apps</guid>
+    <link>https://hmorix.in/blog/integrating-ai-into-web-apps</link>
+    <guid isPermaLink="true">https://hmorix.in/blog/integrating-ai-into-web-apps</guid>
     <description>Learn how to integrate AI into your existing web applications with this step-by-step guide, covering choosing the right AI library, integration steps, and building a business case.</description>
     <pubDate>Tue, 28 Jul 2026 20:06:22 +0000</pubDate>
     <category>AI Solutions</category>
@@ -24,8 +24,8 @@
   </item>
   <item>
     <title>AI Invoicing Software vs Generic Tools: A Feature &amp; Cost Comparison</title>
-    <link>https://orixmh.vercel.app/blog/ai-invoicing-software-vs-generic-tools</link>
-    <guid isPermaLink="true">https://orixmh.vercel.app/blog/ai-invoicing-software-vs-generic-tools</guid>
+    <link>https://hmorix.in/blog/ai-invoicing-software-vs-generic-tools</link>
+    <guid isPermaLink="true">https://hmorix.in/blog/ai-invoicing-software-vs-generic-tools</guid>
     <description>Compare AI Invoicing Software (BillingFlow) with generic invoicing tools for efficiency, cost, and scalability. Discover which is best for your business.</description>
     <pubDate>Mon, 27 Jul 2026 05:06:31 +0000</pubDate>
     <category>Software Comparison</category>
@@ -33,8 +33,8 @@
   </item>
   <item>
     <title>AI Business Automation: Transforming Operations with Human-Centric Efficiency</title>
-    <link>https://orixmh.vercel.app/blog/ai-business-automation</link>
-    <guid isPermaLink="true">https://orixmh.vercel.app/blog/ai-business-automation</guid>
+    <link>https://hmorix.in/blog/ai-business-automation</link>
+    <guid isPermaLink="true">https://hmorix.in/blog/ai-business-automation</guid>
     <description>Discover how AI business automation is transforming operations by enhancing efficiency, reducing costs, and improving customer satisfaction. Learn about its benefits, implementation strategies, and best practices.</description>
     <pubDate>Sun, 26 Jul 2026 08:13:57 +0000</pubDate>
     <category>Artificial Intelligence</category>

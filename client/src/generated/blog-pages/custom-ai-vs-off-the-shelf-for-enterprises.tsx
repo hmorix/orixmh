@@ -237,7 +237,7 @@ const post = {
   "updatedAt": "2026-08-18T05:28:41.601Z",
   "seoTitle": "Custom AI Solutions vs Off-the-Shelf for Enterprises",
   "metaDescription": "Compare custom AI solutions vs off-the-shelf AI for enterprises, focusing on strategic alignment, innovation, and key differences in AI transformation.",
-  "canonicalUrl": "https://orixmh.vercel.app/blog/custom-ai-vs-off-the-shelf-for-enterprises",
+  "canonicalUrl": "https://hmorix.in/blog/custom-ai-vs-off-the-shelf-for-enterprises",
   "openGraph": {
     "title": "Custom AI Solutions vs Off-the-Shelf for Enterprises",
     "description": "Navigate the decision between custom AI solutions and off-the-shelf AI for enterprises, understanding strategic alignment, innovation, and key differences.",
@@ -270,12 +270,12 @@ const post = {
           "@type": "Organization",
           "name": "HMorix AI"
         },
-        "url": "https://orixmh.vercel.app/blog/custom-ai-vs-off-the-shelf-for-enterprises",
+        "url": "https://hmorix.in/blog/custom-ai-vs-off-the-shelf-for-enterprises",
         "image": [],
         "keywords": [],
         "mainEntityOfPage": {
           "@type": "WebPage",
-          "url": "https://orixmh.vercel.app/blog/custom-ai-vs-off-the-shelf-for-enterprises"
+          "url": "https://hmorix.in/blog/custom-ai-vs-off-the-shelf-for-enterprises"
         }
       },
       {
@@ -314,19 +314,19 @@ const post = {
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": "https://orixmh.vercel.app/"
+            "item": "https://hmorix.in/"
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "Blog",
-            "item": "https://orixmh.vercel.app/blog"
+            "item": "https://hmorix.in/blog"
           },
           {
             "@type": "ListItem",
             "position": 3,
             "name": "Custom AI Solutions vs Off-the-Shelf AI for Enterprises",
-            "item": "https://orixmh.vercel.app/blog/custom-ai-vs-off-the-shelf-for-enterprises"
+            "item": "https://hmorix.in/blog/custom-ai-vs-off-the-shelf-for-enterprises"
           }
         ]
       }

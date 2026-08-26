@@ -159,7 +159,7 @@ const wp = {
   "pdfUrl": "/whitepaper/demo-ai-support-automation-whitepaper/pdf",
   "seoTitle": "AI Support Automation for Small E-commerce Teams (Sample) | HMorix",
   "metaDescription": "A sample HMorix white paper on AI support automation. Placeholder content — replace before publishing.",
-  "canonicalUrl": "https://orixmh.vercel.app/whitepapers/demo-ai-support-automation-whitepaper",
+  "canonicalUrl": "https://hmorix.in/whitepapers/demo-ai-support-automation-whitepaper",
   "openGraph": {
     "title": "AI Support Automation — Sample White Paper | HMorix",
     "description": "Sample white paper layout.",

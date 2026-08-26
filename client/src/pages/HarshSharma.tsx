@@ -9,14 +9,14 @@ export default function HarshSharma() {
   const personSchema = {
     '@context': 'https://schema.org',
     '@type': 'Person',
-    '@id': 'https://orixmh.vercel.app/harsh-sharma#person',
+    '@id': 'https://hmorix.in/harsh-sharma#person',
     name: 'Harsh Sharma',
     alternateName: ['Harsh Sharma HMorix', 'Harsh Sharma Hathras'],
     jobTitle: 'Founder & CEO',
-    worksFor: { '@id': 'https://orixmh.vercel.app/#organization' },
-    founder: { '@id': 'https://orixmh.vercel.app/#organization' },
-    image: 'https://orixmh.vercel.app/harsh-sharma.jpg',
-    url: 'https://orixmh.vercel.app/harsh-sharma',
+    worksFor: { '@id': 'https://hmorix.in/#organization' },
+    founder: { '@id': 'https://hmorix.in/#organization' },
+    image: 'https://hmorix.in/harsh-sharma.jpg',
+    url: 'https://hmorix.in/harsh-sharma',
     nationality: 'Indian',
     address: {
       '@type': 'PostalAddress',
@@ -43,12 +43,12 @@ export default function HarshSharma() {
   const orgSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    '@id': 'https://orixmh.vercel.app/#organization',
+    '@id': 'https://hmorix.in/#organization',
     name: 'HMorix',
     alternateName: orgAlternateNames,
-    url: 'https://orixmh.vercel.app',
-    logo: 'https://orixmh.vercel.app/logo.png',
-    founder: { '@id': 'https://orixmh.vercel.app/harsh-sharma#person' },
+    url: 'https://hmorix.in',
+    logo: 'https://hmorix.in/logo.png',
+    founder: { '@id': 'https://hmorix.in/harsh-sharma#person' },
     foundingLocation: { '@type': 'Place', name: 'Hathras, Uttar Pradesh, India' },
     address: {
       '@type': 'PostalAddress',
@@ -63,8 +63,8 @@ export default function HarshSharma() {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://orixmh.vercel.app' },
-      { '@type': 'ListItem', position: 2, name: 'Harsh Sharma', item: 'https://orixmh.vercel.app/harsh-sharma' }
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://hmorix.in' },
+      { '@type': 'ListItem', position: 2, name: 'Harsh Sharma', item: 'https://hmorix.in/harsh-sharma' }
     ]
   }
 

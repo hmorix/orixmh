@@ -7,7 +7,7 @@ from agent.prompt_loader import load_system_prompt
 
 def case_study_seo(draft, case_input):
     system = load_system_prompt()
-    site_url = os.environ.get("SITE_URL", "https://orix-pink.vercel.app")
+    site_url = os.environ.get("SITE_URL", "https://hmorix.in")
 
     user_prompt = f"""
 Title: {draft['title']}

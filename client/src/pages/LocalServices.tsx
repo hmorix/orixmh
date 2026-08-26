@@ -82,7 +82,7 @@ export default function LocalServices() {
     '@context': 'https://schema.org',
     '@type': 'ProfessionalService',
     name: `HMorix ${service.title} in ${city}`,
-    url: `https://orixmh.vercel.app${canonical}`,
+    url: `https://hmorix.in${canonical}`,
     areaServed: city,
     brand: { '@type': 'Brand', name: 'HMorix' },
     founder: { '@type': 'Person', name: 'Harsh Sharma' },

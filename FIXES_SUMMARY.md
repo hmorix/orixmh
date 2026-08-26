@@ -30,9 +30,9 @@ Application was using hardcoded `localhost:3000` for authentication and email ve
 
 ### Environment Variables Required
 ```
-NEXT_PUBLIC_APP_URL=https://orix-pink.vercel.app
-APP_URL=https://orix-pink.vercel.app
-SITE_URL=https://orix-pink.vercel.app
+NEXT_PUBLIC_APP_URL=https://hmorix.in
+APP_URL=https://hmorix.in
+SITE_URL=https://hmorix.in
 ```
 
 ---

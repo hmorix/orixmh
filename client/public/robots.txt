@@ -23,7 +23,7 @@ Disallow: /*#*
 
 Crawl-delay: 1
 
-Sitemap: https://orixmh.vercel.app/sitemap.xml
+Sitemap: https://hmorix.in/sitemap.xml
 
 User-agent: Googlebot
 Allow: /

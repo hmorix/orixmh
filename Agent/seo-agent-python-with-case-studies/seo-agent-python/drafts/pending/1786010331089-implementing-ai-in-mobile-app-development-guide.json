@@ -284,7 +284,7 @@
     },
     {
       "type": "paragraph",
-      "text": "Need tailored AI solutions for your mobile app? <a href=\"https://orixmh.vercel.app\">Contact HMorix</a> for a custom quote on our AI Agent platform."
+      "text": "Need tailored AI solutions for your mobile app? <a href=\"https://hmorix.in\">Contact HMorix</a> for a custom quote on our AI Agent platform."
     }
   ],
   "category": "Technical Guides",
@@ -295,7 +295,7 @@
   "updated_at": "2026-08-06T09:58:51.089Z",
   "seo_title": "AI in Mobile App Development: Beginner\u2019s Guide",
   "meta_description": "Step-by-step guide to integrating AI in mobile app development for beginners, covering frameworks, implementation, and ethics.",
-  "canonical_url": "https://orixmh.vercel.app/blog/implementing-ai-in-mobile-app-development-guide",
+  "canonical_url": "https://hmorix.in/blog/implementing-ai-in-mobile-app-development-guide",
   "open_graph": {
     "title": "AI in Mobile App Development: Beginner\u2019s Guide",
     "description": "Step-by-step guide to integrating AI in mobile app development for beginners, covering frameworks, implementation, and ethics.",
@@ -367,10 +367,10 @@
         "keywords": [],
         "mainEntityOfPage": {
           "@type": "WebPage",
-          "@id": "https://orixmh.vercel.app/blog/implementing-ai-in-mobile-app-development-guide"
+          "@id": "https://hmorix.in/blog/implementing-ai-in-mobile-app-development-guide"
         },
-        "url": "https://orixmh.vercel.app/blog/implementing-ai-in-mobile-app-development-guide",
-        "canonicalUrl": "https://orixmh.vercel.app/blog/implementing-ai-in-mobile-app-development-guide"
+        "url": "https://hmorix.in/blog/implementing-ai-in-mobile-app-development-guide",
+        "canonicalUrl": "https://hmorix.in/blog/implementing-ai-in-mobile-app-development-guide"
       },
       {
         "@type": "FAQPage",
@@ -408,24 +408,24 @@
             "@type": "ListItem",
             "position": 1,
             "name": "Blog",
-            "item": "https://orixmh.vercel.app/blog"
+            "item": "https://hmorix.in/blog"
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "Implementing AI in Mobile App Development: A Practical Beginner\u2019s Guide",
-            "item": "https://orixmh.vercel.app/blog/implementing-ai-in-mobile-app-development-guide"
+            "item": "https://hmorix.in/blog/implementing-ai-in-mobile-app-development-guide"
           }
         ]
       }
     ]
   },
   "social_posts": {
-    "linkedin": "Elevate your mobile app development skills with our practical guide to integrating AI. Discover step-by-step how to select the right framework, implement AI features, and navigate ethical considerations. What's the most impactful AI feature you've seen in a mobile app recently? Read more: https://orixmh.vercel.app/blog/implementing-ai-in-mobile-app-development-guide",
-    "x": "AI in Mobile Apps Made Easy! Step-by-step guide for beginners: https://orixmh.vercel.app/blog/implementing-ai-in-mobile-app-development-guide #AIForBeginners",
-    "facebook": "Ready to Turbocharge Your Mobile Apps with AI? Check out our beginner-friendly, step-by-step guide covering everything from getting started to ethical AI use. Share with us: What's your first AI-powered feature you'd love to implement in a mobile app? Dive in here: https://orixmh.vercel.app/blog/implementing-ai-in-mobile-app-development-guide",
+    "linkedin": "Elevate your mobile app development skills with our practical guide to integrating AI. Discover step-by-step how to select the right framework, implement AI features, and navigate ethical considerations. What's the most impactful AI feature you've seen in a mobile app recently? Read more: https://hmorix.in/blog/implementing-ai-in-mobile-app-development-guide",
+    "x": "AI in Mobile Apps Made Easy! Step-by-step guide for beginners: https://hmorix.in/blog/implementing-ai-in-mobile-app-development-guide #AIForBeginners",
+    "facebook": "Ready to Turbocharge Your Mobile Apps with AI? Check out our beginner-friendly, step-by-step guide covering everything from getting started to ethical AI use. Share with us: What's your first AI-powered feature you'd love to implement in a mobile app? Dive in here: https://hmorix.in/blog/implementing-ai-in-mobile-app-development-guide",
     "instagram": "AI-Powered Mobile Apps, Made Accessible! [Image Suggestion: A developer's screen with AI SDKs and mobile app layouts] New to AI in mobile development? Our latest guide walks you through it all, from frameworks to ethics. Tap the link in our bio to read now! #MobileAppDevelopment #AIIntegration",
-    "threads": "New Guide Alert! Implementing AI in Mobile Apps for Beginners. Step-by-step walkthrough from prep to launch. What's your top AI priority for mobile? Read here: https://orixmh.vercel.app/blog/implementing-ai-in-mobile-app-development-guide"
+    "threads": "New Guide Alert! Implementing AI in Mobile Apps for Beginners. Step-by-step walkthrough from prep to launch. What's your top AI priority for mobile? Read here: https://hmorix.in/blog/implementing-ai-in-mobile-app-development-guide"
   },
   "seo_score": 92,
   "flagged_claims": [

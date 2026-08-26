@@ -85,9 +85,9 @@ DATABASE=supabase
 MONGODB_URI=mongodb+srv://Admin:PASSWORD@cluster.mongodb.net/database?retryWrites=true&w=majority
 
 # Application URLs
-NEXT_PUBLIC_APP_URL=https://orix-pink.vercel.app
-APP_URL=https://orix-pink.vercel.app
-SITE_URL=https://orix-pink.vercel.app
+NEXT_PUBLIC_APP_URL=https://hmorix.in
+APP_URL=https://hmorix.in
+SITE_URL=https://hmorix.in
 
 # Supabase
 VITE_SUPABASE_URL=https://your-project.supabase.co
@@ -107,10 +107,10 @@ JWT_EXPIRES_IN=3600
 Create `client/.env`:
 
 ```bash
-VITE_APP_URL=https://orix-pink.vercel.app
+VITE_APP_URL=https://hmorix.in
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=your_anon_key
-VITE_API_URL=https://orix-pink.vercel.app/api
+VITE_API_URL=https://hmorix.in/api
 VITE_NVIDIA_API_KEY=your_nvidia_api_key
 VITE_NVIDIA_MODEL=meta/llama-3.1-405b-instruct
 VITE_ENABLE_ANALYTICS=true

@@ -11,7 +11,7 @@ interface SEOHeadProps {
 
 export default function SEOHead({ title, description, keywords, canonical, ogImage, type = 'website' }: SEOHeadProps) {
   useEffect(() => {
-    const siteUrl = import.meta.env.VITE_APP_URL || 'https://orixmh.vercel.app'
+    const siteUrl = import.meta.env.VITE_APP_URL || 'https://hmorix.in'
     const pageUrl = `${siteUrl.replace(/\/$/, '')}${canonical || ''}`
     const fullTitle = title.toLowerCase().includes('hmorix') ? title : `${title} | HMorix`
     document.title = fullTitle

@@ -525,7 +525,7 @@
     "seoTitle": "AI Automation Tools for Small Businesses in India",
     "metaDescription": "Empower your Indian SME with AI automation tools. Explore key solutions, compliance, and success stories.",
     "slug": "ai-automation-tools-small-businesses-india",
-    "canonicalUrl": "https://orixmh.vercel.app/blog/ai-automation-tools-small-businesses-india",
+    "canonicalUrl": "https://hmorix.in/blog/ai-automation-tools-small-businesses-india",
     "openGraph": {
       "title": "AI Automation Tools for Small Businesses in India",
       "description": "Discover AI automation tools revolutionizing efficiency for small businesses in India.",
@@ -599,12 +599,12 @@
           "name": "HMorix",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://orixmh.vercel.app/logo.png"
+            "url": "https://hmorix.in/logo.png"
           }
         },
         "image": {
           "@type": "ImageObject",
-          "url": "https://orixmh.vercel.app/blog/ai-automation-tools-small-businesses-india/featured-image.jpg"
+          "url": "https://hmorix.in/blog/ai-automation-tools-small-businesses-india/featured-image.jpg"
         },
         "keywords": [
           "AI Automation",
@@ -613,10 +613,10 @@
         ],
         "mainEntityOfPage": {
           "@type": "WebPage",
-          "url": "https://orixmh.vercel.app/blog/ai-automation-tools-small-businesses-india"
+          "url": "https://hmorix.in/blog/ai-automation-tools-small-businesses-india"
         },
-        "url": "https://orixmh.vercel.app/blog/ai-automation-tools-small-businesses-india",
-        "canonicalUrl": "https://orixmh.vercel.app/blog/ai-automation-tools-small-businesses-india"
+        "url": "https://hmorix.in/blog/ai-automation-tools-small-businesses-india",
+        "canonicalUrl": "https://hmorix.in/blog/ai-automation-tools-small-businesses-india"
       },
       {
         "@type": "FAQPage",
@@ -654,29 +654,29 @@
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": "https://orixmh.vercel.app/"
+            "item": "https://hmorix.in/"
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "Blog",
-            "item": "https://orixmh.vercel.app/blog"
+            "item": "https://hmorix.in/blog"
           },
           {
             "@type": "ListItem",
             "position": 3,
             "name": "AI Automation Tools for Small Businesses in India",
-            "item": "https://orixmh.vercel.app/blog/ai-automation-tools-small-businesses-india"
+            "item": "https://hmorix.in/blog/ai-automation-tools-small-businesses-india"
           }
         ]
       }
     ]
   },
   "social": {
-    "linkedin": "Unlock localized efficiency for your small business in India with AI automation! Discover key tools, compliance insights, and success stories in our latest blog post. How do you think AI can address unique challenges faced by Indian SMEs? Read more: https://orixmh.vercel.app/blog/ai-automation-tools-small-businesses-india",
-    "x": "AI automates efficiency for Indian small businesses! Explore tools, compliance & success stories: https://orixmh.vercel.app/blog/ai-automation-tools-small-businesses-india #AIforSMEs",
-    "facebook": "Indian small businesses, rejoice! AI automation is here to boost your efficiency. Dive into our latest blog to uncover the top tools, essential compliance notes, and inspiring success stories from around the country. How has automation impacted your business, or what's holding you back? Share with us! Read now: https://orixmh.vercel.app/blog/ai-automation-tools-small-businesses-india",
-    "instagram": "Efficiency just got a boost for Indian SMEs! [Image suggestion: A vibrant illustration of Indian market/street with subtle AI/automation elements] Discover how AI automation tools are transforming local businesses. Link in bio: https://orixmh.vercel.app/blog/ai-automation-tools-small-businesses-india #AIforIndia",
+    "linkedin": "Unlock localized efficiency for your small business in India with AI automation! Discover key tools, compliance insights, and success stories in our latest blog post. How do you think AI can address unique challenges faced by Indian SMEs? Read more: https://hmorix.in/blog/ai-automation-tools-small-businesses-india",
+    "x": "AI automates efficiency for Indian small businesses! Explore tools, compliance & success stories: https://hmorix.in/blog/ai-automation-tools-small-businesses-india #AIforSMEs",
+    "facebook": "Indian small businesses, rejoice! AI automation is here to boost your efficiency. Dive into our latest blog to uncover the top tools, essential compliance notes, and inspiring success stories from around the country. How has automation impacted your business, or what's holding you back? Share with us! Read now: https://hmorix.in/blog/ai-automation-tools-small-businesses-india",
+    "instagram": "Efficiency just got a boost for Indian SMEs! [Image suggestion: A vibrant illustration of Indian market/street with subtle AI/automation elements] Discover how AI automation tools are transforming local businesses. Link in bio: https://hmorix.in/blog/ai-automation-tools-small-businesses-india #AIforIndia",
     "threads": "Indian small businesses can now supercharge efficiency with AI automation! Check out our blog for the top tools and success stories. Worth the investment?"
   }
 }

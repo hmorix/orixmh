@@ -39,8 +39,8 @@ export const defaultSEO: SEOConfig = {
     'Agra',
     'Aligarh',
   ],
-  image: 'https://orix-pink.vercel.app/og-image.png',
-  url: 'https://orix-pink.vercel.app',
+  image: 'https://hmorix.in/og-image.png',
+  url: 'https://hmorix.in',
   type: 'website',
 }
 
@@ -114,8 +114,8 @@ export function getOrganizationSchema() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'HMorix',
-    url: 'https://orix-pink.vercel.app',
-    logo: 'https://orix-pink.vercel.app/logo.png',
+    url: 'https://hmorix.in',
+    logo: 'https://hmorix.in/logo.png',
     description: 'Enterprise AI software, web design, mobile apps, digital marketing & smart home solutions',
     sameAs: [
       'https://twitter.com/hmorix',
@@ -145,7 +145,7 @@ export function getSoftwareApplicationSchema() {
     '@type': 'SoftwareApplication',
     name: 'HMorix Platform',
     description: 'Enterprise AI platform for business automation',
-    url: 'https://orix-pink.vercel.app',
+    url: 'https://hmorix.in',
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     offers: {
@@ -232,7 +232,7 @@ export function getLocalBusinessSchema(location: string) {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: loc.name,
-    image: 'https://orix-pink.vercel.app/logo.png',
+    image: 'https://hmorix.in/logo.png',
     description: `HMorix office in ${loc.city} - AI development, web design, and digital solutions`,
     address: {
       '@type': 'PostalAddress',
@@ -242,7 +242,7 @@ export function getLocalBusinessSchema(location: string) {
       postalCode: loc.postalCode,
       addressCountry: 'IN',
     },
-    url: 'https://orix-pink.vercel.app',
+    url: 'https://hmorix.in',
     telephone: '+91-XXXXXXXXXX',
     priceRange: '₹₹₹',
   }

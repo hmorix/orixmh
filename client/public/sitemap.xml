@@ -1,561 +1,561 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://orixmh.vercel.app/</loc>
+    <loc>https://hmorix.in/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/about</loc>
+    <loc>https://hmorix.in/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/services</loc>
+    <loc>https://hmorix.in/services</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/pricing</loc>
+    <loc>https://hmorix.in/pricing</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/contact</loc>
+    <loc>https://hmorix.in/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/sitemap</loc>
+    <loc>https://hmorix.in/sitemap</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/services/web-design</loc>
+    <loc>https://hmorix.in/services/web-design</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/services/mobile-apps</loc>
+    <loc>https://hmorix.in/services/mobile-apps</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/services/digital-marketing</loc>
+    <loc>https://hmorix.in/services/digital-marketing</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/services/ai-solutions</loc>
+    <loc>https://hmorix.in/services/ai-solutions</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/services/software-development</loc>
+    <loc>https://hmorix.in/services/software-development</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/services/advertising</loc>
+    <loc>https://hmorix.in/services/advertising</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/services/ecommerce</loc>
+    <loc>https://hmorix.in/services/ecommerce</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/billingflow</loc>
+    <loc>https://hmorix.in/billingflow</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/billingflow/features</loc>
+    <loc>https://hmorix.in/billingflow/features</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/billingflow/pricing</loc>
+    <loc>https://hmorix.in/billingflow/pricing</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/billingflow/docs</loc>
+    <loc>https://hmorix.in/billingflow/docs</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/billingflow/api</loc>
+    <loc>https://hmorix.in/billingflow/api</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/billingflow/demo</loc>
+    <loc>https://hmorix.in/billingflow/demo</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/billingflow/changelog</loc>
+    <loc>https://hmorix.in/billingflow/changelog</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/agent</loc>
+    <loc>https://hmorix.in/agent</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/agent/playground</loc>
+    <loc>https://hmorix.in/agent/playground</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/agent/docs</loc>
+    <loc>https://hmorix.in/agent/docs</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/agent/templates</loc>
+    <loc>https://hmorix.in/agent/templates</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/agent/workflows</loc>
+    <loc>https://hmorix.in/agent/workflows</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/agent/examples</loc>
+    <loc>https://hmorix.in/agent/examples</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/pdf-automation</loc>
+    <loc>https://hmorix.in/pdf-automation</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/pdf-automation/docs</loc>
+    <loc>https://hmorix.in/pdf-automation/docs</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/pdf-automation/demo</loc>
+    <loc>https://hmorix.in/pdf-automation/demo</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/pdf-automation/templates</loc>
+    <loc>https://hmorix.in/pdf-automation/templates</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/smart-home</loc>
+    <loc>https://hmorix.in/smart-home</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/security</loc>
+    <loc>https://hmorix.in/security</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/status</loc>
+    <loc>https://hmorix.in/status</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/trust</loc>
+    <loc>https://hmorix.in/trust</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/compliance</loc>
+    <loc>https://hmorix.in/compliance</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/certifications</loc>
+    <loc>https://hmorix.in/certifications</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/support</loc>
+    <loc>https://hmorix.in/support</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/knowledge-base</loc>
+    <loc>https://hmorix.in/knowledge-base</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/faq</loc>
+    <loc>https://hmorix.in/faq</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/testimonials</loc>
+    <loc>https://hmorix.in/testimonials</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/blog</loc>
+    <loc>https://hmorix.in/blog</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/case-studies</loc>
+    <loc>https://hmorix.in/case-studies</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/whitepapers</loc>
+    <loc>https://hmorix.in/whitepapers</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/press</loc>
+    <loc>https://hmorix.in/press</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/developers</loc>
+    <loc>https://hmorix.in/developers</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/playground</loc>
+    <loc>https://hmorix.in/playground</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/architecture</loc>
+    <loc>https://hmorix.in/architecture</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/blog/custom-ai-vs-off-the-shelf-for-enterprises</loc>
+    <loc>https://hmorix.in/blog/custom-ai-vs-off-the-shelf-for-enterprises</loc>
     <lastmod>2026-08-18T05:28:41.601Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/blog/what-is-hmorix-ai-solutions-guide</loc>
+    <loc>https://hmorix.in/blog/what-is-hmorix-ai-solutions-guide</loc>
     <lastmod>2026-07-23T14:50:43.581Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/blog/ai-business-automation-solutions</loc>
+    <loc>https://hmorix.in/blog/ai-business-automation-solutions</loc>
     <lastmod>2026-07-23T14:49:40.155Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/blog/billingflow-invoicing-simplification</loc>
+    <loc>https://hmorix.in/blog/billingflow-invoicing-simplification</loc>
     <lastmod>2026-07-23T14:46:04.897Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/careers</loc>
+    <loc>https://hmorix.in/careers</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/investors</loc>
+    <loc>https://hmorix.in/investors</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/partners</loc>
+    <loc>https://hmorix.in/partners</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/roadmap</loc>
+    <loc>https://hmorix.in/roadmap</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/media-kit</loc>
+    <loc>https://hmorix.in/media-kit</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/harsh-sharma</loc>
+    <loc>https://hmorix.in/harsh-sharma</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/harsh-sharma-developer</loc>
+    <loc>https://hmorix.in/harsh-sharma-developer</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/hathras/web-app-development</loc>
+    <loc>https://hmorix.in/locations/hathras/web-app-development</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/hathras/hosting</loc>
+    <loc>https://hmorix.in/locations/hathras/hosting</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/hathras/automation</loc>
+    <loc>https://hmorix.in/locations/hathras/automation</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/hathras/ai-integration</loc>
+    <loc>https://hmorix.in/locations/hathras/ai-integration</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/hathras/software</loc>
+    <loc>https://hmorix.in/locations/hathras/software</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/hathras/seo</loc>
+    <loc>https://hmorix.in/locations/hathras/seo</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/hathras/products</loc>
+    <loc>https://hmorix.in/locations/hathras/products</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/mathura/web-app-development</loc>
+    <loc>https://hmorix.in/locations/mathura/web-app-development</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/mathura/hosting</loc>
+    <loc>https://hmorix.in/locations/mathura/hosting</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/mathura/automation</loc>
+    <loc>https://hmorix.in/locations/mathura/automation</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/mathura/ai-integration</loc>
+    <loc>https://hmorix.in/locations/mathura/ai-integration</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/mathura/software</loc>
+    <loc>https://hmorix.in/locations/mathura/software</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/mathura/seo</loc>
+    <loc>https://hmorix.in/locations/mathura/seo</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/mathura/products</loc>
+    <loc>https://hmorix.in/locations/mathura/products</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/aligarh/web-app-development</loc>
+    <loc>https://hmorix.in/locations/aligarh/web-app-development</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/aligarh/hosting</loc>
+    <loc>https://hmorix.in/locations/aligarh/hosting</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/aligarh/automation</loc>
+    <loc>https://hmorix.in/locations/aligarh/automation</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/aligarh/ai-integration</loc>
+    <loc>https://hmorix.in/locations/aligarh/ai-integration</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/aligarh/software</loc>
+    <loc>https://hmorix.in/locations/aligarh/software</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/aligarh/seo</loc>
+    <loc>https://hmorix.in/locations/aligarh/seo</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/aligarh/products</loc>
+    <loc>https://hmorix.in/locations/aligarh/products</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/agra/web-app-development</loc>
+    <loc>https://hmorix.in/locations/agra/web-app-development</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/agra/hosting</loc>
+    <loc>https://hmorix.in/locations/agra/hosting</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/agra/automation</loc>
+    <loc>https://hmorix.in/locations/agra/automation</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/agra/ai-integration</loc>
+    <loc>https://hmorix.in/locations/agra/ai-integration</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/agra/software</loc>
+    <loc>https://hmorix.in/locations/agra/software</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/agra/seo</loc>
+    <loc>https://hmorix.in/locations/agra/seo</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/agra/products</loc>
+    <loc>https://hmorix.in/locations/agra/products</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/vrindavan/web-app-development</loc>
+    <loc>https://hmorix.in/locations/vrindavan/web-app-development</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/vrindavan/hosting</loc>
+    <loc>https://hmorix.in/locations/vrindavan/hosting</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/vrindavan/automation</loc>
+    <loc>https://hmorix.in/locations/vrindavan/automation</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/vrindavan/ai-integration</loc>
+    <loc>https://hmorix.in/locations/vrindavan/ai-integration</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/vrindavan/software</loc>
+    <loc>https://hmorix.in/locations/vrindavan/software</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/vrindavan/seo</loc>
+    <loc>https://hmorix.in/locations/vrindavan/seo</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/vrindavan/products</loc>
+    <loc>https://hmorix.in/locations/vrindavan/products</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/delhi/web-app-development</loc>
+    <loc>https://hmorix.in/locations/delhi/web-app-development</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/delhi/ai-integration</loc>
+    <loc>https://hmorix.in/locations/delhi/ai-integration</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/delhi/software</loc>
+    <loc>https://hmorix.in/locations/delhi/software</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/delhi/seo</loc>
+    <loc>https://hmorix.in/locations/delhi/seo</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/noida/web-app-development</loc>
+    <loc>https://hmorix.in/locations/noida/web-app-development</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/noida/ai-integration</loc>
+    <loc>https://hmorix.in/locations/noida/ai-integration</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/noida/software</loc>
+    <loc>https://hmorix.in/locations/noida/software</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/noida/seo</loc>
+    <loc>https://hmorix.in/locations/noida/seo</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/mumbai/web-app-development</loc>
+    <loc>https://hmorix.in/locations/mumbai/web-app-development</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/mumbai/ai-integration</loc>
+    <loc>https://hmorix.in/locations/mumbai/ai-integration</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/mumbai/software</loc>
+    <loc>https://hmorix.in/locations/mumbai/software</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/mumbai/products</loc>
+    <loc>https://hmorix.in/locations/mumbai/products</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/bengaluru/web-app-development</loc>
+    <loc>https://hmorix.in/locations/bengaluru/web-app-development</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/bengaluru/ai-integration</loc>
+    <loc>https://hmorix.in/locations/bengaluru/ai-integration</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/bengaluru/software</loc>
+    <loc>https://hmorix.in/locations/bengaluru/software</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/locations/bengaluru/products</loc>
+    <loc>https://hmorix.in/locations/bengaluru/products</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/terms</loc>
+    <loc>https://hmorix.in/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://orixmh.vercel.app/privacy</loc>
+    <loc>https://hmorix.in/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

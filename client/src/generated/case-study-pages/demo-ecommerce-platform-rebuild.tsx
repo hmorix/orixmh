@@ -223,7 +223,7 @@ const cs = {
   ],
   "seoTitle": "E-commerce Platform Rebuild Case Study (Sample) | HMorix",
   "metaDescription": "A sample HMorix case study template for an E-commerce engagement. Placeholder content — replace with real client data before publishing.",
-  "canonicalUrl": "https://orixmh.vercel.app/case-studies/demo-ecommerce-platform-rebuild",
+  "canonicalUrl": "https://hmorix.in/case-studies/demo-ecommerce-platform-rebuild",
   "openGraph": {
     "title": "E-commerce Platform Rebuild — Sample Case Study | HMorix",
     "description": "Sample case study layout for an E-commerce engagement.",
@@ -264,7 +264,7 @@ const cs = {
         "dateModified": "2026-07-24T00:00:00+00:00",
         "mainEntityOfPage": {
           "@type": "WebPage",
-          "@id": "https://orixmh.vercel.app/case-studies/demo-ecommerce-platform-rebuild"
+          "@id": "https://hmorix.in/case-studies/demo-ecommerce-platform-rebuild"
         },
         "about": {
           "@type": "Organization",

@@ -5,7 +5,7 @@
 
 export const config = {
   // Application URLs
-  appUrl: import.meta.env.VITE_APP_URL || 'https://orixmh.vercel.app',
+  appUrl: import.meta.env.VITE_APP_URL || 'https://hmorix.in',
   apiUrl: import.meta.env.VITE_API_URL || '/api',
   
   // Supabase

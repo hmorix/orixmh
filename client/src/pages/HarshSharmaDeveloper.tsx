@@ -49,12 +49,12 @@ const personJsonLd = {
   alternateName: ['Harsh', 'hm_orix', 'Harsha Sharma'],
   jobTitle: 'Full-Stack Developer & Founder',
   description: DESCRIPTION,
-  url: 'https://orixmh.vercel.app/harsh-sharma-developer',
-  image: 'https://orixmh.vercel.app/harsh-sharma.jpg',
+  url: 'https://hmorix.in/harsh-sharma-developer',
+  image: 'https://hmorix.in/harsh-sharma.jpg',
   worksFor: {
     '@type': 'Organization',
     name: 'HMorix',
-    url: 'https://orixmh.vercel.app',
+    url: 'https://hmorix.in',
   },
   address: {
     '@type': 'PostalAddress',

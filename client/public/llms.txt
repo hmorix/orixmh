@@ -6,22 +6,22 @@ Primary service locations include Hathras, Mathura, Aligarh, Agra, Vrindavan, De
 
 ## Important Pages
 
-- Home: https://orixmh.vercel.app/
-- Services: https://orixmh.vercel.app/services
-- Web Design: https://orixmh.vercel.app/services/web-design
-- Mobile Apps: https://orixmh.vercel.app/services/mobile-apps
-- Digital Marketing: https://orixmh.vercel.app/services/digital-marketing
-- AI Solutions: https://orixmh.vercel.app/services/ai-solutions
-- Software Development: https://orixmh.vercel.app/services/software-development
-- BillingFlow: https://orixmh.vercel.app/billingflow
-- AI Agent: https://orixmh.vercel.app/agent
-- PDF Automation: https://orixmh.vercel.app/pdf-automation
-- Security: https://orixmh.vercel.app/security
-- Contact: https://orixmh.vercel.app/contact
-- Harsh Sharma: https://orixmh.vercel.app/harsh-sharma
-- Web App Development in Hathras: https://orixmh.vercel.app/locations/hathras/web-app-development
-- AI Integration in Hathras: https://orixmh.vercel.app/locations/hathras/ai-integration
-- SEO Services in Mathura: https://orixmh.vercel.app/locations/mathura/seo
-- Software Development in Aligarh: https://orixmh.vercel.app/locations/aligarh/software
-- Web App Development in Agra: https://orixmh.vercel.app/locations/agra/web-app-development
-- Hosting in Vrindavan: https://orixmh.vercel.app/locations/vrindavan/hosting
+- Home: https://hmorix.in/
+- Services: https://hmorix.in/services
+- Web Design: https://hmorix.in/services/web-design
+- Mobile Apps: https://hmorix.in/services/mobile-apps
+- Digital Marketing: https://hmorix.in/services/digital-marketing
+- AI Solutions: https://hmorix.in/services/ai-solutions
+- Software Development: https://hmorix.in/services/software-development
+- BillingFlow: https://hmorix.in/billingflow
+- AI Agent: https://hmorix.in/agent
+- PDF Automation: https://hmorix.in/pdf-automation
+- Security: https://hmorix.in/security
+- Contact: https://hmorix.in/contact
+- Harsh Sharma: https://hmorix.in/harsh-sharma
+- Web App Development in Hathras: https://hmorix.in/locations/hathras/web-app-development
+- AI Integration in Hathras: https://hmorix.in/locations/hathras/ai-integration
+- SEO Services in Mathura: https://hmorix.in/locations/mathura/seo
+- Software Development in Aligarh: https://hmorix.in/locations/aligarh/software
+- Web App Development in Agra: https://hmorix.in/locations/agra/web-app-development
+- Hosting in Vrindavan: https://hmorix.in/locations/vrindavan/hosting

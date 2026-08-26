@@ -18,7 +18,7 @@ load_env()
 
 from lib.supabase import select_rows, SupabaseError  # noqa: E402
 
-SITE_URL = os.environ.get("SITE_URL", "https://orix-pink.vercel.app").rstrip("/")
+SITE_URL = os.environ.get("SITE_URL", "https://hmorix.in").rstrip("/")
 SITE_NAME = os.environ.get("SITE_NAME", "HMorix Blog")
 OUTPUT_PATH = os.environ.get("RSS_OUTPUT_PATH", os.path.join(os.getcwd(), "generated", "rss.xml"))
 FEED_ITEM_LIMIT = int(os.environ.get("RSS_ITEM_LIMIT", "50"))

@@ -244,7 +244,7 @@ const post = {
   "updatedAt": "2026-07-23T14:50:43.581Z",
   "seoTitle": "HMorix AI Solutions | Practical AI for Businesses",
   "metaDescription": "Discover HMorix's AI solutions for SMEs, bridging the AI gap with tailored tech & transparent implementation.",
-  "canonicalUrl": "https://orixmh.vercel.app/blog/what-is-hmorix-ai-solutions-guide",
+  "canonicalUrl": "https://hmorix.in/blog/what-is-hmorix-ai-solutions-guide",
   "openGraph": {
     "title": "HMorix AI Solutions for Business - A Complete Guide",
     "description": "Learn how HMorix's AI solutions help businesses adopt AI practically with tailored technology.",
@@ -277,19 +277,19 @@ const post = {
           "@type": "Organization",
           "name": "HMorix AI"
         },
-        "url": "https://orixmh.vercel.app/blog/what-is-hmorix-ai-solutions-guide",
+        "url": "https://hmorix.in/blog/what-is-hmorix-ai-solutions-guide",
         "image": [],
         "keywords": [],
         "mainEntityOfPage": {
           "@type": "WebPage",
-          "url": "https://orixmh.vercel.app/blog/what-is-hmorix-ai-solutions-guide"
+          "url": "https://hmorix.in/blog/what-is-hmorix-ai-solutions-guide"
         },
         "publisher": {
           "@type": "Organization",
           "name": "HMorix",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://orixmh.vercel.app/logo.png"
+            "url": "https://hmorix.in/logo.png"
           }
         }
       },
@@ -345,19 +345,19 @@ const post = {
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": "https://orixmh.vercel.app/"
+            "item": "https://hmorix.in/"
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "Blog",
-            "item": "https://orixmh.vercel.app/blog"
+            "item": "https://hmorix.in/blog"
           },
           {
             "@type": "ListItem",
             "position": 3,
             "name": "What is HMorix? A Complete Guide to Our AI Solutions for Practical Business Adoption",
-            "item": "https://orixmh.vercel.app/blog/what-is-hmorix-ai-solutions-guide"
+            "item": "https://hmorix.in/blog/what-is-hmorix-ai-solutions-guide"
           }
         ]
       }

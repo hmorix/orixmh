@@ -24,7 +24,7 @@
 - **Head Office:** Hathras, Uttar Pradesh, India
 - **Branches:** Hathras, Mathura, Kanpur
 - **Email:** hmorix.in@gmail.com
-- **Website:** https://orixmh.vercel.app
+- **Website:** https://hmorix.in
 - **Industry:** Artificial Intelligence, Software Development, Web Development, Business Automation
 
 ## About
