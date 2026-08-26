@@ -33,7 +33,7 @@ const SESSION_TTL_MS = Number(process.env.SESSION_TTL_MS || 1000 * 60 * 60 * 24 
 let mongoClient: MongoClient | null = null
 
 function appUrl() {
-  const raw = process.env.APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+  const raw = process.env.APP_URL || process.env.SITE_URL || process.env.CLIENT_ORIGIN || process.env.VITE_APP_URL || 'https://hmorix.in'
   return raw.replace(/\/$/, '')
 }
 
@@ -153,6 +153,64 @@ function tokenHash(token: string) {
 
 function generateOtp() {
   return String(crypto.randomInt(100000, 1000000))
+}
+
+function escapeHtml(value: string) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function brandedEmailTemplate(options: {
+  eyebrow: string
+  title: string
+  body: string
+  action?: { label: string; url: string }
+  code?: string
+  details?: Array<{ label: string; value: string }>
+  footer?: string
+}) {
+  const details = options.details?.length
+    ? `<div style="margin:24px 0;border:1px solid #24262b;border-radius:12px;overflow:hidden;background:#111317;">${options.details.map((item, index) => `
+        <div style="padding:14px 16px;${index < options.details!.length - 1 ? 'border-bottom:1px solid #24262b;' : ''}">
+          <div style="font:600 11px Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8b9099;">${escapeHtml(item.label)}</div>
+          <div style="margin-top:5px;font:600 15px Arial,sans-serif;color:#f4f1e8;">${escapeHtml(item.value)}</div>
+        </div>`).join('')}</div>`
+    : ''
+  const action = options.action
+    ? `<a href="${escapeHtml(options.action.url)}" style="display:inline-block;margin:24px 0 6px;padding:14px 22px;border-radius:10px;background:#C8FF00;color:#08090A;font:700 14px Arial,sans-serif;text-decoration:none;">${escapeHtml(options.action.label)}</a>
+       <div style="margin-top:12px;font:12px Arial,sans-serif;color:#8b9099;line-height:1.6;">Button not working? Open this link:<br><a href="${escapeHtml(options.action.url)}" style="color:#C8FF00;word-break:break-all;">${escapeHtml(options.action.url)}</a></div>`
+    : ''
+  const code = options.code
+    ? `<div style="margin:24px 0;padding:18px;border-radius:12px;background:#111317;border:1px solid #2d331f;text-align:center;">
+        <div style="font:600 11px Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8b9099;">Verification code</div>
+        <div style="margin-top:8px;font:800 34px Arial,sans-serif;letter-spacing:.18em;color:#C8FF00;">${escapeHtml(options.code)}</div>
+      </div>`
+    : ''
+
+  return `<!doctype html>
+<html>
+  <body style="margin:0;background:#08090A;padding:28px 14px;">
+    <div style="max-width:560px;margin:0 auto;border:1px solid #24262b;border-radius:18px;overflow:hidden;background:#0d0f12;">
+      <div style="padding:24px 26px;border-bottom:1px solid #24262b;background:#101216;">
+        <div style="display:inline-block;width:36px;height:36px;border-radius:9px;background:#C8FF00;color:#08090A;font:800 15px Arial,sans-serif;line-height:36px;text-align:center;">HM</div>
+        <div style="margin-top:18px;font:700 12px Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#C8FF00;">${escapeHtml(options.eyebrow)}</div>
+        <h1 style="margin:8px 0 0;font:800 26px Arial,sans-serif;line-height:1.2;color:#f4f1e8;">${escapeHtml(options.title)}</h1>
+      </div>
+      <div style="padding:26px;">
+        <p style="margin:0;font:15px Arial,sans-serif;line-height:1.7;color:#c9c7bf;">${escapeHtml(options.body)}</p>
+        ${code}
+        ${details}
+        ${action}
+        <p style="margin:24px 0 0;font:13px Arial,sans-serif;line-height:1.6;color:#8b9099;">${escapeHtml(options.footer || 'If you did not request this email, you can safely ignore it.')}</p>
+      </div>
+    </div>
+    <div style="max-width:560px;margin:16px auto 0;text-align:center;font:12px Arial,sans-serif;color:#686d76;">HMorix &bull; Enterprise AI Software</div>
+  </body>
+</html>`
 }
 
 async function sendMail(options: { to: string; subject: string; html: string; text?: string }) {
@@ -818,7 +876,16 @@ async function createEmployeeAccess(employee: any, options: { email?: string; us
       to: credentials.email,
       subject: 'Your HMorix employee login',
       text: `Welcome to HMorix. Login at ${loginUrl} with username ${credentials.username} and password ${credentials.password}`,
-      html: `<p>Welcome to HMorix.</p><p>Login at <a href="${loginUrl}">${loginUrl}</a>.</p><p><strong>Username:</strong> ${credentials.username}<br /><strong>Password:</strong> ${credentials.password}</p>`,
+      html: brandedEmailTemplate({
+        eyebrow: 'Employee access',
+        title: 'Your HMorix login is ready',
+        body: 'Use these credentials to access your HMorix workspace. Please sign in and update your password from your profile settings when possible.',
+        action: { label: 'Open employee portal', url: loginUrl },
+        details: [
+          { label: 'Username', value: credentials.username },
+          { label: 'Temporary password', value: credentials.password },
+        ],
+      }),
     })
   } catch {}
   return { ...credentials, role: accessRole, loginUrl }
@@ -1803,7 +1870,13 @@ async function createVerificationEmail(user: any) {
     to: user.email,
     subject: 'Verify your HMorix account',
     text: `Verify your HMorix account: ${url}`,
-    html: `<p>Welcome to HMorix.</p><p><a href="${url}">Verify your account</a></p><p>This link expires in 24 hours.</p>`,
+    html: brandedEmailTemplate({
+      eyebrow: 'Account verification',
+      title: 'Confirm your email address',
+      body: 'Welcome to HMorix. Verify your email address to activate your account and continue to your dashboard.',
+      action: { label: 'Verify account', url },
+      footer: 'This secure verification link expires in 24 hours. If you did not create a HMorix account, you can ignore this email.',
+    }),
   })
 }
 
@@ -1819,7 +1892,15 @@ async function sendOtp(email: string, purpose = 'login') {
     to: normalizedEmail,
     subject: 'Your HMorix verification code',
     text: `Your HMorix OTP is ${otp}. It expires in 10 minutes.`,
-    html: `<p>Your HMorix verification code is <strong>${otp}</strong>.</p><p>It expires in 10 minutes.</p>`,
+    html: brandedEmailTemplate({
+      eyebrow: purpose === 'forgot_password' ? 'Password reset' : 'Security verification',
+      title: purpose === 'forgot_password' ? 'Reset your password' : 'Your verification code',
+      body: purpose === 'forgot_password'
+        ? 'Enter this code on the HMorix password reset screen to set a new password.'
+        : 'Enter this code in HMorix to finish your verification.',
+      code: otp,
+      footer: 'This code expires in 10 minutes. Never share it with anyone, including HMorix support.',
+    }),
   })
 }
 
