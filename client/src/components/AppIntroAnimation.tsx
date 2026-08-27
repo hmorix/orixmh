@@ -87,114 +87,158 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
         <motion.div
           animate={{
             scale: phase === 'revealing' || phase === 'ready' ? [1, 1.25, 1.1] : 1,
-            opacity: phase === 'revealing' || phase === 'ready' ? [0.15, 0.28, 0.2] : 0.1,
+            opacity: phase === 'revealing' || phase === 'ready' ? [0.15, 0.3, 0.22] : 0.1,
           }}
           transition={{ duration: 1.6, ease: 'easeOut' }}
-          className="absolute w-[460px] h-[460px] rounded-full bg-[#C8FF00] blur-[110px] pointer-events-none -z-10"
+          className="absolute w-[480px] h-[480px] rounded-full bg-[#C8FF00] blur-[110px] pointer-events-none -z-10"
         />
 
         {/* Central Core Emblem & Brand Reveal */}
         <div className="relative flex flex-col items-center justify-center">
-          {/* Animated SVG Shield Logo */}
-          <div className="relative w-28 h-28 flex items-center justify-center mb-6">
+          {/* Animated SVG Hexagonal Logo */}
+          <div className="relative w-32 h-32 flex items-center justify-center mb-6">
             <svg
               viewBox="0 0 48 48"
-              className="w-full h-full drop-shadow-[0_0_24px_rgba(200,255,0,0.35)]"
+              className="w-full h-full drop-shadow-[0_0_28px_rgba(200,255,0,0.45)]"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
               <defs>
                 <linearGradient id="intro-sheen" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.25" />
+                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.2" />
                   <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
                 </linearGradient>
               </defs>
 
-              {/* Outer Cyber Chamfered Polygon */}
+              {/* Hexagonal Shield Outer Polygon */}
               <motion.polygon
-                points="4,4 36,4 44,12 44,44 12,44 4,36"
+                points="24,3.06 42.14,13.53 42.14,34.47 24,44.94 5.86,34.47 5.86,13.53"
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{
                   pathLength: 1,
                   opacity: 1,
                   fill: phase !== 'drawing' ? '#0D0D0D' : 'rgba(13,13,13,0)',
                 }}
-                transition={{ duration: 0.8, ease: 'easeInOut' }}
+                transition={{ duration: 0.85, ease: 'easeInOut' }}
                 stroke="#C8FF00"
-                strokeWidth="2"
-                strokeLinejoin="round"
+                strokeWidth="1.5"
+                strokeLinejoin="miter"
+                strokeMiterlimit="4"
               />
 
-              {/* Chamfer Notch in Lime */}
-              <motion.polygon
-                points="36,4 44,12 36,12"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{
-                  scale: phase !== 'drawing' ? 1 : 0,
-                  opacity: phase !== 'drawing' ? 1 : 0,
-                }}
-                transition={{ duration: 0.35, delay: 0.4 }}
-                fill="#C8FF00"
-              />
-
-              {/* Inner Gloss */}
+              {/* Inner Gloss Sheen */}
               {phase !== 'drawing' && (
-                <polygon
-                  points="5,5 35,5 43,13 43,43 13,43 5,35"
+                <motion.polygon
+                  points="24,4.5 40.8,14.2 40.8,33.8 24,43.5 7.2,33.8 7.2,14.2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4 }}
                   fill="url(#intro-sheen)"
                 />
               )}
 
-              {/* Monogram 'HM' Paths with stroke and fill animation */}
-              <motion.path
-                d="M12 14H16V34H12V14Z"
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: phase !== 'drawing' ? 1 : 0.4, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.2 }}
-                fill="#EAE8E3"
+              {/* Center Stem Top & Bottom */}
+              <motion.line
+                x1="24"
+                y1="3.06"
+                x2="24"
+                y2="17.7"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.15, ease: 'easeInOut' }}
+                stroke="#C8FF00"
+                strokeWidth="1.5"
+                strokeLinecap="square"
               />
-              <motion.path
-                d="M16 22H24V26H16V22Z"
-                initial={{ opacity: 0, scaleX: 0 }}
-                animate={{ opacity: phase !== 'drawing' ? 1 : 0.4, scaleX: 1 }}
-                transition={{ duration: 0.35, delay: 0.3 }}
-                fill="#EAE8E3"
-              />
-              <motion.path
-                d="M20 14H24V34H20V14Z"
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: phase !== 'drawing' ? 1 : 0.4, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.25 }}
-                fill="#EAE8E3"
-              />
-              <motion.path
-                d="M24 14L30 24L36 14H40V34H36V21L30 31L24 21V14Z"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: phase !== 'drawing' ? 1 : 0.4, scale: 1 }}
-                transition={{ duration: 0.45, delay: 0.35 }}
-                fill="#EAE8E3"
+              <motion.line
+                x1="24"
+                y1="29.46"
+                x2="24"
+                y2="44.94"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.15, ease: 'easeInOut' }}
+                stroke="#C8FF00"
+                strokeWidth="1.5"
+                strokeLinecap="square"
               />
 
-              {/* Cyber Power Accent Node */}
-              <motion.rect
-                x="18"
-                y="23"
-                width="4"
-                height="2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: phase !== 'drawing' ? 1 : 0 }}
-                transition={{ duration: 0.3, delay: 0.6 }}
-                fill="#C8FF00"
+              {/* Main Horizontal Crossbar */}
+              <motion.line
+                x1="10.78"
+                y1="23.72"
+                x2="37.22"
+                y2="23.72"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 0.55, delay: 0.2, ease: 'easeInOut' }}
+                stroke="#C8FF00"
+                strokeWidth="1.5"
+                strokeLinecap="square"
               />
-              <motion.rect
-                x="4"
-                y="36"
-                width="2"
-                height="2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: phase !== 'drawing' ? 1 : 0 }}
-                transition={{ duration: 0.3, delay: 0.65 }}
-                fill="#C8FF00"
+
+              {/* Left Crown Roof & Upper Arch */}
+              <motion.path
+                d="M 10.78 23.72 L 10.78 16.3 L 18.06 12.1 L 18.06 20.11 L 20.3 20.11 C 22.32 20.11 23.86 19.38 24 17.7"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{
+                  pathLength: 1,
+                  opacity: phase !== 'drawing' ? 1 : 0.8,
+                }}
+                transition={{ duration: 0.65, delay: 0.25, ease: 'easeInOut' }}
+                stroke="#C8FF00"
+                strokeWidth="1.5"
+                strokeLinejoin="miter"
+                strokeLinecap="square"
+                fill="none"
+              />
+
+              {/* Right Crown Roof & Upper Arch */}
+              <motion.path
+                d="M 37.22 23.72 L 37.22 16.3 L 29.94 12.1 L 29.94 20.11 L 27.7 20.11 C 25.68 20.11 24.14 19.38 24 17.7"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{
+                  pathLength: 1,
+                  opacity: phase !== 'drawing' ? 1 : 0.8,
+                }}
+                transition={{ duration: 0.65, delay: 0.25, ease: 'easeInOut' }}
+                stroke="#C8FF00"
+                strokeWidth="1.5"
+                strokeLinejoin="miter"
+                strokeLinecap="square"
+                fill="none"
+              />
+
+              {/* Left Spire & Bottom Hook & Lower Arch */}
+              <motion.path
+                d="M 15.18 18.46 L 15.18 35.06 L 18.06 36.74 L 18.06 28.06 L 20.3 28.06 C 22.32 28.06 23.86 28.48 24 29.46"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{
+                  pathLength: 1,
+                  opacity: phase !== 'drawing' ? 1 : 0.8,
+                }}
+                transition={{ duration: 0.65, delay: 0.3, ease: 'easeInOut' }}
+                stroke="#C8FF00"
+                strokeWidth="1.5"
+                strokeLinejoin="miter"
+                strokeLinecap="square"
+                fill="none"
+              />
+
+              {/* Right Spire & Bottom Hook & Lower Arch */}
+              <motion.path
+                d="M 32.82 18.46 L 32.82 35.06 L 29.94 36.74 L 29.94 28.06 L 27.7 28.06 C 25.68 28.06 24.14 28.48 24 29.46"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{
+                  pathLength: 1,
+                  opacity: phase !== 'drawing' ? 1 : 0.8,
+                }}
+                transition={{ duration: 0.65, delay: 0.3, ease: 'easeInOut' }}
+                stroke="#C8FF00"
+                strokeWidth="1.5"
+                strokeLinejoin="miter"
+                strokeLinecap="square"
+                fill="none"
               />
             </svg>
           </div>

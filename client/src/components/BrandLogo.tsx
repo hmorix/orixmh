@@ -9,7 +9,7 @@ export interface BrandIconProps extends React.SVGProps<SVGSVGElement> {
 
 /**
  * High-precision vector Brand Icon for HMorix
- * Chamfered geometric shield with futuristic HM monogram and electric lime accent
+ * Hexagonal cyber-monogram shield emblem with electric lime precision geometry
  */
 export function BrandIcon({
   size = 36,
@@ -22,41 +22,23 @@ export function BrandIcon({
 
   // Color schemes based on variant
   let bgFill = '#0D0D0D'
-  let borderStroke = 'rgba(255, 255, 255, 0.12)'
-  let hColor = '#EAE8E3'
-  let mColor = '#EAE8E3'
-  let limeAccent = '#C8FF00'
+  let strokeColor = '#C8FF00'
 
   if (variant === 'light') {
     bgFill = '#F5F3EF'
-    borderStroke = 'rgba(13, 13, 13, 0.12)'
-    hColor = '#0D0D0D'
-    mColor = '#0D0D0D'
-    limeAccent = '#98D600'
+    strokeColor = '#0D0D0D'
   } else if (variant === 'lime') {
     bgFill = '#C8FF00'
-    borderStroke = 'rgba(200, 255, 0, 0.4)'
-    hColor = '#0D0D0D'
-    mColor = '#0D0D0D'
-    limeAccent = '#0D0D0D'
+    strokeColor = '#0D0D0D'
   } else if (variant === 'monochrome') {
-    bgFill = '#FFFFFF'
-    borderStroke = '#FFFFFF'
-    hColor = '#000000'
-    mColor = '#000000'
-    limeAccent = '#000000'
+    bgFill = '#000000'
+    strokeColor = '#FFFFFF'
   } else if (variant === 'dark') {
     bgFill = '#141414'
-    borderStroke = 'rgba(200, 255, 0, 0.3)'
-    hColor = '#EAE8E3'
-    mColor = '#EAE8E3'
-    limeAccent = '#C8FF00'
+    strokeColor = '#C8FF00'
   } else if (variant === 'outline') {
     bgFill = 'transparent'
-    borderStroke = '#C8FF00'
-    hColor = '#C8FF00'
-    mColor = '#EAE8E3'
-    limeAccent = '#C8FF00'
+    strokeColor = '#C8FF00'
   }
 
   return (
@@ -72,71 +54,98 @@ export function BrandIcon({
     >
       <defs>
         <linearGradient id="hm-sheen-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.16" />
+          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.15" />
           <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.0" />
         </linearGradient>
       </defs>
 
-      {/* Cyber chamfered outer badge */}
+      {/* Hexagonal Shield Outer Polygon */}
       <polygon
-        points="4,4 36,4 44,12 44,44 12,44 4,36"
+        points="24,3.06 42.14,13.53 42.14,34.47 24,44.94 5.86,34.47 5.86,13.53"
         fill={bgFill}
-        stroke={borderStroke}
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-
-      {/* Futuristic top-right chamfer accent notch */}
-      <polygon
-        points="36,4 44,12 36,12"
-        fill={limeAccent}
+        stroke={strokeColor}
+        strokeWidth="1.5"
+        strokeLinejoin="miter"
+        strokeMiterlimit="4"
       />
 
       {/* Subtle inner sheen */}
-      <polygon
-        points="5,5 35,5 43,13 43,43 13,43 5,35"
-        fill="url(#hm-sheen-grad)"
+      {bgFill !== 'transparent' && bgFill !== 'none' && (
+        <polygon
+          points="24,4.5 40.8,14.2 40.8,33.8 24,43.5 7.2,33.8 7.2,14.2"
+          fill="url(#hm-sheen-grad)"
+        />
+      )}
+
+      {/* Center Stem Top & Bottom */}
+      <line
+        x1="24"
+        y1="3.06"
+        x2="24"
+        y2="17.7"
+        stroke={strokeColor}
+        strokeWidth="1.5"
+        strokeLinecap="square"
+      />
+      <line
+        x1="24"
+        y1="29.46"
+        x2="24"
+        y2="44.94"
+        stroke={strokeColor}
+        strokeWidth="1.5"
+        strokeLinecap="square"
       />
 
-      {/* Integrated Monogram HM Vector Paths */}
-      {/* Letter 'H' - Left Pillar */}
-      <path
-        d="M12 14H16V34H12V14Z"
-        fill={hColor}
-      />
-      {/* Letter 'H' - Crossbar */}
-      <path
-        d="M16 22H24V26H16V22Z"
-        fill={hColor}
-      />
-      {/* Letter 'H' / 'M' shared center & right pillar structure */}
-      <path
-        d="M20 14H24V34H20V14Z"
-        fill={hColor}
+      {/* Main Horizontal Crossbar */}
+      <line
+        x1="10.78"
+        y1="23.72"
+        x2="37.22"
+        y2="23.72"
+        stroke={strokeColor}
+        strokeWidth="1.5"
+        strokeLinecap="square"
       />
 
-      {/* Letter 'M' - High-tech angular diagonal chevron & right pillar */}
+      {/* Left Crown Roof & Upper Arch */}
       <path
-        d="M24 14L30 24L36 14H40V34H36V21L30 31L24 21V14Z"
-        fill={mColor}
+        d="M 10.78 23.72 L 10.78 16.3 L 18.06 12.1 L 18.06 20.11 L 20.3 20.11 C 22.32 20.11 23.86 19.38 24 17.7"
+        stroke={strokeColor}
+        strokeWidth="1.5"
+        strokeLinejoin="miter"
+        strokeLinecap="square"
+        fill="none"
       />
 
-      {/* Neon Cyber Node on H crossbeam */}
-      <rect
-        x="18"
-        y="23"
-        width="4"
-        height="2"
-        fill={limeAccent}
+      {/* Right Crown Roof & Upper Arch */}
+      <path
+        d="M 37.22 23.72 L 37.22 16.3 L 29.94 12.1 L 29.94 20.11 L 27.7 20.11 C 25.68 20.11 24.14 19.38 24 17.7"
+        stroke={strokeColor}
+        strokeWidth="1.5"
+        strokeLinejoin="miter"
+        strokeLinecap="square"
+        fill="none"
       />
 
-      {/* Micro tech corner node bottom-left */}
-      <rect
-        x="4"
-        y="36"
-        width="2"
-        height="2"
-        fill={limeAccent}
+      {/* Left Spire & Bottom Hook & Lower Arch */}
+      <path
+        d="M 15.18 18.46 L 15.18 35.06 L 18.06 36.74 L 18.06 28.06 L 20.3 28.06 C 22.32 28.06 23.86 28.48 24 29.46"
+        stroke={strokeColor}
+        strokeWidth="1.5"
+        strokeLinejoin="miter"
+        strokeLinecap="square"
+        fill="none"
+      />
+
+      {/* Right Spire & Bottom Hook & Lower Arch */}
+      <path
+        d="M 32.82 18.46 L 32.82 35.06 L 29.94 36.74 L 29.94 28.06 L 27.7 28.06 C 25.68 28.06 24.14 28.48 24 29.46"
+        stroke={strokeColor}
+        strokeWidth="1.5"
+        strokeLinejoin="miter"
+        strokeLinecap="square"
+        fill="none"
       />
     </svg>
   )
@@ -219,28 +228,27 @@ export function BrandLogo({
  * Raw Standalone SVG string generators for Media Kit downloads & exports
  */
 export function getStandaloneBrandIconSVG(variant: 'dark' | 'light' | 'lime' = 'dark'): string {
-  const bg = variant === 'light' ? '#F5F3EF' : variant === 'lime' ? '#C8FF00' : '#0D0D0D'
-  const border = variant === 'light' ? 'rgba(13,13,13,0.12)' : variant === 'lime' ? '#98D600' : 'rgba(255,255,255,0.12)'
-  const hColor = variant === 'light' || variant === 'lime' ? '#0D0D0D' : '#EAE8E3'
-  const mColor = variant === 'light' || variant === 'lime' ? '#0D0D0D' : '#EAE8E3'
-  const lime = variant === 'lime' ? '#0D0D0D' : '#C8FF00'
+  const isLight = variant === 'light'
+  const isLime = variant === 'lime'
+  const bg = isLight ? '#F5F3EF' : isLime ? '#C8FF00' : '#0D0D0D'
+  const stroke = isLight || isLime ? '#0D0D0D' : '#C8FF00'
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none">
   <defs>
-    <linearGradient id="hm-sheen" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.16"/>
+    <linearGradient id="hm-sheen-${variant}" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.15"/>
       <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
     </linearGradient>
   </defs>
-  <polygon points="4,4 36,4 44,12 44,44 12,44 4,36" fill="${bg}" stroke="${border}" stroke-width="2" stroke-linejoin="round"/>
-  <polygon points="36,4 44,12 36,12" fill="${lime}"/>
-  <polygon points="5,5 35,5 43,13 43,43 13,43 5,35" fill="url(#hm-sheen)"/>
-  <path d="M12 14H16V34H12V14Z" fill="${hColor}"/>
-  <path d="M16 22H24V26H16V22Z" fill="${hColor}"/>
-  <path d="M20 14H24V34H20V14Z" fill="${hColor}"/>
-  <path d="M24 14L30 24L36 14H40V34H36V21L30 31L24 21V14Z" fill="${mColor}"/>
-  <rect x="18" y="23" width="4" height="2" fill="${lime}"/>
-  <rect x="4" y="36" width="2" height="2" fill="${lime}"/>
+  <polygon points="24,3.06 42.14,13.53 42.14,34.47 24,44.94 5.86,34.47 5.86,13.53" fill="${bg}" stroke="${stroke}" stroke-width="1.5" stroke-linejoin="miter" stroke-miterlimit="4"/>
+  <polygon points="24,4.5 40.8,14.2 40.8,33.8 24,43.5 7.2,33.8 7.2,14.2" fill="url(#hm-sheen-${variant})"/>
+  <line x1="24" y1="3.06" x2="24" y2="17.7" stroke="${stroke}" stroke-width="1.5" stroke-linecap="square"/>
+  <line x1="24" y1="29.46" x2="24" y2="44.94" stroke="${stroke}" stroke-width="1.5" stroke-linecap="square"/>
+  <line x1="10.78" y1="23.72" x2="37.22" y2="23.72" stroke="${stroke}" stroke-width="1.5" stroke-linecap="square"/>
+  <path d="M 10.78 23.72 L 10.78 16.3 L 18.06 12.1 L 18.06 20.11 L 20.3 20.11 C 22.32 20.11 23.86 19.38 24 17.7" stroke="${stroke}" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="square" fill="none"/>
+  <path d="M 37.22 23.72 L 37.22 16.3 L 29.94 12.1 L 29.94 20.11 L 27.7 20.11 C 25.68 20.11 24.14 19.38 24 17.7" stroke="${stroke}" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="square" fill="none"/>
+  <path d="M 15.18 18.46 L 15.18 35.06 L 18.06 36.74 L 18.06 28.06 L 20.3 28.06 C 22.32 28.06 23.86 28.48 24 29.46" stroke="${stroke}" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="square" fill="none"/>
+  <path d="M 32.82 18.46 L 32.82 35.06 L 29.94 36.74 L 29.94 28.06 L 27.7 28.06 C 25.68 28.06 24.14 28.48 24 29.46" stroke="${stroke}" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="square" fill="none"/>
 </svg>`
 }
 
