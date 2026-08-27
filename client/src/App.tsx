@@ -7,6 +7,7 @@ import MainLayout from './layouts/MainLayout'
 import CommandPalette from './components/CommandPalette'
 import OfflineStatus from './components/OfflineStatus'
 import OfflinePage from './pages/OfflinePage'
+import AppIntroAnimation from './components/AppIntroAnimation'
 import { GeneratedBlogPost, GeneratedContentPage } from './pages/generated/GeneratedContentPage'
 
 const Home = lazy(() => import('./pages/Home'))
@@ -203,6 +204,7 @@ function App() {
 
   return (
     <>
+      <AppIntroAnimation />
       <CommandPalette isOpen={commandOpen} onClose={() => setCommandOpen(false)} />
       <OfflineStatus />
       <AppErrorBoundary>

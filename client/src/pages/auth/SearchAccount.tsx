@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Loader2, Search, Mail, Phone } from 'lucide-react'
 import { config } from '../../lib/config'
+import { BrandLogo } from '../../components/BrandLogo'
 
 export default function SearchAccount() {
   const [query, setQuery] = useState('')
@@ -37,9 +38,8 @@ export default function SearchAccount() {
     <div className="min-h-screen bg-obsidian flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-3 font-display font-bold text-xl mb-6">
-            <div className="w-9 h-9 bg-cream flex items-center justify-center text-obsidian text-xs font-bold" style={{clipPath:'polygon(0 0, 78% 0, 100% 22%, 100% 78%, 78% 100%, 0 100%)'}}>HM</div>
-            <span>HMorix</span>
+          <Link to="/" className="inline-flex items-center gap-3 mb-6">
+            <BrandLogo size="md" />
           </Link>
           <h1 className="font-display text-2xl font-bold">Find your account</h1>
           <p className="text-sm text-cream/50 mt-2">Enter your email or phone number to find your account.</p>

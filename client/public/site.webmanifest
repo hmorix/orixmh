@@ -13,6 +13,12 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/hmorix-icon.svg",
+      "sizes": "512x512 192x192 any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ]
 }

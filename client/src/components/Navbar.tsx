@@ -5,6 +5,7 @@ import { useAuth } from '../lib/AuthContext'
 import { useTheme } from '../lib/ThemeContext'
 import { config } from '../lib/config'
 import { getLocalNotifications, markLocalNotificationsRead, notificationMatchesContext, notifyUnseenBrowserNotifications, NOTIFICATION_EVENT, type AppNotification } from '../lib/notificationStore'
+import { BrandLogo } from './BrandLogo'
 
 interface NavbarProps {
   onCommandOpen: () => void
@@ -72,9 +73,8 @@ export default function Navbar({ onCommandOpen }: NavbarProps) {
     <nav className={`fixed top-0 left-0 right-0 z-50 py-4 transition-all duration-300 border-b ${scrolled ? 'bg-obsidian/85 backdrop-blur-[20px] border-glass-border' : 'border-transparent'}`}>
       <div className="max-w-[1280px] mx-auto px-8">
         <div className="flex items-center justify-between gap-8">
-          <Link to="/" className="flex items-center gap-3 font-display font-bold text-xl tracking-tight">
-            <div className="w-9 h-9 bg-cream flex items-center justify-center text-obsidian text-xs font-bold" style={{clipPath:'polygon(0 0, 78% 0, 100% 22%, 100% 78%, 78% 100%, 0 100%)'}}>HM</div>
-            <span>HMorix</span>
+          <Link to="/" className="flex items-center gap-3">
+            <BrandLogo size="md" />
           </Link>
 
           <div className="hidden lg:flex items-center gap-1">

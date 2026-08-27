@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { config } from '../../lib/config'
+import { BrandLogo } from '../../components/BrandLogo'
 
 type VerifyStatus = 'idle' | 'checking' | 'success' | 'invalid' | 'expired'
 
@@ -77,9 +78,8 @@ export default function Verify() {
     <div className="min-h-screen bg-obsidian flex items-center justify-center px-4">
       <div className="w-full max-w-[420px]">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-3 font-display font-bold text-xl mb-6">
-            <div className="w-10 h-10 bg-cream flex items-center justify-center text-obsidian text-sm font-bold" style={{clipPath:'polygon(0 0, 78% 0, 100% 22%, 100% 78%, 78% 100%, 0 100%)'}}>HM</div>
-            <span className="text-cream">HMorix</span>
+          <Link to="/" className="inline-flex items-center gap-3 mb-6">
+            <BrandLogo size="lg" />
           </Link>
           <h1 className="font-display text-2xl font-bold text-cream mb-2">{title}</h1>
           <p className="text-sm text-cream/50">{message || 'Enter the 6-digit code sent to your email'}</p>

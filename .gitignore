@@ -12,3 +12,5 @@ Agent/**/generated/social-images/
 .vercel
 server/data/
 .git-credentials
+Connection/
+*.env

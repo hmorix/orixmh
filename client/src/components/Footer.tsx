@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { BrandLogo } from './BrandLogo'
 
 export default function Footer() {
   return (
@@ -6,9 +7,8 @@ export default function Footer() {
       <div className="max-w-[1280px] mx-auto px-8">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-8 mb-16">
           <div className="col-span-2 md:col-span-3 lg:col-span-1">
-            <Link to="/" className="flex items-center gap-3 font-display font-bold text-xl mb-4">
-              <div className="w-9 h-9 bg-cream flex items-center justify-center text-obsidian text-xs font-bold" style={{clipPath:'polygon(0 0, 78% 0, 100% 22%, 100% 78%, 78% 100%, 0 100%)'}}>HM</div>
-              <span>HMorix</span>
+            <Link to="/" className="flex items-center gap-3 mb-4">
+              <BrandLogo size="md" />
             </Link>
             <p className="text-sm text-cream/35 leading-relaxed max-w-[280px]">Enterprise AI software, web design, mobile apps, digital marketing & smart home solutions.</p>
           </div>

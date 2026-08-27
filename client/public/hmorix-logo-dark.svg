@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" width="200" height="48" fill="none">
+  <defs>
+    <linearGradient id="hm-sheen-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- Icon Mark -->
+  <g transform="translate(0, 0)">
+    <polygon points="4,4 36,4 44,12 44,44 12,44 4,36" fill="#0D0D0D" stroke="rgba(255,255,255,0.12)" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="36,4 44,12 36,12" fill="#C8FF00"/>
+    <polygon points="5,5 35,5 43,13 43,43 13,43 5,35" fill="url(#hm-sheen-dark)"/>
+    <path d="M12 14H16V34H12V14Z" fill="#EAE8E3"/>
+    <path d="M16 22H24V26H16V22Z" fill="#EAE8E3"/>
+    <path d="M20 14H24V34H20V14Z" fill="#EAE8E3"/>
+    <path d="M24 14L30 24L36 14H40V34H36V21L30 31L24 21V14Z" fill="#EAE8E3"/>
+    <rect x="18" y="23" width="4" height="2" fill="#C8FF00"/>
+    <rect x="4" y="36" width="2" height="2" fill="#C8FF00"/>
+  </g>
+  <!-- Typography -->
+  <text x="60" y="32" font-family="'Space Grotesk', 'Inter', -apple-system, sans-serif" font-size="24" font-weight="700" fill="#EAE8E3" letter-spacing="-0.03em">HMorix</text>
+  <circle cx="152" cy="22" r="3" fill="#C8FF00"/>
+</svg>
