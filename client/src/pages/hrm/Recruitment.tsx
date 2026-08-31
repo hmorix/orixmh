@@ -25,6 +25,8 @@ import {
   printOfferLetter,
   printJoiningLetter,
   printAppointmentLetter,
+  printSalaryCertificate,
+  printEmployeeIdCard,
   downloadTextDoc
 } from "../../lib/hrm-documents"
 
@@ -230,6 +232,35 @@ export default function Recruitment() {
       joiningDate: new Date().toISOString().slice(0, 10),
       location: selectedJob?.location || app.location || "Hathras, UP",
       workEmail: app.email
+    })
+  }
+
+  
+  const handlePrintCandidateSalaryCert = (app: any) => {
+    const role = app.role || selectedJob?.role || selectedJob?.title || "Software Engineer"
+    const dept = app.department || selectedJob?.department || "Engineering"
+    const parsedCtc = Number(app.salaryExpectation || selectedJob?.salary?.replace(/[^0-9]/g, "") || 700000)
+    const ctc = parsedCtc > 50000 ? parsedCtc : 700000
+    printSalaryCertificate({
+      name: app.name,
+      employeeId: app.employeeId || `HM-${Date.now().toString().slice(-6)}`,
+      role: role,
+      department: dept,
+      joiningDate: new Date().toISOString().slice(0, 10),
+      monthlyGross: Math.round(ctc / 12),
+      annualCtc: ctc
+    })
+  }
+
+  const handlePrintCandidateIdCard = (app: any) => {
+    const role = app.role || selectedJob?.role || selectedJob?.title || "Software Engineer"
+    const dept = app.department || selectedJob?.department || "Engineering"
+    printEmployeeIdCard({
+      name: app.name,
+      employeeId: app.employeeId || `HM-${Date.now().toString().slice(-6)}`,
+      role: role,
+      department: dept,
+      joiningDate: new Date().toISOString().slice(0, 10)
     })
   }
 
@@ -650,6 +681,20 @@ export default function Recruitment() {
                             title="Generate and Print Appointment Letter"
                           >
                             <FileText size={12} /> Appointment
+                          </button>
+                          <button
+                            onClick={() => handlePrintCandidateSalaryCert(app)}
+                            className="px-2.5 py-1.5 bg-white/[0.04] border border-glass-border hover:border-glass-border/80 rounded-[6px] text-xs text-cream/80 flex items-center gap-1.5 transition-colors"
+                            title="Generate Salary Certificate"
+                          >
+                            <FileText size={12} /> Salary Cert
+                          </button>
+                          <button
+                            onClick={() => handlePrintCandidateIdCard(app)}
+                            className="px-2.5 py-1.5 bg-white/[0.04] border border-glass-border hover:border-glass-border/80 rounded-[6px] text-xs text-cream/80 flex items-center gap-1.5 transition-colors"
+                            title="Print Digital ID Badge"
+                          >
+                            <FileText size={12} /> ID Card
                           </button>
                         </div>
 

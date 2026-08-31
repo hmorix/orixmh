@@ -101,7 +101,7 @@ The HMorix platform is organized into 7 specialized operational portals operatin
 
 ---
 
-### Workflow 3: Talent Acquisition, 1-Click Letters, Onboarding & Payroll
+### Workflow 3: Talent Acquisition, 1-Click Legal Document Suite, Onboarding & Payroll
 ```
 [HR Manager in /hrm]
        │
@@ -113,15 +113,17 @@ The HMorix platform is organized into 7 specialized operational portals operatin
    [Applied] ➔ [Screening] ➔ [Interview] ➔ [2nd Round] ➔ [Offer Made] ➔ [Joining Issued] ➔ [Hired]
        │
        ▼
-3. 1-Click Document Generation (Free Native Web Standards):
-   ├── "Print Offer Letter" (Calculates Basic 40%, HRA 20%, Special 30%, Flexi 10%, 90-day probation)
-   ├── "Print Joining Letter" (Company policies, workplace standards, documentation checklist)
-   └── "Print Appointment Letter" (Legally binding employment agreement & IP terms)
+3. Complete 1-Click Hiring & Onboarding Document Suite (100% Free Native Web Engine):
+   ├── 📄 "Print Offer Letter" (Calculates Basic 40%, HRA 20%, Special 30%, Flexi 10%, 90-day probation terms)
+   ├── 📝 "Print Joining & Induction Letter" (Company policies, workplace standards, documentation checklist)
+   ├── 📑 "Print Appointment Letter" (Legally binding employment contract & IP assignment agreements)
+   ├── 💰 "Print Salary Certificate / CTC Structure" (Proof of compensation for loans, visas & banks)
+   └── 🆔 "Print Corporate Digital ID Card" (Printable badge with Employee ID, blood group, emergency contact)
        │
        ▼
-4. 1-Click Automated Onboarding:
+4. 1-Click Automated Onboarding & Provisioning:
    - Clicking "Hire Candidate" creates permanent Employee ID (`HM-XXXXXX`) in `hrm_employees`.
-   - Auto-generates portal username & secure password in `users` collection.
+   - Auto-generates employee portal username & secure password in `users` collection.
        │
        ▼
 5. Time, Attendance & Leave Approvals:
@@ -138,7 +140,7 @@ The HMorix platform is organized into 7 specialized operational portals operatin
 
 ---
 
-### Workflow 4: Employee Self-Service (ESS) & Productivity
+### Workflow 4: Employee Self-Service (ESS) & Document Self-Reprint
 ```
 [Employee in /employee]
        │
@@ -146,40 +148,41 @@ The HMorix platform is organized into 7 specialized operational portals operatin
        ├── Sprint Board: Views prioritized tasks assigned by Manager & marks completion.
        ├── Leave Center: Checks annual balance (Casual 12, Sick 10, Earned 18) & submits requests.
        ├── Payslip Studio: 1-click reprints official monthly salary statements.
-       ├── My Documents: 1-click reprints official Appointment & Joining agreements.
+       ├── My Documents Suite: 1-click reprints:
+       │   ├── 📑 Official Appointment Letter
+       │   ├── 📝 Official Joining Letter
+       │   ├── 💰 Official Salary Certificate (Proof of Income)
+       │   └── 🆔 Corporate Digital ID Badge
        └── LMS Learning: Completes assigned skill training modules and certifications.
 ```
 
 ---
 
-### Workflow 5: Client Portal Experience & Support Escalation
+### Workflow 6: Employee Separation, Exit Clearance & Full Offboarding Suite
 ```
-[Client / Customer in /portal]
-       │
-       ├── Project Dashboard: Inspects active milestones, delivery timelines, and assigned team pod.
-       ├── Invoices & Payments: Reviews billed statements (`INV-XXXXXXXXXXXXX`) & tax breakdown.
-       └── Support Desk: Submits inquiries (`TKT-XXXXXX`) auto-routed to assigned engineers.
-```
-
----
-
-### Workflow 6: Employee Separation & Formal Offboarding
-```
-[Separation Lifecycle]
+[HR / Manager in /hrm Exit & Offboarding Desk]
        │
        ▼
 1. Resignation Submission & Manager Notice Acceptance.
        │
        ▼
-2. Handover of project repositories, credentials, and company hardware assets.
+2. Multi-Department Clearance:
+   ├── IT & Systems: Laptops, emails, SSH keys, access tokens revoked.
+   ├── Finance: Corporate cards, travel advances, departmental claims cleared.
+   └── HR & Ops: Project handover acknowledged by reporting lead.
        │
        ▼
-3. Full & Final (FnF) Settlement calculated in Payroll.
+3. Full & Final (FnF) Settlement Calculation:
+   - Final Month Salary + Leave Encashment (Days × Daily Rate) + Gratuity + Pending Bonuses.
+   - Less Notice shortfall & statutory deductions = Net Final Disbursed.
        │
        ▼
-4. 1-Click Official Offboarding Documents (in /hrm Document Studio):
-   ├── "Print Relieving Letter" (Official confirmation of completed exit clearance)
-   └── "Print Experience Certificate" (Official certification of tenure, role & conduct)
+4. Complete 1-Click Separation & Offboarding Document Suite:
+   ├── 🚪 "Print Formal Relieving Letter" (Official confirmation of completed exit clearance)
+   ├── 🏆 "Print Experience & Service Certificate" (Official certification of tenure, role & conduct)
+   ├── 💰 "Print Salary Verification Certificate" (Official earnings verification for new employer)
+   ├── 🧾 "Print FnF Settlement Statement" (Itemized final credit/debit payout statement)
+   └── 📑 "Print No Objection Certificate (NOC)" (Official clearance for passport/visa/higher education)
 ```
 
 ---

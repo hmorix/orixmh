@@ -469,6 +469,34 @@ NVIDIA_MODEL=meta/llama-3.1-405b-instruct
 - **Master Operations & System Workflow Manual (`PROJECT_WORKFLOW.md`):**
   - Comprehensive documentation covering multi-portal architecture topology, full RBAC matrix across 7 roles, 6 end-to-end operational workflows with step-by-step state diagrams, and complete MongoDB collections schema map.
 
+
+---
+
+## 26. Complete Employee Lifecycle Suite (Onboarding, Exit Clearance & 10-Document Studio) ✅
+
+### Features Implemented
+- **Complete 10-Document Corporate Generator Suite (`client/src/lib/hrm-documents.ts`):**
+  1. **Offer Letter:** CTC structure, probation, notice terms.
+  2. **Joining & Induction Letter:** Workplace standards, credential notice.
+  3. **Appointment Letter:** Legally binding employment contract & IP assignment.
+  4. **Salary Certificate / Proof of Income:** Certified earnings for loans, embassies & banks.
+  5. **Corporate Digital ID Badge:** Printable RFID-style employee badge with blood group and emergency contact.
+  6. **Experience & Service Certificate:** Verified tenure, role, and conduct endorsement.
+  7. **Formal Relieving Letter:** Official discharge confirmation and handover completion.
+  8. **Full & Final (FnF) Settlement Statement:** Itemized calculation of final salary, leave encashment, gratuity, pending bonus, and deductions.
+  9. **No Objection Certificate (NOC):** Clearance for passports, visas, and external transitions.
+  10. **Monthly Payslip:** Gross breakdown, statutory deductions (PF, PT, TDS), and net pay.
+- **HRM Exit & Offboarding Desk (`client/src/pages/hrm/HRMDashboard.tsx`):**
+  - Dedicated operational desk for managing employee departures.
+  - Multi-department clearance tracker (IT, Finance, HR).
+  - FnF settlement calculation ledger.
+  - Instant 1-click issuance of Relieving Letters, Experience Certificates, FnF Statements, Salary Certificates, and NOCs.
+- **Enhanced Onboarding Wizard (`client/src/pages/hrm/AddEmployee.tsx` & `Recruitment.tsx`):**
+  - Extended personal details (Blood group, Emergency contact, Residential address).
+  - 1-Click generation of Appointment Letters, Joining Letters, Salary Certificates, and Digital ID Badges upon hire.
+- **Employee Portal Document Suite (`client/src/pages/employee/EmployeePortal.tsx`):**
+  - Self-service 1-click generation and reprint for Appointment Letters, Joining Letters, Salary Certificates, Digital ID Badges, and Payslips.
+
 ## Files Summary
 
 ### New Files Created (20)

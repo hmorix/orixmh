@@ -12,13 +12,18 @@ import {
   ArrowLeft,
   Printer,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  CreditCard,
+  DollarSign,
+  ShieldCheck
 } from "lucide-react"
 import { config } from "../../lib/config"
 import {
   printAppointmentLetter,
   printJoiningLetter,
-  printOfferLetter
+  printOfferLetter,
+  printEmployeeIdCard,
+  printSalaryCertificate
 } from "../../lib/hrm-documents"
 
 const DEPARTMENTS = [
@@ -37,6 +42,9 @@ export default function AddEmployee() {
     name: "",
     email: "",
     phone: "",
+    bloodGroup: "O+ (Pos)",
+    emergencyPhone: "+91 98765 43210",
+    address: "MG Polytechnic Road, Hathras, UP",
     username: "",
     password: "",
     department: "Engineering",
@@ -74,6 +82,7 @@ export default function AddEmployee() {
         body: JSON.stringify({
           name: form.name,
           email: form.email || undefined,
+          phone: form.phone || undefined,
           username: form.username || undefined,
           password: form.password || undefined,
           department: form.department,
@@ -82,7 +91,10 @@ export default function AddEmployee() {
           salary: Number(form.salary || 0),
           startDate: form.startDate,
           status: form.status,
-          reportingTo: form.reportingTo
+          reportingTo: form.reportingTo,
+          bloodGroup: form.bloodGroup,
+          emergencyPhone: form.emergencyPhone,
+          address: form.address
         })
       })
 
@@ -150,6 +162,33 @@ export default function AddEmployee() {
     })
   }
 
+  const handlePrintIdCard = () => {
+    if (!created) return
+    printEmployeeIdCard({
+      name: created.name || form.name,
+      employeeId: created.employeeId || "HM-NEW",
+      role: created.role || form.role,
+      department: created.department || form.department,
+      bloodGroup: form.bloodGroup,
+      emergencyPhone: form.emergencyPhone,
+      joiningDate: created.startDate || form.startDate
+    })
+  }
+
+  const handlePrintSalaryCert = () => {
+    if (!created) return
+    const salary = Number(created.salary || form.salary || 600000)
+    printSalaryCertificate({
+      name: created.name || form.name,
+      employeeId: created.employeeId || "HM-NEW",
+      role: created.role || form.role,
+      department: created.department || form.department,
+      joiningDate: created.startDate || form.startDate,
+      monthlyGross: Math.round(salary / 12),
+      annualCtc: salary
+    })
+  }
+
   const resetForm = () => {
     setCreated(null)
     setMessage(null)
@@ -158,6 +197,9 @@ export default function AddEmployee() {
       name: "",
       email: "",
       phone: "",
+      bloodGroup: "O+ (Pos)",
+      emergencyPhone: "+91 98765 43210",
+      address: "MG Polytechnic Road, Hathras, UP",
       username: "",
       password: "",
       department: "Engineering",
@@ -173,9 +215,9 @@ export default function AddEmployee() {
   return (
     <div className="pt-28 pb-20 min-h-screen bg-obsidian text-cream">
       <SEOHead
-        title="Add Employee | Enterprise HRM"
-        description="Onboard team members, auto-generate login credentials, and issue 1-click appointment & joining letters."
-        keywords="add employee, employee onboarding, HRM, employee credentials, appointment letter generator"
+        title="Add & Onboard Employee | Enterprise HRM"
+        description="Onboard team members, auto-generate login credentials, and issue 1-click appointment, joining, salary certificate, and digital ID cards."
+        keywords="add employee, employee onboarding, HRM, appointment letter, digital ID card, salary certificate"
         canonical="/hrm/employees/new"
       />
 
@@ -189,7 +231,7 @@ export default function AddEmployee() {
             <ArrowLeft size={14} /> Back to HRM Dashboard
           </Link>
           <span className="text-xs px-2.5 py-1 bg-white/[0.04] border border-glass-border rounded-full text-cream/40 font-mono">
-            Auto-ID Generator Active
+            Auto-ID & Access Provisioner Active
           </span>
         </div>
 
@@ -202,10 +244,10 @@ export default function AddEmployee() {
                 <Sparkles size={12} /> Enterprise Onboarding Engine
               </div>
               <h1 className="font-display text-2xl sm:text-3xl font-bold text-cream">
-                Onboard New Employee
+                Onboard New Team Member
               </h1>
               <p className="text-cream/50 text-sm mt-1 max-w-xl">
-                Create full employee profile, auto-provision employee portal access credentials, and instantly generate official printable HR letters.
+                Create employee records, auto-provision secure portal credentials, and generate official printable legal documents.
               </p>
             </div>
             <div className="w-14 h-14 rounded-[14px] bg-[#C8FF00]/10 border border-[#C8FF00]/20 flex items-center justify-center text-[#C8FF00] flex-shrink-0">
@@ -216,7 +258,7 @@ export default function AddEmployee() {
           {/* Stepper Tabs */}
           <div className="grid grid-cols-3 gap-2 mt-8 pt-6 border-t border-glass-border/70">
             {[
-              { num: 1, label: "Personal Info", icon: User },
+              { num: 1, label: "Personal & Contact", icon: User },
               { num: 2, label: "Role & Compensation", icon: Building },
               { num: 3, label: "Access & Documents", icon: Key }
             ].map(s => {
@@ -275,7 +317,7 @@ export default function AddEmployee() {
               <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px] space-y-4">
                 <div className="flex items-center gap-2 pb-3 border-b border-glass-border">
                   <User size={16} className="text-[#C8FF00]" />
-                  <h2 className="font-display font-semibold text-base">Step 1: Personal & Contact Information</h2>
+                  <h2 className="font-display font-semibold text-base">Step 1: Personal, Contact & Emergency Details</h2>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">
@@ -286,7 +328,7 @@ export default function AddEmployee() {
                       value={form.name}
                       onChange={e => setForm({ ...form, name: e.target.value })}
                       placeholder="e.g. Rahul Verma"
-                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream placeholder:text-cream/30 outline-none focus:border-[#C8FF00] transition-colors"
+                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream placeholder:text-cream/30 outline-none focus:border-[#C8FF00]"
                     />
                   </div>
 
@@ -297,19 +339,52 @@ export default function AddEmployee() {
                       value={form.email}
                       onChange={e => setForm({ ...form, email: e.target.value })}
                       placeholder="rahul.verma@hmorix.com"
-                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream placeholder:text-cream/30 outline-none focus:border-[#C8FF00] transition-colors"
+                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream placeholder:text-cream/30 outline-none focus:border-[#C8FF00]"
                     />
-                    <span className="text-[10px] text-cream/40">If left empty, system generates email from name.</span>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs text-cream/70 font-medium">Contact Phone Number</label>
+                    <label className="text-xs text-cream/70 font-medium">Primary Phone *</label>
                     <input
                       type="tel"
                       value={form.phone}
                       onChange={e => setForm({ ...form, phone: e.target.value })}
                       placeholder="+91 98765 43210"
-                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream placeholder:text-cream/30 outline-none focus:border-[#C8FF00] transition-colors"
+                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream placeholder:text-cream/30 outline-none focus:border-[#C8FF00]"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-cream/70 font-medium">Blood Group</label>
+                    <select
+                      value={form.bloodGroup}
+                      onChange={e => setForm({ ...form, bloodGroup: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream outline-none focus:border-[#C8FF00]"
+                    >
+                      {["O+ (Pos)", "O- (Neg)", "A+ (Pos)", "A- (Neg)", "B+ (Pos)", "B- (Neg)", "AB+ (Pos)", "AB- (Neg)"].map(bg => (
+                        <option key={bg} value={bg}>{bg}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-cream/70 font-medium">Emergency Contact Phone</label>
+                    <input
+                      type="tel"
+                      value={form.emergencyPhone}
+                      onChange={e => setForm({ ...form, emergencyPhone: e.target.value })}
+                      placeholder="+91 98765 43210 (Family)"
+                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream outline-none focus:border-[#C8FF00]"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <label className="text-xs text-cream/70 font-medium">Residential / Permanent Address</label>
+                    <input
+                      value={form.address}
+                      onChange={e => setForm({ ...form, address: e.target.value })}
+                      placeholder="MG Polytechnic Road, Hathras, UP - 204101"
+                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream outline-none focus:border-[#C8FF00]"
                     />
                   </div>
                 </div>
@@ -332,7 +407,7 @@ export default function AddEmployee() {
               <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px] space-y-4">
                 <div className="flex items-center gap-2 pb-3 border-b border-glass-border">
                   <Building size={16} className="text-[#C8FF00]" />
-                  <h2 className="font-display font-semibold text-base">Step 2: Role & Employment Details</h2>
+                  <h2 className="font-display font-semibold text-base">Step 2: Role & Compensation Structure</h2>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">
@@ -342,8 +417,8 @@ export default function AddEmployee() {
                       required
                       value={form.role}
                       onChange={e => setForm({ ...form, role: e.target.value })}
-                      placeholder="e.g. Senior Frontend Engineer"
-                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream placeholder:text-cream/30 outline-none focus:border-[#C8FF00] transition-colors"
+                      placeholder="e.g. Senior Fullstack Engineer"
+                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream outline-none focus:border-[#C8FF00]"
                     />
                   </div>
 
@@ -352,7 +427,7 @@ export default function AddEmployee() {
                     <select
                       value={form.department}
                       onChange={e => setForm({ ...form, department: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream outline-none focus:border-[#C8FF00] transition-colors"
+                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream outline-none focus:border-[#C8FF00]"
                     >
                       {DEPARTMENTS.map(d => (
                         <option key={d} value={d}>{d}</option>
@@ -368,7 +443,7 @@ export default function AddEmployee() {
                       value={form.salary}
                       onChange={e => setForm({ ...form, salary: e.target.value })}
                       placeholder="e.g. 750000"
-                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream placeholder:text-cream/30 outline-none focus:border-[#C8FF00] transition-colors"
+                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream outline-none focus:border-[#C8FF00]"
                     />
                     <span className="text-[10px] text-[#C8FF00]">
                       ₹{Math.round(Number(form.salary || 0) / 12).toLocaleString("en-IN")}/month gross
@@ -382,7 +457,7 @@ export default function AddEmployee() {
                       required
                       value={form.startDate}
                       onChange={e => setForm({ ...form, startDate: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream outline-none focus:border-[#C8FF00] transition-colors"
+                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream outline-none focus:border-[#C8FF00]"
                     />
                   </div>
 
@@ -391,8 +466,8 @@ export default function AddEmployee() {
                     <input
                       value={form.location}
                       onChange={e => setForm({ ...form, location: e.target.value })}
-                      placeholder="e.g. Hathras / Remote / Delhi NCR"
-                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream placeholder:text-cream/30 outline-none focus:border-[#C8FF00] transition-colors"
+                      placeholder="Hathras, UP / Remote / Delhi NCR"
+                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream outline-none focus:border-[#C8FF00]"
                     />
                   </div>
 
@@ -402,17 +477,13 @@ export default function AddEmployee() {
                       value={form.reportingTo}
                       onChange={e => setForm({ ...form, reportingTo: e.target.value })}
                       placeholder="Harsh Sharma (Director)"
-                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream placeholder:text-cream/30 outline-none focus:border-[#C8FF00] transition-colors"
+                      className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream outline-none focus:border-[#C8FF00]"
                     />
                   </div>
                 </div>
 
                 <div className="flex justify-between pt-4 border-t border-glass-border">
-                  <button
-                    type="button"
-                    onClick={() => setStep(1)}
-                    className="btn-outline text-sm px-5 py-2.5"
-                  >
+                  <button type="button" onClick={() => setStep(1)} className="btn-outline text-sm px-5 py-2.5">
                     &larr; Back
                   </button>
                   <button
@@ -433,13 +504,6 @@ export default function AddEmployee() {
                 <div className="flex items-center gap-2 pb-3 border-b border-glass-border">
                   <Key size={16} className="text-[#C8FF00]" />
                   <h2 className="font-display font-semibold text-base">Step 3: Portal Credentials & Status</h2>
-                </div>
-
-                <div className="p-4 bg-obsidian border border-glass-border rounded-[10px] space-y-2">
-                  <div className="text-xs font-semibold text-[#C8FF00]">Automated Access Provisioning:</div>
-                  <p className="text-xs text-cream/60">
-                    Leaving username/password blank will auto-generate secure login credentials and email them to the employee.
-                  </p>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">
@@ -464,7 +528,7 @@ export default function AddEmployee() {
                   </div>
 
                   <div className="space-y-1.5 sm:col-span-2">
-                    <label className="text-xs text-cream/70 font-medium">Initial Employment Status</label>
+                    <label className="text-xs text-cream/70 font-medium">Initial Status</label>
                     <select
                       value={form.status}
                       onChange={e => setForm({ ...form, status: e.target.value })}
@@ -478,11 +542,7 @@ export default function AddEmployee() {
                 </div>
 
                 <div className="flex justify-between pt-4 border-t border-glass-border">
-                  <button
-                    type="button"
-                    onClick={() => setStep(2)}
-                    className="btn-outline text-sm px-5 py-2.5"
-                  >
+                  <button type="button" onClick={() => setStep(2)} className="btn-outline text-sm px-5 py-2.5">
                     &larr; Back
                   </button>
                   <button
@@ -497,14 +557,13 @@ export default function AddEmployee() {
             )}
           </form>
         ) : (
-          /* ================= SUCCESS & DOCUMENT DISPATCH CARD ================= */
+          /* ================= SUCCESS & DOCUMENT DISPATCH SUITE ================= */
           <div className="space-y-6">
-            {/* Credentials Card */}
-            <div className="p-6 sm:p-8 bg-obsidian-2 border border-[#C8FF00]/30 rounded-[16px] relative overflow-hidden">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="p-6 sm:p-8 bg-obsidian-2 border border-[#C8FF00]/30 rounded-[16px] space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <span className="px-2.5 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-semibold">
-                    ✓ Onboarding Complete
+                    ✓ Onboarding Complete & Access Provisioned
                   </span>
                   <h2 className="font-display text-xl font-bold mt-2">
                     {created.name} &bull; <span className="text-[#C8FF00]">{created.employeeId}</span>
@@ -523,8 +582,8 @@ export default function AddEmployee() {
                 </a>
               </div>
 
-              {/* Login Credentials Grid */}
-              <div className="grid sm:grid-cols-3 gap-3 mb-6">
+              {/* Login Credentials */}
+              <div className="grid sm:grid-cols-3 gap-3">
                 {[
                   { label: "Login Email", val: created.credentials?.email || form.email, key: "email" },
                   { label: "Username", val: created.credentials?.username || "auto-generated", key: "user" },
@@ -539,8 +598,7 @@ export default function AddEmployee() {
                       <button
                         type="button"
                         onClick={() => copyValue(cred.val, cred.key)}
-                        className="p-1.5 bg-white/[0.04] border border-glass-border rounded-[6px] hover:text-[#C8FF00] transition-colors flex-shrink-0"
-                        title="Copy to clipboard"
+                        className="p-1.5 bg-white/[0.04] border border-glass-border rounded-[6px] hover:text-[#C8FF00]"
                       >
                         {copiedKey === cred.key ? <Check size={13} className="text-[#C8FF00]" /> : <Copy size={13} />}
                       </button>
@@ -549,36 +607,32 @@ export default function AddEmployee() {
                 ))}
               </div>
 
-              {/* 1-Click Document Generation Toolbar */}
-              <div className="p-4 bg-obsidian border border-glass-border rounded-[12px]">
-                <div className="flex items-center gap-2 mb-3">
+              {/* 1-Click Complete Onboarding Document Suite */}
+              <div className="p-5 bg-obsidian border border-glass-border rounded-[14px] space-y-3">
+                <div className="flex items-center gap-2">
                   <FileText size={16} className="text-[#C8FF00]" />
-                  <span className="text-xs font-semibold text-cream">1-Click Official Document Generator:</span>
+                  <span className="text-xs font-semibold text-cream">1-Click Official Onboarding Documents:</span>
                 </div>
                 <div className="flex flex-wrap gap-2.5">
-                  <button
-                    onClick={handlePrintAppointment}
-                    className="btn-primary text-xs flex items-center gap-1.5 py-2 px-4"
-                  >
-                    <Printer size={13} /> Print Appointment Letter
+                  <button onClick={handlePrintAppointment} className="btn-primary text-xs flex items-center gap-1.5 py-2 px-3.5">
+                    <Printer size={13} /> Appointment Letter
                   </button>
-                  <button
-                    onClick={handlePrintJoining}
-                    className="btn-outline text-xs flex items-center gap-1.5 py-2 px-4"
-                  >
-                    <FileText size={13} /> Print Joining Letter
+                  <button onClick={handlePrintJoining} className="btn-outline text-xs flex items-center gap-1.5 py-2 px-3.5">
+                    <FileText size={13} /> Joining Letter
                   </button>
-                  <button
-                    onClick={handlePrintOffer}
-                    className="btn-outline text-xs flex items-center gap-1.5 py-2 px-4"
-                  >
-                    <FileText size={13} /> Print Offer Letter
+                  <button onClick={handlePrintSalaryCert} className="btn-outline text-xs flex items-center gap-1.5 py-2 px-3.5">
+                    <DollarSign size={13} /> Salary Certificate
+                  </button>
+                  <button onClick={handlePrintIdCard} className="btn-outline text-xs flex items-center gap-1.5 py-2 px-3.5">
+                    <CreditCard size={13} /> Digital ID Card
+                  </button>
+                  <button onClick={handlePrintOffer} className="btn-outline text-xs flex items-center gap-1.5 py-2 px-3.5">
+                    <FileText size={13} /> Offer Letter
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Actions Footer */}
             <div className="flex items-center justify-between gap-4">
               <Link to="/hrm" className="btn-outline text-sm">
                 &larr; Return to HRM Dashboard

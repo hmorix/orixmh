@@ -26,7 +26,11 @@ import { config } from "../../lib/config"
 import {
   printPayslip,
   printJoiningLetter,
-  printAppointmentLetter
+  printAppointmentLetter,
+  printSalaryCertificate,
+  printEmployeeIdCard,
+  printExperienceLetter,
+  printRelievingLetter
 } from "../../lib/hrm-documents"
 
 const TABS = [
@@ -199,6 +203,32 @@ export default function EmployeePortal() {
       joiningDate: employee.startDate || "2026-01-01",
       location: employee.location || "Hathras, UP",
       ctc: Number(employee.salary || 600000)
+    })
+  }
+
+  
+  const handlePrintMySalaryCert = () => {
+    if (!employee) return
+    const salary = Number(employee.salary || 600000)
+    printSalaryCertificate({
+      name: employee.name,
+      employeeId: employee.employeeId || "HM-STAFF",
+      role: employee.role || "Software Engineer",
+      department: employee.department || "Engineering",
+      joiningDate: employee.startDate || "2025-06-15",
+      monthlyGross: Math.round(salary / 12),
+      annualCtc: salary
+    })
+  }
+
+  const handlePrintMyIdCard = () => {
+    if (!employee) return
+    printEmployeeIdCard({
+      name: employee.name,
+      employeeId: employee.employeeId || "HM-STAFF",
+      role: employee.role || "Software Engineer",
+      department: employee.department || "Engineering",
+      joiningDate: employee.startDate || "2025-06-15"
     })
   }
 
@@ -755,15 +785,16 @@ export default function EmployeePortal() {
           </div>
         )}
 
+        
         {/* ================= TAB 7: MY DOCUMENTS ================= */}
         {activeTab === "My Documents" && (
           <div className="bg-obsidian-2 border border-glass-border rounded-[16px] p-6 shadow-xl space-y-6">
             <div className="pb-4 border-b border-glass-border">
-              <h2 className="font-display font-semibold text-base">Official Employment Documentation</h2>
-              <p className="text-xs text-cream/50 mt-0.5">1-click reprint of your official onboarding agreements and company certificates.</p>
+              <h2 className="font-display font-semibold text-base">Official Corporate Legal Documentation</h2>
+              <p className="text-xs text-cream/50 mt-0.5">1-click reprint of your official onboarding agreements, ID cards, salary certificates, and company policies.</p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="p-5 bg-obsidian border border-glass-border rounded-[14px] space-y-3">
                 <div className="flex items-center gap-2">
                   <FileText size={18} className="text-[#C8FF00]" />
@@ -774,38 +805,50 @@ export default function EmployeePortal() {
                   onClick={handlePrintMyAppointment}
                   className="btn-primary text-xs py-2 px-4 w-full flex items-center justify-center gap-1.5"
                 >
-                  <Printer size={13} /> View & Print Letter
+                  <Printer size={13} /> View & Print
                 </button>
               </div>
 
               <div className="p-5 bg-obsidian border border-glass-border rounded-[14px] space-y-3">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 size={18} className="text-green-400" />
-                  <h4 className="font-semibold text-sm text-cream">Joining & Induction Letter</h4>
+                  <h4 className="font-semibold text-sm text-cream">Joining Letter</h4>
                 </div>
                 <p className="text-xs text-cream/50">Onboarding confirmation & employee credentials.</p>
                 <button
                   onClick={handlePrintMyJoining}
                   className="btn-outline text-xs py-2 px-4 w-full flex items-center justify-center gap-1.5"
                 >
-                  <Printer size={13} /> View & Print Letter
+                  <Printer size={13} /> View & Print
+                </button>
+              </div>
+
+              <div className="p-5 bg-obsidian border border-glass-border rounded-[14px] space-y-3">
+                <div className="flex items-center gap-2">
+                  <DollarSign size={18} className="text-yellow-400" />
+                  <h4 className="font-semibold text-sm text-cream">Salary Certificate</h4>
+                </div>
+                <p className="text-xs text-cream/50">Proof of earnings for bank loans & visa applications.</p>
+                <button
+                  onClick={handlePrintMySalaryCert}
+                  className="btn-outline text-xs py-2 px-4 w-full flex items-center justify-center gap-1.5"
+                >
+                  <Printer size={13} /> View & Print
                 </button>
               </div>
 
               <div className="p-5 bg-obsidian border border-glass-border rounded-[14px] space-y-3">
                 <div className="flex items-center gap-2">
                   <ShieldCheck size={18} className="text-blue-400" />
-                  <h4 className="font-semibold text-sm text-cream">Company Code of Conduct</h4>
+                  <h4 className="font-semibold text-sm text-cream">Digital ID Badge</h4>
                 </div>
-                <p className="text-xs text-cream/50">Information security & workplace ethics.</p>
-                <a
-                  href="/terms"
-                  target="_blank"
-                  rel="noreferrer"
+                <p className="text-xs text-cream/50">Printable corporate ID card with blood group.</p>
+                <button
+                  onClick={handlePrintMyIdCard}
                   className="btn-outline text-xs py-2 px-4 w-full flex items-center justify-center gap-1.5"
                 >
-                  <ExternalLink size={13} /> Read Standards
-                </a>
+                  <Printer size={13} /> View & Print
+                </button>
               </div>
             </div>
           </div>
