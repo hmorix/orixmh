@@ -89,6 +89,7 @@ This file serves as the canonical system reference for HMorix (`hmorix.in`), cap
 - `api/[...path].ts`: Comprehensive serverless API router handling auth, HRM, CRM, sales, portal, settings, and billing.
 - `client/src/App.tsx`: Central client router, layout wrapper, global keyboard shortcuts, and error boundaries.
 - `client/src/lib/config.ts`: Client-side configuration and environment variable resolver.
+- `client/src/lib/hrm-documents.ts`: Zero-dependency 1-click HR document generator (Offer Letter, Joining Letter, Appointment Letter, Experience Certificate, Relieving Letter, Payslips) using native browser print APIs.
 - `client/src/pages/hrm/`: HRM dashboard, recruitment pipeline, payroll processing, leave management, and employee creation.
 - `client/src/pages/employee/`: Employee self-service portal, attendance clock, requests, and directory.
 - `client/src/pages/manager/`: Manager team overview, delegation, task scoring, and training management.

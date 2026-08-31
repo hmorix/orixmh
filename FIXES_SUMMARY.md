@@ -407,6 +407,38 @@ NVIDIA_MODEL=meta/llama-3.1-405b-instruct
 
 ---
 
+
+---
+
+## 24. Enterprise HRM Model & 1-Click Document Generator Suite ✅
+
+### Features Implemented
+- **Unified Document Generator Engine (`client/src/lib/hrm-documents.ts`):**
+  - Zero paid dependencies — leverages standard browser print APIs and Blob streams.
+  - Complete official letter generation suite with company letterhead, CIN, authorized signatures, and company seal:
+    1. **Offer Letter:** Detailed CTC breakdown (Basic 40%, HRA 20%, Special Allowance 30%, Flexi Pay 10%), probation terms, notice period, and candidate acceptance acknowledgment.
+    2. **Joining & Induction Letter:** Onboarding confirmation, permanent Employee ID (`HM-XXXXXX`), portal login URL, workplace policies, and asset checklist.
+    3. **Appointment Letter:** Formal legal employment agreement with detailed terms of service, IP assignment, and non-compete clauses.
+    4. **Experience & Service Certificate:** Official tenure verification, role certification, and conduct endorsement.
+    5. **Formal Relieving Letter:** Acceptance of resignation, clearance confirmation, FnF settlement notice, and asset handover completion.
+    6. **Monthly Salary Slip (Payslip):** Full breakdown of gross earnings (Basic, HRA, Allowances, Bonuses) and statutory deductions (PF 12%, PT ₹200, TDS), net disbursement amount, and direct bank credit details.
+- **HRM Dashboard (`client/src/pages/hrm/HRMDashboard.tsx`):**
+  - Obsidian theme with Lime highlights, responsive layout for mobile and desktop.
+  - Integrated 5-tab interface: Overview, Staff Directory, Leave Approvals, Department Analytics, and 1-Click Document Studio.
+  - Live KPI stats: Total Headcount, Present Today, On Leave, Open Positions, Departments, New Monthly Hires.
+- **Recruitment & ATS Pipeline (`client/src/pages/hrm/Recruitment.tsx`):**
+  - Kanban pipeline stages with 1-click stage transitions.
+  - Integrated 1-click candidate document actions (Print Offer Letter, Joining Letter, Appointment Letter, Hire & Provision Login).
+- **Payroll & Compensation Desk (`client/src/pages/hrm/Payroll.tsx`):**
+  - Real-time monthly payroll run calculations, tax withholding metrics, CSV report exports, and individual 1-click printable payslips.
+- **Leave Management & Approvals (`client/src/pages/hrm/Leaves.tsx`):**
+  - Filterable leave requests with live approval/rejection, balance tracking, and employee reason quotes.
+- **Structured Employee Onboarding (`client/src/pages/hrm/AddEmployee.tsx`):**
+  - 3-step wizard (Personal Info -> Role & Salary -> Access Provisioning).
+  - Automated portal credential generation with copy buttons and immediate 1-click document printing.
+
+---
+
 ## Files Summary
 
 ### New Files Created (20)
