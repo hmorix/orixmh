@@ -498,39 +498,83 @@ NVIDIA_MODEL=meta/llama-3.1-405b-instruct
 
 ---
 
-## Support & Documentation
+---
 
-- See `database/MIGRATION_GUIDE.md` for setup instructions
-- See `client/src/lib/config.ts` for configuration options
-- See `client/src/lib/seo.ts` for SEO utilities
-- See `.env.example` for all environment variables
+## 18. Production Domain & Brand Configuration ✅
+
+### Changes
+- Updated production domain to `https://hmorix.in` across all serverless API endpoints, client config, OAuth callback handlers, and sitemaps.
+- Centralized `appUrl()` and `getOAuthRedirectUrl()` to eliminate any residual `localhost` or preview deployment discrepancies.
+- Updated support and official email references to `support@hmorix.in` and `contact@hmorix.in`.
 
 ---
 
-## Next Steps
+## 19. Brand SVG Suite, Media Kit & Cinematic Intro ✅
 
-1. **Deploy to Vercel**
-   - Connect GitHub repository
-   - Add environment variables
-   - Deploy
-
-2. **Monitor Production**
-   - Check error logs
-   - Monitor database connections
-   - Track user signups
-
-3. **Optimize Performance**
-   - Monitor API response times
-   - Optimize database queries
-   - Cache static assets
-
-4. **Enhance Features**
-   - Add more OAuth providers
-   - Implement advanced analytics
-   - Add AI features
-   - Expand SEO content
+### Features Implemented
+- Created complete vector SVG brand assets (`hmorix-icon-lime.svg`, `hmorix-icon.svg`, `hmorix-logo-dark.svg`, `hmorix-logo-light.svg`).
+- Interactive Media Kit page (`/media-kit`) with one-click PNG/SVG downloads and brand color guidelines.
+- Cinematic intro splash animation (`AppIntroAnimation.tsx`) displaying sleek branding on first app load with local session suppression.
 
 ---
 
-**Last Updated:** July 18, 2026
-**Status:** Production Ready ✅
+## 20. Notification Center & Push Alerts ✅
+
+### Features Implemented
+- Real-time notifications bell with unread badge counter in header.
+- Interactive notification panel drawer with mark-as-read, clear-all, and direct route navigation.
+- Admin Notifications management dashboard (`/admin/notifications`).
+- Browser push notification permissions and system notifications.
+
+---
+
+## 21. Field Sales Portal & CRM Pipeline Sync ✅
+
+### Features Implemented
+- Dedicated `/sales` portal for field sales representatives to capture local businesses (Hotels, Restaurants, Factories, Clinics, Schools, Retail).
+- Atomic creation of `crm_contacts`, `crm_deals`, and `client_projects` upon lead entry.
+- 1-click deal closure transitioning stages to `closed_won` and notifying managers for project delegation.
+
+---
+
+## 22. Enterprise HRM & Manager Project-Team Coordination ✅
+
+### Features Implemented
+- Candidate-to-employee onboarding pipeline with automatic `HM-XXXXXX` ID and secure login credential generation.
+- Automated offer letter and joining letter document generator in recruitment pipeline.
+- Manager Portal (`/manager`) for team assembly, client project assignment, and workload distribution.
+- Client support ticket (`TKT-XXXXXX`) automated delegation to assigned project engineering teams.
+- Real-time time & attendance clock-in/clock-out tracking with monthly statistics.
+- Automated monthly payroll calculator with tax withholdings, bonuses, and one-click CSV export.
+
+---
+
+## 23. Dual Database Adapter & Offline PWA Sync ✅
+
+### Features Implemented
+- MongoDB Atlas primary driver with auto-indexed collections and TTL expiration.
+- Repository abstraction for Supabase / PostgreSQL schema parity.
+- IndexedDB (`hmorix-offline`) client cache and Service Worker for offline availability.
+
+---
+
+## Files Summary
+
+### Core Updated Files
+1. `api/[...path].ts` - Consolidated serverless API router for all platform modules.
+2. `client/src/App.tsx` - Complete client routing and layout architecture.
+3. `client/src/lib/config.ts` - Centralized production URL resolution.
+4. `client/src/pages/sales/SalesPortal.tsx` - Field sales lead generation and CRM sync.
+5. `client/src/pages/hrm/` - HRM Dashboard, Recruitment, Payroll, Leaves, Add Employee.
+6. `client/src/pages/manager/ManagerPortal.tsx` - Manager team and project delegation.
+7. `client/src/pages/employee/EmployeePortal.tsx` - Employee self-service suite.
+8. `client/src/pages/portal/ClientPortal.tsx` - Customer project and ticket portal.
+9. `PROJECT_WORKFLOW.md` - Canonical platform workflow documentation.
+10. `PROJECT_MEMORY.md` - System memory and architectural reference.
+11. `FIXES_SUMMARY.md` - Complete platform change log.
+
+---
+
+**Last Updated:** August 2026  
+**Status:** Production Ready & Enterprise Scale ✅
+
