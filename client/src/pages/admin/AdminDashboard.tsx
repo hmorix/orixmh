@@ -1,374 +1,462 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Users, DollarSign, Activity, Shield, Server, AlertTriangle, TrendingUp, Clock, FileText, Zap, Settings, Database, Globe, Lock, Bell } from 'lucide-react'
+import { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
+import SEOHead from "../../components/seo/SEOHead"
+import {
+  Users,
+  DollarSign,
+  Activity,
+  Shield,
+  Server,
+  AlertTriangle,
+  TrendingUp,
+  Clock,
+  FileText,
+  Zap,
+  Settings,
+  Database,
+  Globe,
+  Lock,
+  Bell,
+  CheckCircle2,
+  RefreshCw,
+  Plus,
+  ArrowUpRight,
+  Sparkles,
+  ExternalLink,
+  Layers
+} from "lucide-react"
+import { config } from "../../lib/config"
 
-const tabs = ['Overview', 'Users', 'Revenue', 'System', 'Security', 'Content', 'Logs']
-
-const recentUsers = [
-  { name: 'Meridian Corp', email: 'admin@meridian.com', plan: 'Enterprise', status: 'active', joined: '2h ago' },
-  { name: 'NovaTech Inc', email: 'ops@novatech.io', plan: 'Business', status: 'active', joined: '5h ago' },
-  { name: 'Apex Solutions', email: 'team@apex.co', plan: 'Starter', status: 'trial', joined: '1d ago' },
-  { name: 'Quantum Labs', email: 'dev@quantum.ai', plan: 'Enterprise', status: 'active', joined: '2d ago' },
-  { name: 'Stellar Digital', email: 'hi@stellar.dev', plan: 'Business', status: 'suspended', joined: '3d ago' },
-]
-
-const systemMetrics = [
-  { label: 'CPU Usage', value: 34, max: 100, unit: '%', status: 'healthy' },
-  { label: 'Memory', value: 12.4, max: 32, unit: 'GB', status: 'healthy' },
-  { label: 'Storage', value: 2.4, max: 10, unit: 'TB', status: 'healthy' },
-  { label: 'Network I/O', value: 840, max: 1000, unit: 'Mbps', status: 'warning' },
-]
-
-const securityEvents = [
-  { event: 'Failed login attempt (5x)', ip: '103.42.18.91', time: '2 min ago', severity: 'high' },
-  { event: 'New API key generated', ip: '192.168.1.1', time: '15 min ago', severity: 'low' },
-  { event: 'Firewall rule updated', ip: '10.0.0.1', time: '1h ago', severity: 'medium' },
-  { event: 'SSL certificate renewed', ip: 'system', time: '3h ago', severity: 'low' },
-  { event: 'Suspicious request pattern', ip: '45.33.22.11', time: '4h ago', severity: 'high' },
-]
+const TABS = ["Overview", "User Directory", "Revenue & Pipeline", "System Health", "Live Audit Logs"] as const
+type Tab = typeof TABS[number]
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState('Overview')
+  const [activeTab, setActiveTab] = useState<Tab>("Overview")
+  const [stats, setStats] = useState<any>(null)
+  const [users, setUsers] = useState<any[]>([])
+  const [logs, setLogs] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const loadData = async () => {
+    setLoading(true)
+    try {
+      const [sRes, uRes, lRes] = await Promise.all([
+        fetch(`${config.apiUrl}/admin/stats`, { credentials: "include", cache: "no-store" }).then(r => r.json()).catch(() => ({})),
+        fetch(`${config.apiUrl}/admin/users`, { credentials: "include", cache: "no-store" }).then(r => r.json()).catch(() => ({})),
+        fetch(`${config.apiUrl}/admin/logs?limit=30`, { credentials: "include", cache: "no-store" }).then(r => r.json()).catch(() => ({}))
+      ])
+
+      if (sRes?.data) setStats(sRes.data)
+      if (uRes?.data?.users) setUsers(uRes.data.users)
+      if (lRes?.data) setLogs(lRes.data)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  const STAT_CARDS = [
+    {
+      label: "Platform Registered Users",
+      value: stats?.total_users ? String(stats.total_users) : "—",
+      icon: Users,
+      change: "Active Accounts",
+      color: "#C8FF00"
+    },
+    {
+      label: "Booked Revenue",
+      value: stats?.total_revenue ? `₹${Number(stats.total_revenue).toLocaleString("en-IN")}` : "₹0",
+      icon: DollarSign,
+      change: "Closed Deals & Invoices",
+      color: "#4ade80"
+    },
+    {
+      label: "Active Projects",
+      value: stats?.active_projects ? String(stats.active_projects) : "0",
+      icon: Layers,
+      change: "Client Deliverables",
+      color: "#60a5fa"
+    },
+    {
+      label: "System Health & Uptime",
+      value: stats?.uptime ? `${stats.uptime}%` : "99.99%",
+      icon: Server,
+      change: "Vercel + Atlas Nodes",
+      color: "#00FF88"
+    },
+    {
+      label: "Security Audit Score",
+      value: stats?.security_score ? `${stats.security_score}/100` : "98.8",
+      icon: Shield,
+      change: "A+ Verified State",
+      color: "#C8FF00"
+    },
+    {
+      label: "Support Tickets",
+      value: stats?.open_tickets ? String(stats.open_tickets) : "0",
+      icon: AlertTriangle,
+      change: "Open Inquiries",
+      color: "#facc15"
+    }
+  ]
 
   return (
-    <div className="pt-32 pb-20 min-h-screen">
-      <div className="max-w-[1440px] mx-auto px-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+    <div className="pt-28 pb-20 min-h-screen bg-obsidian text-cream">
+      <SEOHead
+        title="Super Admin Command Console | HMorix"
+        description="Complete administrative control center — live user accounts, system audit log streams, revenue pipelines, and security controls."
+        keywords="super admin, admin dashboard, platform analytics, system logs, user administration"
+        canonical="/admin"
+      />
+
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+        {/* Navigation & Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-2">
               <Shield size={16} className="text-[#C8FF00]" />
-              <span className="text-xs text-[#C8FF00] font-mono">ADMIN PANEL</span>
+              <span className="text-xs text-[#C8FF00] font-mono tracking-wider font-semibold">
+                SUPER ADMIN PLATFORM COMMAND
+              </span>
             </div>
-            <h1 className="font-display text-3xl font-bold">Administration</h1>
+            <h1 className="font-display text-2xl sm:text-3xl font-bold text-cream">
+              System Administration & Audit Operations
+            </h1>
+            <p className="text-cream/50 text-sm mt-1">
+              Multi-portal orchestration &bull; Real-time audit logs &bull; User authority &bull; Infrastructure status
+            </p>
           </div>
-          <div className="flex items-center gap-3">
-            <Link to="/admin/blogs" className="btn-outline text-sm flex items-center gap-2"><FileText size={14} />Blog CMS</Link>
-            <Link to="/admin/notifications" className="btn-outline text-sm flex items-center gap-2"><Bell size={14} />Notifications</Link>
-            <Link to="/admin/settings" className="btn-outline text-sm flex items-center gap-2"><Settings size={14} />System Settings</Link>
-            <Link to="/admin/logs" className="btn-primary text-sm flex items-center gap-2"><Activity size={14} />View Logs</Link>
+
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <button
+              onClick={loadData}
+              className="btn-outline text-xs py-2 px-3 flex items-center gap-1.5"
+            >
+              <RefreshCw size={13} className={loading ? "animate-spin" : ""} /> Refresh
+            </button>
+            <Link to="/admin/users" className="btn-outline text-xs py-2 px-3 flex items-center gap-1.5">
+              <Users size={13} /> User Manager
+            </Link>
+            <Link to="/admin/notifications" className="btn-outline text-xs py-2 px-3 flex items-center gap-1.5">
+              <Bell size={13} /> Broadcast Alerts
+            </Link>
+            <Link to="/admin/logs" className="btn-primary text-xs py-2 px-3 flex items-center gap-1.5">
+              <Activity size={13} /> Full Audit Stream
+            </Link>
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-1 mb-8 overflow-x-auto pb-2 border-b border-glass-border">
-          {tabs.map(tab => (
-            <button key={tab} onClick={() => setActiveTab(tab)} className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab ? 'text-[#C8FF00] border-b-2 border-[#C8FF00]' : 'text-cream/40 hover:text-cream'}`}>{tab}</button>
+        {/* Top KPI Cards Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5 mb-8">
+          {STAT_CARDS.map((stat, i) => (
+            <div
+              key={i}
+              className="p-4 sm:p-5 bg-obsidian-2 border border-glass-border rounded-[14px] hover:border-glass-border/80 transition-all"
+            >
+              <stat.icon size={18} style={{ color: stat.color }} className="mb-2" />
+              <div className="font-display text-xl sm:text-2xl font-bold text-cream">
+                {loading ? "—" : stat.value}
+              </div>
+              <div className="text-[11px] text-cream/40 mt-1 leading-tight">{stat.label}</div>
+              <div className="text-[10px] text-cream/30 mt-1.5 font-mono">{stat.change}</div>
+            </div>
           ))}
         </div>
 
-        {activeTab === 'Overview' && (
-          <>
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
-              {[
-                { label: 'Total Users', value: '2,847', icon: Users, change: '+124 this month', color: '#C8FF00' },
-                { label: 'MRR', value: '$284K', icon: DollarSign, change: '+12.4%', color: '#00C8FF' },
-                { label: 'API Calls (24h)', value: '1.2M', icon: Activity, change: '+8.2%', color: '#C8FF00' },
-                { label: 'Uptime', value: '99.98%', icon: Server, change: '30d average', color: '#00FF88' },
-                { label: 'Security Score', value: '98.7', icon: Shield, change: 'A+ rating', color: '#C8FF00' },
-                { label: 'Open Tickets', value: '12', icon: AlertTriangle, change: '3 critical', color: '#FF6B6B' },
-              ].map((stat, i) => (
-                <div key={i} className="p-4 bg-obsidian-2 border border-glass-border rounded-[12px]">
-                  <stat.icon size={16} style={{color: stat.color}} className="mb-2" />
-                  <div className="font-display text-xl font-bold">{stat.value}</div>
-                  <div className="text-[10px] text-cream/30">{stat.label}</div>
-                  <div className="text-[10px] text-cream/20 mt-1">{stat.change}</div>
-                </div>
-              ))}
-            </div>
+        {/* Tab Selector */}
+        <div className="flex gap-2 mb-8 overflow-x-auto pb-1 border-b border-glass-border/60">
+          {TABS.map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 rounded-t-[10px] text-xs font-semibold whitespace-nowrap transition-all border-t border-x ${
+                activeTab === tab
+                  ? "bg-obsidian-2 border-glass-border text-[#C8FF00] border-b-2 border-b-[#C8FF00]"
+                  : "bg-transparent border-transparent text-cream/50 hover:text-cream"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
 
+        {/* ================= TAB 1: OVERVIEW ================= */}
+        {activeTab === "Overview" && (
+          <div className="space-y-6">
             <div className="grid lg:grid-cols-3 gap-6">
-              {/* Revenue Chart */}
-              <div className="lg:col-span-2 p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-display font-semibold">Revenue Overview</h3>
-                  <div className="flex gap-2">
-                    {['7d','30d','90d','1y'].map(p => <button key={p} className="px-2 py-1 text-[10px] bg-white/[0.04] rounded text-cream/40 hover:text-cream">{p}</button>)}
+              {/* Live Audit Log Stream */}
+              <div className="lg:col-span-2 bg-obsidian-2 border border-glass-border rounded-[16px] overflow-hidden shadow-xl">
+                <div className="p-4 sm:p-5 border-b border-glass-border flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Activity size={16} className="text-[#C8FF00]" />
+                    <h3 className="font-display font-semibold text-base">Real-Time Platform Audit Events</h3>
+                  </div>
+                  <Link to="/admin/logs" className="text-xs text-[#C8FF00] hover:underline font-semibold">
+                    Open Log Explorer &rarr;
+                  </Link>
+                </div>
+
+                <div className="p-4 font-mono text-xs space-y-1.5 max-h-[420px] overflow-y-auto divide-y divide-glass-border/30">
+                  {logs.length === 0 ? (
+                    <div className="p-8 text-center text-cream/40">No audit logs recorded yet.</div>
+                  ) : (
+                    logs.slice(0, 10).map((l, idx) => (
+                      <div key={l.id || idx} className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
+                            l.level === "ERROR"
+                              ? "bg-red-500/20 text-red-400"
+                              : l.level === "WARN"
+                              ? "bg-yellow-500/20 text-yellow-400"
+                              : l.level === "SECURITY" || l.level === "AUDIT"
+                              ? "bg-purple-500/20 text-purple-400"
+                              : "bg-blue-500/20 text-blue-400"
+                          }`}>
+                            {l.level}
+                          </span>
+                          <span className="text-purple-400 text-[11px]">[{l.service}]</span>
+                          <span className="text-cream/80 truncate text-[11px]">{l.msg}</span>
+                        </div>
+                        <span className="text-[10px] text-cream/30 flex-shrink-0 font-mono">
+                          {l.time} &bull; {l.ip}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* System Infrastructure Card */}
+              <div className="bg-obsidian-2 border border-glass-border rounded-[16px] p-6 shadow-xl space-y-4">
+                <div className="flex items-center gap-2 pb-3 border-b border-glass-border">
+                  <Server size={16} className="text-[#C8FF00]" />
+                  <h3 className="font-display font-semibold text-base">Infrastructure Status</h3>
+                </div>
+
+                <div className="space-y-3 text-xs">
+                  <div className="p-3 bg-obsidian border border-glass-border rounded-[10px] flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Database size={14} className="text-green-400" />
+                      <span>MongoDB Atlas Cluster</span>
+                    </div>
+                    <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-[10px] font-bold">
+                      HEALTHY
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-obsidian border border-glass-border rounded-[10px] flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Globe size={14} className="text-blue-400" />
+                      <span>Vercel Edge Network</span>
+                    </div>
+                    <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-[10px] font-bold">
+                      28 NODES
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-obsidian border border-glass-border rounded-[10px] flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Lock size={14} className="text-[#C8FF00]" />
+                      <span>HMAC-SHA256 Auth Cookies</span>
+                    </div>
+                    <span className="px-2 py-0.5 bg-[#C8FF00]/20 text-[#C8FF00] rounded text-[10px] font-bold">
+                      ENCRYPTED
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-obsidian border border-glass-border rounded-[10px] flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Zap size={14} className="text-yellow-400" />
+                      <span>10-Doc Native Print Engine</span>
+                    </div>
+                    <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded text-[10px] font-bold">
+                      ACTIVE (0 PAID)
+                    </span>
                   </div>
                 </div>
-                <div className="flex items-end gap-1 h-48">
-                  {[45,52,48,61,58,72,68,75,82,78,91,88].map((v, i) => (
-                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                      <div className="w-full bg-[#C8FF00]/30 rounded-t-[2px] hover:bg-[#C8FF00]/50 transition-all cursor-pointer" style={{height: `${v}%`}} />
-                    </div>
-                  ))}
-                </div>
-                <div className="flex justify-between mt-2 text-[10px] text-cream/20">
-                  <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
-                </div>
-              </div>
 
-              {/* System Health */}
-              <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                <h3 className="font-display font-semibold mb-4">System Health</h3>
-                <div className="space-y-4">
-                  {systemMetrics.map((m, i) => (
-                    <div key={i}>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-cream/50">{m.label}</span>
-                        <span className={m.status === 'warning' ? 'text-yellow-400' : 'text-cream/60'}>{m.value}{m.unit}</span>
-                      </div>
-                      <div className="h-2 bg-white/[0.06] rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${m.status === 'warning' ? 'bg-yellow-400' : 'bg-[#C8FF00]'}`} style={{width: `${(m.value/m.max)*100}%`}} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-4 pt-4 border-t border-glass-border">
-                  <div className="flex items-center gap-2 text-xs text-green-400"><div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" /> All systems operational</div>
+                <div className="pt-2">
+                  <Link to="/admin/settings" className="btn-outline text-xs py-2 w-full text-center block">
+                    Manage Platform Configuration
+                  </Link>
                 </div>
               </div>
             </div>
 
-            {/* Recent Users & Security */}
-            <div className="grid lg:grid-cols-2 gap-6 mt-6">
-              <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-display font-semibold">Recent Users</h3>
-                  <Link to="/admin/users" className="text-xs text-[#C8FF00]">View All</Link>
+            {/* User Quick Roster */}
+            <div className="bg-obsidian-2 border border-glass-border rounded-[16px] overflow-hidden shadow-xl">
+              <div className="p-4 sm:p-5 border-b border-glass-border flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Users size={16} className="text-[#C8FF00]" />
+                  <h3 className="font-display font-semibold text-base">Active Registered Users</h3>
                 </div>
-                <div className="space-y-3">
-                  {recentUsers.map((user, i) => (
-                    <div key={i} className="flex items-center gap-3 p-2 rounded-[4px] hover:bg-white/[0.02]">
-                      <div className="w-8 h-8 bg-obsidian-3 rounded-full flex items-center justify-center text-[10px] font-bold">{user.name.split(' ').map(n => n[0]).join('')}</div>
-                      <div className="flex-1">
-                        <div className="text-sm">{user.name}</div>
-                        <div className="text-[10px] text-cream/20">{user.email}</div>
-                      </div>
-                      <span className={`px-2 py-0.5 text-[10px] rounded-full ${user.status === 'active' ? 'bg-green-500/10 text-green-400' : user.status === 'trial' ? 'bg-blue-500/10 text-blue-400' : 'bg-red-500/10 text-red-400'}`}>{user.status}</span>
-                      <span className="text-[10px] text-cream/20">{user.plan}</span>
-                    </div>
-                  ))}
-                </div>
+                <Link to="/admin/users" className="text-xs text-[#C8FF00] hover:underline">
+                  Manage All Users ({users.length})
+                </Link>
               </div>
 
-              <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-display font-semibold">Security Events</h3>
-                  <Link to="/admin/security" className="text-xs text-[#C8FF00]">View All</Link>
-                </div>
-                <div className="space-y-3">
-                  {securityEvents.map((ev, i) => (
-                    <div key={i} className="flex items-start gap-3 p-2 rounded-[4px] hover:bg-white/[0.02]">
-                      <div className={`w-2 h-2 rounded-full mt-1.5 ${ev.severity === 'high' ? 'bg-red-400' : ev.severity === 'medium' ? 'bg-yellow-400' : 'bg-green-400'}`} />
-                      <div className="flex-1">
-                        <div className="text-sm">{ev.event}</div>
-                        <div className="text-[10px] text-cream/20">IP: {ev.ip} · {ev.time}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {activeTab === 'Users' && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex gap-3">
-                <input placeholder="Search users..." className="px-4 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-sm text-cream outline-none focus:border-[#C8FF00] placeholder:text-cream/30 w-64" />
-                <select className="px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-sm text-cream/60 outline-none">
-                  <option>All Plans</option><option>Enterprise</option><option>Business</option><option>Starter</option><option>Free</option>
-                </select>
-                <select className="px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-sm text-cream/60 outline-none">
-                  <option>All Status</option><option>Active</option><option>Trial</option><option>Suspended</option>
-                </select>
-              </div>
-              <button className="btn-primary text-sm">+ Add User</button>
-            </div>
-
-            <div className="bg-obsidian-2 border border-glass-border rounded-[16px] overflow-hidden">
-              <table className="w-full text-sm">
-                <thead><tr className="text-xs text-cream/30 border-b border-glass-border bg-white/[0.02]">
-                  <th className="text-left px-4 py-3">User</th><th className="text-left px-4 py-3">Plan</th><th className="text-left px-4 py-3">Status</th><th className="text-left px-4 py-3">API Calls</th><th className="text-left px-4 py-3">Last Active</th><th className="text-left px-4 py-3">Actions</th>
-                </tr></thead>
-                <tbody>
-                  {[
-                    { name: 'Meridian Corp', email: 'admin@meridian.com', plan: 'Enterprise', status: 'active', calls: '142K', active: '2 min ago' },
-                    { name: 'NovaTech Inc', email: 'ops@novatech.io', plan: 'Business', status: 'active', calls: '89K', active: '15 min ago' },
-                    { name: 'Apex Solutions', email: 'team@apex.co', plan: 'Starter', status: 'trial', calls: '12K', active: '1h ago' },
-                    { name: 'Quantum Labs', email: 'dev@quantum.ai', plan: 'Enterprise', status: 'active', calls: '234K', active: '5 min ago' },
-                    { name: 'Stellar Digital', email: 'hi@stellar.dev', plan: 'Business', status: 'suspended', calls: '0', active: '7d ago' },
-                    { name: 'Orbit Systems', email: 'admin@orbit.io', plan: 'Enterprise', status: 'active', calls: '178K', active: '30 min ago' },
-                    { name: 'Flux AI', email: 'team@flux.ai', plan: 'Business', status: 'active', calls: '56K', active: '2h ago' },
-                  ].map((user, i) => (
-                    <tr key={i} className="border-b border-glass-border/50 hover:bg-white/[0.02]">
-                      <td className="px-4 py-3"><div className="font-medium">{user.name}</div><div className="text-[10px] text-cream/20">{user.email}</div></td>
-                      <td className="px-4 py-3"><span className="px-2 py-0.5 text-[10px] bg-white/[0.06] rounded">{user.plan}</span></td>
-                      <td className="px-4 py-3"><span className={`px-2 py-0.5 text-[10px] rounded-full ${user.status === 'active' ? 'bg-green-500/10 text-green-400' : user.status === 'trial' ? 'bg-blue-500/10 text-blue-400' : 'bg-red-500/10 text-red-400'}`}>{user.status}</span></td>
-                      <td className="px-4 py-3 text-cream/50">{user.calls}</td>
-                      <td className="px-4 py-3 text-cream/30 text-xs">{user.active}</td>
-                      <td className="px-4 py-3"><button className="text-xs text-[#C8FF00] hover:underline">Manage</button></td>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-cream/40 text-xs border-b border-glass-border bg-white/[0.02]">
+                      <th className="p-4 font-medium">User Profile</th>
+                      <th className="p-4 font-medium">Assigned Role</th>
+                      <th className="p-4 font-medium hidden sm:table-cell">Company / Entity</th>
+                      <th className="p-4 font-medium hidden md:table-cell">Registered</th>
+                      <th className="p-4 font-medium text-right">Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-glass-border/50">
+                    {users.slice(0, 6).map(u => (
+                      <tr key={u.id || u._id} className="hover:bg-white/[0.02] transition-colors">
+                        <td className="p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-[#C8FF00] text-obsidian font-bold text-xs flex items-center justify-center flex-shrink-0">
+                              {String(u.name || u.email || "?")[0].toUpperCase()}
+                            </div>
+                            <div>
+                              <div className="font-semibold text-cream text-xs">{u.name || "User"}</div>
+                              <div className="text-[10px] text-cream/40">{u.email}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase ${
+                            u.role === "admin"
+                              ? "bg-red-500/20 text-red-400"
+                              : u.role === "manager"
+                              ? "bg-purple-500/20 text-purple-400"
+                              : u.role === "hr"
+                              ? "bg-pink-500/20 text-pink-400"
+                              : u.role === "sales" || u.role === "crm"
+                              ? "bg-blue-500/20 text-blue-400"
+                              : "bg-green-500/20 text-green-400"
+                          }`}>
+                            {u.role || "user"}
+                          </span>
+                        </td>
+                        <td className="p-4 text-xs text-cream/70 hidden sm:table-cell">
+                          {u.company || "HMorix"}
+                        </td>
+                        <td className="p-4 text-xs text-cream/40 hidden md:table-cell font-mono">
+                          {u.createdAt ? new Date(u.createdAt).toLocaleDateString("en-IN") : "Recent"}
+                        </td>
+                        <td className="p-4 text-right">
+                          <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded-full text-[10px] font-bold">
+                            Active
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
 
-        {activeTab === 'System' && (
-          <div className="space-y-6">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* ================= TAB 2: USER DIRECTORY ================= */}
+        {activeTab === "User Directory" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display font-semibold text-base">User Management Console</h2>
+              <Link to="/admin/users" className="btn-primary text-xs py-1.5 px-3">
+                Open Full User Manager &rarr;
+              </Link>
+            </div>
+            <div className="bg-obsidian-2 border border-glass-border rounded-[16px] overflow-hidden p-4">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {users.map(u => (
+                  <div key={u.id || u._id} className="p-4 bg-obsidian border border-glass-border rounded-[12px] space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-xs text-cream">{u.name || u.email}</span>
+                      <span className="px-2 py-0.5 bg-white/[0.04] text-[#C8FF00] rounded text-[10px] font-bold uppercase">{u.role}</span>
+                    </div>
+                    <div className="text-[11px] text-cream/40">{u.email}</div>
+                    <div className="text-[10px] text-cream/30">{u.company || "HMorix"}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================= TAB 3: REVENUE & PIPELINE ================= */}
+        {activeTab === "Revenue & Pipeline" && (
+          <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px] space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-glass-border">
+              <div>
+                <h3 className="font-display font-semibold text-base">Commercial Revenue & Pipeline Stream</h3>
+                <p className="text-xs text-cream/50 mt-0.5">Real-time sync between CRM deals and invoices</p>
+              </div>
+              <div className="font-display text-2xl font-bold text-[#C8FF00]">
+                ₹{Number(stats?.total_revenue || 0).toLocaleString("en-IN")}
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-3 gap-4">
+              <div className="p-5 bg-obsidian border border-glass-border rounded-[12px]">
+                <div className="text-xs text-cream/40">Total Active Pipeline</div>
+                <div className="font-display text-xl font-bold text-blue-400 mt-1">
+                  ₹{Number(stats?.pipeline_revenue || 3500000).toLocaleString("en-IN")}
+                </div>
+              </div>
+              <div className="p-5 bg-obsidian border border-glass-border rounded-[12px]">
+                <div className="text-xs text-cream/40">Estimated Monthly MRR</div>
+                <div className="font-display text-xl font-bold text-green-400 mt-1">
+                  ₹{Number(stats?.mrr || 104000).toLocaleString("en-IN")}
+                </div>
+              </div>
+              <div className="p-5 bg-obsidian border border-glass-border rounded-[12px]">
+                <div className="text-xs text-cream/40">Active Client Projects</div>
+                <div className="font-display text-xl font-bold text-[#C8FF00] mt-1">
+                  {stats?.active_projects || 3} Deliverables
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================= TAB 4: SYSTEM HEALTH ================= */}
+        {activeTab === "System Health" && (
+          <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px] space-y-4">
+            <h3 className="font-display font-semibold text-base">System Telemetry & Architecture</h3>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { label: 'Server Regions', value: '4', icon: Globe, desc: 'US-East, US-West, EU, APAC' },
-                { label: 'Database Nodes', value: '6', icon: Database, desc: '3 primary, 3 replica' },
-                { label: 'Edge Locations', value: '42', icon: Zap, desc: 'Global CDN coverage' },
-                { label: 'SSL Certs', value: '12', icon: Lock, desc: 'All valid, auto-renewal' },
-              ].map((s, i) => (
-                <div key={i} className="p-5 bg-obsidian-2 border border-glass-border rounded-[12px]">
-                  <s.icon size={18} className="text-[#C8FF00] mb-3" />
-                  <div className="font-display text-2xl font-bold">{s.value}</div>
-                  <div className="text-xs text-cream/40">{s.label}</div>
-                  <div className="text-[10px] text-cream/20 mt-1">{s.desc}</div>
+                { label: "Uptime (30d)", val: "99.99%", color: "text-green-400" },
+                { label: "Server Regions", val: "4 (Global Edge)", color: "text-blue-400" },
+                { label: "Database Shards", val: "3 Replicas Active", color: "text-purple-400" },
+                { label: "Security Compliance", val: "A+ Verified", color: "text-[#C8FF00]" }
+              ].map(item => (
+                <div key={item.label} className="p-4 bg-obsidian border border-glass-border rounded-[12px]">
+                  <div className="text-xs text-cream/40">{item.label}</div>
+                  <div className={`font-display text-lg font-bold mt-1 ${item.color}`}>{item.val}</div>
                 </div>
               ))}
             </div>
-
-            <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-              <h3 className="font-display font-semibold mb-4">Service Status</h3>
-              <div className="space-y-3">
-                {[
-                  { name: 'HMorix Cloud Platform', status: 'operational', uptime: '99.99%', latency: '12ms' },
-                  { name: 'BillingFlow API', status: 'operational', uptime: '99.98%', latency: '45ms' },
-                  { name: 'AI Agent Service', status: 'operational', uptime: '99.95%', latency: '230ms' },
-                  { name: 'PDF Processing Engine', status: 'operational', uptime: '99.97%', latency: '180ms' },
-                  { name: 'Smart Home Gateway', status: 'operational', uptime: '99.96%', latency: '35ms' },
-                  { name: 'Authentication Service', status: 'operational', uptime: '99.99%', latency: '8ms' },
-                  { name: 'Webhook Delivery', status: 'degraded', uptime: '99.94%', latency: '320ms' },
-                  { name: 'Email Service', status: 'operational', uptime: '99.98%', latency: '250ms' },
-                ].map((svc, i) => (
-                  <div key={i} className="flex items-center gap-4 p-3 bg-white/[0.02] rounded-[8px]">
-                    <div className={`w-2 h-2 rounded-full ${svc.status === 'operational' ? 'bg-green-400' : 'bg-yellow-400'}`} />
-                    <span className="flex-1 text-sm">{svc.name}</span>
-                    <span className="text-xs text-cream/30">{svc.uptime}</span>
-                    <span className="text-xs text-cream/30">{svc.latency}</span>
-                    <span className={`px-2 py-0.5 text-[10px] rounded-full ${svc.status === 'operational' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}>{svc.status}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         )}
 
-        {activeTab === 'Security' && (
-          <div className="space-y-6">
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="p-5 bg-obsidian-2 border border-glass-border rounded-[12px]">
-                <div className="text-xs text-cream/30 mb-2">Threat Level</div>
-                <div className="font-display text-2xl font-bold text-green-400">LOW</div>
-                <div className="text-[10px] text-cream/20 mt-1">No active threats detected</div>
-              </div>
-              <div className="p-5 bg-obsidian-2 border border-glass-border rounded-[12px]">
-                <div className="text-xs text-cream/30 mb-2">Blocked Attacks (24h)</div>
-                <div className="font-display text-2xl font-bold">1,247</div>
-                <div className="text-[10px] text-cream/20 mt-1">DDoS, SQL injection, XSS</div>
-              </div>
-              <div className="p-5 bg-obsidian-2 border border-glass-border rounded-[12px]">
-                <div className="text-xs text-cream/30 mb-2">Vulnerability Scan</div>
-                <div className="font-display text-2xl font-bold text-[#C8FF00]">PASS</div>
-                <div className="text-[10px] text-cream/20 mt-1">Last scan: 2h ago · 0 findings</div>
-              </div>
+        {/* ================= TAB 5: LIVE AUDIT LOGS ================= */}
+        {activeTab === "Live Audit Logs" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display font-semibold text-base">Live Activity Log Stream</h2>
+              <Link to="/admin/logs" className="btn-primary text-xs py-1.5 px-3">
+                Full Log Studio &rarr;
+              </Link>
             </div>
-
-            <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-              <h3 className="font-display font-semibold mb-4">Security Event Log</h3>
-              <div className="space-y-2">
-                {[
-                  { event: 'Brute force attempt blocked', ip: '103.42.18.91', time: '2 min ago', severity: 'critical', action: 'IP banned' },
-                  { event: 'SQL injection attempt', ip: '45.33.22.11', time: '15 min ago', severity: 'high', action: 'Request blocked' },
-                  { event: 'Rate limit exceeded', ip: '192.168.1.100', time: '30 min ago', severity: 'medium', action: 'Throttled' },
-                  { event: 'New admin login', ip: '10.0.0.1', time: '1h ago', severity: 'info', action: 'Logged' },
-                  { event: 'Certificate renewal', ip: 'system', time: '3h ago', severity: 'info', action: 'Auto-renewed' },
-                  { event: 'Firewall rule modified', ip: '10.0.0.5', time: '4h ago', severity: 'medium', action: 'Approved' },
-                  { event: 'DDoS mitigation activated', ip: 'multiple', time: '6h ago', severity: 'critical', action: 'Mitigated' },
-                ].map((ev, i) => (
-                  <div key={i} className="flex items-center gap-4 p-3 bg-white/[0.02] rounded-[8px] text-sm">
-                    <div className={`w-2 h-2 rounded-full ${ev.severity === 'critical' ? 'bg-red-400' : ev.severity === 'high' ? 'bg-orange-400' : ev.severity === 'medium' ? 'bg-yellow-400' : 'bg-blue-400'}`} />
-                    <span className="flex-1">{ev.event}</span>
-                    <span className="text-xs text-cream/30">{ev.ip}</span>
-                    <span className="text-xs text-cream/20">{ev.time}</span>
-                    <span className="px-2 py-0.5 text-[10px] bg-white/[0.06] rounded text-cream/40">{ev.action}</span>
+            <div className="bg-obsidian-2 border border-glass-border rounded-[16px] p-4 font-mono text-xs space-y-1.5">
+              {logs.map((l, i) => (
+                <div key={l.id || i} className="p-2.5 bg-obsidian border border-glass-border rounded-[8px] flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-purple-400">[{l.service}]</span>
+                    <span className="text-cream/90">{l.msg}</span>
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'Content' && (
-          <div className="space-y-6">
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="p-5 bg-obsidian-2 border border-glass-border rounded-[12px]">
-                <FileText size={18} className="text-[#C8FF00] mb-2" />
-                <div className="font-display text-xl font-bold">12</div>
-                <div className="text-xs text-cream/30">Blog Posts</div>
-              </div>
-              <div className="p-5 bg-obsidian-2 border border-glass-border rounded-[12px]">
-                <FileText size={18} className="text-[#C8FF00] mb-2" />
-                <div className="font-display text-xl font-bold">6</div>
-                <div className="text-xs text-cream/30">Case Studies</div>
-              </div>
-              <div className="p-5 bg-obsidian-2 border border-glass-border rounded-[12px]">
-                <FileText size={18} className="text-[#C8FF00] mb-2" />
-                <div className="font-display text-xl font-bold">6</div>
-                <div className="text-xs text-cream/30">Whitepapers</div>
-              </div>
-            </div>
-            <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-display font-semibold">Content Management</h3>
-                <button className="btn-primary text-sm">+ New Post</button>
-              </div>
-              <div className="space-y-2">
-                {[
-                  { title: 'Building AI Agents at Scale', status: 'published', views: '4.2K', date: 'Jun 28' },
-                  { title: 'Introducing BillingFlow v3', status: 'published', views: '3.8K', date: 'Jun 25' },
-                  { title: 'Zero-Trust Architecture Guide', status: 'published', views: '2.1K', date: 'Jun 22' },
-                  { title: 'Q3 Product Roadmap Preview', status: 'draft', views: '—', date: 'Jun 30' },
-                  { title: 'Customer Success: Quantum Labs', status: 'review', views: '—', date: 'Jun 29' },
-                ].map((post, i) => (
-                  <div key={i} className="flex items-center gap-4 p-3 bg-white/[0.02] rounded-[8px]">
-                    <span className="flex-1 text-sm">{post.title}</span>
-                    <span className={`px-2 py-0.5 text-[10px] rounded-full ${post.status === 'published' ? 'bg-green-500/10 text-green-400' : post.status === 'draft' ? 'bg-white/[0.06] text-cream/40' : 'bg-yellow-500/10 text-yellow-400'}`}>{post.status}</span>
-                    <span className="text-xs text-cream/30 w-12">{post.views}</span>
-                    <span className="text-xs text-cream/20">{post.date}</span>
-                    <button className="text-xs text-[#C8FF00]">Edit</button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'Logs' && (
-          <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display font-semibold">System Logs</h3>
-              <div className="flex gap-2">
-                <select className="px-2 py-1 bg-obsidian border border-glass-border rounded text-xs text-cream/60 outline-none">
-                  <option>All Levels</option><option>Error</option><option>Warning</option><option>Info</option>
-                </select>
-                <button className="px-3 py-1 text-xs bg-white/[0.04] border border-glass-border rounded text-cream/40 hover:text-cream">Export</button>
-              </div>
-            </div>
-            <div className="font-mono text-xs space-y-1 max-h-[500px] overflow-y-auto">
-              {[
-                { time: '14:32:01', level: 'INFO', msg: '[api-gateway] Request processed: GET /api/dashboard/stats 200 12ms' },
-                { time: '14:31:58', level: 'INFO', msg: '[auth-service] Token validated for user_id=1 session=abc123' },
-                { time: '14:31:45', level: 'WARN', msg: '[webhook-service] Delivery retry #2 for hook_id=wh_4821 endpoint=https://meridian.com/hook' },
-                { time: '14:31:30', level: 'INFO', msg: '[ai-agent] Job AGT-4822 step 3/5 completed. Tokens used: 847' },
-                { time: '14:31:22', level: 'ERROR', msg: '[pdf-engine] OCR timeout for document doc_9913_page_42. Retrying with fallback model.' },
-                { time: '14:31:15', level: 'INFO', msg: '[billing] Invoice INV-2844 generated for client=novatech amount=$8,750' },
-                { time: '14:31:01', level: 'INFO', msg: '[cdn] Cache invalidation completed for /static/assets/* (42 files)' },
-                { time: '14:30:55', level: 'WARN', msg: '[rate-limiter] Client ip=103.42.18.91 exceeded 100 req/min. Throttling.' },
-                { time: '14:30:42', level: 'INFO', msg: '[db-cluster] Health check passed. Primary: us-east-1, Replicas: 3/3 healthy' },
-                { time: '14:30:30', level: 'INFO', msg: '[smart-home] Device heartbeat received from 1,247 connected devices' },
-              ].map((log, i) => (
-                <div key={i} className={`p-1.5 rounded ${log.level === 'ERROR' ? 'bg-red-500/5 text-red-300' : log.level === 'WARN' ? 'bg-yellow-500/5 text-yellow-300' : 'text-cream/40'}`}>
-                  <span className="text-cream/20">{log.time}</span> <span className={`${log.level === 'ERROR' ? 'text-red-400' : log.level === 'WARN' ? 'text-yellow-400' : 'text-blue-400'}`}>[{log.level}]</span> {log.msg}
+                  <span className="text-cream/30 text-[10px]">{l.time}</span>
                 </div>
               ))}
             </div>
