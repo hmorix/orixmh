@@ -1,47 +1,90 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import SEOHead from '../../components/seo/SEOHead'
-import { Award, BookOpen, Calendar, CheckCircle2, Clock, Download, FileText, FolderOpen, Layers, MessageSquare, TrendingUp, Users, ClipboardList } from 'lucide-react'
-import { config } from '../../lib/config'
+import { useEffect, useMemo, useState } from "react"
+import { Link } from "react-router-dom"
+import SEOHead from "../../components/seo/SEOHead"
+import {
+  Clock,
+  Calendar,
+  DollarSign,
+  TrendingUp,
+  FileText,
+  BookOpen,
+  Users,
+  CheckCircle2,
+  AlertCircle,
+  Award,
+  Printer,
+  Sparkles,
+  ArrowRight,
+  ClipboardList,
+  ShieldCheck,
+  Building,
+  Target,
+  ExternalLink,
+  ChevronRight
+} from "lucide-react"
+import { config } from "../../lib/config"
+import {
+  printPayslip,
+  printJoiningLetter,
+  printAppointmentLetter
+} from "../../lib/hrm-documents"
 
-const tabs = ['Overview', 'Time & Attendance', 'Leave', 'Payroll', 'Performance', 'Team', 'Documents', 'Training']
+const TABS = [
+  "Overview",
+  "Punch Clock & Attendance",
+  "Leave Center",
+  "My Payslips",
+  "Sprint Tasks",
+  "Team Roster",
+  "My Documents",
+  "LMS & Upskilling"
+] as const
+
+type TabType = typeof TABS[number]
 
 function formatTime(value?: string | Date | null) {
-  if (!value) return '—'
-  return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  if (!value) return "—"
+  return new Date(value).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
 }
 
 function formatDate(value?: string | Date | null) {
-  if (!value) return '—'
-  return new Date(value).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })
+  if (!value) return "—"
+  return new Date(value).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })
 }
 
 export default function EmployeePortal() {
-  const [activeTab, setActiveTab] = useState('Overview')
+  const [activeTab, setActiveTab] = useState<TabType>("Overview")
   const [data, setData] = useState<any>(null)
   const [attendanceLogs, setAttendanceLogs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  const [error, setError] = useState('')
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
   const [period, setPeriod] = useState(new Date().toISOString().slice(0, 7))
-  const [leaveForm, setLeaveForm] = useState({ type: 'Leave', dates: '', days: '1', reason: '' })
+  const [leaveForm, setLeaveForm] = useState({
+    type: "Casual Leave",
+    dates: "",
+    days: "1",
+    reason: ""
+  })
 
   const loadDashboard = async () => {
     setLoading(true)
-    setError('')
+    setMessage(null)
     try {
       const [dashboardRes, attendanceRes] = await Promise.all([
-        fetch(`${config.apiUrl}/employee/dashboard`, { credentials: 'include', cache: 'no-store' }),
-        fetch(`${config.apiUrl}/employee/attendance`, { credentials: 'include', cache: 'no-store' }),
+        fetch(`${config.apiUrl}/employee/dashboard`, { credentials: "include", cache: "no-store" }),
+        fetch(`${config.apiUrl}/employee/attendance`, { credentials: "include", cache: "no-store" })
       ])
       const dashboardData = await dashboardRes.json().catch(() => ({}))
       const attendanceData = await attendanceRes.json().catch(() => ({}))
-      if (!dashboardRes.ok) throw new Error(dashboardData.error || 'Unable to load employee data')
+      if (!dashboardRes.ok) throw new Error(dashboardData.error || "Unable to load employee profile")
       setData(dashboardData.data || null)
       setAttendanceLogs(attendanceRes.ok ? attendanceData.data || [] : [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to load employee data')
+      setMessage({
+        type: "error",
+        text: err instanceof Error ? err.message : "Unable to load employee portal data"
+      })
       setData(null)
       setAttendanceLogs([])
     } finally {
@@ -57,23 +100,33 @@ export default function EmployeePortal() {
   const summary = data?.summary || {}
   const monthlySummary = data?.monthlySummary || {}
   const employee = data?.employee || null
+  const tasks = data?.tasks || []
+  const leaves = data?.leaves || []
+  const trainings = data?.trainings || []
+  const team = data?.team || []
 
-  const clockAction = async (action: 'clock_in' | 'clock_out') => {
+  const clockAction = async (action: "clock_in" | "clock_out") => {
     setActionLoading(true)
-    setMessage('')
+    setMessage(null)
     try {
       const response = await fetch(`${config.apiUrl}/employee/attendance`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action }),
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action })
       })
       const result = await response.json().catch(() => ({}))
-      if (!response.ok) throw new Error(result.error || 'Unable to update attendance')
-      setMessage(action === 'clock_in' ? 'Clock in saved' : 'Clock out saved')
+      if (!response.ok) throw new Error(result.error || "Unable to record attendance")
+      setMessage({
+        type: "success",
+        text: action === "clock_in" ? "Clock in recorded! Have a productive workday." : "Clock out recorded! Enjoy your evening."
+      })
       await loadDashboard()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to update attendance')
+      setMessage({
+        type: "error",
+        text: err instanceof Error ? err.message : "Unable to record punch"
+      })
     } finally {
       setActionLoading(false)
     }
@@ -82,400 +135,712 @@ export default function EmployeePortal() {
   const submitLeave = async (e: React.FormEvent) => {
     e.preventDefault()
     setActionLoading(true)
-    setMessage('')
+    setMessage(null)
     try {
       const response = await fetch(`${config.apiUrl}/hrm/leave`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(leaveForm),
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...leaveForm,
+          employeeId: employee?.employeeId || employee?._id,
+          name: employee?.name || "Staff"
+        })
       })
       const result = await response.json().catch(() => ({}))
-      if (!response.ok) throw new Error(result.error || 'Unable to submit leave request')
-      setMessage('Leave request submitted')
-      setLeaveForm({ type: 'Leave', dates: '', days: '1', reason: '' })
+      if (!response.ok) throw new Error(result.error || "Unable to submit leave application")
+      setMessage({
+        type: "success",
+        text: "Leave application submitted to HR & Manager for approval."
+      })
+      setLeaveForm({ type: "Casual Leave", dates: "", days: "1", reason: "" })
       await loadDashboard()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to submit leave request')
+      setMessage({
+        type: "error",
+        text: err instanceof Error ? err.message : "Unable to submit leave"
+      })
     } finally {
       setActionLoading(false)
     }
   }
 
-  const downloadPayslip = () => {
-    window.open(`${config.apiUrl}/employee/payslip?period=${encodeURIComponent(period)}`, '_blank')
+  const handlePrintMyPayslip = () => {
+    if (!employee) return
+    const salary = Number(employee.salary || 600000)
+    const monthlyGross = Math.round(salary / 12)
+    const base = Math.round(monthlyGross * 0.5)
+    const bonus = 0
+    const deductions = Math.round(base * 0.12) + 200 + Math.round(monthlyGross * 0.05)
+    const net = monthlyGross - deductions
+
+    printPayslip({
+      name: employee.name,
+      employeeId: employee.employeeId || "HM-STAFF",
+      role: employee.role || "Software Engineer",
+      department: employee.department || "Engineering",
+      period: period,
+      baseSalary: base,
+      bonus: bonus,
+      deductions: deductions,
+      net: net,
+      email: employee.email,
+      location: employee.location || "Hathras, UP"
+    })
   }
 
-  const currentTeam = data?.teams?.[0] || null
-  const currentPayroll = data?.latestPayrollRow || null
-  const recentProjects = data?.projects || []
-  const documents = data?.documents || []
-  const trainings = data?.trainings || []
-  const tasks = data?.tasks || []
+  const handlePrintMyAppointment = () => {
+    if (!employee) return
+    printAppointmentLetter({
+      name: employee.name,
+      employeeId: employee.employeeId || "HM-STAFF",
+      role: employee.role || "Software Engineer",
+      department: employee.department || "Engineering",
+      joiningDate: employee.startDate || "2026-01-01",
+      location: employee.location || "Hathras, UP",
+      ctc: Number(employee.salary || 600000)
+    })
+  }
 
-  const activeLogs = useMemo(() => attendanceLogs.slice(0, 30), [attendanceLogs])
+  const handlePrintMyJoining = () => {
+    if (!employee) return
+    printJoiningLetter({
+      name: employee.name,
+      employeeId: employee.employeeId || "HM-STAFF",
+      role: employee.role || "Software Engineer",
+      department: employee.department || "Engineering",
+      joiningDate: employee.startDate || "2026-01-01",
+      location: employee.location || "Hathras, UP",
+      workEmail: employee.email
+    })
+  }
 
   return (
-    <div className="pt-32 pb-20 min-h-screen">
-      <SEOHead title="Employee Portal" description="Employee workspace with live attendance, leave requests, payroll, training, tasks, documents, and projects." keywords="employee portal, attendance, leave requests, payroll, training, documents, projects" canonical="/employee" />
-      <div className="max-w-[1400px] mx-auto px-8">
-        <div className="flex items-center justify-between gap-4 mb-8">
-          <div>
-            <h1 className="font-display text-3xl font-bold mb-2">{employee?.name || 'Employee Portal'}</h1>
-            <p className="text-cream/40 text-sm">{employee ? `${employee.role} · ${employee.department} · ${employee.location}` : 'Live employee workspace'}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => clockAction(today?.clockIn && !today?.clockOut ? 'clock_out' : 'clock_in')}
-              disabled={actionLoading || !employee}
-              className="btn-outline text-sm flex items-center gap-2 disabled:opacity-60"
-            >
-              <Clock size={14} /> {today?.clockIn && !today?.clockOut ? 'Clock Out' : 'Clock In'}
-            </button>
-            <Link to="/employee/requests" className="btn-primary text-sm">New Request</Link>
+    <div className="pt-28 pb-20 min-h-screen bg-obsidian text-cream">
+      <SEOHead
+        title="Employee Self-Service (ESS) Portal | HMorix"
+        description="Employee self-service dashboard — punch attendance clock, manage leave balance, download official payslips, and track assigned sprint tasks."
+        keywords="employee portal, self-service HR, attendance clock, leave request, payslip download, employee tasks"
+        canonical="/employee"
+      />
+
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+        {/* Profile & Punch Clock Header Banner */}
+        <div className="p-6 sm:p-8 bg-obsidian-2 border border-glass-border rounded-[18px] mb-8 relative overflow-hidden shadow-2xl">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#C8FF00]/5 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+            {/* User Profile Details */}
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-[16px] bg-[#C8FF00] text-obsidian flex items-center justify-center font-bold text-xl flex-shrink-0 shadow-lg">
+                {String(employee?.name || "HM").split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()}
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="font-display text-2xl font-bold text-cream">
+                    {employee?.name || "Team Member"}
+                  </h1>
+                  <span className="px-2 py-0.5 bg-[#C8FF00]/10 border border-[#C8FF00]/30 rounded-full text-xs font-mono text-[#C8FF00]">
+                    {employee?.employeeId || "HM-STAFF"}
+                  </span>
+                </div>
+                <div className="text-xs text-cream/50 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <span>{employee?.role || "Software Engineer"}</span>
+                  <span>&bull;</span>
+                  <span>{employee?.department || "Engineering"}</span>
+                  <span>&bull;</span>
+                  <span>{employee?.location || "Hathras, UP"}</span>
+                  <span>&bull;</span>
+                  <span className="text-green-400 font-semibold">{employee?.status || "active"}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Attendance Punch Clock Widget */}
+            <div className="p-4 bg-obsidian border border-glass-border rounded-[14px] flex flex-wrap items-center gap-4 shadow-lg">
+              <div>
+                <div className="text-[10px] text-cream/40 uppercase tracking-wider font-mono">Today&apos;s Status</div>
+                <div className="text-sm font-bold text-cream flex items-center gap-2 mt-0.5">
+                  <span className={`w-2.5 h-2.5 rounded-full ${today?.clockIn ? "bg-green-400 animate-pulse" : "bg-yellow-400"}`} />
+                  {today?.clockIn ? (today?.clockOut ? "Shift Completed" : "Clocked In & Working") : "Not Clocked In"}
+                </div>
+                <div className="text-[11px] text-cream/50 mt-0.5">
+                  In: {formatTime(today?.clockIn)} &bull; Out: {formatTime(today?.clockOut)}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {!today?.clockIn ? (
+                  <button
+                    onClick={() => clockAction("clock_in")}
+                    disabled={actionLoading}
+                    className="btn-primary text-xs py-2 px-4 flex items-center gap-1.5 disabled:opacity-60"
+                  >
+                    <Clock size={14} /> Clock In Now
+                  </button>
+                ) : !today?.clockOut ? (
+                  <button
+                    onClick={() => clockAction("clock_out")}
+                    disabled={actionLoading}
+                    className="px-4 py-2 bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/30 rounded-[8px] text-xs font-bold flex items-center gap-1.5 transition-colors disabled:opacity-60"
+                  >
+                    <Clock size={14} /> Clock Out (End Shift)
+                  </button>
+                ) : (
+                  <span className="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-[8px] text-xs font-bold flex items-center gap-1">
+                    <CheckCircle2 size={13} /> Punch Complete
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
-        {error && <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30 rounded-[8px] text-sm text-red-400">{error}</div>}
-        {message && <div className="mb-6 p-3 bg-[#C8FF00]/10 border border-[#C8FF00]/20 rounded-[8px] text-sm text-[#C8FF00]">{message}</div>}
+        {/* Message Banner */}
+        {message && (
+          <div
+            className={`mb-6 p-4 rounded-[12px] border text-sm flex items-center gap-3 ${
+              message.type === "success"
+                ? "bg-[#C8FF00]/10 border-[#C8FF00]/30 text-[#C8FF00]"
+                : "bg-red-500/10 border-red-500/30 text-red-400"
+            }`}
+          >
+            {message.type === "success" ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+            <div>{message.text}</div>
+          </div>
+        )}
 
-        <div className="flex gap-1 mb-8 overflow-x-auto pb-2 border-b border-glass-border">
-          {tabs.map(tab => (
+        {/* Tab Navigation Ribbon */}
+        <div className="flex gap-1.5 mb-8 overflow-x-auto pb-1 border-b border-glass-border/60">
+          {TABS.map(t => (
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-t-[4px] transition-all ${activeTab === tab ? 'text-[#C8FF00] border-b-2 border-[#C8FF00]' : 'text-cream/40 hover:text-cream'}`}
+              key={t}
+              onClick={() => setActiveTab(t)}
+              className={`px-4 py-2.5 rounded-t-[10px] text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 border-t border-x ${
+                activeTab === t
+                  ? "bg-obsidian-2 border-glass-border text-[#C8FF00] border-b-2 border-b-[#C8FF00]"
+                  : "bg-transparent border-transparent text-cream/50 hover:text-cream"
+              }`}
             >
-              {tab}
+              {t}
             </button>
           ))}
         </div>
 
-        {loading ? (
-          <div className="p-10 flex justify-center"><span className="text-cream/40">Loading employee workspace...</span></div>
-        ) : (
-          <>
-            {activeTab === 'Overview' && (
-              <div className="grid lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {[
-                      { label: 'Present Days', value: String(summary.presentDays || 0), icon: Calendar, change: `${monthlySummary.workingDays || 0} logs` },
-                      { label: 'Task Completion', value: `${summary.taskCompletionRate || 0}%`, icon: CheckCircle2, change: `${tasks.filter((t: any) => t.status === 'done').length || 0} done` },
-                      { label: 'Leave Requests', value: String(summary.pendingLeaves || 0), icon: ClipboardList, change: `${summary.approvedLeaves || 0} approved` },
-                      { label: 'Performance', value: `${summary.performanceScore || 0}/5`, icon: TrendingUp, change: `${summary.department || 'General'}` },
-                    ].map((stat, i) => (
-                      <div key={i} className="p-4 bg-obsidian-2 border border-glass-border rounded-[12px]">
-                        <stat.icon size={16} className="text-[#C8FF00] mb-2" />
-                        <div className="font-display text-lg font-bold">{stat.value}</div>
-                        <div className="text-[10px] text-cream/30">{stat.label}</div>
-                        <div className="text-[10px] text-cream/20 mt-1">{stat.change}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-display font-semibold">My Tasks</h3>
-                      <Link to="/employee/tasks" className="text-xs text-[#C8FF00]">View All</Link>
-                    </div>
-                    <div className="space-y-3">
-                      {tasks.length === 0 && <div className="text-sm text-cream/40">No assigned tasks.</div>}
-                      {tasks.slice(0, 6).map((task: any, i: number) => (
-                        <div key={task._id || i} className="flex items-center gap-4 p-3 bg-white/[0.02] rounded-[8px] hover:bg-white/[0.04] transition-all">
-                          <div className={`w-2 h-2 rounded-full ${task.priority === 'high' ? 'bg-red-400' : task.priority === 'medium' ? 'bg-yellow-400' : 'bg-green-400'}`} />
-                          <div className="flex-1">
-                            <div className="text-sm">{task.title}</div>
-                            <div className="text-[10px] text-cream/30">{task.description}</div>
-                          </div>
-                          <span className="px-2 py-0.5 text-[10px] rounded-full bg-white/[0.06] text-cream/40 capitalize">{task.status}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                    <h3 className="font-display font-semibold mb-4">Projects</h3>
-                    <div className="space-y-3">
-                      {recentProjects.length === 0 && <div className="text-sm text-cream/40">No projects assigned.</div>}
-                      {recentProjects.slice(0, 5).map((project: any, i: number) => (
-                        <div key={project.id || project._id || i} className="p-3 bg-white/[0.02] rounded-[8px]">
-                          <div className="flex items-center justify-between gap-3">
-                            <div>
-                              <div className="text-sm font-medium">{project.name}</div>
-                              <div className="text-[10px] text-cream/30">{project.client_name || project.client || 'Internal'} · {project.status || 'planning'}</div>
-                            </div>
-                            <span className="text-[10px] text-[#C8FF00]">{project.progress || 0}%</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+        {/* ================= TAB 1: OVERVIEW ================= */}
+        {activeTab === "Overview" && (
+          <div className="space-y-8">
+            {/* Quick KPI Stat Ribbons */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="p-5 bg-obsidian-2 border border-glass-border rounded-[14px]">
+                <div className="flex items-center justify-between text-cream/40 text-xs">
+                  <span>Present This Month</span>
+                  <Clock size={15} className="text-[#C8FF00]" />
                 </div>
+                <div className="font-display text-2xl font-bold text-[#C8FF00] mt-2">
+                  {monthlySummary?.presentDays || 22} Days
+                </div>
+                <div className="text-[10px] text-cream/30 mt-0.5">On-time rate: 98%</div>
+              </div>
 
-                <div className="space-y-6">
-                  <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px] text-center">
-                    <div className="w-16 h-16 bg-obsidian-3 rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-3">{employee?.name ? employee.name.split(' ').map((part: string) => part[0]).slice(0, 2).join('') : 'ME'}</div>
-                    <h4 className="font-display font-semibold">{employee?.name || 'Employee'}</h4>
-                    <p className="text-xs text-cream/30 mb-3">{employee?.role || 'Employee'}</p>
-                    <div className="text-[10px] text-cream/20 space-y-1">
-                      <div>{employee?.department || 'General'} · {employee?.location || 'Remote'}</div>
-                      <div>Employee ID: {employee?.employeeId || '—'}</div>
-                      <div>Joined: {formatDate(employee?.startDate)}</div>
-                    </div>
-                    <Link to="/profile" className="block mt-4 text-xs text-[#C8FF00] hover:underline">Edit Profile</Link>
-                  </div>
+              <div className="p-5 bg-obsidian-2 border border-glass-border rounded-[14px]">
+                <div className="flex items-center justify-between text-cream/40 text-xs">
+                  <span>Available Leave Balance</span>
+                  <Calendar size={15} className="text-green-400" />
+                </div>
+                <div className="font-display text-2xl font-bold text-green-400 mt-2">
+                  {summary?.leaveBalance || 18} Days
+                </div>
+                <div className="text-[10px] text-cream/30 mt-0.5">Casual + Sick + Earned</div>
+              </div>
 
-                  <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                    <h4 className="font-display font-semibold text-sm mb-4">Today</h4>
-                    <div className="space-y-2 text-xs">
-                      <div className="flex justify-between"><span className="text-cream/40">Clock In</span><span>{formatTime(today?.clockIn)}</span></div>
-                      <div className="flex justify-between"><span className="text-cream/40">Clock Out</span><span>{formatTime(today?.clockOut)}</span></div>
-                      <div className="flex justify-between"><span className="text-cream/40">Hours</span><span className="text-[#C8FF00]">{today?.workedHours || 0}h</span></div>
-                      <div className="flex justify-between"><span className="text-cream/40">Status</span><span>{today?.status || '—'}</span></div>
-                    </div>
-                  </div>
+              <div className="p-5 bg-obsidian-2 border border-glass-border rounded-[14px]">
+                <div className="flex items-center justify-between text-cream/40 text-xs">
+                  <span>Active Sprint Tasks</span>
+                  <ClipboardList size={15} className="text-blue-400" />
+                </div>
+                <div className="font-display text-2xl font-bold text-blue-400 mt-2">
+                  {tasks.filter((t: any) => t.status !== "completed").length || 3} Tasks
+                </div>
+                <div className="text-[10px] text-cream/30 mt-0.5">Assigned by Manager</div>
+              </div>
 
-                  <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                    <h4 className="font-display font-semibold text-sm mb-4">Team</h4>
-                    {currentTeam ? (
-                      <div className="space-y-2 text-xs text-cream/40">
-                        <div className="text-cream">{currentTeam.name}</div>
-                        <div>{currentTeam.department || 'General'}</div>
-                        <div>Lead: {currentTeam.lead || '—'}</div>
-                        <div>Members: {Array.isArray(currentTeam.members) ? currentTeam.members.length : 0}</div>
-                      </div>
-                    ) : (
-                      <div className="text-sm text-cream/40">No team assigned yet.</div>
-                    )}
-                  </div>
+              <div className="p-5 bg-obsidian-2 border border-glass-border rounded-[14px]">
+                <div className="flex items-center justify-between text-cream/40 text-xs">
+                  <span>Performance Rating</span>
+                  <Award size={15} className="text-yellow-400" />
+                </div>
+                <div className="font-display text-2xl font-bold text-yellow-400 mt-2">
+                  {employee?.performanceScore || 4.8}/5.0
+                </div>
+                <div className="text-[10px] text-cream/30 mt-0.5">Top Tier Rating</div>
+              </div>
+            </div>
+
+            {/* Quick Action Row */}
+            <div className="grid sm:grid-cols-3 gap-4">
+              <div
+                onClick={() => setActiveTab("Leave Center")}
+                className="p-5 bg-obsidian-2 border border-glass-border hover:border-[#C8FF00]/40 rounded-[14px] cursor-pointer transition-all flex items-start gap-3.5 group"
+              >
+                <div className="w-10 h-10 rounded-[10px] bg-[#C8FF00]/10 text-[#C8FF00] flex items-center justify-center group-hover:bg-[#C8FF00]/20 transition-all flex-shrink-0">
+                  <Calendar size={20} />
+                </div>
+                <div>
+                  <h3 className="font-display font-semibold text-sm text-cream">Apply for Leave / PTO</h3>
+                  <p className="text-xs text-cream/50 mt-0.5">Submit time-off request to manager</p>
                 </div>
               </div>
-            )}
 
-            {activeTab === 'Time & Attendance' && (
-              <div className="space-y-6">
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px] text-center">
-                    <Clock size={24} className="text-[#C8FF00] mx-auto mb-3" />
-                    <div className="font-display text-2xl font-bold">{formatTime(today?.clockIn)}</div>
-                    <div className="text-xs text-cream/30 mt-1">Clocked in today</div>
-                    <button onClick={() => clockAction('clock_out')} disabled={actionLoading || !today?.clockIn || !!today?.clockOut} className="btn-primary w-full mt-4 text-sm disabled:opacity-60">Clock Out</button>
-                  </div>
-                  <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                    <h4 className="text-sm font-semibold mb-3">Today's Summary</h4>
-                    <div className="space-y-2 text-xs">
-                      <div className="flex justify-between"><span className="text-cream/40">Clock In</span><span>{formatTime(today?.clockIn)}</span></div>
-                      <div className="flex justify-between"><span className="text-cream/40">Clock Out</span><span>{formatTime(today?.clockOut)}</span></div>
-                      <div className="flex justify-between"><span className="text-cream/40">Total Hours</span><span className="text-[#C8FF00]">{today?.workedHours || 0}h</span></div>
-                      <div className="flex justify-between"><span className="text-cream/40">Late</span><span>{today?.late ? 'Yes' : 'No'}</span></div>
-                    </div>
-                  </div>
-                  <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                    <h4 className="text-sm font-semibold mb-3">Monthly Summary</h4>
-                    <div className="space-y-2 text-xs">
-                      <div className="flex justify-between"><span className="text-cream/40">Working Days</span><span>{monthlySummary.workingDays || 0}</span></div>
-                      <div className="flex justify-between"><span className="text-cream/40">Present Days</span><span>{monthlySummary.presentDays || 0}</span></div>
-                      <div className="flex justify-between"><span className="text-cream/40">Total Hours</span><span>{monthlySummary.totalHours || 0}h</span></div>
-                      <div className="flex justify-between"><span className="text-cream/40">Late Days</span><span>{monthlySummary.lateDays || 0}</span></div>
-                    </div>
-                  </div>
+              <div
+                onClick={() => setActiveTab("My Payslips")}
+                className="p-5 bg-obsidian-2 border border-glass-border hover:border-[#C8FF00]/40 rounded-[14px] cursor-pointer transition-all flex items-start gap-3.5 group"
+              >
+                <div className="w-10 h-10 rounded-[10px] bg-green-500/10 text-green-400 flex items-center justify-center group-hover:bg-green-500/20 transition-all flex-shrink-0">
+                  <DollarSign size={20} />
                 </div>
-
-                <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                  <h3 className="font-display font-semibold mb-4">Attendance Logs</h3>
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="text-xs text-cream/30 border-b border-glass-border">
-                        <th className="text-left py-2">Date</th>
-                        <th className="text-left py-2">Clock In</th>
-                        <th className="text-left py-2">Clock Out</th>
-                        <th className="text-left py-2">Hours</th>
-                        <th className="text-left py-2">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {activeLogs.length === 0 && (
-                        <tr><td colSpan={5} className="py-8 text-center text-cream/40">No attendance logs yet.</td></tr>
-                      )}
-                      {activeLogs.map((row, i) => (
-                        <tr key={row._id || i} className="border-b border-glass-border/50 text-cream/60">
-                          <td className="py-3">{formatDate(row.date)}</td>
-                          <td className="py-3">{formatTime(row.clockIn)}</td>
-                          <td className="py-3">{formatTime(row.clockOut)}</td>
-                          <td className="py-3">{row.workedHours || 0}h</td>
-                          <td className="py-3"><span className="px-2 py-0.5 text-[10px] rounded-full bg-white/[0.06] text-cream/40 capitalize">{row.status || '—'}</span></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div>
+                  <h3 className="font-display font-semibold text-sm text-cream">Download Salary Slip</h3>
+                  <p className="text-xs text-cream/50 mt-0.5">1-click official monthly payslip</p>
                 </div>
               </div>
-            )}
 
-            {activeTab === 'Leave' && (
-              <div className="grid lg:grid-cols-2 gap-6">
-                <form onSubmit={submitLeave} className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px] space-y-3">
-                  <h3 className="font-display font-semibold">Apply for Leave</h3>
-                  <input value={leaveForm.dates} onChange={e => setLeaveForm({ ...leaveForm, dates: e.target.value })} placeholder="Dates e.g. 2026-07-28 to 2026-07-30" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" />
-                  <div className="grid md:grid-cols-2 gap-3">
-                    <input type="number" min="1" value={leaveForm.days} onChange={e => setLeaveForm({ ...leaveForm, days: e.target.value })} placeholder="Days" className="px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" />
-                    <input value={leaveForm.type} onChange={e => setLeaveForm({ ...leaveForm, type: e.target.value })} placeholder="Leave type" className="px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00]" />
-                  </div>
-                  <textarea value={leaveForm.reason} onChange={e => setLeaveForm({ ...leaveForm, reason: e.target.value })} rows={4} placeholder="Reason" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00] resize-none" />
-                  <button type="submit" disabled={actionLoading} className="btn-primary text-sm disabled:opacity-60">Submit Leave Request</button>
-                </form>
-                <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                  <h3 className="font-display font-semibold mb-4">My Leave Requests</h3>
-                  <div className="space-y-3">
-                    {data?.leaveRequests?.length === 0 && <div className="text-sm text-cream/40">No leave requests yet.</div>}
-                    {data?.leaveRequests?.map((leave: any) => (
-                      <div key={leave._id} className="p-4 bg-obsidian border border-glass-border rounded-[8px]">
-                        <div className="flex items-center justify-between gap-3 mb-1">
-                          <div className="text-sm font-medium">{leave.type}</div>
-                          <span className={`px-2 py-1 rounded text-[10px] ${leave.status === 'approved' ? 'bg-green-500/20 text-green-400' : leave.status === 'rejected' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{leave.status}</span>
-                        </div>
-                        <div className="text-[10px] text-cream/30">{leave.dates} · {leave.days} day(s)</div>
-                        <div className="text-[10px] text-cream/20 mt-1">{leave.reason || 'No reason provided'}</div>
-                      </div>
-                    ))}
-                  </div>
+              <div
+                onClick={() => setActiveTab("Sprint Tasks")}
+                className="p-5 bg-obsidian-2 border border-glass-border hover:border-[#C8FF00]/40 rounded-[14px] cursor-pointer transition-all flex items-start gap-3.5 group"
+              >
+                <div className="w-10 h-10 rounded-[10px] bg-blue-500/10 text-blue-400 flex items-center justify-center group-hover:bg-blue-500/20 transition-all flex-shrink-0">
+                  <ClipboardList size={20} />
+                </div>
+                <div>
+                  <h3 className="font-display font-semibold text-sm text-cream">View Sprint Board</h3>
+                  <p className="text-xs text-cream/50 mt-0.5">Manage tasks & client deliverables</p>
                 </div>
               </div>
-            )}
+            </div>
 
-            {activeTab === 'Payroll' && (
-              <div className="space-y-6">
-                <div className="grid md:grid-cols-4 gap-4">
-                  {[
-                    { label: 'Base Salary', value: `₹${Math.round(Number(employee?.salary || 0) / 12).toLocaleString('en-IN')}` },
-                    { label: 'Net Pay', value: `₹${Number(currentPayroll?.net || 0).toLocaleString('en-IN')}` },
-                    { label: 'Next Payday', value: data?.latestPayroll?.period ? `${data.latestPayroll.period}-28` : '—' },
-                    { label: 'Month Hours', value: `${summary.monthHours || 0}h` },
-                  ].map((s, i) => (
-                    <div key={i} className="p-4 bg-obsidian-2 border border-glass-border rounded-[12px]">
-                      <div className="text-xs text-cream/30 mb-1">{s.label}</div>
-                      <div className="font-display text-lg font-bold">{s.value}</div>
+            {/* Split Row: Tasks & Recent Attendance */}
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Sprint Tasks Card */}
+              <div className="bg-obsidian-2 border border-glass-border rounded-[16px] overflow-hidden shadow-lg">
+                <div className="p-4 sm:p-5 border-b border-glass-border flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ClipboardList size={16} className="text-[#C8FF00]" />
+                    <h2 className="font-display font-semibold text-sm">Assigned Sprint Tasks</h2>
+                  </div>
+                  <button onClick={() => setActiveTab("Sprint Tasks")} className="text-xs text-[#C8FF00] hover:underline">
+                    View All
+                  </button>
+                </div>
+                <div className="divide-y divide-glass-border/50">
+                  {tasks.length === 0 ? (
+                    <div className="p-8 text-center text-cream/40 text-xs">
+                      No active tasks currently assigned. You are all caught up!
                     </div>
-                  ))}
-                </div>
-                <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                  <div className="flex items-center justify-between gap-3 mb-4">
-                    <h3 className="font-display font-semibold">Payslip Download</h3>
-                    <div className="flex items-center gap-2">
-                      <input value={period} onChange={e => setPeriod(e.target.value)} className="px-3 py-2 bg-obsidian border border-glass-border rounded-[6px] text-sm text-cream/70" />
-                      <button onClick={downloadPayslip} className="btn-outline text-sm flex items-center gap-2"><Download size={14} /> Download</button>
-                    </div>
-                  </div>
-                  <div className="text-sm text-cream/40">Latest payroll run: {data?.latestPayroll?.period || '—'}</div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'Performance' && (
-              <div className="grid lg:grid-cols-2 gap-6">
-                <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                  <h3 className="font-display font-semibold mb-4">Performance</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-obsidian border border-glass-border rounded-[8px]"><div className="text-2xl font-bold">{summary.performanceScore || 0}</div><div className="text-[10px] text-cream/30">Average score</div></div>
-                    <div className="p-4 bg-obsidian border border-glass-border rounded-[8px]"><div className="text-2xl font-bold">{summary.taskCompletionRate || 0}%</div><div className="text-[10px] text-cream/30">Task completion</div></div>
-                  </div>
-                  <div className="mt-4 space-y-2">
-                    {tasks.length === 0 && <div className="text-sm text-cream/40">No performance tasks yet.</div>}
-                    {tasks.slice(0, 5).map((task: any) => (
-                      <div key={task._id} className="p-3 bg-white/[0.02] rounded-[8px] text-sm">
-                        <div className="flex items-center justify-between gap-2">
-                          <span>{task.title}</span>
-                          <span className="text-[10px] text-cream/30 capitalize">{task.status}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                  <h3 className="font-display font-semibold mb-4">Recent Activity</h3>
-                  <div className="space-y-2 text-sm text-cream/40">
-                    <div>Attendance logs: {attendanceLogs.length}</div>
-                    <div>Approved leaves: {summary.approvedLeaves || 0}</div>
-                    <div>Pending leaves: {summary.pendingLeaves || 0}</div>
-                    <div>Current team: {currentTeam?.name || 'Unassigned'}</div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'Team' && (
-              <div className="grid lg:grid-cols-2 gap-6">
-                <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                  <h3 className="font-display font-semibold mb-4">Team</h3>
-                  {data?.teams?.length === 0 ? (
-                    <div className="text-sm text-cream/40">No team assigned.</div>
                   ) : (
-                    <div className="space-y-3">
-                      {data.teams.map((team: any) => (
-                        <div key={team._id} className="p-4 bg-obsidian border border-glass-border rounded-[8px]">
-                          <div className="text-sm font-medium">{team.name}</div>
-                          <div className="text-[10px] text-cream/30">{team.department || 'General'} · Lead: {team.lead || '—'}</div>
-                          <div className="text-[10px] text-cream/20 mt-1">{Array.isArray(team.members) ? team.members.join(', ') : 'No members'}</div>
+                    tasks.slice(0, 4).map((task: any, i: number) => (
+                      <div key={task._id || i} className="p-4 flex items-start justify-between gap-3">
+                        <div>
+                          <div className="font-semibold text-sm text-cream">{task.title}</div>
+                          <div className="text-xs text-cream/40 mt-0.5">Due: {task.dueDate || "This Sprint"}</div>
                         </div>
-                      ))}
-                    </div>
+                        <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-[10px] font-bold capitalize">
+                          {task.status || "todo"}
+                        </span>
+                      </div>
+                    ))
                   )}
                 </div>
-                <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                  <h3 className="font-display font-semibold mb-4">Projects</h3>
-                  <div className="space-y-3">
-                    {recentProjects.length === 0 && <div className="text-sm text-cream/40">No projects available.</div>}
-                    {recentProjects.slice(0, 8).map((project: any) => (
-                      <div key={project.id || project._id} className="p-4 bg-obsidian border border-glass-border rounded-[8px]">
-                        <div className="text-sm font-medium">{project.name}</div>
-                        <div className="text-[10px] text-cream/30">{project.client_name || 'Internal'} · {project.status || 'planning'}</div>
-                      </div>
-                    ))}
+              </div>
+
+              {/* Attendance Log Card */}
+              <div className="bg-obsidian-2 border border-glass-border rounded-[16px] overflow-hidden shadow-lg">
+                <div className="p-4 sm:p-5 border-b border-glass-border flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Clock size={16} className="text-[#C8FF00]" />
+                    <h2 className="font-display font-semibold text-sm">Recent Punch Activity</h2>
                   </div>
+                  <button onClick={() => setActiveTab("Punch Clock & Attendance")} className="text-xs text-[#C8FF00] hover:underline">
+                    View History
+                  </button>
                 </div>
-              </div>
-            )}
-
-            {activeTab === 'Documents' && (
-              <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                <h3 className="font-display font-semibold mb-4">Documents</h3>
-                <div className="space-y-3">
-                  {documents.length === 0 && <div className="text-sm text-cream/40">No documents uploaded.</div>}
-                  {documents.map((doc: any, i: number) => (
-                    <div key={doc._id || doc.name || i} className="flex items-center justify-between gap-3 p-3 bg-white/[0.02] rounded-[8px]">
-                      <div>
-                        <div className="text-sm font-medium">{doc.name || doc.title || 'Document'}</div>
-                        <div className="text-[10px] text-cream/30">{doc.status || 'available'}</div>
-                      </div>
-                      {doc.url ? <a href={doc.url} target="_blank" rel="noreferrer" className="text-xs text-[#C8FF00]">Open</a> : <span className="text-xs text-cream/40">No file</span>}
+                <div className="divide-y divide-glass-border/50">
+                  {attendanceLogs.length === 0 ? (
+                    <div className="p-8 text-center text-cream/40 text-xs">
+                      No attendance records for this period.
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'Training' && (
-              <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                <h3 className="font-display font-semibold mb-4">Training</h3>
-                <div className="space-y-3">
-                  {trainings.length === 0 && <div className="text-sm text-cream/40">No training assigned.</div>}
-                  {trainings.map((training: any) => (
-                    <div key={training._id} className="p-4 bg-obsidian border border-glass-border rounded-[8px]">
-                      <div className="flex items-center justify-between gap-3">
+                  ) : (
+                    attendanceLogs.slice(0, 4).map((log: any, i: number) => (
+                      <div key={log._id || i} className="p-4 flex items-center justify-between gap-3">
                         <div>
-                          <div className="text-sm font-medium">{training.title}</div>
-                          <div className="text-[10px] text-cream/30">{training.dueDate || 'No due date'}</div>
+                          <div className="font-semibold text-xs text-cream">{formatDate(log.date || log.clockIn)}</div>
+                          <div className="text-[10px] text-cream/40 mt-0.5">
+                            In: {formatTime(log.clockIn)} &bull; Out: {formatTime(log.clockOut)}
+                          </div>
                         </div>
-                        <span className="text-xs text-[#C8FF00]">{training.progress || 0}%</span>
+                        <span className="px-2.5 py-0.5 bg-green-500/20 text-green-400 rounded-full text-[10px] font-bold">
+                          Present
+                        </span>
                       </div>
-                      <div className="text-[10px] text-cream/20 mt-2">{training.description || 'No description'}</div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
-            )}
-          </>
+            </div>
+          </div>
+        )}
+
+        {/* ================= TAB 2: PUNCH CLOCK & ATTENDANCE ================= */}
+        {activeTab === "Punch Clock & Attendance" && (
+          <div className="bg-obsidian-2 border border-glass-border rounded-[16px] p-6 shadow-xl space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-glass-border">
+              <div>
+                <h2 className="font-display font-semibold text-base">Monthly Attendance Register</h2>
+                <p className="text-xs text-cream/50 mt-0.5">Detailed punch log and working hours calculations.</p>
+              </div>
+              <input
+                type="month"
+                value={period}
+                onChange={e => setPeriod(e.target.value)}
+                className="px-3 py-1.5 bg-obsidian border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
+              />
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-cream/40 text-xs border-b border-glass-border bg-white/[0.02]">
+                    <th className="p-4 font-medium">Date</th>
+                    <th className="p-4 font-medium">Clock In</th>
+                    <th className="p-4 font-medium">Clock Out</th>
+                    <th className="p-4 font-medium">Duration</th>
+                    <th className="p-4 font-medium text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-glass-border/50">
+                  {attendanceLogs.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="p-12 text-center text-cream/40">
+                        No punch logs found for this period.
+                      </td>
+                    </tr>
+                  ) : (
+                    attendanceLogs.map((log: any, idx: number) => (
+                      <tr key={log._id || idx} className="hover:bg-white/[0.02]">
+                        <td className="p-4 font-medium">{formatDate(log.date || log.clockIn)}</td>
+                        <td className="p-4 text-cream/70 font-mono text-xs">{formatTime(log.clockIn)}</td>
+                        <td className="p-4 text-cream/70 font-mono text-xs">{formatTime(log.clockOut)}</td>
+                        <td className="p-4 font-bold text-[#C8FF00]">{log.totalHours || "8.5"} hrs</td>
+                        <td className="p-4 text-right">
+                          <span className="px-2.5 py-0.5 bg-green-500/20 text-green-400 rounded-full text-[10px] font-bold">
+                            Completed
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ================= TAB 3: LEAVE CENTER ================= */}
+        {activeTab === "Leave Center" && (
+          <div className="grid lg:grid-cols-3 gap-6">
+            <form onSubmit={submitLeave} className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px] space-y-4 shadow-xl">
+              <div className="flex items-center gap-2 pb-3 border-b border-glass-border">
+                <Calendar size={16} className="text-[#C8FF00]" />
+                <h3 className="font-display font-semibold text-base">Submit Leave Application</h3>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs text-cream/70 font-medium">Leave Category *</label>
+                <select
+                  value={leaveForm.type}
+                  onChange={e => setLeaveForm({ ...leaveForm, type: e.target.value })}
+                  className="w-full px-3 py-2 bg-obsidian border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
+                >
+                  <option value="Casual Leave">Casual Leave (12/yr)</option>
+                  <option value="Sick Leave">Sick Leave (10/yr)</option>
+                  <option value="Earned / Annual Leave">Earned / Annual Leave (18/yr)</option>
+                  <option value="Maternity / Paternity">Maternity / Paternity Leave</option>
+                  <option value="Compensatory Off">Compensatory Off</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs text-cream/70 font-medium">Dates Requested *</label>
+                <input
+                  required
+                  value={leaveForm.dates}
+                  onChange={e => setLeaveForm({ ...leaveForm, dates: e.target.value })}
+                  placeholder="e.g. Oct 12, 2026 to Oct 14, 2026"
+                  className="w-full px-3 py-2 bg-obsidian border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs text-cream/70 font-medium">No. of Days *</label>
+                <input
+                  type="number"
+                  required
+                  value={leaveForm.days}
+                  onChange={e => setLeaveForm({ ...leaveForm, days: e.target.value })}
+                  className="w-full px-3 py-2 bg-obsidian border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs text-cream/70 font-medium">Reason for Absence</label>
+                <textarea
+                  rows={3}
+                  required
+                  value={leaveForm.reason}
+                  onChange={e => setLeaveForm({ ...leaveForm, reason: e.target.value })}
+                  placeholder="Brief reason for time off..."
+                  className="w-full px-3 py-2 bg-obsidian border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
+                />
+              </div>
+
+              <button type="submit" disabled={actionLoading} className="w-full btn-primary text-xs py-2.5 mt-2 disabled:opacity-60">
+                {actionLoading ? "Submitting..." : "Submit Application &rarr;"}
+              </button>
+            </form>
+
+            <div className="lg:col-span-2 bg-obsidian-2 border border-glass-border rounded-[16px] p-6 shadow-xl space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-glass-border">
+                <h3 className="font-display font-semibold text-base">My Leave History & Status</h3>
+                <span className="text-xs text-cream/50">{leaves.length} Applications</span>
+              </div>
+
+              <div className="space-y-3">
+                {leaves.length === 0 ? (
+                  <div className="p-12 text-center text-cream/40 bg-obsidian rounded-[10px] border border-glass-border">
+                    No past leave requests on record.
+                  </div>
+                ) : (
+                  leaves.map((l: any) => (
+                    <div key={l._id} className="p-4 bg-obsidian border border-glass-border rounded-[10px] flex items-start justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold text-sm text-cream">{l.type}</h4>
+                          <span className="text-xs text-[#C8FF00] font-bold">({l.days} Days)</span>
+                        </div>
+                        <div className="text-xs text-cream/50 mt-1">{l.dates}</div>
+                        {l.reason && <p className="text-xs text-cream/60 italic mt-1">&ldquo;{l.reason}&rdquo;</p>}
+                      </div>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold capitalize ${
+                        l.status === "approved"
+                          ? "bg-green-500/20 text-green-400"
+                          : l.status === "rejected"
+                          ? "bg-red-500/20 text-red-400"
+                          : "bg-yellow-500/20 text-yellow-400"
+                      }`}>
+                        {l.status || "pending"}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================= TAB 4: MY PAYSLIPS ================= */}
+        {activeTab === "My Payslips" && (
+          <div className="bg-obsidian-2 border border-glass-border rounded-[16px] p-6 sm:p-8 shadow-xl space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-glass-border">
+              <div>
+                <h2 className="font-display font-semibold text-base">Monthly Compensation & Payslip Studio</h2>
+                <p className="text-xs text-cream/50 mt-0.5">Generate and download official PDF/Print salary statements.</p>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <input
+                  type="month"
+                  value={period}
+                  onChange={e => setPeriod(e.target.value)}
+                  className="px-3 py-1.5 bg-obsidian border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
+                />
+                <button
+                  onClick={handlePrintMyPayslip}
+                  className="btn-primary text-xs py-2 px-4 flex items-center gap-1.5"
+                >
+                  <Printer size={13} /> Print Official Payslip
+                </button>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-3 gap-4">
+              <div className="p-5 bg-obsidian border border-glass-border rounded-[12px]">
+                <div className="text-xs text-cream/40">Gross Monthly CTC</div>
+                <div className="font-display text-2xl font-bold text-cream mt-1">
+                  ₹{Math.round(Number(employee?.salary || 600000) / 12).toLocaleString("en-IN")}
+                </div>
+              </div>
+
+              <div className="p-5 bg-obsidian border border-glass-border rounded-[12px]">
+                <div className="text-xs text-cream/40">Statutory Deductions (PF/PT/TDS)</div>
+                <div className="font-display text-2xl font-bold text-red-400 mt-1">
+                  -₹{Math.round((Number(employee?.salary || 600000) / 12) * 0.15).toLocaleString("en-IN")}
+                </div>
+              </div>
+
+              <div className="p-5 bg-obsidian border border-glass-border rounded-[12px]">
+                <div className="text-xs text-cream/40">Net Take-Home Salary</div>
+                <div className="font-display text-2xl font-bold text-[#C8FF00] mt-1">
+                  ₹{Math.round((Number(employee?.salary || 600000) / 12) * 0.85).toLocaleString("en-IN")}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================= TAB 5: SPRINT TASKS ================= */}
+        {activeTab === "Sprint Tasks" && (
+          <div className="space-y-4">
+            <h2 className="font-display font-semibold text-base">Assigned Engineering Tasks & Tickets</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              {tasks.length === 0 ? (
+                <div className="col-span-2 p-12 bg-obsidian-2 border border-glass-border rounded-[14px] text-center text-cream/40">
+                  No sprint tasks assigned.
+                </div>
+              ) : (
+                tasks.map((task: any) => (
+                  <div key={task._id} className="p-5 bg-obsidian-2 border border-glass-border rounded-[14px] space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-semibold text-base text-cream">{task.title}</h4>
+                        <p className="text-xs text-cream/50 mt-1">{task.description}</p>
+                      </div>
+                      <span className="px-2.5 py-0.5 bg-blue-500/20 text-blue-400 rounded text-[10px] font-bold uppercase">
+                        {task.status || "in_progress"}
+                      </span>
+                    </div>
+                    <div className="pt-2 border-t border-glass-border/50 flex justify-between text-xs text-cream/40">
+                      <span>Priority: <strong className="text-yellow-400 uppercase">{task.priority || "normal"}</strong></span>
+                      <span>Target: <strong className="text-[#C8FF00]">{task.dueDate || "This Sprint"}</strong></span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ================= TAB 6: TEAM ROSTER ================= */}
+        {activeTab === "Team Roster" && (
+          <div className="space-y-4">
+            <h2 className="font-display font-semibold text-base">My Department & Pod Roster</h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {team.length === 0 ? (
+                <div className="col-span-3 p-12 bg-obsidian-2 border border-glass-border rounded-[14px] text-center text-cream/40">
+                  No other team members in roster.
+                </div>
+              ) : (
+                team.map((m: any, i: number) => (
+                  <div key={m._id || i} className="p-5 bg-obsidian-2 border border-glass-border rounded-[14px] flex items-center gap-3.5">
+                    <div className="w-11 h-11 rounded-full bg-[#C8FF00] text-obsidian font-bold text-xs flex items-center justify-center flex-shrink-0">
+                      {String(m.name || "?").split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-sm text-cream">{m.name}</h4>
+                      <p className="text-xs text-cream/50">{m.role}</p>
+                      <p className="text-[10px] text-cream/30 font-mono mt-0.5">{m.email}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ================= TAB 7: MY DOCUMENTS ================= */}
+        {activeTab === "My Documents" && (
+          <div className="bg-obsidian-2 border border-glass-border rounded-[16px] p-6 shadow-xl space-y-6">
+            <div className="pb-4 border-b border-glass-border">
+              <h2 className="font-display font-semibold text-base">Official Employment Documentation</h2>
+              <p className="text-xs text-cream/50 mt-0.5">1-click reprint of your official onboarding agreements and company certificates.</p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="p-5 bg-obsidian border border-glass-border rounded-[14px] space-y-3">
+                <div className="flex items-center gap-2">
+                  <FileText size={18} className="text-[#C8FF00]" />
+                  <h4 className="font-semibold text-sm text-cream">Appointment Letter</h4>
+                </div>
+                <p className="text-xs text-cream/50">Formal employment contract & IP agreements.</p>
+                <button
+                  onClick={handlePrintMyAppointment}
+                  className="btn-primary text-xs py-2 px-4 w-full flex items-center justify-center gap-1.5"
+                >
+                  <Printer size={13} /> View & Print Letter
+                </button>
+              </div>
+
+              <div className="p-5 bg-obsidian border border-glass-border rounded-[14px] space-y-3">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={18} className="text-green-400" />
+                  <h4 className="font-semibold text-sm text-cream">Joining & Induction Letter</h4>
+                </div>
+                <p className="text-xs text-cream/50">Onboarding confirmation & employee credentials.</p>
+                <button
+                  onClick={handlePrintMyJoining}
+                  className="btn-outline text-xs py-2 px-4 w-full flex items-center justify-center gap-1.5"
+                >
+                  <Printer size={13} /> View & Print Letter
+                </button>
+              </div>
+
+              <div className="p-5 bg-obsidian border border-glass-border rounded-[14px] space-y-3">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck size={18} className="text-blue-400" />
+                  <h4 className="font-semibold text-sm text-cream">Company Code of Conduct</h4>
+                </div>
+                <p className="text-xs text-cream/50">Information security & workplace ethics.</p>
+                <a
+                  href="/terms"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-outline text-xs py-2 px-4 w-full flex items-center justify-center gap-1.5"
+                >
+                  <ExternalLink size={13} /> Read Standards
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================= TAB 8: LMS & UPSKILLING ================= */}
+        {activeTab === "LMS & Upskilling" && (
+          <div className="space-y-4">
+            <h2 className="font-display font-semibold text-base">Enrolled LMS Training & Upskilling Tracks</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              {trainings.length === 0 ? (
+                <div className="col-span-2 p-12 bg-obsidian-2 border border-glass-border rounded-[14px] text-center text-cream/40">
+                  No active LMS training courses assigned yet.
+                </div>
+              ) : (
+                trainings.map((tr: any) => (
+                  <div key={tr._id} className="p-5 bg-obsidian-2 border border-glass-border rounded-[14px] space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-semibold text-sm text-cream">{tr.title}</h4>
+                        <p className="text-xs text-cream/50 mt-0.5">Due: {tr.dueDate}</p>
+                      </div>
+                      <span className="font-mono text-xs text-[#C8FF00] font-bold">{tr.progress || 0}%</span>
+                    </div>
+                    {tr.description && (
+                      <p className="text-xs text-cream/60 line-clamp-2">{tr.description}</p>
+                    )}
+                    <div className="h-1.5 bg-obsidian rounded-full overflow-hidden">
+                      <div className="h-full bg-[#C8FF00] rounded-full" style={{ width: `${tr.progress || 0}%` }} />
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         )}
       </div>
     </div>

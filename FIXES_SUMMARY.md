@@ -439,6 +439,36 @@ NVIDIA_MODEL=meta/llama-3.1-405b-instruct
 
 ---
 
+
+---
+
+## 25. Complete Enterprise Multi-Portal Overhaul (Manager, Employee, CRM, Sales & Workflow Manual) ✅
+
+### Features Implemented
+- **Operations & Delivery Manager Portal (`client/src/pages/manager/ManagerPortal.tsx`):**
+  - Upgraded to full enterprise design matching Obsidian & Lime theme.
+  - Interactive Project Team Pod Assembler (grouping engineers, assigning leads, and linking client projects).
+  - Sprint Task & Client Ticket Delegation register with priority tags (Critical, High, Medium, Low) and deadline tracking.
+  - Staff Quarterly Performance & OKR scoring on a 1.0 to 5.0 scale with instant persistence.
+  - Enterprise LMS & Training enrollment tracker with progress bars.
+- **Employee Self-Service (ESS) Portal (`client/src/pages/employee/EmployeePortal.tsx`):**
+  - Biometric-style Punch Clock with 1-click Clock In / Clock Out, duration calculations, and monthly attendance history.
+  - Annual Leave & PTO Center with quota balances (Casual 12, Sick 10, Earned 18) and leave application submission.
+  - 1-Click Monthly Payslip reprint studio powered by native print engine.
+  - Sprint Task Board for tracking assigned deliverables.
+  - 1-Click official employment document re-printer (Appointment Letter, Joining Letter, Code of Conduct).
+  - LMS Training & certification track progress.
+- **Commercial CRM & Revenue Suite (`client/src/pages/crm/CRMDashboard.tsx`, `Deals.tsx`, `Contacts.tsx`):**
+  - Executive Revenue Dashboard with total pipeline valuation in ₹, deal win rates, and 6-stage funnel conversion.
+  - Interactive Sales Kanban Board (`Deals.tsx`) with stage column valuation sums, deal probability, and 1-click **"Mark Won"** deal closure.
+  - Enterprise Business Contacts Directory (`Contacts.tsx`) with industry classification (Hotels, Factories, Clinics, Schools, Retail) and quick communication actions.
+- **Field Sales Lead Capture Hub (`client/src/pages/sales/SalesPortal.tsx`):**
+  - Mobile-first on-ground pitch logger with business categorization and multi-service selection pills.
+  - Atomic 3-way synchronization on submission (creating `crm_contacts`, `crm_deals`, and `client_projects`).
+  - 1-Click **"Close Deal (Won)"** transitioning status and notifying delivery managers.
+- **Master Operations & System Workflow Manual (`PROJECT_WORKFLOW.md`):**
+  - Comprehensive documentation covering multi-portal architecture topology, full RBAC matrix across 7 roles, 6 end-to-end operational workflows with step-by-step state diagrams, and complete MongoDB collections schema map.
+
 ## Files Summary
 
 ### New Files Created (20)
