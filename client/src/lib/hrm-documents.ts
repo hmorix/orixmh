@@ -1,30 +1,40 @@
 // HMorix HRM & Enterprise Document Generator Suite
-// 100% free & native — zero paid libraries, zero external dependencies
-// Uses native browser window.open() + window.print() + SVG vector seals
+// 100% Free & Native — Zero external paid dependencies
+// Compliant with Indian Corporate, Legal, and Labor Standards
 
 export interface CompanyInfo {
   name: string
+  legalName: string
   address: string
+  registeredOffice: string
   email: string
+  hrEmail: string
   phone: string
   website: string
   cin: string
-  pan?: string
-  gstin?: string
+  pan: string
+  gstin: string
+  tan: string
+  iso: string
 }
 
 export const COMPANY: CompanyInfo = {
   name: "HMorix Technologies Pvt Ltd",
+  legalName: "HMORIX TECHNOLOGIES PRIVATE LIMITED",
   address: "MG Polytechnic Road, Hathras, Uttar Pradesh – 204101, India",
-  email: "hr@hmorix.com",
+  registeredOffice: "Regd Off: Plot 14, Tech Boulevard, Hathras, UP – 204101, India",
+  email: "contact@hmorix.com",
+  hrEmail: "hr@hmorix.com",
   phone: "+91 98765 43210",
   website: "https://hmorix.in",
   cin: "U72900UP2026PTC123456",
   pan: "AABCH1234F",
-  gstin: "09AABCH1234F1Z5"
+  gstin: "09AABCH1234F1Z5",
+  tan: "KNP01234F",
+  iso: "An ISO 9001:2015 & ISO/IEC 27001:2022 Certified Organization"
 }
 
-// Convert numbers to English currency words
+// Convert numbers to formal Indian Currency words
 export function numberToWords(num: number): string {
   const a = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"]
   const b = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"]
@@ -40,8 +50,8 @@ export function numberToWords(num: number): string {
   }
 
   const rounded = Math.round(Math.abs(num))
-  if (rounded === 0) return "Zero Rupees Only"
-  return (inWords(rounded).trim() + " Rupees Only")
+  if (rounded === 0) return "INR Zero Only"
+  return ("INR " + inWords(rounded).trim() + " Only")
 }
 
 const DOCUMENT_STYLES = `
@@ -52,12 +62,12 @@ const DOCUMENT_STYLES = `
     color: #1e293b;
     background: #f1f5f9;
     padding: 0;
-    line-height: 1.65;
+    line-height: 1.68;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* Interactive Top Toolbar (Hidden on Print) */
+  /* Interactive Top Toolbar (Screen-Only) */
   .print-toolbar {
     position: sticky;
     top: 0;
@@ -68,31 +78,31 @@ const DOCUMENT_STYLES = `
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    border-bottom: 1px solid rgba(255,255,255,0.12);
   }
   .tb-brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
   }
   .tb-logo {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     background: #c8ff00;
     color: #090d16;
-    border-radius: 6px;
+    border-radius: 7px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 900;
-    font-size: 12px;
+    font-size: 13px;
+    letter-spacing: -0.5px;
   }
   .tb-title {
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 800;
     color: #ffffff;
-    letter-spacing: -0.01em;
   }
   .tb-sub {
     font-size: 10px;
@@ -118,7 +128,7 @@ const DOCUMENT_STYLES = `
   .tb-btn-mode {
     background: rgba(255,255,255,0.08);
     color: #cbd5e1;
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.16);
   }
   .tb-btn-mode:hover {
     background: rgba(255,255,255,0.16);
@@ -127,7 +137,7 @@ const DOCUMENT_STYLES = `
   .tb-btn-mode.active {
     background: #ffffff;
     color: #090d16;
-    font-weight: 700;
+    font-weight: 800;
     border-color: #ffffff;
   }
   .tb-btn-print {
@@ -137,7 +147,7 @@ const DOCUMENT_STYLES = `
   }
   .tb-btn-print:hover {
     background: #d4ff33;
-    box-shadow: 0 0 12px rgba(200,255,0,0.4);
+    box-shadow: 0 0 14px rgba(200,255,0,0.45);
   }
 
   /* Document Sheet Container */
@@ -148,12 +158,30 @@ const DOCUMENT_STYLES = `
   }
   .doc-sheet {
     width: 100%;
-    max-width: 800px;
+    max-width: 820px;
     background: #ffffff;
-    padding: 44px 48px;
+    padding: 48px 52px;
     border-radius: 4px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.08);
     position: relative;
+    border: 1px solid #e2e8f0;
+  }
+
+  /* Watermark Pattern */
+  .doc-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-35deg);
+    font-size: 64px;
+    font-weight: 900;
+    color: rgba(15, 23, 42, 0.035);
+    letter-spacing: 0.2em;
+    pointer-events: none;
+    user-select: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+    z-index: 1;
   }
 
   /* Header Section */
@@ -161,41 +189,52 @@ const DOCUMENT_STYLES = `
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding-bottom: 18px;
+    padding-bottom: 20px;
     border-bottom: 2.5px solid #0f172a;
     margin-bottom: 22px;
+    position: relative;
+    z-index: 2;
   }
   .header-left {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
   }
   .corp-badge {
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
     background: #0f172a;
-    border-radius: 8px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #c8ff00;
     font-weight: 900;
-    font-size: 18px;
+    font-size: 20px;
     letter-spacing: -1px;
     flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(15,23,42,0.15);
   }
   .corp-name {
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 800;
     color: #0f172a;
     letter-spacing: -0.02em;
     line-height: 1.2;
+    text-transform: uppercase;
+  }
+  .corp-iso {
+    font-size: 8.5px;
+    color: #0284c7;
+    font-weight: 700;
+    margin-top: 1px;
+    letter-spacing: 0.04em;
   }
   .corp-meta {
     font-size: 9.5px;
     color: #64748b;
-    margin-top: 3px;
-    line-height: 1.4;
+    margin-top: 2px;
+    line-height: 1.45;
   }
   .header-right {
     text-align: right;
@@ -212,13 +251,14 @@ const DOCUMENT_STYLES = `
     border-radius: 4px;
   }
   .doc-reg-details {
-    font-size: 9px;
-    color: #94a3b8;
-    margin-top: 5px;
-    font-mono: monospace;
+    font-size: 8.5px;
+    color: #64748b;
+    margin-top: 6px;
+    line-height: 1.5;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
-  /* Reference & Date Ribbon */
+  /* Reference & Verification Ribbon */
   .ref-ribbon {
     display: flex;
     justify-content: space-between;
@@ -227,28 +267,32 @@ const DOCUMENT_STYLES = `
     border: 1px solid #e2e8f0;
     padding: 8px 14px;
     border-radius: 6px;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
     font-size: 10.5px;
     color: #475569;
+    position: relative;
+    z-index: 2;
   }
   .ref-ribbon strong {
     color: #0f172a;
   }
 
-  /* Recipient / Candidate / Client Block */
+  /* Recipient / Candidate / Client Address Block */
   .recipient-block {
-    margin-bottom: 20px;
-    padding: 12px 16px;
+    margin-bottom: 22px;
+    padding: 12px 18px;
     background: #f8fafc;
     border-left: 3.5px solid #c8ff00;
     border-radius: 0 6px 6px 0;
+    position: relative;
+    z-index: 2;
   }
   .recipient-title {
-    font-size: 9.5px;
+    font-size: 9px;
     text-transform: uppercase;
-    font-weight: 700;
+    font-weight: 800;
     color: #64748b;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     margin-bottom: 2px;
   }
   .recipient-name {
@@ -266,13 +310,15 @@ const DOCUMENT_STYLES = `
   .details-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px 16px;
+    gap: 8px 20px;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
-    padding: 12px 16px;
-    margin: 16px 0;
+    padding: 14px 18px;
+    margin: 18px 0;
     font-size: 11px;
+    position: relative;
+    z-index: 2;
   }
   .dg-item {
     display: flex;
@@ -291,13 +337,15 @@ const DOCUMENT_STYLES = `
     color: #0f172a;
   }
 
-  /* Typography */
+  /* Formal Paragraphs & Headings */
   p {
     margin-bottom: 12px;
     font-size: 11.5px;
     color: #334155;
     text-align: justify;
     line-height: 1.7;
+    position: relative;
+    z-index: 2;
   }
   h3 {
     font-size: 11px;
@@ -305,17 +353,21 @@ const DOCUMENT_STYLES = `
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: #0f172a;
-    margin: 18px 0 8px;
+    margin: 20px 0 8px;
     padding-bottom: 4px;
     border-bottom: 1.5px solid #e2e8f0;
+    position: relative;
+    z-index: 2;
   }
 
   /* Financial & Itemized Tables */
   .table-wrap {
-    margin: 14px 0 20px;
+    margin: 16px 0 22px;
     overflow: hidden;
     border-radius: 6px;
     border: 1px solid #e2e8f0;
+    position: relative;
+    z-index: 2;
   }
   table {
     width: 100%;
@@ -331,14 +383,14 @@ const DOCUMENT_STYLES = `
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    padding: 8px 12px;
+    padding: 9px 12px;
     text-align: left;
   }
   th.num, td.num {
     text-align: right;
   }
   td {
-    padding: 7px 12px;
+    padding: 8px 12px;
     border-bottom: 1px solid #f1f5f9;
     color: #334155;
   }
@@ -361,9 +413,11 @@ const DOCUMENT_STYLES = `
     background: #f8fafc;
     border: 1.5px solid #0f172a;
     border-radius: 8px;
-    padding: 16px;
-    margin: 18px 0;
+    padding: 16px 20px;
+    margin: 20px 0;
     text-align: center;
+    position: relative;
+    z-index: 2;
   }
   .net-callout-label {
     font-size: 10px;
@@ -385,37 +439,44 @@ const DOCUMENT_STYLES = `
     font-style: italic;
   }
 
-  /* Terms Box */
-  .terms-box {
+  /* Legal Clauses & Terms Container */
+  .legal-clauses-box {
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
-    padding: 12px 16px;
-    margin: 16px 0;
+    padding: 14px 18px;
+    margin: 18px 0;
     font-size: 10.5px;
     color: #475569;
+    position: relative;
+    z-index: 2;
   }
-  .terms-box ul {
+  .legal-clauses-box ol, .legal-clauses-box ul {
     padding-left: 18px;
   }
-  .terms-box li {
-    margin-bottom: 4px;
+  .legal-clauses-box li {
+    margin-bottom: 6px;
+  }
+  .legal-clauses-box li strong {
+    color: #0f172a;
   }
 
-  /* Signatures & Corporate Seal */
+  /* Signatures, Stamp & QR Verification */
   .sig-grid {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     margin-top: 36px;
-    padding-top: 14px;
+    padding-top: 16px;
+    position: relative;
+    z-index: 2;
   }
   .sig-col {
-    width: 220px;
+    width: 230px;
   }
   .sig-bar {
     border-top: 1.5px solid #0f172a;
-    width: 170px;
+    width: 180px;
     margin-bottom: 6px;
   }
   .sig-caption {
@@ -435,9 +496,25 @@ const DOCUMENT_STYLES = `
     color: #64748b;
   }
 
-  /* Digital Verification Seal Badge */
+  /* Digital Verification Seal with QR block */
+  .seal-qr-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .qr-code-box {
+    width: 52px;
+    height: 52px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   .digital-seal-box {
-    text-align: center;
+    text-align: left;
     border: 1.5px dashed #10b981;
     background: #ecfdf5;
     border-radius: 8px;
@@ -445,7 +522,7 @@ const DOCUMENT_STYLES = `
     display: inline-block;
   }
   .seal-text-top {
-    font-size: 8.5px;
+    font-size: 8px;
     font-weight: 800;
     color: #059669;
     text-transform: uppercase;
@@ -463,18 +540,44 @@ const DOCUMENT_STYLES = `
 
   /* Footer Section */
   .doc-footer {
-    margin-top: 32px;
-    padding-top: 12px;
+    margin-top: 36px;
+    padding-top: 14px;
     border-top: 1px solid #e2e8f0;
-    font-size: 9px;
+    font-size: 8.5px;
     color: #94a3b8;
     text-align: center;
-    line-height: 1.5;
+    line-height: 1.55;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Candidate Acceptance Section */
+  .ack-box {
+    margin-top: 28px;
+    padding: 14px 18px;
+    border: 1px dashed #94a3b8;
+    border-radius: 6px;
+    background: #fdfdfd;
+    position: relative;
+    z-index: 2;
+  }
+  .ack-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .ack-sig-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 24px;
   }
 
   /* =========================================================================
      BLACK & WHITE (B&W MONOCHROME) MODE OVERRIDES
-     Optimized for Laser Printers, Photocopy Clarity, & Low-Ink Printing
      ========================================================================= */
   .bw-mode {
     color: #000000 !important;
@@ -491,8 +594,12 @@ const DOCUMENT_STYLES = `
   .bw-mode .recipient-name,
   .bw-mode h3,
   .bw-mode .net-callout-val,
-  .bw-mode .sig-person {
+  .bw-mode .sig-person,
+  .bw-mode .ack-title {
     color: #000000 !important;
+  }
+  .bw-mode .corp-iso {
+    color: #333333 !important;
   }
   .bw-mode .doc-type-pill {
     background: #ffffff !important;
@@ -502,7 +609,8 @@ const DOCUMENT_STYLES = `
   .bw-mode .ref-ribbon,
   .bw-mode .details-grid,
   .bw-mode .recipient-block,
-  .bw-mode .terms-box {
+  .bw-mode .legal-clauses-box,
+  .bw-mode .ack-box {
     background: #ffffff !important;
     border: 1px solid #000000 !important;
     color: #000000 !important;
@@ -556,44 +664,45 @@ const DOCUMENT_STYLES = `
   }
 
   /* =========================================================================
-     DIGITAL ID BADGE SPECIFIC STYLING
+     DIGITAL ID CARD BADGE STYLES (Front & Back)
      ========================================================================= */
   .badge-grid-container {
     display: flex;
     justify-content: center;
-    gap: 24px;
+    gap: 28px;
     flex-wrap: wrap;
     padding: 10px 0;
+    position: relative;
+    z-index: 2;
   }
   .id-card-frame {
     width: 320px;
-    min-height: 480px;
+    min-height: 490px;
     background: #ffffff;
     border-radius: 16px;
     border: 2px solid #0f172a;
     overflow: hidden;
     box-shadow: 0 8px 30px rgba(0,0,0,0.12);
     display: flex;
-    flex-col;
     flex-direction: column;
     justify-content: space-between;
   }
   .id-card-top {
     background: #0f172a;
-    padding: 18px 16px;
+    padding: 16px;
     text-align: center;
   }
   .id-card-brand {
     font-size: 16px;
     font-weight: 900;
     color: #c8ff00;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
   }
   .id-card-tag {
-    font-size: 9px;
+    font-size: 8.5px;
     color: #94a3b8;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     margin-top: 2px;
   }
   .id-card-body {
@@ -614,6 +723,7 @@ const DOCUMENT_STYLES = `
     justify-content: center;
     margin: 0 auto 12px;
     border: 3px solid #c8ff00;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
   .id-card-name {
     font-size: 16px;
@@ -684,7 +794,7 @@ const DOCUMENT_STYLES = `
     color: #000000 !important;
   }
 
-  /* Print Layout Media Query */
+  /* Print Media Query */
   @media print {
     body {
       background: #ffffff !important;
@@ -700,6 +810,7 @@ const DOCUMENT_STYLES = `
       box-shadow: none !important;
       padding: 0 !important;
       max-width: 100% !important;
+      border: none !important;
     }
     @page {
       margin: 12mm 15mm;
@@ -710,36 +821,58 @@ const DOCUMENT_STYLES = `
 
 function renderHeader(docTitle: string): string {
   return `
+    <div class="doc-watermark">HMORIX OFFICIAL</div>
     <div class="doc-header">
       <div class="header-left">
         <div class="corp-badge">HM</div>
         <div>
-          <div class="corp-name">${COMPANY.name}</div>
+          <div class="corp-name">${COMPANY.legalName}</div>
+          <div class="corp-iso">${COMPANY.iso}</div>
           <div class="corp-meta">${COMPANY.address}</div>
           <div class="corp-meta">${COMPANY.email} &bull; ${COMPANY.phone} &bull; ${COMPANY.website}</div>
         </div>
       </div>
       <div class="header-right">
         <div class="doc-type-pill">${docTitle}</div>
-        <div class="doc-reg-details">CIN: ${COMPANY.cin} &bull; GSTIN: ${COMPANY.gstin}</div>
+        <div class="doc-reg-details">
+          CIN: ${COMPANY.cin}<br>
+          PAN: ${COMPANY.pan} &bull; GSTIN: ${COMPANY.gstin}
+        </div>
       </div>
     </div>
   `;
 }
 
 function renderSignatures(signer = "Harsh Sharma", title = "Chief Executive Officer"): string {
+  const hash = `HM-SHA256:${Date.now().toString(16).toUpperCase()}-9E2A`
   return `
     <div class="sig-grid">
       <div class="sig-col">
         <div class="sig-bar"></div>
-        <div class="sig-caption">Authorized Signatory</div>
+        <div class="sig-caption">For ${COMPANY.name}</div>
         <div class="sig-person">${signer}</div>
-        <div class="sig-dept">${title}, ${COMPANY.name}</div>
+        <div class="sig-dept">${title}</div>
       </div>
-      <div class="digital-seal-box">
-        <div class="seal-text-top">&bull; DIGITALLY SIGNED &amp; VERIFIED &bull;</div>
-        <div class="seal-text-mid">${COMPANY.name}</div>
-        <div class="seal-text-bot">Official Corporate Seal &bull; CIN: ${COMPANY.cin}</div>
+      <div class="seal-qr-wrapper">
+        <div class="qr-code-box">
+          <svg viewBox="0 0 100 100" width="44" height="44">
+            <rect width="100" height="100" fill="#ffffff" />
+            <path d="M10,10 h30 v30 h-30 z M15,15 v20 h20 v-20 z M20,20 h10 v10 h-10 z" fill="#0f172a" />
+            <path d="M60,10 h30 v30 h-30 z M65,15 v20 h20 v-20 z M70,20 h10 v10 h-10 z" fill="#0f172a" />
+            <path d="M10,60 h30 v30 h-30 z M15,65 v20 h20 v-20 z M20,70 h10 v10 h-10 z" fill="#0f172a" />
+            <rect x="50" y="20" width="5" height="15" fill="#0f172a" />
+            <rect x="20" y="50" width="15" height="5" fill="#0f172a" />
+            <rect x="50" y="50" width="15" height="15" fill="#0f172a" />
+            <rect x="70" y="60" width="20" height="10" fill="#0f172a" />
+            <rect x="60" y="80" width="15" height="10" fill="#0f172a" />
+            <rect x="80" y="75" width="10" height="15" fill="#0f172a" />
+          </svg>
+        </div>
+        <div class="digital-seal-box">
+          <div class="seal-text-top">&bull; DIGITALLY SIGNED &amp; SECURE &bull;</div>
+          <div class="seal-text-mid">${COMPANY.legalName}</div>
+          <div class="seal-text-bot">Ref: ${hash} &bull; CIN: ${COMPANY.cin}</div>
+        </div>
       </div>
     </div>
   `;
@@ -748,13 +881,14 @@ function renderSignatures(signer = "Harsh Sharma", title = "Chief Executive Offi
 function renderFooter(): string {
   return `
     <div class="doc-footer">
-      Official Corporate Record &bull; ${COMPANY.name} &bull; CIN: ${COMPANY.cin} &bull; Verification: hr@hmorix.com &bull; ${COMPANY.website}
+      ${COMPANY.registeredOffice}<br>
+      Confidential &amp; Proprietary &bull; Document Verification Desk: ${COMPANY.hrEmail} &bull; ${COMPANY.website}
     </div>
   `;
 }
 
 export function openPrintWindow(htmlContent: string, windowTitle: string) {
-  const printWindow = window.open("", "_blank", "width=900,height=960");
+  const printWindow = window.open("", "_blank", "width=920,height=960");
   if (!printWindow) {
     alert("Please allow pop-ups for this site to generate and print official HR documents.");
     return;
@@ -766,33 +900,31 @@ export function openPrintWindow(htmlContent: string, windowTitle: string) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${windowTitle} - HMorix Document Studio</title>
+        <title>${windowTitle} - ${COMPANY.name}</title>
         <style>${DOCUMENT_STYLES}</style>
       </head>
       <body>
-        <!-- Top Interactive Controls (Hidden on Print) -->
         <div class="print-toolbar">
           <div class="tb-brand">
             <div class="tb-logo">HM</div>
             <div>
               <div class="tb-title">${windowTitle}</div>
-              <div class="tb-sub">HMorix Enterprise Document Studio</div>
+              <div class="tb-sub">${COMPANY.legalName} &bull; Document Verification Studio</div>
             </div>
           </div>
           <div class="tb-actions">
             <button class="tb-btn tb-btn-mode active" id="btn-colour" onclick="setDocMode('colour')">
-              🎨 Full Colour
+              🎨 Full Colour Mode
             </button>
             <button class="tb-btn tb-btn-mode" id="btn-bw" onclick="setDocMode('bw')">
-              ⬛ Black &amp; White (B&amp;W)
+              ⬛ Black &amp; White (B&amp;W Laser)
             </button>
             <button class="tb-btn tb-btn-print" onclick="window.print()">
-              🖨️ Print / Save PDF
+              🖨️ Print / Save as PDF
             </button>
           </div>
         </div>
 
-        <!-- Document Body -->
         <div class="doc-sheet-wrapper">
           <div class="doc-sheet" id="doc-root">
             ${htmlContent}
@@ -826,7 +958,7 @@ export function openPrintWindow(htmlContent: string, windowTitle: string) {
 }
 
 /* ==========================================================================
-   1. OFFER LETTER
+   1. FORMAL JOB OFFER LETTER
    ========================================================================== */
 export interface OfferLetterData {
   name: string
@@ -844,14 +976,15 @@ export interface OfferLetterData {
 export function printOfferLetter(data: OfferLetterData) {
   const date = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })
   const m = Math.round(data.ctc / 12)
-  const ref = `HM/OL/${Date.now().toString().slice(-6)}`
+  const ref = `HMT/HRD/OL/2026/${Date.now().toString().slice(-4)}`
   const words = numberToWords(data.ctc)
 
   const html = `
-    ${renderHeader("Job Offer Letter")}
+    ${renderHeader("Offer of Employment")}
     <div class="ref-ribbon">
-      <span><strong>Ref:</strong> ${ref}</span>
+      <span><strong>Ref No:</strong> ${ref}</span>
       <span><strong>Issue Date:</strong> ${date}</span>
+      <span><strong>Place of Issue:</strong> Hathras, Uttar Pradesh, India</span>
     </div>
 
     <div class="recipient-block">
@@ -859,55 +992,55 @@ export function printOfferLetter(data: OfferLetterData) {
       <div class="recipient-name">${data.name}</div>
       <div class="recipient-sub">
         ${data.email ? `<span>Email: ${data.email}</span> &bull; ` : ""}
-        ${data.phone ? `<span>Phone: ${data.phone}</span> &bull; ` : ""}
+        ${data.phone ? `<span>Contact: ${data.phone}</span> &bull; ` : ""}
         <span>Location: ${data.location}</span>
       </div>
     </div>
 
     <p>Dear <strong>${data.name}</strong>,</p>
     <p>
-      We are delighted to extend this formal offer of employment for the position of <strong>${data.role}</strong>
-      in the <strong>${data.department}</strong> department at <strong>${COMPANY.name}</strong>.
-      Following our evaluation of your skills and background, we are confident you will make significant contributions to our technological and business goals.
+      On behalf of the Board of Directors and Management of <strong>${COMPANY.legalName}</strong>,
+      we are pleased to offer you the position of <strong>${data.role}</strong> in the <strong>${data.department}</strong> department.
+      Based on your qualifications, technical evaluations, and professional credentials, we believe you possess the skills and leadership to drive our engineering mission forward.
     </p>
 
     <div class="details-grid">
-      <div class="dg-item"><span class="dg-label">Designation:</span><span class="dg-value">${data.role}</span></div>
-      <div class="dg-item"><span class="dg-label">Department:</span><span class="dg-value">${data.department}</span></div>
-      <div class="dg-item"><span class="dg-label">Work Location:</span><span class="dg-value">${data.location}</span></div>
-      <div class="dg-item"><span class="dg-label">Joining Date:</span><span class="dg-value">${data.joiningDate}</span></div>
-      ${data.reportingTo ? `<div class="dg-item"><span class="dg-label">Reporting Manager:</span><span class="dg-value">${data.reportingTo}</span></div>` : ""}
-      <div class="dg-item"><span class="dg-label">Annual CTC:</span><span class="dg-value">₹${data.ctc.toLocaleString("en-IN")}</span></div>
+      <div class="dg-item"><span class="dg-label">1. Designation:</span><span class="dg-value">${data.role}</span></div>
+      <div class="dg-item"><span class="dg-label">2. Functional Unit:</span><span class="dg-value">${data.department}</span></div>
+      <div class="dg-item"><span class="dg-label">3. Base Work Location:</span><span class="dg-value">${data.location}</span></div>
+      <div class="dg-item"><span class="dg-label">4. Effective Joining Date:</span><span class="dg-value">${data.joiningDate}</span></div>
+      <div class="dg-item"><span class="dg-label">5. Reporting Manager:</span><span class="dg-value">${data.reportingTo || "Department Engineering Lead"}</span></div>
+      <div class="dg-item"><span class="dg-label">6. Total Annual Remuneration (CTC):</span><span class="dg-value">₹${data.ctc.toLocaleString("en-IN")}</span></div>
     </div>
 
-    <h3>Compensation Structure (Annual CTC: ₹${data.ctc.toLocaleString("en-IN")})</h3>
+    <h3>Annexure A: Compensation &amp; Benefits Ledger</h3>
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
             <th>Salary Component</th>
             <th class="num">Monthly (₹)</th>
-            <th class="num">Annualized (₹)</th>
+            <th class="num">Annual (₹)</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>Basic Salary (40%)</td>
+            <td>Basic Salary (40% of CTC)</td>
             <td class="num">₹${Math.round(m * 0.4).toLocaleString("en-IN")}</td>
             <td class="num">₹${Math.round(data.ctc * 0.4).toLocaleString("en-IN")}</td>
           </tr>
           <tr>
-            <td>House Rent Allowance - HRA (20%)</td>
+            <td>House Rent Allowance - HRA (20% of CTC)</td>
             <td class="num">₹${Math.round(m * 0.2).toLocaleString("en-IN")}</td>
             <td class="num">₹${Math.round(data.ctc * 0.2).toLocaleString("en-IN")}</td>
           </tr>
           <tr>
-            <td>Special Allowance (30%)</td>
+            <td>Special Allowance (30% of CTC)</td>
             <td class="num">₹${Math.round(m * 0.3).toLocaleString("en-IN")}</td>
             <td class="num">₹${Math.round(data.ctc * 0.3).toLocaleString("en-IN")}</td>
           </tr>
           <tr>
-            <td>Statutory & Flexi Benefits (10%)</td>
+            <td>Statutory &amp; Flexi Benefits (10% of CTC)</td>
             <td class="num">₹${Math.round(m * 0.1).toLocaleString("en-IN")}</td>
             <td class="num">₹${Math.round(data.ctc * 0.1).toLocaleString("en-IN")}</td>
           </tr>
@@ -921,31 +1054,50 @@ export function printOfferLetter(data: OfferLetterData) {
     </div>
 
     <div class="net-callout">
-      <div class="net-callout-label">Total Compensation Value</div>
+      <div class="net-callout-label">Total Cost to Company (Gross CTC)</div>
       <div class="net-callout-val">₹${data.ctc.toLocaleString("en-IN")} PA</div>
       <div class="net-callout-words">${words}</div>
     </div>
 
-    <div class="terms-box">
-      <h3>Key Terms &amp; Conditions</h3>
-      <ul>
-        <li><strong>Probation Period:</strong> 90 days from the effective date of joining. Confirmation is subject to satisfactory performance.</li>
-        <li><strong>Notice Period:</strong> 30 days during probation; 60 days following confirmation.</li>
-        <li><strong>Confidentiality:</strong> Complete confidentiality regarding proprietary systems, client information, and internal IP.</li>
-        <li><strong>Validity:</strong> This offer is valid for 7 calendar days from the date of issuance.</li>
-      </ul>
+    <div class="legal-clauses-box">
+      <h3>Key Terms &amp; Conditions of Offer</h3>
+      <ol>
+        <li><strong>Probation Period:</strong> You will be on probation for a period of ninety (90) calendar days from the date of joining. Confirmation will be subject to satisfactory performance appraisals by the management.</li>
+        <li><strong>Notice Period &amp; Separation:</strong> During probation, either party may terminate the employment by serving thirty (30) days notice or salary in lieu thereof. Post confirmation, the notice period shall be sixty (60) days.</li>
+        <li><strong>Intellectual Property &amp; NDA:</strong> All software, patents, algorithms, trade secrets, workflows, and documentation created during your employment are the sole and exclusive intellectual property of ${COMPANY.name}.</li>
+        <li><strong>Background Verification:</strong> This offer is conditional upon satisfactory verification of your educational qualifications, previous employment references, background checks, and identity proof.</li>
+        <li><strong>Validity:</strong> This offer stands valid for acceptance within seven (7) business days from the date of issuance.</li>
+      </ol>
     </div>
 
-    <p>Please sign and return the duplicate copy of this letter as confirmation of your acceptance.</p>
+    <p>Please endorse your acceptance by signing the confirmation declaration below.</p>
 
     ${renderSignatures()}
+
+    <div class="ack-box">
+      <div class="ack-title">Candidate Acceptance Declaration</div>
+      <p style="font-size:10px;margin-bottom:0;">
+        I, <strong>${data.name}</strong>, hereby accept the offer of employment on the terms and conditions outlined above. I confirm my date of joining as <strong>${data.joiningDate}</strong>.
+      </p>
+      <div class="ack-sig-row">
+        <div>
+          <div class="sig-bar" style="width:140px;"></div>
+          <div class="sig-caption">Signature of Candidate</div>
+          <div class="sig-person" style="font-size:11px;">${data.name}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="sig-bar" style="width:100px;margin-left:auto;"></div>
+          <div class="sig-caption">Date &amp; Place</div>
+        </div>
+      </div>
+    </div>
   `;
 
   openPrintWindow(html, `Offer Letter - ${data.name}`);
 }
 
 /* ==========================================================================
-   2. JOINING LETTER
+   2. FORMAL JOINING LETTER
    ========================================================================== */
 export interface JoiningLetterData {
   name: string
@@ -960,48 +1112,51 @@ export interface JoiningLetterData {
 
 export function printJoiningLetter(data: JoiningLetterData) {
   const date = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })
+  const ref = `HMT/HRD/JL/2026/${data.employeeId}`
+
   const html = `
     ${renderHeader("Joining Confirmation Letter")}
     <div class="ref-ribbon">
-      <span><strong>Ref:</strong> HM/JL/${data.employeeId}</span>
+      <span><strong>Ref No:</strong> ${ref}</span>
       <span><strong>Issue Date:</strong> ${date}</span>
+      <span><strong>Status:</strong> Active Onboarding</span>
     </div>
 
     <div class="recipient-block">
-      <div class="recipient-title">Employee Information</div>
+      <div class="recipient-title">Employee Identification</div>
       <div class="recipient-name">${data.name}</div>
       <div class="recipient-sub">
-        <span>Employee ID: <strong>${data.employeeId}</strong></span> &bull; 
-        <span>Department: ${data.department}</span>
+        <span>Employee Code: <strong>${data.employeeId}</strong></span> &bull; 
+        <span>Department: <strong>${data.department}</strong></span>
       </div>
     </div>
 
     <p>Dear <strong>${data.name}</strong>,</p>
     <p>
-      We are delighted to confirm your joining with <strong>${COMPANY.name}</strong> effective <strong>${data.joiningDate}</strong>.
-      We warmly welcome you to the team and look forward to a successful and productive journey together.
+      We are delighted to confirm that you have formally reported for duty and joined the workforce of <strong>${COMPANY.legalName}</strong>
+      as <strong>${data.role}</strong> with effect from <strong>${data.joiningDate}</strong>.
     </p>
 
     <div class="details-grid">
       <div class="dg-item"><span class="dg-label">Employee ID:</span><span class="dg-value">${data.employeeId}</span></div>
       <div class="dg-item"><span class="dg-label">Designation:</span><span class="dg-value">${data.role}</span></div>
       <div class="dg-item"><span class="dg-label">Department:</span><span class="dg-value">${data.department}</span></div>
-      <div class="dg-item"><span class="dg-label">Joining Date:</span><span class="dg-value">${data.joiningDate}</span></div>
+      <div class="dg-item"><span class="dg-label">Date of Joining:</span><span class="dg-value">${data.joiningDate}</span></div>
       <div class="dg-item"><span class="dg-label">Work Location:</span><span class="dg-value">${data.location}</span></div>
-      ${data.workEmail ? `<div class="dg-item"><span class="dg-label">Work Email:</span><span class="dg-value">${data.workEmail}</span></div>` : ""}
+      <div class="dg-item"><span class="dg-label">Official Work Email:</span><span class="dg-value">${data.workEmail || "Allocated Post Induction"}</span></div>
     </div>
 
-    <div class="terms-box">
-      <h3>Workplace Standards &amp; Operations</h3>
+    <div class="legal-clauses-box">
+      <h3>Corporate Policies &amp; Operational Directives</h3>
       <ul>
-        <li><strong>Standard Hours:</strong> Monday to Friday, 9:30 AM to 6:30 PM IST (Saturday &amp; Sunday Off).</li>
-        <li><strong>Leave Entitlement:</strong> 12 Casual Leaves, 10 Sick Leaves, and 18 Earned Leaves per calendar year.</li>
-        <li><strong>IT &amp; Assets:</strong> Company equipment and software licenses are allocated strictly for official duties.</li>
-        <li><strong>Code of Conduct:</strong> Adhere to corporate integrity, non-disclosure agreements, and professionalism.</li>
+        <li><strong>Working Schedule:</strong> Official core business hours are Monday through Friday, 9:30 AM to 6:30 PM IST. Saturdays and Sundays are designated weekly off days.</li>
+        <li><strong>Annual Leave Balance:</strong> You are entitled to 12 Casual Leaves (CL), 10 Medical/Sick Leaves (SL), and 18 Earned Leaves (EL) per calendar annum, computed on a pro-rata basis.</li>
+        <li><strong>Asset Responsibility:</strong> All hardware, access cards, and credentials assigned to you remain the property of the company and must be handled with due care.</li>
+        <li><strong>Compliance &amp; Governance:</strong> You are bound by the company Information Security Policy, Code of Ethical Business Conduct, and POSH guidelines.</li>
       </ul>
     </div>
 
-    <p>Wishing you an inspiring and rewarding career at HMorix.</p>
+    <p>We extend our warmest welcome to the HMorix family and look forward to your impactful contributions.</p>
 
     ${renderSignatures()}
   `;
@@ -1010,7 +1165,7 @@ export function printJoiningLetter(data: JoiningLetterData) {
 }
 
 /* ==========================================================================
-   3. APPOINTMENT LETTER
+   3. FORMAL APPOINTMENT LETTER
    ========================================================================== */
 export interface AppointmentLetterData {
   name: string
@@ -1027,12 +1182,14 @@ export function printAppointmentLetter(data: AppointmentLetterData) {
   const date = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })
   const m = Math.round(data.ctc / 12)
   const words = numberToWords(data.ctc)
+  const ref = `HMT/HRD/APL/2026/${data.employeeId}`
 
   const html = `
-    ${renderHeader("Employment Appointment Letter")}
+    ${renderHeader("Contract of Employment &amp; Appointment")}
     <div class="ref-ribbon">
-      <span><strong>Ref:</strong> HM/APL/${data.employeeId}</span>
-      <span><strong>Date:</strong> ${date}</span>
+      <span><strong>Ref No:</strong> ${ref}</span>
+      <span><strong>Date of Execution:</strong> ${date}</span>
+      <span><strong>Jurisdiction:</strong> Hathras / Allahabad, UP</span>
     </div>
 
     <div class="recipient-block">
@@ -1043,33 +1200,34 @@ export function printAppointmentLetter(data: AppointmentLetterData) {
 
     <p>Dear <strong>${data.name}</strong>,</p>
     <p>
-      With reference to your application and subsequent technical evaluations, the management of <strong>${COMPANY.name}</strong>
-      is pleased to appoint you as <strong>${data.role}</strong> in the <strong>${data.department}</strong> department, effective <strong>${data.joiningDate}</strong>.
+      In pursuance of your application and subsequent acceptance of our offer, the Management of <strong>${COMPANY.legalName}</strong>
+      is pleased to appoint you as <strong>${data.role}</strong> in our <strong>${data.department}</strong> department, effective <strong>${data.joiningDate}</strong>,
+      on the terms and statutory covenants detailed herein.
     </p>
 
     <div class="details-grid">
-      <div class="dg-item"><span class="dg-label">Employee ID:</span><span class="dg-value">${data.employeeId}</span></div>
+      <div class="dg-item"><span class="dg-label">Employee Code:</span><span class="dg-value">${data.employeeId}</span></div>
       <div class="dg-item"><span class="dg-label">Designation:</span><span class="dg-value">${data.role}</span></div>
       <div class="dg-item"><span class="dg-label">Department:</span><span class="dg-value">${data.department}</span></div>
-      <div class="dg-item"><span class="dg-label">Annual Gross CTC:</span><span class="dg-value">₹${data.ctc.toLocaleString("en-IN")}</span></div>
-      <div class="dg-item"><span class="dg-label">Monthly Gross:</span><span class="dg-value">₹${m.toLocaleString("en-IN")}</span></div>
-      <div class="dg-item"><span class="dg-label">Location:</span><span class="dg-value">${data.location}</span></div>
+      <div class="dg-item"><span class="dg-label">Annual Cost to Company:</span><span class="dg-value">₹${data.ctc.toLocaleString("en-IN")}</span></div>
+      <div class="dg-item"><span class="dg-label">Monthly Gross Remuneration:</span><span class="dg-value">₹${m.toLocaleString("en-IN")}</span></div>
+      <div class="dg-item"><span class="dg-label">Place of Posting:</span><span class="dg-value">${data.location}</span></div>
     </div>
 
     <div class="net-callout">
-      <div class="net-callout-label">Agreed Annual Remuneration</div>
+      <div class="net-callout-label">Agreed Annual Gross Remuneration</div>
       <div class="net-callout-val">₹${data.ctc.toLocaleString("en-IN")} PA</div>
       <div class="net-callout-words">${words}</div>
     </div>
 
-    <div class="terms-box">
-      <h3>Terms of Appointment</h3>
-      <ul>
-        <li><strong>Probation &amp; Confirmation:</strong> You will be on probation for 90 days from the joining date. Confirmation is based on quarterly KPI milestones.</li>
-        <li><strong>Notice Period:</strong> 30 days during probation; 60 days post confirmation.</li>
-        <li><strong>IP &amp; Inventions:</strong> All software, codebases, designs, and workflows developed during employment are exclusive intellectual property of ${COMPANY.name}.</li>
-        <li><strong>Statutory Compliances:</strong> Provident Fund, Professional Tax, and Income Tax deductions apply in accordance with Indian government regulations.</li>
-      </ul>
+    <div class="legal-clauses-box">
+      <h3>Statutory Terms &amp; Employment Covenants</h3>
+      <ol>
+        <li><strong>Duties &amp; Posting:</strong> You will perform all engineering, architectural, and operational tasks assigned by management. The company reserves the right to transfer or depute you to any office or client location across India.</li>
+        <li><strong>Tax &amp; Statutory Withholding:</strong> All salary components are subject to statutory deductions including Provident Fund (EPF), Professional Tax (PT), and Income Tax (TDS Section 192).</li>
+        <li><strong>Non-Compete &amp; Non-Solicitation:</strong> For a period of twelve (12) months following the cessation of your employment, you agree not to directly or indirectly solicit any clients, vendors, or employees of ${COMPANY.name}.</li>
+        <li><strong>Governing Law &amp; Dispute Resolution:</strong> This contract is governed by the laws of India. Any disputes arising hereunder shall be subject to the exclusive jurisdiction of the competent courts in Uttar Pradesh.</li>
+      </ol>
     </div>
 
     ${renderSignatures()}
@@ -1079,7 +1237,7 @@ export function printAppointmentLetter(data: AppointmentLetterData) {
 }
 
 /* ==========================================================================
-   4. SALARY CERTIFICATE (Proof of Income / Embassy / Loan)
+   4. SALARY & EMPLOYMENT CERTIFICATE
    ========================================================================== */
 export interface SalaryCertData {
   name: string
@@ -1087,60 +1245,66 @@ export interface SalaryCertData {
   role: string
   department: string
   joiningDate: string
-  monthlyGross: number
-  annualCtc: number
+  monthlyGross?: number
+  annualCtc?: number
   purpose?: string
 }
 
 export function printSalaryCertificate(data: SalaryCertData) {
   const date = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })
-  const mWords = numberToWords(data.monthlyGross)
-  const aWords = numberToWords(data.annualCtc)
+  const gross = data.monthlyGross || Math.round((data.annualCtc || 600000) / 12)
+  const ctc = data.annualCtc || (gross * 12)
+  const mWords = numberToWords(gross)
+  const aWords = numberToWords(ctc)
+  const ref = `HMT/FIN/SC/2026/${data.employeeId}`
 
   const html = `
-    ${renderHeader("Salary & Employment Certificate")}
+    ${renderHeader("Salary &amp; Employment Certificate")}
     <div class="ref-ribbon">
-      <span><strong>Ref:</strong> HM/SC/${data.employeeId}</span>
-      <span><strong>Date:</strong> ${date}</span>
+      <span><strong>Ref No:</strong> ${ref}</span>
+      <span><strong>Date of Issue:</strong> ${date}</span>
+      <span><strong>Verification:</strong> ${COMPANY.hrEmail}</span>
     </div>
 
-    <p style="font-weight:700;font-size:13px;color:#0f172a;text-align:center;margin:16px 0;">TO WHOMSOEVER IT MAY CONCERN</p>
+    <p style="font-weight:800;font-size:13px;color:#0f172a;text-align:center;letter-spacing:0.05em;margin:18px 0;">TO WHOMSOEVER IT MAY CONCERN</p>
 
     <p>
       This is to certify that <strong>${data.name}</strong> (Employee ID: <strong>${data.employeeId}</strong>)
-      is a bonafide full-time employee of <strong>${COMPANY.name}</strong>, working as <strong>${data.role}</strong>
-      in the <strong>${data.department}</strong> department since <strong>${data.joiningDate}</strong>.
+      is a bonafide, confirmed full-time employee of <strong>${COMPANY.legalName}</strong>,
+      currently serving as <strong>${data.role}</strong> in the <strong>${data.department}</strong> department,
+      having joined our services on <strong>${data.joiningDate}</strong>.
     </p>
 
     <div class="details-grid">
-      <div class="dg-item"><span class="dg-label">Employee Name:</span><span class="dg-value">${data.name}</span></div>
-      <div class="dg-item"><span class="dg-label">Employee ID:</span><span class="dg-value">${data.employeeId}</span></div>
+      <div class="dg-item"><span class="dg-label">Employee Full Name:</span><span class="dg-value">${data.name}</span></div>
+      <div class="dg-item"><span class="dg-label">Employee Code:</span><span class="dg-value">${data.employeeId}</span></div>
       <div class="dg-item"><span class="dg-label">Designation:</span><span class="dg-value">${data.role}</span></div>
-      <div class="dg-item"><span class="dg-label">Date of Joining:</span><span class="dg-value">${data.joiningDate}</span></div>
-      <div class="dg-item"><span class="dg-label">Employment Status:</span><span class="dg-value">Active / Confirmed</span></div>
-      <div class="dg-item"><span class="dg-label">Monthly Gross Salary:</span><span class="dg-value">₹${data.monthlyGross.toLocaleString("en-IN")}</span></div>
-      <div class="dg-item"><span class="dg-label">Annual Cost to Company:</span><span class="dg-value">₹${data.annualCtc.toLocaleString("en-IN")}</span></div>
+      <div class="dg-item"><span class="dg-label">Department:</span><span class="dg-value">${data.department}</span></div>
+      <div class="dg-item"><span class="dg-label">Date of Commencement:</span><span class="dg-value">${data.joiningDate}</span></div>
+      <div class="dg-item"><span class="dg-label">Employment Status:</span><span class="dg-value" style="color:#059669;">Active &amp; Confirmed</span></div>
+      <div class="dg-item"><span class="dg-label">Monthly Gross Earnings:</span><span class="dg-value">₹${gross.toLocaleString("en-IN")}</span></div>
+      <div class="dg-item"><span class="dg-label">Annual Cost to Company:</span><span class="dg-value">₹${ctc.toLocaleString("en-IN")}</span></div>
     </div>
 
     <div class="net-callout">
-      <div class="net-callout-label">Certified Monthly Gross Salary</div>
-      <div class="net-callout-val">₹${data.monthlyGross.toLocaleString("en-IN")} / Month</div>
-      <div class="net-callout-words">${mWords} (Annual CTC: ₹${data.annualCtc.toLocaleString("en-IN")} &bull; ${aWords})</div>
+      <div class="net-callout-label">Certified Monthly Gross Compensation</div>
+      <div class="net-callout-val">₹${gross.toLocaleString("en-IN")} / Month</div>
+      <div class="net-callout-words">${mWords} (Annual CTC: ₹${ctc.toLocaleString("en-IN")} &bull; ${aWords})</div>
     </div>
 
     <p>
-      This certificate is issued upon the request of the employee ${data.purpose ? `for the purpose of ${data.purpose}` : "for official verification and financial documentation"}
-      without any financial liability or commitment on part of the company.
+      This certificate is issued at the specific request of the employee ${data.purpose ? `for the purpose of <strong>${data.purpose}</strong>` : "for official verification, bank loan sanction, and financial documentation"}
+      without any financial liability or commitment on part of ${COMPANY.name}.
     </p>
 
-    ${renderSignatures()}
+    ${renderSignatures("Authorized HR Signatory", "Head of Talent & Governance")}
   `;
 
   openPrintWindow(html, `Salary Certificate - ${data.name}`);
 }
 
 /* ==========================================================================
-   5. MONTHLY PAYSLIP / PAYMENT SLIP
+   5. MONTHLY PAYSLIP / PAY ADVICE
    ========================================================================== */
 export interface PayslipData {
   name: string
@@ -1181,10 +1345,11 @@ export function printPayslip(data: PayslipData) {
   const words = numberToWords(netPay)
 
   const html = `
-    ${renderHeader(`Salary Slip - ${periodDisplay}`)}
+    ${renderHeader(`Salary Pay Advice - ${periodDisplay}`)}
     <div class="ref-ribbon">
-      <span><strong>Payslip For:</strong> ${periodDisplay}</span>
-      <span><strong>Pay Date:</strong> 28 ${periodDisplay}</span>
+      <span><strong>Pay Period:</strong> ${periodDisplay}</span>
+      <span><strong>Disbursement Date:</strong> 28 ${periodDisplay}</span>
+      <span><strong>Mode:</strong> Bank Direct Transfer (NEFT/RTGS)</span>
     </div>
 
     <div class="details-grid">
@@ -1193,13 +1358,13 @@ export function printPayslip(data: PayslipData) {
       <div class="dg-item"><span class="dg-label">Designation:</span><span class="dg-value">${data.role}</span></div>
       <div class="dg-item"><span class="dg-label">Department:</span><span class="dg-value">${data.department}</span></div>
       <div class="dg-item"><span class="dg-label">Bank Name:</span><span class="dg-value">${data.bankName || "HDFC Bank Ltd"}</span></div>
-      <div class="dg-item"><span class="dg-label">Bank A/C No:</span><span class="dg-value">${data.accountNo || "XXXX-XXXX-8921"}</span></div>
-      <div class="dg-item"><span class="dg-label">PAN Number:</span><span class="dg-value">${data.pan || "XXXXX1234X"}</span></div>
-      <div class="dg-item"><span class="dg-label">Days Payable:</span><span class="dg-value">${data.workedDays || "30 / 30 Days"}</span></div>
+      <div class="dg-item"><span class="dg-label">Bank Account No:</span><span class="dg-value">${data.accountNo || "XXXX-XXXX-8921"}</span></div>
+      <div class="dg-item"><span class="dg-label">PAN Card:</span><span class="dg-value">${data.pan || "XXXXX1234X"}</span></div>
+      <div class="dg-item"><span class="dg-label">Payable Days:</span><span class="dg-value">${data.workedDays || "30 / 30 Days (LOP: 0)"}</span></div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-      <!-- Earnings -->
+      <!-- Earnings Column -->
       <div class="table-wrap">
         <table>
           <thead>
@@ -1223,29 +1388,29 @@ export function printPayslip(data: PayslipData) {
             </tr>
             ${data.bonus > 0 ? `
             <tr>
-              <td>Performance Bonus</td>
+              <td>Performance Incentive / Bonus</td>
               <td class="num">₹${data.bonus.toLocaleString("en-IN")}</td>
             </tr>` : ""}
             <tr class="total-row">
-              <td>Gross Earnings</td>
+              <td>Total Gross Earnings</td>
               <td class="num">₹${gross.toLocaleString("en-IN")}</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Deductions -->
+      <!-- Deductions Column -->
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Deductions</th>
+              <th>Statutory Deductions</th>
               <th class="num">Amount (₹)</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Provident Fund (PF 12%)</td>
+              <td>Provident Fund (EPF 12%)</td>
               <td class="num">₹${pf.toLocaleString("en-IN")}</td>
             </tr>
             <tr>
@@ -1253,7 +1418,7 @@ export function printPayslip(data: PayslipData) {
               <td class="num">₹${pt.toLocaleString("en-IN")}</td>
             </tr>
             <tr>
-              <td>TDS / Income Tax</td>
+              <td>Tax Deducted at Source (TDS)</td>
               <td class="num">₹${tds.toLocaleString("en-IN")}</td>
             </tr>
             <tr class="total-row">
@@ -1266,16 +1431,16 @@ export function printPayslip(data: PayslipData) {
     </div>
 
     <div class="net-callout">
-      <div class="net-callout-label">Net Salary Transferred to Bank Account</div>
+      <div class="net-callout-label">Net Salary Disbursed into Bank Account</div>
       <div class="net-callout-val">₹${netPay.toLocaleString("en-IN")}</div>
       <div class="net-callout-words">${words}</div>
     </div>
 
-    <p style="font-size:9px;color:#64748b;text-align:center;margin-top:12px;">
-      This is a digitally generated pay advice and does not require a physical signature. Direct all queries to hr@hmorix.com.
+    <p style="font-size:8.5px;color:#64748b;text-align:center;margin-top:12px;line-height:1.5;">
+      This is a system-generated pay advice issued in compliance with the Payment of Wages Act, 1936 and Income Tax Rules, 1962. No physical signature is required. For salary queries, contact payroll@hmorix.com.
     </p>
 
-    ${renderSignatures()}
+    ${renderSignatures("Finance & Payroll Controller", "Chief Financial Officer")}
   `;
 
   openPrintWindow(html, `Payslip - ${data.name} - ${periodDisplay}`);
@@ -1298,9 +1463,9 @@ export function printEmployeeIdCard(data: EmployeeIdCardData) {
   const initials = data.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
 
   const html = `
-    ${renderHeader("Digital Corporate ID Badge")}
-    <p style="text-align:center;color:#64748b;font-size:11px;margin-bottom:16px;">
-      Official identification card for ${COMPANY.name}. Fold or cut along edges for dual-sided lamination.
+    ${renderHeader("Corporate ID Credential")}
+    <p style="text-align:center;color:#64748b;font-size:11px;margin-bottom:20px;">
+      Official Identity Badge &bull; Standard ISO 7810 ID-1 Specification &bull; Front &amp; Back Print Alignment
     </p>
 
     <div class="badge-grid-container">
@@ -1318,7 +1483,7 @@ export function printEmployeeIdCard(data: EmployeeIdCardData) {
           <div class="id-card-dept">${data.department}</div>
 
           <div class="id-fields-table">
-            <div class="id-row"><span class="id-lbl">Emp ID:</span><span class="id-val">${data.employeeId}</span></div>
+            <div class="id-row"><span class="id-lbl">Emp Code:</span><span class="id-val">${data.employeeId}</span></div>
             <div class="id-row"><span class="id-lbl">Blood Group:</span><span class="id-val">${data.bloodGroup || "O+"}</span></div>
             <div class="id-row"><span class="id-lbl">Valid From:</span><span class="id-val">${data.joiningDate}</span></div>
           </div>
@@ -1327,15 +1492,15 @@ export function printEmployeeIdCard(data: EmployeeIdCardData) {
         </div>
 
         <div class="id-card-bot">
-          ${COMPANY.name} &bull; Hathras, UP
+          ${COMPANY.legalName} &bull; Hathras, UP
         </div>
       </div>
 
       <!-- ID BADGE BACK -->
       <div class="id-card-frame">
         <div class="id-card-top">
-          <div class="id-card-brand">SECURITY &amp; RETURN</div>
-          <div class="id-card-tag">Terms &bull; Emergency Contacts</div>
+          <div class="id-card-brand">SECURITY &amp; EMERGENCY</div>
+          <div class="id-card-tag">Return &amp; Safety Instructions</div>
         </div>
 
         <div class="id-card-body" style="font-size:9.5px;color:#475569;text-align:left;">
@@ -1345,18 +1510,18 @@ export function printEmployeeIdCard(data: EmployeeIdCardData) {
             1. This card is the property of ${COMPANY.name} and must be surrendered upon separation.
           </p>
           <p style="font-size:9px;line-height:1.4;margin-bottom:8px;">
-            2. The holder must wear this badge visibly on company premises and client sites.
+            2. The holder must display this badge visibly while on corporate premises and client facilities.
           </p>
 
           <div class="id-fields-table" style="margin-top:10px;">
-            <div class="id-row"><span class="id-lbl">Emergency:</span><span class="id-val">${data.emergencyPhone || COMPANY.phone}</span></div>
-            <div class="id-row"><span class="id-lbl">Corporate HR:</span><span class="id-val">${COMPANY.email}</span></div>
-            <div class="id-row"><span class="id-lbl">Return To:</span><span class="id-val">${COMPANY.address}</span></div>
+            <div class="id-row"><span class="id-lbl">Emergency SOS:</span><span class="id-val">${data.emergencyPhone || COMPANY.phone}</span></div>
+            <div class="id-row"><span class="id-lbl">Corporate HR:</span><span class="id-val">${COMPANY.hrEmail}</span></div>
+            <div class="id-row"><span class="id-lbl">Return Location:</span><span class="id-val">${COMPANY.address}</span></div>
           </div>
         </div>
 
         <div class="id-card-bot">
-          If found, please drop in any post box or contact hr@hmorix.com
+          If found, please post to the return location or contact hr@hmorix.com
         </div>
       </div>
     </div>
@@ -1366,7 +1531,7 @@ export function printEmployeeIdCard(data: EmployeeIdCardData) {
 }
 
 /* ==========================================================================
-   7. EXPERIENCE CERTIFICATE
+   7. FORMAL EXPERIENCE & SERVICE CERTIFICATE
    ========================================================================== */
 export interface ExperienceLetterData {
   name: string
@@ -1380,44 +1545,47 @@ export interface ExperienceLetterData {
 
 export function printExperienceLetter(data: ExperienceLetterData) {
   const date = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })
+  const ref = `HMT/HRD/EXP/2026/${data.employeeId}`
+
   const html = `
-    ${renderHeader("Experience & Service Certificate")}
+    ${renderHeader("Experience &amp; Service Certificate")}
     <div class="ref-ribbon">
-      <span><strong>Ref:</strong> HM/EXP/${data.employeeId}</span>
-      <span><strong>Date:</strong> ${date}</span>
+      <span><strong>Ref No:</strong> ${ref}</span>
+      <span><strong>Date of Issue:</strong> ${date}</span>
+      <span><strong>Verification:</strong> ${COMPANY.hrEmail}</span>
     </div>
 
-    <p style="font-weight:700;font-size:13px;color:#0f172a;text-align:center;margin:16px 0;">TO WHOMSOEVER IT MAY CONCERN</p>
+    <p style="font-weight:800;font-size:13px;color:#0f172a;text-align:center;letter-spacing:0.05em;margin:18px 0;">TO WHOMSOEVER IT MAY CONCERN</p>
 
     <p>
       This is to certify that <strong>${data.name}</strong> (Employee ID: <strong>${data.employeeId}</strong>)
-      was employed with <strong>${COMPANY.name}</strong> from <strong>${data.joiningDate}</strong> to <strong>${data.relievingDate}</strong>.
-      During their tenure with us, they served as <strong>${data.role}</strong> in the <strong>${data.department}</strong> department.
+      was employed with <strong>${COMPANY.legalName}</strong> from <strong>${data.joiningDate}</strong> to <strong>${data.relievingDate}</strong>.
+      During their tenure with us, they served with distinction as <strong>${data.role}</strong> in the <strong>${data.department}</strong> department.
     </p>
 
     <div class="details-grid">
       <div class="dg-item"><span class="dg-label">Employee Name:</span><span class="dg-value">${data.name}</span></div>
-      <div class="dg-item"><span class="dg-label">Employee ID:</span><span class="dg-value">${data.employeeId}</span></div>
-      <div class="dg-item"><span class="dg-label">Last Designation:</span><span class="dg-value">${data.role}</span></div>
-      <div class="dg-item"><span class="dg-label">Department:</span><span class="dg-value">${data.department}</span></div>
-      <div class="dg-item"><span class="dg-label">Date of Joining:</span><span class="dg-value">${data.joiningDate}</span></div>
-      <div class="dg-item"><span class="dg-label">Last Working Day:</span><span class="dg-value">${data.relievingDate}</span></div>
+      <div class="dg-item"><span class="dg-label">Employee Code:</span><span class="dg-value">${data.employeeId}</span></div>
+      <div class="dg-item"><span class="dg-label">Final Designation:</span><span class="dg-value">${data.role}</span></div>
+      <div class="dg-item"><span class="dg-label">Functional Unit:</span><span class="dg-value">${data.department}</span></div>
+      <div class="dg-item"><span class="dg-label">Tenure Commencement:</span><span class="dg-value">${data.joiningDate}</span></div>
+      <div class="dg-item"><span class="dg-label">Last Working Date:</span><span class="dg-value">${data.relievingDate}</span></div>
     </div>
 
     <p>
-      ${data.performance || `During their employment, ${data.name} demonstrated outstanding technical competence, strong problem-solving capabilities, and exemplary professional conduct. They were an integral contributor to multiple engineering initiatives.`}
+      ${data.performance || `During their tenure with HMorix, ${data.name} demonstrated exemplary technical expertise, professional integrity, and diligence in engineering execution. Their conduct was consistently outstanding, and they maintained excellent working relationships with peers and leadership.`}
     </p>
 
-    <p>We thank ${data.name} for their dedicated service and wish them the very best in all their future endeavors.</p>
+    <p>We thank ${data.name} for their dedicated service and wish them continued success in all their future professional pursuits.</p>
 
-    ${renderSignatures()}
+    ${renderSignatures("Authorized HR Signatory", "Head of Human Resources")}
   `;
 
   openPrintWindow(html, `Experience Certificate - ${data.name}`);
 }
 
 /* ==========================================================================
-   8. RELIEVING LETTER
+   8. FORMAL RELIEVING LETTER
    ========================================================================== */
 export interface RelievingLetterData {
   name: string
@@ -1431,40 +1599,43 @@ export interface RelievingLetterData {
 
 export function printRelievingLetter(data: RelievingLetterData) {
   const date = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })
+  const ref = `HMT/HRD/RL/2026/${data.employeeId}`
+
   const html = `
     ${renderHeader("Official Relieving Letter")}
     <div class="ref-ribbon">
-      <span><strong>Ref:</strong> HM/RL/${data.employeeId}</span>
-      <span><strong>Date:</strong> ${date}</span>
+      <span><strong>Ref No:</strong> ${ref}</span>
+      <span><strong>Issue Date:</strong> ${date}</span>
+      <span><strong>Clearance Status:</strong> Full Exit Approved</span>
     </div>
 
     <div class="recipient-block">
-      <div class="recipient-title">Relieving Confirmation For</div>
+      <div class="recipient-title">Relieving Notice For</div>
       <div class="recipient-name">${data.name}</div>
       <div class="recipient-sub">Employee ID: <strong>${data.employeeId}</strong> &bull; ${data.role}</div>
     </div>
 
     <p>Dear <strong>${data.name}</strong>,</p>
     <p>
-      With reference to your formal resignation letter, we hereby confirm that you have been officially relieved from your duties and responsibilities as <strong>${data.role}</strong> at <strong>${COMPANY.name}</strong> with effect from the close of business hours on <strong>${data.relievingDate}</strong>.
+      With reference to your formal resignation letter, we hereby confirm that you have been relieved from all your professional duties and responsibilities as <strong>${data.role}</strong> at <strong>${COMPANY.legalName}</strong> effective from the close of business hours on <strong>${data.relievingDate}</strong>.
     </p>
 
     <div class="details-grid">
       <div class="dg-item"><span class="dg-label">Employee ID:</span><span class="dg-value">${data.employeeId}</span></div>
       <div class="dg-item"><span class="dg-label">Designation:</span><span class="dg-value">${data.role}</span></div>
       <div class="dg-item"><span class="dg-label">Department:</span><span class="dg-value">${data.department}</span></div>
-      <div class="dg-item"><span class="dg-label">Joining Date:</span><span class="dg-value">${data.joiningDate}</span></div>
+      <div class="dg-item"><span class="dg-label">Commencement Date:</span><span class="dg-value">${data.joiningDate}</span></div>
       <div class="dg-item"><span class="dg-label">Relieving Date:</span><span class="dg-value">${data.relievingDate}</span></div>
-      <div class="dg-item"><span class="dg-label">Clearance Status:</span><span class="dg-value">All Assets &amp; Handover Complete</span></div>
+      <div class="dg-item"><span class="dg-label">Asset Handover:</span><span class="dg-value" style="color:#059669;">Verified &amp; Surrendered</span></div>
     </div>
 
     <p>
-      You have satisfactorily completed all handover protocols, returned all company-owned digital assets and security credentials, and completed full and final financial settlements.
+      You have successfully completed all handover protocols, surrendered all company property including digital hardware, ID badges, and software access credentials, and finalized all financial reconciliations.
     </p>
 
-    <p>We appreciate your contributions to HMorix and wish you success in your future career milestones.</p>
+    <p>We appreciate your valuable contributions during your tenure with us and wish you the very best in your future career endeavors.</p>
 
-    ${renderSignatures()}
+    ${renderSignatures("Authorized HR Signatory", "Head of People Operations")}
   `;
 
   openPrintWindow(html, `Relieving Letter - ${data.name}`);
@@ -1511,12 +1682,14 @@ export function printFnFStatement(data: FnFData) {
   const totalDeductions = data.deductions ?? (noticeAdj + otherDed)
   const netPayable = data.netPayable ?? (grossPayable - totalDeductions)
   const words = numberToWords(netPayable)
+  const ref = `HMT/FIN/FNF/2026/${data.employeeId}`
 
   const html = `
-    ${renderHeader("Full & Final Settlement Statement")}
+    ${renderHeader("Full &amp; Final Settlement Statement")}
     <div class="ref-ribbon">
-      <span><strong>Ref:</strong> HM/FNF/${data.employeeId}</span>
+      <span><strong>Ref No:</strong> ${ref}</span>
       <span><strong>Settlement Date:</strong> ${date}</span>
+      <span><strong>Discharge Status:</strong> Final Dues Reconciled</span>
     </div>
 
     <div class="details-grid">
@@ -1533,19 +1706,19 @@ export function printFnFStatement(data: FnFData) {
         <thead>
           <tr>
             <th>Settlement Component</th>
-            <th>Units / Calculation</th>
+            <th>Computation Basis</th>
             <th class="num">Amount (₹)</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>Final Month Salary</td>
-            <td>${unpaidDays} Days @ ₹${perDay}/day</td>
+            <td>Final Month Salary Payable</td>
+            <td>${unpaidDays} Working Days @ ₹${perDay}/day</td>
             <td class="num">₹${salaryPay.toLocaleString("en-IN")}</td>
           </tr>
           <tr>
-            <td>Leave Encashment</td>
-            <td>${leaveDays} Accumulated Days</td>
+            <td>Accumulated Leave Encashment</td>
+            <td>${leaveDays} Accumulated Earned Leaves</td>
             <td class="num">₹${leavePay.toLocaleString("en-IN")}</td>
           </tr>
           ${gratuity > 0 ? `
@@ -1556,21 +1729,21 @@ export function printFnFStatement(data: FnFData) {
           </tr>` : ""}
           ${bonus > 0 ? `
           <tr>
-            <td>Pending Incentive / Bonus</td>
-            <td>Approved quarterly incentive</td>
+            <td>Quarterly Incentive / Bonus</td>
+            <td>Approved KPI Incentive</td>
             <td class="num">₹${bonus.toLocaleString("en-IN")}</td>
           </tr>` : ""}
           <tr style="font-weight:700;background:#f8fafc;">
-            <td colspan="2">Gross Settlement Amount</td>
+            <td colspan="2">Total Gross Settlement Dues</td>
             <td class="num">₹${grossPayable.toLocaleString("en-IN")}</td>
           </tr>
           <tr>
-            <td>Statutory & Notice Deductions</td>
-            <td>TDS / Asset deductions</td>
+            <td>Statutory Deductions &amp; Notice Adjustments</td>
+            <td>TDS / Asset Clearance Recovery</td>
             <td class="num" style="color:#ef4444;">- ₹${totalDeductions.toLocaleString("en-IN")}</td>
           </tr>
           <tr class="total-row">
-            <td colspan="2">Net Payout to Employee</td>
+            <td colspan="2">Net Final Disbursement to Employee</td>
             <td class="num">₹${netPayable.toLocaleString("en-IN")}</td>
           </tr>
         </tbody>
@@ -1578,16 +1751,16 @@ export function printFnFStatement(data: FnFData) {
     </div>
 
     <div class="net-callout">
-      <div class="net-callout-label">Net Final Settlement Payout</div>
+      <div class="net-callout-label">Net Final Settlement Disbursement</div>
       <div class="net-callout-val">₹${netPayable.toLocaleString("en-IN")}</div>
       <div class="net-callout-words">${words}</div>
     </div>
 
-    <p style="font-size:10px;color:#64748b;">
-      By accepting this settlement, both parties acknowledge that all financial claims, dues, and liabilities stand fully discharged.
+    <p style="font-size:9.5px;color:#64748b;line-height:1.5;">
+      <strong>Mutual Discharge &amp; No Dues Declaration:</strong> Upon receipt of the settlement amount, the employee and the company agree that all statutory, financial, and contractual obligations stand fully discharged with no surviving claims.
     </p>
 
-    ${renderSignatures()}
+    ${renderSignatures("Finance &amp; Accounts", "Chief Financial Officer")}
   `;
 
   openPrintWindow(html, `FnF Statement - ${data.name}`);
@@ -1607,24 +1780,27 @@ export interface NocData {
 
 export function printNocLetter(data: NocData) {
   const date = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })
+  const ref = `HMT/HRD/NOC/2026/${data.employeeId}`
+
   const html = `
     ${renderHeader("No Objection Certificate (NOC)")}
     <div class="ref-ribbon">
-      <span><strong>Ref:</strong> HM/NOC/${data.employeeId}</span>
-      <span><strong>Date:</strong> ${date}</span>
+      <span><strong>Ref No:</strong> ${ref}</span>
+      <span><strong>Date of Issue:</strong> ${date}</span>
+      <span><strong>Verification Desk:</strong> ${COMPANY.hrEmail}</span>
     </div>
 
-    <p style="font-weight:700;font-size:13px;color:#0f172a;text-align:center;margin:16px 0;">TO WHOMSOEVER IT MAY CONCERN</p>
+    <p style="font-weight:800;font-size:13px;color:#0f172a;text-align:center;letter-spacing:0.05em;margin:18px 0;">TO WHOMSOEVER IT MAY CONCERN</p>
 
     <p>
-      This is to certify that <strong>${COMPANY.name}</strong> has no objection whatsoever to <strong>${data.name}</strong> (Employee ID: <strong>${data.employeeId}</strong>), currently employed as <strong>${data.role}</strong> with us${data.department ? ` in the <strong>${data.department}</strong> department` : ""}, ${data.purpose ? `applying for ${data.purpose}` : "pursuing higher education / passport renewal / external professional engagements"}.
+      This is to certify that <strong>${COMPANY.legalName}</strong> has no objection whatsoever to <strong>${data.name}</strong> (Employee ID: <strong>${data.employeeId}</strong>), currently employed as <strong>${data.role}</strong> with us${data.department ? ` in the <strong>${data.department}</strong> department` : ""}, ${data.purpose ? `applying for <strong>${data.purpose}</strong>` : "pursuing higher education / passport renewal / external professional engagements"}.
     </p>
 
     <p>
-      This certificate is issued upon the specific request of the employee and does not impose any financial liability on ${COMPANY.name}.
+      This certificate is issued upon the specific request of the employee and does not impose any financial or legal liability on ${COMPANY.name}.
     </p>
 
-    ${renderSignatures()}
+    ${renderSignatures("Authorized HR Signatory", "Head of Human Resources")}
   `;
 
   openPrintWindow(html, `NOC - ${data.name}`);
@@ -1652,6 +1828,7 @@ export function printPaymentReceipt(data: PaymentReceiptData) {
     <div class="ref-ribbon">
       <span><strong>Receipt No:</strong> ${data.receiptNo}</span>
       <span><strong>Payment Date:</strong> ${data.paymentDate}</span>
+      <span><strong>Status:</strong> Cleared &amp; Confirmed</span>
     </div>
 
     <div class="recipient-block">
@@ -1665,20 +1842,20 @@ export function printPaymentReceipt(data: PaymentReceiptData) {
 
     <div class="details-grid">
       <div class="dg-item"><span class="dg-label">Receipt Number:</span><span class="dg-value">${data.receiptNo}</span></div>
-      <div class="dg-item"><span class="dg-label">Project / Service:</span><span class="dg-value">${data.projectName}</span></div>
-      <div class="dg-item"><span class="dg-label">Payment Method:</span><span class="dg-value">${data.paymentMethod}</span></div>
+      <div class="dg-item"><span class="dg-label">Project / Service Scope:</span><span class="dg-value">${data.projectName}</span></div>
+      <div class="dg-item"><span class="dg-label">Payment Channel:</span><span class="dg-value">${data.paymentMethod}</span></div>
       <div class="dg-item"><span class="dg-label">Transaction Reference:</span><span class="dg-value">${data.transactionId || "TXN-" + Date.now().toString().slice(-8)}</span></div>
-      <div class="dg-item"><span class="dg-label">Payment Status:</span><span class="dg-value" style="color:#059669;">CONFIRMED &amp; RECEIVED</span></div>
-      <div class="dg-item"><span class="dg-label">Amount Paid:</span><span class="dg-value">₹${data.amount.toLocaleString("en-IN")}</span></div>
+      <div class="dg-item"><span class="dg-label">Payment Status:</span><span class="dg-value" style="color:#059669;">CONFIRMED &amp; SETTLED</span></div>
+      <div class="dg-item"><span class="dg-label">Total Amount Paid:</span><span class="dg-value">₹${data.amount.toLocaleString("en-IN")}</span></div>
     </div>
 
     <div class="net-callout">
-      <div class="net-callout-label">Total Payment Confirmed</div>
+      <div class="net-callout-label">Total Payment Value Received</div>
       <div class="net-callout-val">₹${data.amount.toLocaleString("en-IN")}</div>
       <div class="net-callout-words">${words}</div>
     </div>
 
-    ${renderSignatures("Finance Department", "Head of Accounts")}
+    ${renderSignatures("Finance Department", "Head of Accounts &amp; Treasury")}
   `;
 
   openPrintWindow(html, `Payment Receipt - ${data.receiptNo}`);
@@ -1730,7 +1907,7 @@ export function printInvoice(data: InvoiceData) {
         <thead>
           <tr>
             <th>#</th>
-            <th>Item &amp; Scope Description</th>
+            <th>Deliverable / Service Description</th>
             <th class="num">Qty</th>
             <th class="num">Unit Price (₹)</th>
             <th class="num">Total (₹)</th>
@@ -1747,7 +1924,7 @@ export function printInvoice(data: InvoiceData) {
             </tr>
           `).join("")}
           <tr style="background:#f8fafc;font-weight:700;">
-            <td colspan="4" class="num">Subtotal Amount</td>
+            <td colspan="4" class="num">Subtotal Taxable Amount</td>
             <td class="num">₹${subtotal.toLocaleString("en-IN")}</td>
           </tr>
           <tr>
@@ -1755,7 +1932,7 @@ export function printInvoice(data: InvoiceData) {
             <td class="num">₹${taxAmount.toLocaleString("en-IN")}</td>
           </tr>
           <tr class="total-row">
-            <td colspan="4" class="num">Grand Total Payable</td>
+            <td colspan="4" class="num">Grand Total Amount Payable</td>
             <td class="num">₹${grandTotal.toLocaleString("en-IN")}</td>
           </tr>
         </tbody>
@@ -1769,14 +1946,14 @@ export function printInvoice(data: InvoiceData) {
     </div>
 
     <div class="details-grid">
-      <div class="dg-item"><span class="dg-label">Beneficiary:</span><span class="dg-value">${COMPANY.name}</span></div>
+      <div class="dg-item"><span class="dg-label">Beneficiary:</span><span class="dg-value">${COMPANY.legalName}</span></div>
       <div class="dg-item"><span class="dg-label">Bank Name:</span><span class="dg-value">HDFC Bank Ltd</span></div>
       <div class="dg-item"><span class="dg-label">Current A/C No:</span><span class="dg-value">50200084920194</span></div>
       <div class="dg-item"><span class="dg-label">IFSC Code:</span><span class="dg-value">HDFC0000240</span></div>
       <div class="dg-item"><span class="dg-label">UPI ID:</span><span class="dg-value">hmorix@hdfcbank</span></div>
     </div>
 
-    ${renderSignatures("Finance & Accounts", "Authorized Signatory")}
+    ${renderSignatures("Finance &amp; Accounts", "Authorized Financial Signatory")}
   `;
 
   openPrintWindow(html, `Tax Invoice - ${data.invoiceNo}`);
