@@ -341,7 +341,16 @@ function getSupabasePublicClient() {
 const STORAGE_BUCKET = process.env.SUPABASE_STORAGE_BUCKET || 'Orixbucket'
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
 const JSON_TYPES = new Set(['application/json'])
+const DOCUMENT_TYPES = new Set([
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'text/plain',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+])
 const MAX_UPLOAD_SIZE = Number(process.env.MAX_UPLOAD_SIZE || 8 * 1024 * 1024)
+const MAX_RESUME_SIZE = 5 * 1024 * 1024 // 5MB for resumes
 
 async function ensureStorageBucket() {
   const supabase = getSupabaseAdminClient()
@@ -359,6 +368,12 @@ function extFromMime(mime: string, fallback = 'bin') {
     'image/webp': 'webp',
     'image/gif': 'gif',
     'application/json': 'json',
+    'application/pdf': 'pdf',
+    'application/msword': 'doc',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+    'text/plain': 'txt',
+    'application/vnd.ms-excel': 'xls',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
   }
   return map[mime] || fallback
 }
@@ -1489,14 +1504,48 @@ async function handleCareers(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleHrmCalendar(req: VercelRequest, res: VercelResponse) {
-  const col = await mongoCollection('hrm_calendar')
   const year = String(req.query?.year || new Date().getFullYear())
+  const start = `${year}-01-01`
+  const end = `${year}-12-31`
+
+  let col: any = null
+  try {
+    col = await mongoCollection('hrm_calendar')
+  } catch (err: any) {
+    console.error('Mongo hrm_calendar connection warning:', err?.message)
+  }
+
+  const supabase = getSupabaseAdminClient()
+  const hasSupabase = Boolean(process.env.SUPABASE_URL && (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_PUBLISHABLE_KEY))
 
   if (req.method === 'GET') {
-    const start = `${year}-01-01`
-    const end = `${year}-12-31`
-    const holidays = await col.find({ date: { $gte: start, $lte: end } }).sort({ date: 1 }).toArray()
-    return res.json({ success: true, data: holidays })
+    let holidays: any[] = []
+    if (col) {
+      try {
+        holidays = await col.find({ date: { $gte: start, $lte: end } }).sort({ date: 1 }).toArray()
+      } catch (err: any) {
+        console.error('Mongo calendar fetch error:', err?.message)
+      }
+    }
+
+    // If MongoDB returned no records or failed, query Supabase database as reliable fallback
+    if (hasSupabase && holidays.length === 0) {
+      try {
+        const { data: supaHolidays, error } = await supabase
+          .from('hrm_calendar')
+          .select('*')
+          .gte('date', start)
+          .lte('date', end)
+          .order('date', { ascending: true })
+        if (!error && Array.isArray(supaHolidays) && supaHolidays.length > 0) {
+          return res.json({ success: true, data: supaHolidays, source: 'supabase' })
+        }
+      } catch (err: any) {
+        // Table may not exist yet
+      }
+    }
+
+    return res.json({ success: true, data: holidays, source: 'mongodb' })
   }
 
   if (req.method === 'POST') {
@@ -1506,23 +1555,69 @@ async function handleHrmCalendar(req: VercelRequest, res: VercelResponse) {
     if (!date || !name) return res.status(400).json({ error: 'Date and name are required' })
     const validTypes = ['national', 'regional', 'company', 'restricted']
     const type = validTypes.includes(body.type) ? body.type : 'company'
+    const description = sanitizeText(body.description || '', 300)
     const now = new Date()
-    // Upsert (replace if same date and company type)
-    const existing = await col.findOne({ date })
-    if (existing) {
-      await col.updateOne({ date }, { $set: { name, type, description: sanitizeText(body.description || '', 300), updatedAt: now } })
-      const updated = await col.findOne({ date })
-      return res.json({ success: true, data: updated })
+    const doc = { date, name, type, description, createdAt: now, updatedAt: now }
+
+    let resultDoc: any = null
+
+    // 1. Save to MongoDB
+    if (col) {
+      try {
+        const existing = await col.findOne({ date })
+        if (existing) {
+          await col.updateOne({ date }, { $set: { name, type, description, updatedAt: now } })
+          resultDoc = await col.findOne({ date })
+        } else {
+          const result = await col.insertOne(doc)
+          resultDoc = { _id: result.insertedId, ...doc }
+        }
+      } catch (err: any) {
+        console.error('Mongo calendar save error:', err?.message)
+      }
     }
-    const doc = { date, name, type, description: sanitizeText(body.description || '', 300), createdAt: now, updatedAt: now }
-    const result = await col.insertOne(doc)
-    return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
+
+    // 2. Dual-save/mirror to Supabase Database
+    if (hasSupabase) {
+      try {
+        await supabase
+          .from('hrm_calendar')
+          .upsert({ date, name, type, description, updated_at: now.toISOString() }, { onConflict: 'date' })
+      } catch (err: any) {
+        // Supabase schema sync optional
+      }
+    }
+
+    return res.status(201).json({ success: true, data: resultDoc || doc })
   }
 
   if (req.method === 'DELETE') {
     const id = String(req.query?.id || '')
-    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid holiday id is required' })
-    await col.deleteOne({ _id: new ObjectId(id) })
+    const date = String(req.query?.date || '')
+    if (!id && !date) return res.status(400).json({ error: 'Valid holiday id or date is required' })
+
+    if (col) {
+      try {
+        if (ObjectId.isValid(id)) {
+          await col.deleteOne({ _id: new ObjectId(id) })
+        } else if (date) {
+          await col.deleteOne({ date })
+        }
+      } catch (err: any) {
+        console.error('Mongo delete error:', err?.message)
+      }
+    }
+
+    if (hasSupabase) {
+      try {
+        if (date) {
+          await supabase.from('hrm_calendar').delete().eq('date', date)
+        } else if (id) {
+          await supabase.from('hrm_calendar').delete().eq('id', id)
+        }
+      } catch (err: any) {}
+    }
+
     return res.json({ success: true })
   }
 
@@ -2945,6 +3040,14 @@ async function handleUpload(req: VercelRequest, res: VercelResponse) {
   const parsed = await parseUpload(req)
   if (!parsed.file) return res.status(400).json({ error: 'File is required' })
   const kind = String(parsed.kind || 'attachments')
+
+  // Determine allowed types and size limit based on kind
+  const isDoc = kind === 'resume' || kind === 'document'
+  const allowed = kind === 'json' ? JSON_TYPES : isDoc ? DOCUMENT_TYPES : IMAGE_TYPES
+  const maxSize = isDoc ? MAX_RESUME_SIZE : MAX_UPLOAD_SIZE
+  if (!allowed.has(parsed.mime)) return res.status(400).json({ error: `Unsupported file type: ${parsed.mime}` })
+  if (parsed.file.length > maxSize) return res.status(413).json({ error: `File too large (max ${Math.round(maxSize/1024/1024)}MB)` })
+
   const folderMap: Record<string, string> = {
     avatar: `profiles/${user.id}/avatar`,
     profile: `profiles/${user.id}/avatar`,
@@ -2952,11 +3055,11 @@ async function handleUpload(req: VercelRequest, res: VercelResponse) {
     blog: 'blogs/images',
     content: 'blogs/images',
     json: 'blogs/json',
+    resume: `resumes/${user.id}`,
+    document: `documents/${user.id}`,
     attachment: `attachments/${user.id}`,
     attachments: `attachments/${user.id}`,
   }
-  const allowed = kind === 'json' ? JSON_TYPES : IMAGE_TYPES
-  if (!allowed.has(parsed.mime)) return res.status(400).json({ error: 'Unsupported file type' })
   const upload = await uploadBufferToStorage(parsed.file, parsed.mime, folderMap[kind] || `attachments/${user.id}`, parsed.filename)
   if (parsed.oldPath) await deleteStoragePath(parsed.oldPath)
   if (kind === 'avatar' || kind === 'profile') {
@@ -2969,6 +3072,33 @@ async function handleUpload(req: VercelRequest, res: VercelResponse) {
   }
   return res.json({ success: true, url: upload.url, path: upload.path, publicUrl: upload.url })
 }
+
+// Public resume upload — no login required, used by career applicants
+async function handleUploadResume(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const parsed = await parseUpload(req)
+  if (!parsed.file) return res.status(400).json({ error: 'File is required' })
+  if (!DOCUMENT_TYPES.has(parsed.mime)) {
+    return res.status(400).json({ error: 'Only PDF, DOC, DOCX, or TXT files are allowed for resumes' })
+  }
+  if (parsed.file.length > MAX_RESUME_SIZE) {
+    return res.status(413).json({ error: 'Resume must be under 5MB' })
+  }
+  try {
+    const supabase = await ensureStorageBucket()
+    const safeName = String(parsed.filename || 'resume').replace(/\.[^.]+$/, '').replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'resume'
+    const ext = extFromMime(parsed.mime, 'pdf')
+    const storagePath = `resumes/public/${Date.now()}-${safeName}.${ext}`
+    const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(storagePath, parsed.file, { contentType: parsed.mime, upsert: false })
+    if (error) throw new Error(error.message)
+    const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(storagePath)
+    return res.json({ success: true, url: data.publicUrl, path: storagePath, publicUrl: data.publicUrl })
+  } catch (err: any) {
+    console.error('Resume upload error:', err.message)
+    return res.status(502).json({ error: 'Resume upload failed. Please try again.' })
+  }
+}
+
 
 async function handleProjects(req: VercelRequest, res: VercelResponse) {
   const user = await getAuthUser(req)
@@ -3539,6 +3669,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'account/api-keys': return handleApiKeys(req, res)
       case 'account/billing': return handleBilling(req, res)
       case 'employee/assign-bill': return handleAssignBill(req, res)
+      case 'upload/resume': return handleUploadResume(req, res)
       case 'upload': return handleUpload(req, res)
       case 'portal': return handleClientPortal(req, res)
       case 'sales/projects': return handleSalesProjects(req, res)

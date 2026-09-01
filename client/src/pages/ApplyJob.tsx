@@ -48,15 +48,21 @@ export default function ApplyJob() {
     formData.append('type', 'resume')
     try {
       setUploadProgress(30)
-      const response = await fetch(`${config.apiUrl}/upload`, {
-        method: 'POST', credentials: 'include', body: formData
+      let response = await fetch(`${config.apiUrl}/upload/resume`, {
+        method: 'POST', body: formData
       })
+      if (!response.ok) {
+        response = await fetch(`${config.apiUrl}/upload`, {
+          method: 'POST', credentials: 'include', body: formData
+        })
+      }
       setUploadProgress(80)
       const data = await response.json().catch(() => ({}))
       if (!response.ok) throw new Error(data.error || 'Upload failed')
-      setForm(prev => ({ ...prev, resumeUrl: data.url || data.data?.url || '' }))
+      const publicUrl = data.url || data.publicUrl || data.data?.url || ''
+      setForm(prev => ({ ...prev, resumeUrl: publicUrl }))
       setUploadProgress(100)
-      setMessage({ type: 'success', text: `✓ ${file.name} uploaded successfully` })
+      setMessage({ type: 'success', text: `✓ ${file.name} uploaded to Supabase Storage` })
       setTimeout(() => { setUploadProgress(0); setMessage(null) }, 3000)
     } catch {
       setUploadProgress(0)
