@@ -200,20 +200,18 @@ const DOCUMENT_STYLES = `
     align-items: center;
     gap: 16px;
   }
-  .corp-badge {
+  .corp-logo-wrap {
     width: 52px;
     height: 52px;
-    background: #0f172a;
-    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #c8ff00;
-    font-weight: 900;
-    font-size: 20px;
-    letter-spacing: -1px;
     flex-shrink: 0;
-    box-shadow: 0 4px 10px rgba(15,23,42,0.15);
+  }
+  .corp-logo-wrap svg {
+    width: 48px;
+    height: 48px;
+    display: block;
   }
   .corp-name {
     font-size: 18px;
@@ -585,10 +583,16 @@ const DOCUMENT_STYLES = `
   .bw-mode .doc-header {
     border-bottom: 2px solid #000000 !important;
   }
-  .bw-mode .corp-badge {
-    background: #ffffff !important;
-    border: 2px solid #000000 !important;
-    color: #000000 !important;
+  .bw-mode .corp-logo-wrap polygon,
+  .bw-mode .hm-logo-crest polygon {
+    fill: #ffffff !important;
+    stroke: #000000 !important;
+  }
+  .bw-mode .corp-logo-wrap line,
+  .bw-mode .corp-logo-wrap path,
+  .bw-mode .hm-logo-crest line,
+  .bw-mode .hm-logo-crest path {
+    stroke: #000000 !important;
   }
   .bw-mode .corp-name,
   .bw-mode .recipient-name,
@@ -819,12 +823,27 @@ const DOCUMENT_STYLES = `
   }
 `;
 
+export const COMPANY_LOGO_MARK = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="46" height="46" fill="none" class="hm-logo-crest">
+  <polygon points="24,3.06 42.14,13.53 42.14,34.47 24,44.94 5.86,34.47 5.86,13.53" fill="#0D0D0D" stroke="#C8FF00" stroke-width="1.8" stroke-linejoin="miter" stroke-miterlimit="4"/>
+  <line x1="24" y1="3.06" x2="24" y2="17.7" stroke="#C8FF00" stroke-width="1.8" stroke-linecap="square"/>
+  <line x1="24" y1="29.46" x2="24" y2="44.94" stroke="#C8FF00" stroke-width="1.8" stroke-linecap="square"/>
+  <line x1="10.78" y1="23.72" x2="37.22" y2="23.72" stroke="#C8FF00" stroke-width="1.8" stroke-linecap="square"/>
+  <path d="M 10.78 23.72 L 10.78 16.3 L 18.06 12.1 L 18.06 20.11 L 20.3 20.11 C 22.32 20.11 23.86 19.38 24 17.7" stroke="#C8FF00" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="square" fill="none"/>
+  <path d="M 37.22 23.72 L 37.22 16.3 L 29.94 12.1 L 29.94 20.11 L 27.7 20.11 C 25.68 20.11 24.14 19.38 24 17.7" stroke="#C8FF00" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="square" fill="none"/>
+  <path d="M 15.18 18.46 L 15.18 35.06 L 18.06 36.74 L 18.06 28.06 L 20.3 28.06 C 22.32 28.06 23.86 28.48 24 29.46" stroke="#C8FF00" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="square" fill="none"/>
+  <path d="M 32.82 18.46 L 32.82 35.06 L 29.94 36.74 L 29.94 28.06 L 27.7 28.06 C 25.68 28.06 24.14 28.48 24 29.46" stroke="#C8FF00" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="square" fill="none"/>
+</svg>
+`;
+
 function renderHeader(docTitle: string): string {
   return `
     <div class="doc-watermark">HMORIX OFFICIAL</div>
     <div class="doc-header">
       <div class="header-left">
-        <div class="corp-badge">HM</div>
+        <div class="corp-logo-wrap">
+          ${COMPANY_LOGO_MARK}
+        </div>
         <div>
           <div class="corp-name">${COMPANY.legalName}</div>
           <div class="corp-iso">${COMPANY.iso}</div>
@@ -906,7 +925,9 @@ export function openPrintWindow(htmlContent: string, windowTitle: string) {
       <body>
         <div class="print-toolbar">
           <div class="tb-brand">
-            <div class="tb-logo">HM</div>
+            <div style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;">
+              ${COMPANY_LOGO_MARK}
+            </div>
             <div>
               <div class="tb-title">${windowTitle}</div>
               <div class="tb-sub">${COMPANY.legalName} &bull; Document Verification Studio</div>
@@ -1472,7 +1493,10 @@ export function printEmployeeIdCard(data: EmployeeIdCardData) {
       <!-- ID BADGE FRONT -->
       <div class="id-card-frame">
         <div class="id-card-top">
-          <div class="id-card-brand">HMORIX</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:2px;">
+            ${COMPANY_LOGO_MARK}
+            <div class="id-card-brand">HMORIX</div>
+          </div>
           <div class="id-card-tag">Identity Credential &bull; Front</div>
         </div>
 

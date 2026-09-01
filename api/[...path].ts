@@ -817,7 +817,352 @@ const hrmSeedEmployees = [
 ]
 
 async function ensureHrmSeed() {
-  return
+  try {
+    const [employeesCol, recruitmentCol, applicationsCol, usersCol, leavesCol] = await Promise.all([
+      mongoCollection('hrm_employees'),
+      mongoCollection('hrm_recruitment'),
+      mongoCollection('job_applications'),
+      mongoCollection('users'),
+      mongoCollection('hrm_leave_requests'),
+    ])
+
+    const empCount = await employeesCol.countDocuments()
+    if (empCount === 0) {
+      const defaultPasswordHash = await bcrypt.hash('HMorix@2026', 12)
+      const now = new Date()
+
+      const seedEmployees = [
+        {
+          employeeId: 'HM-10001',
+          name: 'Harsh Sharma',
+          email: 'harsh@hmorix.com',
+          username: 'harsh.sharma',
+          department: 'Leadership',
+          role: 'Chief Executive Officer',
+          accessRole: 'admin',
+          location: 'Hathras, Uttar Pradesh',
+          phone: '+91 98765 43210',
+          status: 'active',
+          salary: 2400000,
+          performanceScore: 4.9,
+          startDate: '2023-01-01',
+          bloodGroup: 'O+ (Pos)',
+          emergencyPhone: '+91 98765 43211',
+          emergencyContact: { name: 'Suresh Sharma', phone: '+91 98765 43211', relation: 'Father' },
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          employeeId: 'HM-24012',
+          name: 'Aarav Singh',
+          email: 'aarav@hmorix.com',
+          username: 'aarav.singh',
+          department: 'Engineering',
+          role: 'Lead Full Stack Engineer',
+          accessRole: 'employee',
+          location: 'Noida, Uttar Pradesh',
+          phone: '+91 98111 22334',
+          status: 'active',
+          salary: 1450000,
+          performanceScore: 4.8,
+          startDate: '2024-02-12',
+          bloodGroup: 'O+',
+          emergencyPhone: '+91 98111 22335',
+          emergencyContact: { name: 'Meera Singh', phone: '+91 98111 22335', relation: 'Spouse' },
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          employeeId: 'HM-24018',
+          name: 'Priya Verma',
+          email: 'priya.verma@hmorix.com',
+          username: 'priya.verma',
+          department: 'Design',
+          role: 'Lead UI/UX Product Designer',
+          accessRole: 'employee',
+          location: 'Bengaluru, Karnataka',
+          phone: '+91 98222 33445',
+          status: 'active',
+          salary: 1100000,
+          performanceScore: 4.7,
+          startDate: '2024-03-18',
+          bloodGroup: 'A+',
+          emergencyPhone: '+91 98222 33446',
+          emergencyContact: { name: 'Rajesh Verma', phone: '+91 98222 33446', relation: 'Brother' },
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          employeeId: 'HM-24025',
+          name: 'Rohan Gupta',
+          email: 'rohan.sales@hmorix.com',
+          username: 'rohan.gupta',
+          department: 'Sales',
+          role: 'Enterprise Sales Manager',
+          accessRole: 'crm',
+          location: 'Delhi NCR',
+          phone: '+91 98333 44556',
+          status: 'active',
+          salary: 1280000,
+          performanceScore: 4.6,
+          startDate: '2024-05-06',
+          bloodGroup: 'B+',
+          emergencyPhone: '+91 98333 44557',
+          emergencyContact: { name: 'Sunita Gupta', phone: '+91 98333 44557', relation: 'Mother' },
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          employeeId: 'HM-24031',
+          name: 'Neha Sharma',
+          email: 'neha.hr@hmorix.com',
+          username: 'neha.sharma',
+          department: 'HR',
+          role: 'HR Operations Lead',
+          accessRole: 'hr',
+          location: 'Agra, Uttar Pradesh',
+          phone: '+91 98444 55667',
+          status: 'active',
+          salary: 950000,
+          performanceScore: 4.9,
+          startDate: '2024-06-03',
+          bloodGroup: 'AB+',
+          emergencyPhone: '+91 98444 55668',
+          emergencyContact: { name: 'Anil Sharma', phone: '+91 98444 55668', relation: 'Father' },
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          employeeId: 'HM-24044',
+          name: 'Vikram Malhotra',
+          email: 'vikram.cloud@hmorix.com',
+          username: 'vikram.malhotra',
+          department: 'Engineering',
+          role: 'DevOps & Cloud Architect',
+          accessRole: 'manager',
+          location: 'Pune, Maharashtra',
+          phone: '+91 98555 66778',
+          status: 'active',
+          salary: 1600000,
+          performanceScore: 4.7,
+          startDate: '2024-01-15',
+          bloodGroup: 'O-',
+          emergencyPhone: '+91 98555 66779',
+          emergencyContact: { name: 'Kavita Malhotra', phone: '+91 98555 66779', relation: 'Spouse' },
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          employeeId: 'HM-24052',
+          name: 'Ananya Patel',
+          email: 'ananya.ui@hmorix.com',
+          username: 'ananya.patel',
+          department: 'Product',
+          role: 'Product Operations Specialist',
+          accessRole: 'employee',
+          location: 'Hyderabad, Telangana',
+          phone: '+91 98666 77889',
+          status: 'active',
+          salary: 1050000,
+          performanceScore: 4.5,
+          startDate: '2024-07-01',
+          bloodGroup: 'A+',
+          emergencyPhone: '+91 98666 77890',
+          emergencyContact: { name: 'Dinesh Patel', phone: '+91 98666 77890', relation: 'Father' },
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]
+
+      await employeesCol.insertMany(seedEmployees)
+
+      for (const emp of seedEmployees) {
+        await usersCol.updateOne(
+          { email: emp.email },
+          {
+            $set: {
+              name: emp.name,
+              displayName: emp.name,
+              email: emp.email,
+              username: emp.username,
+              passwordHash: defaultPasswordHash,
+              role: emp.accessRole,
+              emailVerified: true,
+              company: 'HMorix',
+              createdAt: now,
+              updatedAt: now,
+            },
+            $addToSet: { providers: 'email' },
+          },
+          { upsert: true }
+        )
+      }
+    }
+
+    const jobCount = await recruitmentCol.countDocuments({ deletedAt: { $exists: false } })
+    let insertedJobs: any[] = []
+    if (jobCount === 0) {
+      const now = new Date()
+      const seedJobs = [
+        {
+          role: 'Senior Fullstack Engineer (React & Node.js)',
+          department: 'Engineering',
+          location: 'Hybrid / Hathras, UP',
+          type: 'Full-time',
+          salary: '₹12L - ₹18L PA',
+          openings: 2,
+          applicants: 1,
+          status: 'open',
+          pipeline: { applied: 1, screening: 0, interview: 1, offer: 0 },
+          requirements: '3+ years with TypeScript, React, Node.js, and MongoDB. Experience in microservices and distributed cloud workflows.',
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          role: 'AI & Platforms Architect',
+          department: 'AI & Platforms',
+          location: 'Remote / Bengaluru',
+          type: 'Full-time',
+          salary: '₹16L - ₹24L PA',
+          openings: 1,
+          applicants: 0,
+          status: 'open',
+          pipeline: { applied: 0, screening: 0, interview: 0, offer: 0 },
+          requirements: 'Experience building LLM agents, vector embeddings, LangChain, and enterprise RAG pipelines.',
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          role: 'Enterprise Sales Manager',
+          department: 'Sales',
+          location: 'Delhi NCR',
+          type: 'Full-time',
+          salary: '₹10L - ₹16L PA + Commission',
+          openings: 2,
+          applicants: 1,
+          status: 'open',
+          pipeline: { applied: 1, screening: 0, interview: 0, offer: 1 },
+          requirements: 'B2B SaaS software sales, enterprise pipeline closing, and client stakeholder management.',
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          role: 'Lead UI/UX Product Designer',
+          department: 'Design',
+          location: 'Remote / Noida',
+          type: 'Full-time',
+          salary: '₹11L - ₹17L PA',
+          openings: 1,
+          applicants: 1,
+          status: 'open',
+          pipeline: { applied: 1, screening: 1, interview: 0, offer: 0 },
+          requirements: 'Design systems, Figma mastery, user journeys, dark-mode modern SaaS UI.',
+          createdAt: now,
+          updatedAt: now,
+        }
+      ]
+      const res = await recruitmentCol.insertMany(seedJobs)
+      insertedJobs = Object.keys(res.insertedIds).map(k => ({ _id: res.insertedIds[k as any], ...seedJobs[Number(k)] }))
+    } else {
+      insertedJobs = await recruitmentCol.find({ deletedAt: { $exists: false } }).toArray()
+    }
+
+    const appCount = await applicationsCol.countDocuments()
+    if (appCount === 0 && insertedJobs.length > 0) {
+      const engJob = insertedJobs.find((j: any) => j.department === 'Engineering') || insertedJobs[0]
+      const salesJob = insertedJobs.find((j: any) => j.department === 'Sales') || insertedJobs[1] || insertedJobs[0]
+      const designJob = insertedJobs.find((j: any) => j.department === 'Design') || insertedJobs[2] || insertedJobs[0]
+
+      const seedApps = [
+        {
+          jobId: String(engJob._id),
+          name: 'Karan Mehta',
+          email: 'karan.mehta.dev@gmail.com',
+          phone: '+91 98123 45678',
+          location: 'Hathras, Uttar Pradesh',
+          resumeUrl: 'https://jdfnchfcvjebkcvffkvc.supabase.co/storage/v1/object/public/Orixbucket/resumes/karan_mehta_resume.pdf',
+          portfolio: 'https://github.com/karanmehta-dev',
+          experience: '4.5',
+          currentCTC: '1000000',
+          expectedCTC: '1500000',
+          salaryExpectation: 1500000,
+          noticePeriod: '30',
+          coverLetter: 'Passionate full-stack developer with 4.5 years building high-throughput React & Node.js systems. Excited to contribute to HMorix core platform.',
+          stage: 'interview_scheduled',
+          interviewDate: '2026-09-03T11:00',
+          interviewNotes: 'Technical round with Engineering Lead. Focus on React optimization and MongoDB indexing.',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          jobId: String(designJob._id),
+          name: 'Sneha Roy',
+          email: 'sneha.roy.design@gmail.com',
+          phone: '+91 98234 56789',
+          location: 'Noida, Uttar Pradesh',
+          resumeUrl: 'https://jdfnchfcvjebkcvffkvc.supabase.co/storage/v1/object/public/Orixbucket/resumes/sneha_roy_resume.pdf',
+          portfolio: 'https://behance.net/sneharoy-ui',
+          experience: '3.5',
+          currentCTC: '800000',
+          expectedCTC: '1300000',
+          salaryExpectation: 1300000,
+          noticePeriod: '15',
+          coverLetter: 'Product designer specializing in dark mode enterprise interfaces, micro-interactions, and comprehensive design tokens.',
+          stage: 'reviewing',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          jobId: String(salesJob._id),
+          name: 'Aditya Joshi',
+          email: 'aditya.joshi.sales@gmail.com',
+          phone: '+91 98345 67890',
+          location: 'Delhi NCR',
+          resumeUrl: 'https://jdfnchfcvjebkcvffkvc.supabase.co/storage/v1/object/public/Orixbucket/resumes/aditya_joshi_resume.pdf',
+          portfolio: 'https://linkedin.com/in/aditya-joshi-sales',
+          experience: '5',
+          currentCTC: '1100000',
+          expectedCTC: '1600000',
+          salaryExpectation: 1600000,
+          noticePeriod: '30',
+          coverLetter: 'Enterprise sales professional with proven track record closing $50k+ ARR deals for SaaS platforms across India & MENA regions.',
+          stage: 'offered',
+          offeredSalary: '₹14,00,000 PA',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
+      ]
+      await applicationsCol.insertMany(seedApps)
+    }
+
+    const leaveCount = await leavesCol.countDocuments()
+    if (leaveCount === 0) {
+      await leavesCol.insertMany([
+        {
+          name: 'Aarav Singh',
+          employeeId: 'HM-24012',
+          type: 'Casual Leave',
+          dates: '2026-09-08 to 2026-09-09',
+          days: 2,
+          reason: 'Family function in hometown',
+          status: 'pending',
+          createdAt: new Date(),
+        },
+        {
+          name: 'Priya Verma',
+          employeeId: 'HM-24018',
+          type: 'Medical Leave',
+          dates: '2026-09-04',
+          days: 1,
+          reason: 'Routine health checkup',
+          status: 'approved',
+          createdAt: new Date(),
+        }
+      ])
+    }
+  } catch (err: any) {
+    console.error('HRM Seed warning:', err?.message)
+  }
 }
 
 function normalizeEmployeeUsername(name: string) {
@@ -1501,6 +1846,23 @@ async function handleCareers(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
   const jobs = await recruitment.find({ deletedAt: { $exists: false }, status: { $ne: 'closed' } }).sort({ createdAt: -1 }).toArray()
   return res.json({ success: true, data: jobs })
+}
+
+async function handleHrmSeed(req: VercelRequest, res: VercelResponse) {
+  if (req.query?.force === 'true') {
+    const [employeesCol, recruitmentCol, applicationsCol, leavesCol] = await Promise.all([
+      mongoCollection('hrm_employees'),
+      mongoCollection('hrm_recruitment'),
+      mongoCollection('job_applications'),
+      mongoCollection('hrm_leave_requests'),
+    ])
+    await employeesCol.deleteMany({})
+    await recruitmentCol.deleteMany({})
+    await applicationsCol.deleteMany({})
+    await leavesCol.deleteMany({})
+  }
+  await ensureHrmSeed()
+  return res.json({ success: true, message: 'HRM enterprise test data seeded successfully.' })
 }
 
 async function handleHrmCalendar(req: VercelRequest, res: VercelResponse) {
@@ -3778,6 +4140,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'hrm/payroll/export': return handleHrmPayrollExport(req, res)
       case 'hrm/recruitment': return handleHrmRecruitment(req, res)
       case 'hrm/calendar': return handleHrmCalendar(req, res)
+      case 'hrm/seed': return handleHrmSeed(req, res)
       case 'careers': return handleCareers(req, res)
       case 'careers/applications': return handleJobApplications(req, res)
       case 'employee/overview': return handleEmployeeOverview(req, res)
