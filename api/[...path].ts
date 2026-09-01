@@ -792,19 +792,22 @@ async function handleHrmStats(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleHrmEmployees(req: VercelRequest, res: VercelResponse) {
-  const db = getDatabase()
-  const { department, status, search, page = '1', limit = '20' } = req.query as any
   try {
-    const options: any = { orderBy: { column: 'name', ascending: true }, limit: parseInt(limit), offset: (parseInt(page) - 1) * parseInt(limit), count: true }
-    if (department) options.where = { ...options.where, department_id: department }
-    if (status) options.where = { ...options.where, status }
-    if (search) options.search = [{ column: 'name', value: search }]
-    const { data, count } = await db.query('hrm_employees', options)
-    return res.json({ employees: data, total: count || data.length, page: parseInt(page) })
-  } catch {
-    const employees = Array.from({ length: 50 }, (_, i) => ({ id: `emp_${1000 + i}`, name: ['Alex Rivera', 'Sarah Chen', 'Mike Johnson', 'Emily Park', 'Lisa Martinez', 'David Kim', 'James Wu', 'Anna Petrov'][i % 8], email: `employee${i}@hmorix.com`, department: ['Engineering', 'Product', 'Marketing', 'Sales', 'AI/ML', 'Security', 'Operations', 'HR'][i % 8], role: ['Staff Engineer', 'VP Product', 'Head of Security', 'ML Lead', 'Frontend Lead', 'Growth Lead', 'IoT Lead', 'DevOps Lead'][i % 8], location: ['San Francisco', 'New York', 'Remote', 'Austin', 'Seattle'][i % 5], status: i % 15 === 0 ? 'on_leave' : i % 20 === 0 ? 'onboarding' : 'active', startDate: new Date(2022, i % 12, 1 + (i % 28)).toISOString(), salary: 100000 + (i * 5000), manager: ['Hamza Morix', 'Alex Rivera', 'Sarah Chen'][i % 3], performanceScore: 3.5 + Math.random() * 1.5 }))
-    const pageNum = parseInt(page); const limitNum = parseInt(limit)
-    return res.json({ employees: employees.slice((pageNum - 1) * limitNum, pageNum * limitNum), total: employees.length, page: pageNum })
+    await ensureHrmSeed()
+    const employeesCol = await mongoCollection('hrm_employees')
+    const { department, status, search, page = '1', limit = '100' } = req.query as any
+    const filter: any = {}
+    if (department) filter.department = department
+    if (status) filter.status = status
+    if (search) filter.$or = [{ name: { $regex: String(search), $options: 'i' } }, { role: { $regex: String(search), $options: 'i' } }, { department: { $regex: String(search), $options: 'i' } }]
+    const data = await employeesCol.find(filter).sort({ name: 1 }).toArray()
+    const pageNum = parseInt(page)
+    const limitNum = parseInt(limit)
+    const paginated = limitNum ? data.slice((pageNum - 1) * limitNum, pageNum * limitNum) : data
+    return res.json({ success: true, data: paginated, employees: paginated, total: data.length, page: pageNum })
+  } catch (err: any) {
+    console.error('handleHrmEmployees error:', err?.message)
+    return res.status(500).json({ error: 'Failed to fetch employees' })
   }
 }
 
@@ -1699,6 +1702,7 @@ async function handleHrmPeople(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleHrmLeave(req: VercelRequest, res: VercelResponse) {
+  await ensureHrmSeed()
   const leaves = await mongoCollection('hrm_leave_requests')
   if (req.method === 'GET') {
     const user = await getAuthUser(req)
@@ -1765,6 +1769,7 @@ async function handleHrmTasks(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleHrmPayroll(req: VercelRequest, res: VercelResponse) {
+  await ensureHrmSeed()
   const employees = await mongoCollection('hrm_employees')
   const payrollRuns = await mongoCollection('hrm_payroll_runs')
   const period = String(req.query.period || req.body?.period || new Date().toISOString().slice(0, 7))
@@ -1796,6 +1801,7 @@ async function handleHrmPayrollExport(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleHrmRecruitment(req: VercelRequest, res: VercelResponse) {
+  await ensureHrmSeed()
   const recruitment = await mongoCollection('hrm_recruitment')
   const applications = await mongoCollection('job_applications')
   if (req.method === 'GET') {
@@ -1842,6 +1848,7 @@ async function handleHrmRecruitment(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleCareers(req: VercelRequest, res: VercelResponse) {
+  await ensureHrmSeed()
   const recruitment = await mongoCollection('hrm_recruitment')
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
   const jobs = await recruitment.find({ deletedAt: { $exists: false }, status: { $ne: 'closed' } }).sort({ createdAt: -1 }).toArray()
@@ -3862,13 +3869,11 @@ async function handleSalesProjects(req: VercelRequest, res: VercelResponse) {
 
 async function handleSettings(req: VercelRequest, res: VercelResponse) {
   const user = await findSessionUser(req, res)
-  if (!user) return res.status(401).json({ error: 'Not authenticated' })
-  const settings = await mongoCollection('user_settings')
   const defaults = {
-    userId: user.id,
-    displayName: user.name || '',
-    username: (user as any).username || '',
-    email: user.email,
+    userId: user?.id || null,
+    displayName: user?.name || 'Guest User',
+    username: (user as any)?.username || 'guest',
+    email: user?.email || '',
     company: '',
     emailNotifications: true,
     pushNotifications: true,
@@ -3891,9 +3896,15 @@ async function handleSettings(req: VercelRequest, res: VercelResponse) {
     integrations: {},
   }
   if (req.method === 'GET') {
+    if (!user) {
+      return res.json({ success: true, data: defaults })
+    }
+    const settings = await mongoCollection('user_settings')
     const saved = await settings.findOne({ userId: user.id })
     return res.json({ success: true, data: { ...defaults, ...(saved || {}) } })
   }
+  if (!user) return res.status(401).json({ error: 'Not authenticated' })
+  const settings = await mongoCollection('user_settings')
   if (req.method === 'PUT') {
     const allowed = ['displayName', 'username', 'company', 'emailNotifications', 'pushNotifications', 'securityAlerts', 'productUpdates', 'marketingEmails', 'weeklyDigest', 'ticketUpdates', 'invoiceReminders', 'theme', 'accentColor', 'fontSize', 'sidebarExpanded', 'language', 'timezone', 'dateFormat', 'currency', 'keyboardShortcuts', 'integrations']
     const update: any = {}

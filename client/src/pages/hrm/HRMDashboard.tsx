@@ -127,8 +127,10 @@ export default function HRMDashboard() {
       fetch(`${config.apiUrl}/hrm/overview`, { credentials: "include", cache: "no-store" }).then(r => r.json()).catch(() => ({}))
     ]).then(([s, e, l, o]) => {
       if (s?.data) setStats(s.data)
-      if (e?.data) setEmployees(e.data)
-      if (l?.data) setLeaves(l.data)
+      const empList = Array.isArray(e?.data) ? e.data : Array.isArray(e?.employees) ? e.employees : Array.isArray(e) ? e : []
+      if (empList.length > 0) setEmployees(empList)
+      const leaveList = Array.isArray(l?.data) ? l.data : Array.isArray(l?.leaves) ? l.leaves : Array.isArray(l) ? l : []
+      if (leaveList.length > 0) setLeaves(leaveList)
       if (o?.data) setOverview(o.data)
       setLoading(false)
     })
