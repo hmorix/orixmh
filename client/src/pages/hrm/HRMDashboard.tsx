@@ -87,32 +87,37 @@ export default function HRMDashboard() {
   >("offer")
 
   const [docForm, setDocForm] = useState({
-    name: "Rahul Verma",
-    employeeId: "HM-24901",
-    role: "Senior Fullstack Engineer",
-    department: "Engineering",
-    location: "Hathras, UP",
-    email: "rahul.verma@hmorix.com",
-    ctc: "850000",
-    joiningDate: "2025-06-15",
+    name: "",
+    employeeId: "",
+    role: "",
+    department: "",
+    location: "",
+    email: "",
+    ctc: "600000",
+    joiningDate: new Date().toISOString().slice(0, 10),
     relievingDate: new Date().toISOString().slice(0, 10),
-    bloodGroup: "O+ (Pos)",
+    bloodGroup: "O+",
     emergencyPhone: "+91 98765 43210",
     period: new Date().toISOString().slice(0, 7),
-    baseSalary: "45000",
-    bonus: "5000",
-    deductions: "4800",
-    net: "45200",
-    monthlyGross: "70833",
-    annualCtc: "850000",
+    baseSalary: "25000",
+    bonus: "0",
+    deductions: "3200",
+    net: "46800",
+    monthlyGross: "50000",
+    annualCtc: "600000",
     leaveEncashmentDays: "8",
     leaveEncashmentAmount: "12000",
     gratuityAmount: "25000",
     pendingBonus: "5000",
     noticePayAdjustment: "0",
     otherDeductions: "3500",
-    purpose: "Official verification for loan / visa application"
+    purpose: "Official employment and salary verification"
   })
+
+  // Smart employee picker filters
+  const [docDeptFilter, setDocDeptFilter] = useState("")
+  const [docRoleFilter, setDocRoleFilter] = useState("")
+  const [docEmpSearch, setDocEmpSearch] = useState("")
 
   useEffect(() => {
     Promise.all([
@@ -980,150 +985,283 @@ export default function HRMDashboard() {
           </div>
         )}
 
-        {/* ================= TAB 5: 1-CLICK DOCUMENT STUDIO ================= */}
+        {/* ================= TAB 5: SMART DOCUMENT STUDIO ================= */}
         {tab === "Document Studio" && (
-          <div className="p-6 sm:p-8 bg-obsidian-2 border border-[#C8FF00]/30 rounded-[18px] shadow-2xl">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-glass-border mb-6">
+          <div className="space-y-5">
+
+            {/* Header */}
+            <div className="p-6 bg-obsidian-2 border border-[#C8FF00]/30 rounded-[18px] shadow-xl">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-5 border-b border-glass-border mb-6">
+                <div>
+                  <span className="px-2.5 py-1 bg-[#C8FF00]/10 border border-[#C8FF00]/30 rounded-full text-xs font-semibold text-[#C8FF00]">
+                    Smart Auto-Fill · 10-Document Corporate Suite
+                  </span>
+                  <h2 className="font-display text-xl font-bold mt-2">Instant Document Generator</h2>
+                  <p className="text-xs text-cream/50 mt-0.5">
+                    Filter → Select Employee → Data auto-fills → Pick doc type → Generate
+                  </p>
+                </div>
+                {docForm.name && (
+                  <div className="flex items-center gap-2.5 bg-[#C8FF00]/10 border border-[#C8FF00]/30 px-4 py-2.5 rounded-[10px] shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-[#C8FF00] text-obsidian font-black text-xs flex items-center justify-center">
+                      {docForm.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-[#C8FF00]">{docForm.name}</div>
+                      <div className="text-[10px] text-cream/50">{docForm.role} · {docForm.employeeId}</div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setDocForm({ name: "", employeeId: "", role: "", department: "", location: "", email: "", ctc: "600000", joiningDate: new Date().toISOString().slice(0, 10), relievingDate: new Date().toISOString().slice(0, 10), bloodGroup: "O+", emergencyPhone: "+91 98765 43210", period: new Date().toISOString().slice(0, 7), baseSalary: "25000", bonus: "0", deductions: "3200", net: "46800", monthlyGross: "50000", annualCtc: "600000", leaveEncashmentDays: "8", leaveEncashmentAmount: "12000", gratuityAmount: "25000", pendingBonus: "5000", noticePayAdjustment: "0", otherDeductions: "3500", purpose: "Official employment and salary verification" })}
+                      className="ml-1 text-cream/40 hover:text-red-400"
+                      title="Clear"
+                    ><X size={13} /></button>
+                  </div>
+                )}
+              </div>
+
+              {/* STEP 1: Employee Picker */}
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-5 h-5 rounded-full bg-[#C8FF00] text-obsidian font-black text-[10px] flex items-center justify-center flex-shrink-0">1</div>
+                  <span className="text-xs font-bold text-cream/80 uppercase tracking-wide">Select Employee — All Fields Auto-Fill</span>
+                </div>
+
+                {/* Filters row */}
+                <div className="grid sm:grid-cols-3 gap-3 mb-3">
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-cream/40 uppercase tracking-wide font-semibold">Department</label>
+                    <select
+                      value={docDeptFilter}
+                      onChange={e => { setDocDeptFilter(e.target.value); setDocRoleFilter("") }}
+                      className="w-full px-3 py-2 bg-obsidian border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
+                    >
+                      <option value="">All Departments</option>
+                      {Array.from(new Set(employees.map((e: any) => e.department).filter(Boolean))).sort().map((dept: any) => (
+                        <option key={dept} value={dept}>{dept}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-cream/40 uppercase tracking-wide font-semibold">Role / Designation</label>
+                    <select
+                      value={docRoleFilter}
+                      onChange={e => setDocRoleFilter(e.target.value)}
+                      className="w-full px-3 py-2 bg-obsidian border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
+                    >
+                      <option value="">All Roles</option>
+                      {Array.from(new Set(employees
+                        .filter((e: any) => !docDeptFilter || e.department === docDeptFilter)
+                        .map((e: any) => e.role).filter(Boolean)
+                      )).sort().map((r: any) => (
+                        <option key={r} value={r}>{r}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-cream/40 uppercase tracking-wide font-semibold">Search by Name</label>
+                    <div className="relative">
+                      <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-cream/30" />
+                      <input
+                        type="text"
+                        placeholder="Search employee..."
+                        value={docEmpSearch}
+                        onChange={e => setDocEmpSearch(e.target.value)}
+                        className="w-full pl-7 pr-3 py-2 bg-obsidian border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00] placeholder:text-cream/20"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Employee grid */}
+                {(() => {
+                  const filtered = employees.filter((e: any) => {
+                    const deptOk = !docDeptFilter || e.department === docDeptFilter
+                    const roleOk = !docRoleFilter || e.role === docRoleFilter
+                    const nameOk = !docEmpSearch || e.name?.toLowerCase().includes(docEmpSearch.toLowerCase())
+                    return deptOk && roleOk && nameOk
+                  })
+                  if (employees.length === 0) return (
+                    <div className="p-6 text-center text-cream/30 text-xs bg-obsidian rounded-[10px] border border-glass-border">
+                      Loading employees...
+                    </div>
+                  )
+                  if (filtered.length === 0) return (
+                    <div className="p-6 text-center text-cream/30 text-xs bg-obsidian rounded-[10px] border border-glass-border">
+                      No employees match selected filters
+                    </div>
+                  )
+                  return (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 max-h-[280px] overflow-y-auto pr-1">
+                      {filtered.map((emp: any) => {
+                        const isSelected = docForm.employeeId === (emp.employeeId || emp._id)
+                        const salary = Number(emp.salary || 600000)
+                        const monthly = Math.round(salary / 12)
+                        const base = Math.round(monthly * 0.5)
+                        return (
+                          <button
+                            key={emp._id}
+                            type="button"
+                            onClick={() => setDocForm({
+                              name: emp.name || "",
+                              employeeId: emp.employeeId || emp._id || `HM-${Date.now().toString().slice(-4)}`,
+                              role: emp.role || "",
+                              department: emp.department || "",
+                              location: emp.location || "Hathras, UP",
+                              email: emp.email || "",
+                              ctc: String(salary),
+                              joiningDate: emp.startDate || new Date().toISOString().slice(0, 10),
+                              relievingDate: new Date().toISOString().slice(0, 10),
+                              bloodGroup: emp.bloodGroup || "O+",
+                              emergencyPhone: emp.emergencyPhone || emp.phone || "+91 98765 43210",
+                              period: new Date().toISOString().slice(0, 7),
+                              baseSalary: String(base),
+                              bonus: "0",
+                              deductions: String(Math.round(base * 0.12) + 200),
+                              net: String(Math.round(monthly * 0.85)),
+                              monthlyGross: String(monthly),
+                              annualCtc: String(salary),
+                              leaveEncashmentDays: "8",
+                              leaveEncashmentAmount: String(Math.round(base * 0.25)),
+                              gratuityAmount: "25000",
+                              pendingBonus: "5000",
+                              noticePayAdjustment: "0",
+                              otherDeductions: "3500",
+                              purpose: "Official employment and salary verification"
+                            })}
+                            className={`p-2.5 rounded-[10px] text-left transition-all border ${
+                              isSelected
+                                ? "bg-[#C8FF00]/15 border-[#C8FF00]/60 shadow-[0_0_10px_rgba(200,255,0,0.12)]"
+                                : "bg-obsidian border-glass-border hover:border-[#C8FF00]/30"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className={`w-6 h-6 rounded-full font-black text-[9px] flex items-center justify-center flex-shrink-0 ${isSelected ? "bg-[#C8FF00] text-obsidian" : "bg-obsidian-2 text-cream/50"}`}>
+                                {String(emp.name || "?").split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className={`text-[10px] font-bold truncate leading-tight ${isSelected ? "text-[#C8FF00]" : "text-cream"}`}>{emp.name}</div>
+                              </div>
+                              {isSelected && <Check size={10} className="text-[#C8FF00] flex-shrink-0" />}
+                            </div>
+                            <div className="text-[8.5px] text-cream/40 truncate">{emp.role}</div>
+                            <div className="text-[8px] text-cream/25 truncate">{emp.department}</div>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )
+                })()}
+              </div>
+
+              {/* STEP 2: Document Type */}
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-5 h-5 rounded-full bg-[#C8FF00] text-obsidian font-black text-[10px] flex items-center justify-center flex-shrink-0">2</div>
+                  <span className="text-xs font-bold text-cream/80 uppercase tracking-wide">Choose Document Type</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                  {[
+                    { id: "offer", label: "Offer Letter", icon: FileText },
+                    { id: "joining", label: "Joining Letter", icon: Check },
+                    { id: "appointment", label: "Appointment", icon: Award },
+                    { id: "salary_cert", label: "Salary Cert", icon: DollarSign },
+                    { id: "id_card", label: "ID Badge", icon: CreditCard },
+                    { id: "experience", label: "Experience", icon: ShieldCheck },
+                    { id: "relieving", label: "Relieving", icon: LogOut },
+                    { id: "fnf", label: "FnF Statement", icon: DollarSign },
+                    { id: "noc", label: "NOC Letter", icon: FileText },
+                    { id: "payslip", label: "Pay Slip", icon: TrendingUp }
+                  ].map(dt => (
+                    <button
+                      type="button"
+                      key={dt.id}
+                      onClick={() => setDocType(dt.id as any)}
+                      className={`p-3 rounded-[10px] text-xs font-semibold flex flex-col items-center gap-1.5 transition-all border ${
+                        docType === dt.id
+                          ? "bg-[#C8FF00] text-obsidian border-[#C8FF00] font-bold shadow-[0_0_14px_rgba(200,255,0,0.3)]"
+                          : "bg-obsidian border-glass-border text-cream/60 hover:text-cream hover:border-[#C8FF00]/30"
+                      }`}
+                    >
+                      <dt.icon size={16} />
+                      <span className="text-center leading-tight">{dt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* STEP 3: Review & Generate */}
               <div>
-                <span className="px-2.5 py-1 bg-[#C8FF00]/10 border border-[#C8FF00]/30 rounded-full text-xs font-semibold text-[#C8FF00]">
-                  Complete 10-Document Corporate HR Suite
-                </span>
-                <h2 className="font-display text-xl font-bold mt-2">
-                  Instant Legal Document Generator
-                </h2>
-                <p className="text-xs text-cream/50 mt-0.5">
-                  Generate, preview, and print official letters formatted with company letterhead, CIN, and authorized signatures.
-                </p>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-5 h-5 rounded-full bg-[#C8FF00] text-obsidian font-black text-[10px] flex items-center justify-center flex-shrink-0">3</div>
+                  <span className="text-xs font-bold text-cream/80 uppercase tracking-wide">Review Auto-Filled Details & Generate</span>
+                </div>
+
+                <form onSubmit={handleGenerateDoc} className="bg-obsidian p-5 rounded-[12px] border border-glass-border">
+                  {!docForm.name && (
+                    <div className="flex items-center gap-2.5 p-4 mb-4 bg-yellow-500/10 border border-yellow-500/30 rounded-[8px] text-xs text-yellow-400">
+                      <AlertCircle size={14} />
+                      Select an employee above — all fields will auto-fill from their profile. You can still edit any field before generating.
+                    </div>
+                  )}
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+                    {[
+                      { label: "Full Name *", field: "name", type: "text", required: true },
+                      { label: "Employee ID", field: "employeeId", type: "text" },
+                      { label: "Designation *", field: "role", type: "text", required: true },
+                      { label: "Department", field: "department", type: "text" },
+                      { label: "Work Location", field: "location", type: "text" },
+                      { label: "Official Email", field: "email", type: "email" },
+                      { label: "Annual CTC (₹)", field: "ctc", type: "number" },
+                      { label: "Date of Joining", field: "joiningDate", type: "date" },
+                      { label: "Relieving Date", field: "relievingDate", type: "date" },
+                    ].map(({ label, field, type, required }) => (
+                      <div key={field} className="space-y-1">
+                        <label className="text-[10px] text-cream/40 font-semibold uppercase tracking-wide">{label}</label>
+                        <input
+                          type={type}
+                          required={required}
+                          value={(docForm as any)[field] || ""}
+                          onChange={e => setDocForm({ ...docForm, [field]: e.target.value })}
+                          className="w-full px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
+                        />
+                      </div>
+                    ))}
+
+                    {docType === "payslip" && (
+                      <div className="space-y-1">
+                        <label className="text-[10px] text-cream/40 font-semibold uppercase tracking-wide">Pay Period</label>
+                        <input type="month" value={docForm.period} onChange={e => setDocForm({ ...docForm, period: e.target.value })} className="w-full px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]" />
+                      </div>
+                    )}
+                    {(docType === "noc" || docType === "salary_cert") && (
+                      <div className="space-y-1">
+                        <label className="text-[10px] text-cream/40 font-semibold uppercase tracking-wide">Purpose / Reason</label>
+                        <input type="text" value={docForm.purpose} onChange={e => setDocForm({ ...docForm, purpose: e.target.value })} placeholder="e.g. Home Loan / Visa / Passport" className="w-full px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00] placeholder:text-cream/20" />
+                      </div>
+                    )}
+                    {docType === "id_card" && (
+                      <div className="space-y-1">
+                        <label className="text-[10px] text-cream/40 font-semibold uppercase tracking-wide">Blood Group</label>
+                        <select value={docForm.bloodGroup} onChange={e => setDocForm({ ...docForm, bloodGroup: e.target.value })} className="w-full px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]">
+                          {["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"].map(bg => <option key={bg} value={bg}>{bg}</option>)}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-glass-border">
+                    <div className="text-xs text-cream/30">
+                      <span className="text-[#C8FF00] font-bold">{docType.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase())}</span>
+                      {docForm.name && <span> for <strong className="text-cream/60">{docForm.name}</strong></span>}
+                    </div>
+                    <button type="submit" className="btn-primary text-xs py-2.5 px-6 flex items-center gap-2">
+                      <Printer size={14} /> Generate & Print
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
-
-            {/* Document Selector Grid (10 Doc Types) */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 mb-8">
-              {[
-                { id: "offer", label: "Offer Letter", icon: FileText },
-                { id: "joining", label: "Joining Letter", icon: Check },
-                { id: "appointment", label: "Appointment Letter", icon: Award },
-                { id: "salary_cert", label: "Salary Certificate", icon: DollarSign },
-                { id: "id_card", label: "Digital ID Card", icon: CreditCard },
-                { id: "experience", label: "Experience Cert", icon: ShieldCheck },
-                { id: "relieving", label: "Relieving Letter", icon: LogOut },
-                { id: "fnf", label: "FnF Statement", icon: DollarSign },
-                { id: "noc", label: "NOC Letter", icon: FileText },
-                { id: "payslip", label: "Monthly Payslip", icon: TrendingUp }
-              ].map(dt => (
-                <button
-                  type="button"
-                  key={dt.id}
-                  onClick={() => setDocType(dt.id as any)}
-                  className={`p-3 rounded-[10px] text-xs font-semibold flex flex-col items-center gap-1.5 transition-all border ${
-                    docType === dt.id
-                      ? "bg-[#C8FF00] text-obsidian border-[#C8FF00] font-bold shadow-[0_0_15px_rgba(200,255,0,0.3)]"
-                      : "bg-obsidian border-glass-border text-cream/60 hover:text-cream"
-                  }`}
-                >
-                  <dt.icon size={16} />
-                  <span>{dt.label}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Document Form */}
-            <form onSubmit={handleGenerateDoc} className="space-y-4 bg-obsidian p-6 rounded-[14px] border border-glass-border">
-              <div className="grid sm:grid-cols-3 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs text-cream/70 font-medium">Candidate / Employee Name *</label>
-                  <input
-                    required
-                    value={docForm.name}
-                    onChange={e => setDocForm({ ...docForm, name: e.target.value })}
-                    className="w-full px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs text-cream/70 font-medium">Employee ID</label>
-                  <input
-                    value={docForm.employeeId}
-                    onChange={e => setDocForm({ ...docForm, employeeId: e.target.value })}
-                    className="w-full px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs text-cream/70 font-medium">Designation / Role *</label>
-                  <input
-                    required
-                    value={docForm.role}
-                    onChange={e => setDocForm({ ...docForm, role: e.target.value })}
-                    className="w-full px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs text-cream/70 font-medium">Department</label>
-                  <input
-                    value={docForm.department}
-                    onChange={e => setDocForm({ ...docForm, department: e.target.value })}
-                    className="w-full px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs text-cream/70 font-medium">Work Location</label>
-                  <input
-                    value={docForm.location}
-                    onChange={e => setDocForm({ ...docForm, location: e.target.value })}
-                    className="w-full px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs text-cream/70 font-medium">Work / Contact Email</label>
-                  <input
-                    type="email"
-                    value={docForm.email}
-                    onChange={e => setDocForm({ ...docForm, email: e.target.value })}
-                    className="w-full px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs text-cream/70 font-medium">Annual CTC (₹ INR)</label>
-                  <input
-                    type="number"
-                    value={docForm.ctc}
-                    onChange={e => setDocForm({ ...docForm, ctc: e.target.value, annualCtc: e.target.value })}
-                    className="w-full px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs text-cream/70 font-medium">Date of Joining</label>
-                  <input
-                    type="date"
-                    value={docForm.joiningDate}
-                    onChange={e => setDocForm({ ...docForm, joiningDate: e.target.value })}
-                    className="w-full px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs text-cream/70 font-medium">Relieving / Effective Date</label>
-                  <input
-                    type="date"
-                    value={docForm.relievingDate}
-                    onChange={e => setDocForm({ ...docForm, relievingDate: e.target.value })}
-                    className="w-full px-3 py-2 bg-obsidian-2 border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end pt-4 border-t border-glass-border">
-                <button type="submit" className="btn-primary text-xs py-2.5 px-6 flex items-center gap-2">
-                  <Printer size={14} /> Generate & Print {docType.toUpperCase()}
-                </button>
-              </div>
-            </form>
           </div>
         )}
 
