@@ -1481,20 +1481,35 @@ export interface FnFData {
   joiningDate: string
   relievingDate: string
   monthlySalary: number
-  unpaidDays: number
-  leaveEncashDays: number
-  gratuity: number
-  bonus: number
-  deductions: number
+  unpaidDays?: number
+  leaveEncashDays?: number
+  leaveEncashmentDays?: number
+  leaveEncashmentAmount?: number
+  gratuity?: number
+  gratuityAmount?: number
+  bonus?: number
+  pendingBonus?: number
+  deductions?: number
+  noticePayAdjustment?: number
+  noticeAdjustment?: number
+  otherDeductions?: number
+  netPayable?: number
 }
 
 export function printFnFStatement(data: FnFData) {
   const date = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })
   const perDay = Math.round(data.monthlySalary / 30)
-  const salaryPay = Math.round(perDay * (data.unpaidDays || 30))
-  const leavePay = Math.round(perDay * (data.leaveEncashDays || 0))
-  const grossPayable = salaryPay + leavePay + (data.gratuity || 0) + (data.bonus || 0)
-  const netPayable = grossPayable - (data.deductions || 0)
+  const unpaidDays = data.unpaidDays ?? 30
+  const salaryPay = Math.round(perDay * unpaidDays)
+  const leaveDays = data.leaveEncashmentDays ?? data.leaveEncashDays ?? 0
+  const leavePay = data.leaveEncashmentAmount ?? Math.round(perDay * leaveDays)
+  const gratuity = data.gratuityAmount ?? data.gratuity ?? 0
+  const bonus = data.pendingBonus ?? data.bonus ?? 0
+  const grossPayable = salaryPay + leavePay + gratuity + bonus
+  const noticeAdj = data.noticePayAdjustment ?? data.noticeAdjustment ?? 0
+  const otherDed = data.otherDeductions ?? 0
+  const totalDeductions = data.deductions ?? (noticeAdj + otherDed)
+  const netPayable = data.netPayable ?? (grossPayable - totalDeductions)
   const words = numberToWords(netPayable)
 
   const html = `
@@ -1525,25 +1540,25 @@ export function printFnFStatement(data: FnFData) {
         <tbody>
           <tr>
             <td>Final Month Salary</td>
-            <td>${data.unpaidDays || 30} Days @ ₹${perDay}/day</td>
+            <td>${unpaidDays} Days @ ₹${perDay}/day</td>
             <td class="num">₹${salaryPay.toLocaleString("en-IN")}</td>
           </tr>
           <tr>
             <td>Leave Encashment</td>
-            <td>${data.leaveEncashDays || 0} Accumulated Days</td>
+            <td>${leaveDays} Accumulated Days</td>
             <td class="num">₹${leavePay.toLocaleString("en-IN")}</td>
           </tr>
-          ${data.gratuity > 0 ? `
+          ${gratuity > 0 ? `
           <tr>
             <td>Gratuity Settlement</td>
             <td>Payment of Gratuity Act, 1972</td>
-            <td class="num">₹${data.gratuity.toLocaleString("en-IN")}</td>
+            <td class="num">₹${gratuity.toLocaleString("en-IN")}</td>
           </tr>` : ""}
-          ${data.bonus > 0 ? `
+          ${bonus > 0 ? `
           <tr>
             <td>Pending Incentive / Bonus</td>
             <td>Approved quarterly incentive</td>
-            <td class="num">₹${data.bonus.toLocaleString("en-IN")}</td>
+            <td class="num">₹${bonus.toLocaleString("en-IN")}</td>
           </tr>` : ""}
           <tr style="font-weight:700;background:#f8fafc;">
             <td colspan="2">Gross Settlement Amount</td>
@@ -1552,7 +1567,7 @@ export function printFnFStatement(data: FnFData) {
           <tr>
             <td>Statutory & Notice Deductions</td>
             <td>TDS / Asset deductions</td>
-            <td class="num" style="color:#ef4444;">- ₹${(data.deductions || 0).toLocaleString("en-IN")}</td>
+            <td class="num" style="color:#ef4444;">- ₹${totalDeductions.toLocaleString("en-IN")}</td>
           </tr>
           <tr class="total-row">
             <td colspan="2">Net Payout to Employee</td>
@@ -1585,6 +1600,8 @@ export interface NocData {
   name: string
   employeeId: string
   role: string
+  department?: string
+  joiningDate?: string
   purpose?: string
 }
 
@@ -1600,7 +1617,7 @@ export function printNocLetter(data: NocData) {
     <p style="font-weight:700;font-size:13px;color:#0f172a;text-align:center;margin:16px 0;">TO WHOMSOEVER IT MAY CONCERN</p>
 
     <p>
-      This is to certify that <strong>${COMPANY.name}</strong> has no objection whatsoever to <strong>${data.name}</strong> (Employee ID: <strong>${data.employeeId}</strong>), currently employed as <strong>${data.role}</strong> with us, ${data.purpose ? `applying for ${data.purpose}` : "pursuing higher education / passport renewal / external professional engagements"}.
+      This is to certify that <strong>${COMPANY.name}</strong> has no objection whatsoever to <strong>${data.name}</strong> (Employee ID: <strong>${data.employeeId}</strong>), currently employed as <strong>${data.role}</strong> with us${data.department ? ` in the <strong>${data.department}</strong> department` : ""}, ${data.purpose ? `applying for ${data.purpose}` : "pursuing higher education / passport renewal / external professional engagements"}.
     </p>
 
     <p>
