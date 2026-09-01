@@ -1488,6 +1488,47 @@ async function handleCareers(req: VercelRequest, res: VercelResponse) {
   return res.json({ success: true, data: jobs })
 }
 
+async function handleHrmCalendar(req: VercelRequest, res: VercelResponse) {
+  const col = await mongoCollection('hrm_calendar')
+  const year = String(req.query?.year || new Date().getFullYear())
+
+  if (req.method === 'GET') {
+    const start = `${year}-01-01`
+    const end = `${year}-12-31`
+    const holidays = await col.find({ date: { $gte: start, $lte: end } }).sort({ date: 1 }).toArray()
+    return res.json({ success: true, data: holidays })
+  }
+
+  if (req.method === 'POST') {
+    const body = req.body || {}
+    const date = sanitizeText(body.date || '', 20)
+    const name = sanitizeText(body.name || '', 120)
+    if (!date || !name) return res.status(400).json({ error: 'Date and name are required' })
+    const validTypes = ['national', 'regional', 'company', 'restricted']
+    const type = validTypes.includes(body.type) ? body.type : 'company'
+    const now = new Date()
+    // Upsert (replace if same date and company type)
+    const existing = await col.findOne({ date })
+    if (existing) {
+      await col.updateOne({ date }, { $set: { name, type, description: sanitizeText(body.description || '', 300), updatedAt: now } })
+      const updated = await col.findOne({ date })
+      return res.json({ success: true, data: updated })
+    }
+    const doc = { date, name, type, description: sanitizeText(body.description || '', 300), createdAt: now, updatedAt: now }
+    const result = await col.insertOne(doc)
+    return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
+  }
+
+  if (req.method === 'DELETE') {
+    const id = String(req.query?.id || '')
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid holiday id is required' })
+    await col.deleteOne({ _id: new ObjectId(id) })
+    return res.json({ success: true })
+  }
+
+  return res.status(405).json({ error: 'Method not allowed' })
+}
+
 async function handleJobApplications(req: VercelRequest, res: VercelResponse) {
   const applications = await mongoCollection('job_applications')
   const recruitment = await mongoCollection('hrm_recruitment')
@@ -3468,6 +3509,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'hrm/payroll': return handleHrmPayroll(req, res)
       case 'hrm/payroll/export': return handleHrmPayrollExport(req, res)
       case 'hrm/recruitment': return handleHrmRecruitment(req, res)
+      case 'hrm/calendar': return handleHrmCalendar(req, res)
       case 'careers': return handleCareers(req, res)
       case 'careers/applications': return handleJobApplications(req, res)
       case 'employee/overview': return handleEmployeeOverview(req, res)

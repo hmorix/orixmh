@@ -382,6 +382,12 @@ export default function HRMDashboard() {
             >
               <Calendar size={13} /> Leaves
             </Link>
+            <Link
+              to="/hrm/calendar"
+              className="btn-outline text-xs flex items-center gap-1.5 py-2 px-3.5"
+            >
+              <Calendar size={13} /> 2026 Calendar
+            </Link>
           </div>
         </div>
 

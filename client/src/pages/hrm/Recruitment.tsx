@@ -612,49 +612,110 @@ export default function Recruitment() {
                             {String(app.name || "?").split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()}
                           </div>
                           <div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <h4 className="font-display font-semibold text-base text-cream">{app.name}</h4>
-                              <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-[10px] font-mono capitalize">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-mono capitalize ${
+                                app.status === 'selected' || app.status === 'hired'
+                                  ? 'bg-green-500/20 text-green-400'
+                                  : app.status === 'rejected'
+                                  ? 'bg-red-500/20 text-red-400'
+                                  : app.status === 'final_offer'
+                                  ? 'bg-[#C8FF00]/20 text-[#C8FF00]'
+                                  : 'bg-blue-500/20 text-blue-400'
+                              }`}>
                                 {String(app.status).replace(/_/g, " ")}
                               </span>
+                              {app.experience && <span className="text-[10px] px-2 py-0.5 bg-white/[0.04] border border-glass-border rounded text-cream/50">{app.experience} yrs exp</span>}
+                              {app.noticePeriod && <span className="text-[10px] px-2 py-0.5 bg-white/[0.04] border border-glass-border rounded text-cream/50">Notice: {app.noticePeriod}d</span>}
                             </div>
                             <div className="text-xs text-cream/50 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
                               <span>{app.email}</span>
-                              <span>&bull;</span>
-                              <span>{app.phone || "No contact"}</span>
-                              <span>&bull;</span>
-                              <span>{app.location || "Hathras"}</span>
+                              {app.phone && <><span>&bull;</span><span>{app.phone}</span></>}
+                              {app.location && <><span>&bull;</span><span>{app.location}</span></>}
                               {app.salaryExpectation && (
                                 <>
                                   <span>&bull;</span>
-                                  <span className="text-[#C8FF00]">Exp: ₹{Number(app.salaryExpectation).toLocaleString("en-IN")}</span>
+                                  <span className="text-[#C8FF00]">Expected: ₹{Number(app.salaryExpectation).toLocaleString("en-IN")}</span>
                                 </>
                               )}
                             </div>
+                            {app.nextInterviewDate && (
+                              <div className="mt-1.5 inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 bg-blue-500/10 border border-blue-500/30 rounded-full text-blue-400 font-medium">
+                                <Calendar size={10} /> Interview: {new Date(app.nextInterviewDate).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                              </div>
+                            )}
                           </div>
                         </div>
 
-                        {/* Resume Links */}
-                        <div className="flex items-center gap-2">
-                          {app.resumeUrl && (
+                        {/* Resume & Portfolio Links */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {app.resumeUrl && !app.resumeUrl.startsWith('pending:') && (
                             <a
                               href={app.resumeUrl}
                               target="_blank"
                               rel="noreferrer"
                               className="btn-outline text-xs flex items-center gap-1 py-1.5 px-3"
                             >
-                              <ExternalLink size={12} /> View Resume
+                              <ExternalLink size={12} /> Resume
+                            </a>
+                          )}
+                          {app.resumeUrl && app.resumeUrl.startsWith('pending:') && (
+                            <span className="text-[10px] text-yellow-400 px-2 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded">Resume Pending</span>
+                          )}
+                          {app.portfolio && (
+                            <a
+                              href={app.portfolio}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="btn-outline text-xs flex items-center gap-1 py-1.5 px-3"
+                            >
+                              <ExternalLink size={12} /> Portfolio
                             </a>
                           )}
                         </div>
                       </div>
 
-                      {/* Resume / Cover note */}
+                      {/* Resume Text Preview */}
                       {app.resumeText && (
                         <div className="p-3 bg-white/[0.02] border border-glass-border rounded-[8px] text-xs text-cream/70 line-clamp-2">
                           {app.resumeText}
                         </div>
                       )}
+
+                      {/* Cover Letter Preview */}
+                      {app.coverLetter && (
+                        <details className="text-xs">
+                          <summary className="cursor-pointer text-cream/40 hover:text-cream transition-colors">Show Cover Letter</summary>
+                          <div className="mt-2 p-3 bg-white/[0.02] border border-glass-border rounded-[8px] text-cream/70">
+                            {app.coverLetter}
+                          </div>
+                        </details>
+                      )}
+
+                      {/* Interview Scheduler */}
+                      <div className="p-3 bg-white/[0.02] border border-glass-border/50 rounded-[10px] flex flex-col sm:flex-row sm:items-center gap-3">
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <Calendar size={13} className="text-blue-400" />
+                          <span className="text-xs text-cream/60 font-medium">Schedule Interview:</span>
+                        </div>
+                        <input
+                          type="datetime-local"
+                          value={scheduleDates[String(app._id)] || ""}
+                          onChange={e => setScheduleDates(prev => ({ ...prev, [String(app._id)]: e.target.value }))}
+                          className="flex-1 px-2.5 py-1.5 bg-obsidian border border-glass-border rounded-[6px] text-xs text-cream outline-none focus:border-[#C8FF00]"
+                        />
+                        <button
+                          onClick={() => {
+                            const dt = scheduleDates[String(app._id)]
+                            if (!dt) return
+                            updateApplication(String(app._id), "interview_scheduled", { nextInterviewDate: dt })
+                          }}
+                          disabled={!scheduleDates[String(app._id)]}
+                          className="px-3 py-1.5 bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-[6px] text-xs font-semibold hover:bg-blue-500/30 disabled:opacity-40"
+                        >
+                          Schedule &amp; Notify
+                        </button>
+                      </div>
 
                       {/* Action Ribbons */}
                       <div className="pt-3 border-t border-glass-border/60 flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -664,35 +725,30 @@ export default function Recruitment() {
                           <button
                             onClick={() => handlePrintCandidateOffer(app)}
                             className="px-2.5 py-1.5 bg-[#C8FF00]/10 border border-[#C8FF00]/30 hover:bg-[#C8FF00]/20 rounded-[6px] text-xs text-[#C8FF00] font-medium flex items-center gap-1.5 transition-colors"
-                            title="Generate and Print Official Offer Letter"
                           >
-                            <Printer size={12} /> Print Offer Letter
+                            <Printer size={12} /> Offer Letter
                           </button>
                           <button
                             onClick={() => handlePrintCandidateJoining(app)}
                             className="px-2.5 py-1.5 bg-white/[0.04] border border-glass-border hover:border-glass-border/80 rounded-[6px] text-xs text-cream/80 flex items-center gap-1.5 transition-colors"
-                            title="Generate and Print Joining Letter"
                           >
-                            <FileText size={12} /> Joining Letter
+                            <FileText size={12} /> Joining
                           </button>
                           <button
                             onClick={() => handlePrintCandidateAppointment(app)}
                             className="px-2.5 py-1.5 bg-white/[0.04] border border-glass-border hover:border-glass-border/80 rounded-[6px] text-xs text-cream/80 flex items-center gap-1.5 transition-colors"
-                            title="Generate and Print Appointment Letter"
                           >
                             <FileText size={12} /> Appointment
                           </button>
                           <button
                             onClick={() => handlePrintCandidateSalaryCert(app)}
                             className="px-2.5 py-1.5 bg-white/[0.04] border border-glass-border hover:border-glass-border/80 rounded-[6px] text-xs text-cream/80 flex items-center gap-1.5 transition-colors"
-                            title="Generate Salary Certificate"
                           >
                             <FileText size={12} /> Salary Cert
                           </button>
                           <button
                             onClick={() => handlePrintCandidateIdCard(app)}
                             className="px-2.5 py-1.5 bg-white/[0.04] border border-glass-border hover:border-glass-border/80 rounded-[6px] text-xs text-cream/80 flex items-center gap-1.5 transition-colors"
-                            title="Print Digital ID Badge"
                           >
                             <FileText size={12} /> ID Card
                           </button>
@@ -707,10 +763,10 @@ export default function Recruitment() {
                             Screen
                           </button>
                           <button
-                            onClick={() => updateApplication(String(app._id), "interview")}
+                            onClick={() => updateApplication(String(app._id), "second_interview")}
                             className="px-2.5 py-1 bg-white/[0.04] border border-glass-border rounded text-xs text-cream/60 hover:text-cream"
                           >
-                            Interview
+                            2nd Round
                           </button>
                           <button
                             onClick={() => updateApplication(String(app._id), "final_offer", { generateOfferLetter: true })}
@@ -722,7 +778,7 @@ export default function Recruitment() {
                             onClick={() => updateApplication(String(app._id), "selected", { createEmployee: true })}
                             className="px-3 py-1 bg-green-500/20 border border-green-500/30 text-green-400 font-bold rounded text-xs hover:bg-green-500/30"
                           >
-                            Hire Candidate &rarr;
+                            Hire &rarr;
                           </button>
                           <button
                             onClick={() => updateApplication(String(app._id), "rejected")}

@@ -101,6 +101,7 @@ const Recruitment = lazy(() => import('./pages/hrm/Recruitment'))
 const Payroll = lazy(() => import('./pages/hrm/Payroll'))
 const Leaves = lazy(() => import('./pages/hrm/Leaves'))
 const AddEmployee = lazy(() => import('./pages/hrm/AddEmployee'))
+const HRMCalendar = lazy(() => import('./pages/hrm/HRMCalendar'))
 const ManagerPortal = lazy(() => import('./pages/manager/ManagerPortal'))
 const AnalyticsDashboard = lazy(() => import('./pages/analytics/AnalyticsDashboard'))
 const EmployeeLogin = lazy(() => import('./pages/employee/EmployeeLogin'))
@@ -292,6 +293,7 @@ function App() {
           <Route path="/hrm/payroll" element={<Payroll />} />
           <Route path="/hrm/leaves" element={<Leaves />} />
           <Route path="/hrm/employees/new" element={<AddEmployee />} />
+          <Route path="/hrm/calendar" element={<HRMCalendar />} />
           <Route path="/manager" element={<ManagerPortal />} />
 
           {/* Analytics */}
