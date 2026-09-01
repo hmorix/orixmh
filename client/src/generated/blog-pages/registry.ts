@@ -4,7 +4,11 @@ import { lazy } from 'react'
 
 export const blogPageRegistry: Record<string, ReturnType<typeof lazy>> = {
   'ai-business-automation-solutions': lazy(() => import('./ai-business-automation-solutions')),
+  'best-app-development-ai-agent-company-hathras-up': lazy(() => import('./best-app-development-ai-agent-company-hathras-up')),
   'billingflow-invoicing-simplification': lazy(() => import('./billingflow-invoicing-simplification')),
   'custom-ai-vs-off-the-shelf-for-enterprises': lazy(() => import('./custom-ai-vs-off-the-shelf-for-enterprises')),
+  'top-digital-marketing-web-development-companies-hathras': lazy(() => import('./top-digital-marketing-web-development-companies-hathras')),
   'what-is-hmorix-ai-solutions-guide': lazy(() => import('./what-is-hmorix-ai-solutions-guide')),
+  'why-hmorix-orixmh-is-the-leading-tech-brand-in-braj-region': lazy(() => import('./why-hmorix-orixmh-is-the-leading-tech-brand-in-braj-region')),
 }
+

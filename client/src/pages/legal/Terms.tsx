@@ -1,45 +1,95 @@
+import { Link } from 'react-router-dom'
 import SEOHead from '../../components/seo/SEOHead'
 
 export default function Terms() {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': 'https://hmorix.in/terms#webpage',
+        url: 'https://hmorix.in/terms',
+        name: 'HMorix Terms of Service & User Agreement',
+        description: 'Read the official terms and conditions for using HMorix cloud software, AI agents, BillingFlow, and custom web development services.',
+        publisher: {
+          '@type': 'Organization',
+          name: 'HMorix',
+          url: 'https://hmorix.in',
+          founder: {
+            '@type': 'Person',
+            name: 'Harsh Sharma',
+            url: 'https://hmorix.in/harsh-sharma'
+          },
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: 'Hathras',
+            addressRegion: 'Uttar Pradesh',
+            postalCode: '204101',
+            addressCountry: 'IN'
+          }
+        }
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': 'https://hmorix.in/terms#breadcrumbs',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://hmorix.in' },
+          { '@type': 'ListItem', position: 2, name: 'Terms of Service', item: 'https://hmorix.in/terms' }
+        ]
+      }
+    ]
+  }
+
   return (
     <div className="pt-32 pb-20 min-h-screen">
-      <SEOHead title="Terms of Service" description="HMorix Terms of Service — read our terms and conditions for using HMorix products, services, and platform." keywords="terms of service, terms and conditions, HMorix terms, user agreement, service agreement, legal terms" canonical="/terms" />
+      <SEOHead
+        title="Terms of Service & User Agreement | HMorix"
+        description="Official HMorix Terms of Service — read our legal terms and conditions for using HMorix enterprise software, AI agents, web development, and digital marketing services."
+        keywords="HMorix terms of service, HMorix terms, Harsh Sharma HMorix, Hathras enterprise software terms, legal agreement, user terms, SLA terms"
+        canonical="/terms"
+      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+
       <div className="max-w-[800px] mx-auto px-8">
-        <h1 className="font-display text-4xl font-bold mb-8">Terms of Service</h1>
+        <nav className="flex items-center gap-2 text-[11px] text-cream/40 font-mono mb-6">
+          <Link to="/" className="hover:text-[#C8FF00]">Home</Link>
+          <span>/</span>
+          <span className="text-[#C8FF00]">Terms of Service</span>
+        </nav>
+
+        <h1 className="font-display text-4xl font-bold mb-4">Terms of Service</h1>
+        <p className="text-xs text-cream/40 font-mono mb-8">Effective Date: January 1, 2026 · Governing Law: Hathras, Uttar Pradesh, India</p>
+
         <div className="prose prose-invert max-w-none space-y-6 text-cream/60 text-sm leading-relaxed">
-          <p className="text-cream/40 text-xs">Last updated: July 1, 2024</p>
-          
           <h2 className="font-display text-xl font-semibold text-cream !mt-8">1. Acceptance of Terms</h2>
-          <p>By accessing or using HMorix services, including our website (hmorix.com), products, APIs, and any associated services, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.</p>
+          <p>By accessing or using HMorix services, website (https://hmorix.in), APIs, BillingFlow, AI Agent platform, or engaging our digital marketing and web development services, you agree to be bound by these Terms of Service. If you do not agree, do not use our services.</p>
           
-          <h2 className="font-display text-xl font-semibold text-cream !mt-8">2. Services Description</h2>
-          <p>HMorix provides enterprise software solutions including but not limited to: AI-powered automation tools (BillingFlow, PDF Automation, AI Agent), web design and development services, mobile application development, digital marketing services, smart home solutions, and cloud computing infrastructure.</p>
+          <h2 className="font-display text-xl font-semibold text-cream !mt-8">2. Scope of Services</h2>
+          <p>HMorix, founded by Harsh Sharma and headquartered in Hathras, Uttar Pradesh, provides enterprise B2B SaaS software, autonomous AI agent workflows, custom full-stack web and mobile application engineering, digital marketing, local SEO optimization, PDF automation, and smart technology solutions.</p>
           
-          <h2 className="font-display text-xl font-semibold text-cream !mt-8">3. Account Registration</h2>
-          <p>To access certain features, you must create an account. You are responsible for maintaining the confidentiality of your credentials and for all activities under your account. You must provide accurate and complete information during registration.</p>
+          <h2 className="font-display text-xl font-semibold text-cream !mt-8">3. User Accounts and Security</h2>
+          <p>Users must provide accurate registration details. You are responsible for safeguarding your credentials and any API tokens issued by the HMorix Client Portal. Notify support@hmorix.com immediately upon noticing unauthorized account activity.</p>
           
-          <h2 className="font-display text-xl font-semibold text-cream !mt-8">4. Acceptable Use</h2>
-          <p>You agree not to: (a) use our services for unlawful purposes; (b) attempt to gain unauthorized access to our systems; (c) interfere with the operation of our services; (d) reverse engineer our software; (e) resell or redistribute our services without authorization.</p>
+          <h2 className="font-display text-xl font-semibold text-cream !mt-8">4. Acceptable Use Policy</h2>
+          <p>You agree not to use HMorix infrastructure for malicious scraping, unlawful spam campaigns, reverse engineering proprietary LLM or BillingFlow pipelines, or interfering with system integrity.</p>
           
           <h2 className="font-display text-xl font-semibold text-cream !mt-8">5. Intellectual Property</h2>
-          <p>All content, software, and materials provided through HMorix services are protected by intellectual property laws. You retain ownership of your data. We retain ownership of our platform, tools, and proprietary technology.</p>
+          <p>Clients retain full ownership of their proprietary business data and content. HMorix retains all intellectual property rights to its proprietary platforms, software architectures, algorithms, and brand assets.</p>
           
-          <h2 className="font-display text-xl font-semibold text-cream !mt-8">6. Payment Terms</h2>
-          <p>Paid services are billed in advance on a monthly or annual basis. All fees are non-refundable except as required by law. We reserve the right to change pricing with 30 days notice.</p>
+          <h2 className="font-display text-xl font-semibold text-cream !mt-8">6. Payment Terms & Milestone Deliverables</h2>
+          <p>Services and SaaS subscriptions are billed as specified in client contracts and invoices generated via BillingFlow. Transparent milestone billing applies to custom engineering engagements.</p>
           
-          <h2 className="font-display text-xl font-semibold text-cream !mt-8">7. Service Level Agreement</h2>
-          <p>Enterprise customers are covered by our SLA guaranteeing 99.99% uptime. Service credits will be issued for any downtime exceeding the SLA threshold.</p>
+          <h2 className="font-display text-xl font-semibold text-cream !mt-8">7. Service Level Agreement (SLA)</h2>
+          <p>HMorix guarantees 99.99% cloud platform uptime for enterprise tier plans, backed by continuous multi-region health monitoring and automated failover.</p>
           
-          <h2 className="font-display text-xl font-semibold text-cream !mt-8">8. Limitation of Liability</h2>
-          <p>HMorix shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of our services. Our total liability shall not exceed the amount paid by you in the 12 months preceding the claim.</p>
+          <h2 className="font-display text-xl font-semibold text-cream !mt-8">8. Governing Law & Jurisdiction</h2>
+          <p>These terms are governed by the laws of India. Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the competent courts in Hathras, Uttar Pradesh, India.</p>
           
-          <h2 className="font-display text-xl font-semibold text-cream !mt-8">9. Termination</h2>
-          <p>Either party may terminate this agreement with 30 days written notice. Upon termination, you may export your data within 30 days. We reserve the right to suspend accounts that violate these terms.</p>
-          
-          <h2 className="font-display text-xl font-semibold text-cream !mt-8">10. Contact</h2>
-          <p>For questions about these terms, contact us at legal@hmorix.com or visit our Contact page.</p>
+          <h2 className="font-display text-xl font-semibold text-cream !mt-8">9. Contact Information</h2>
+          <p>For legal inquiries, contract clarification, or compliance questions, reach our legal team at legal@hmorix.com or contact our headquarters in Hathras, UP.</p>
         </div>
       </div>
     </div>
   )
 }
+

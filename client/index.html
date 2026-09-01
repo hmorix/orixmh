@@ -42,6 +42,8 @@
   <meta name="msapplication-TileColor" content="#0A0A0B" />
   <meta name="geo.region" content="IN-UP" />
   <meta name="geo.placename" content="Hathras, Uttar Pradesh, India" />
+  <meta name="geo.position" content="27.5946;78.0526" />
+  <meta name="ICBM" content="27.5946, 78.0526" />
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-K82KCZY84B"></script>
@@ -52,45 +54,96 @@
     gtag('config', 'G-K82KCZY84B');
   </script>
   
-  <!-- Structured Data - Organization -->
+  <!-- Structured Data - Organization & LocalBusiness -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "HMorix",
-    "url": "https://hmorix.in",
-    "logo": "https://hmorix.in/favicon.svg",
-    "description": "Enterprise AI software company offering web app development, hosting, automation, AI integration, web design, mobile apps, digital marketing, SEO, advertising automation, cybersecurity, and smart home solutions in Hathras, Mathura, Aligarh, Agra, Vrindavan, Delhi, Noida, Mumbai, and Bengaluru.",
-    "foundingDate": "2023",
-    "member": { "@type": "Person", "name": "Harsh Sharma", "jobTitle": "CEO", "url": "https://hmorix.in/harsh-sharma" },
-    "areaServed": ["Hathras", "Mathura", "Aligarh", "Agra", "Vrindavan", "Delhi", "Noida", "Mumbai", "Bengaluru"],
-    "address": { "@type": "PostalAddress", "addressLocality": "Hathras", "addressRegion": "Uttar Pradesh", "addressCountry": "IN" },
-    "contactPoint": { "@type": "ContactPoint", "telephone": "+1-555-HMORIX", "contactType": "customer service", "email": "support@hmorix.com" },
-    "sameAs": ["https://twitter.com/hmorix", "https://linkedin.com/company/hmorix", "https://github.com/hmorix"]
-  }
-  </script>
-
-  <!-- Structured Data - WebSite -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "HMorix",
-    "url": "https://hmorix.in",
-    "potentialAction": { "@type": "SearchAction", "target": "https://hmorix.in/search?q={search_term_string}", "query-input": "required name=search_term_string" }
-  }
-  </script>
-
-  <!-- Structured Data - SoftwareApplication -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "HMorix Cloud Platform",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "Web, Android, iOS",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "ratingCount": "2847" }
+    "@graph": [
+      {
+        "@type": ["Organization", "LocalBusiness", "ProfessionalService"],
+        "@id": "https://hmorix.in/#organization",
+        "name": "HMorix",
+        "alternateName": ["hmorix", "orix", "orixmh", "Morix", "HM orix", "H Morix", "HM Orix", "HMorix Cloud Platform"],
+        "url": "https://hmorix.in",
+        "logo": "https://hmorix.in/favicon.svg",
+        "image": "https://hmorix.in/og-image.png",
+        "description": "HMorix is India's leading enterprise AI software, full-stack web development, mobile app development, and digital marketing company headquartered in Hathras, Uttar Pradesh. Serving Hathras, Mathura, Vrindavan, Aligarh, Agra, Delhi NCR, and global clients.",
+        "foundingDate": "2023",
+        "founder": {
+          "@type": "Person",
+          "@id": "https://hmorix.in/harsh-sharma#person",
+          "name": "Harsh Sharma",
+          "jobTitle": "Founder & CEO",
+          "url": "https://hmorix.in/harsh-sharma",
+          "sameAs": ["https://github.com/HMorix", "https://x.com/hm_orix", "https://linkedin.com/company/hmorix"]
+        },
+        "areaServed": [
+          { "@type": "City", "name": "Hathras" },
+          { "@type": "City", "name": "Mathura" },
+          { "@type": "City", "name": "Vrindavan" },
+          { "@type": "City", "name": "Aligarh" },
+          { "@type": "City", "name": "Agra" },
+          { "@type": "City", "name": "Kanpur" },
+          { "@type": "City", "name": "Delhi" },
+          { "@type": "City", "name": "Noida" },
+          { "@type": "City", "name": "Mumbai" },
+          { "@type": "City", "name": "Bengaluru" }
+        ],
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "HMorix Headquarters, Hathras",
+          "addressLocality": "Hathras",
+          "addressRegion": "Uttar Pradesh",
+          "postalCode": "204101",
+          "addressCountry": "IN"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 27.5946,
+          "longitude": 78.0526
+        },
+        "priceRange": "₹₹",
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+          "opens": "09:00",
+          "closes": "20:00"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "Customer Service",
+          "email": "support@hmorix.com",
+          "availableLanguage": ["English", "Hindi"]
+        },
+        "sameAs": [
+          "https://github.com/HMorix",
+          "https://x.com/hm_orix",
+          "https://linkedin.com/company/hmorix",
+          "https://instagram.com/hm_orix"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://hmorix.in/#website",
+        "name": "HMorix",
+        "url": "https://hmorix.in",
+        "publisher": { "@id": "https://hmorix.in/#organization" },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://hmorix.in/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://hmorix.in/#software",
+        "name": "HMorix Cloud Platform",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web, Android, iOS",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+        "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "ratingCount": "2847" }
+      }
+    ]
   }
   </script>
 

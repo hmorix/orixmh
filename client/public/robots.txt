@@ -2,6 +2,7 @@ User-agent: *
 Allow: /
 Allow: /sitemap.xml
 Allow: /rss.xml
+Allow: /llms.txt
 Allow: /manifest.webmanifest
 Allow: /site.webmanifest
 Allow: /security.txt
@@ -18,21 +19,62 @@ Disallow: /hrm
 Disallow: /retry
 Disallow: /generated
 Disallow: /*.json
-Disallow: /*?*
-Disallow: /*#*
 
-Crawl-delay: 1
-
-Sitemap: https://hmorix.in/sitemap.xml
-
+# Googlebot
 User-agent: Googlebot
 Allow: /
 Allow: /blog/
 Allow: /case-studies/
 Allow: /whitepapers/
 Allow: /press/
+Allow: /locations/
+Allow: /services/
+Allow: /harsh-sharma
+Allow: /harsh-sharma-developer
+Allow: /terms
+Allow: /privacy
 Crawl-delay: 0
 
+# Bingbot
 User-agent: Bingbot
 Allow: /
-Crawl-delay: 1
+Crawl-delay: 0
+
+# OpenAI GPTBot & ChatGPT-User
+User-agent: GPTBot
+Allow: /
+Allow: /llms.txt
+
+User-agent: ChatGPT-User
+Allow: /
+Allow: /llms.txt
+
+# Anthropic ClaudeBot
+User-agent: ClaudeBot
+Allow: /
+Allow: /llms.txt
+
+User-agent: anthropic-ai
+Allow: /
+Allow: /llms.txt
+
+# PerplexityBot
+User-agent: PerplexityBot
+Allow: /
+Allow: /llms.txt
+
+# Google Extended / Gemini
+User-agent: Google-Extended
+Allow: /
+Allow: /llms.txt
+
+# Applebot
+User-agent: Applebot
+Allow: /
+
+# Common Crawl
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://hmorix.in/sitemap.xml
+

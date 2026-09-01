@@ -3,6 +3,10 @@
 import { lazy } from 'react'
 
 export const caseStudyPageRegistry: Record<string, ReturnType<typeof lazy>> = {
+  'agra-export-ecommerce-seo-domination': lazy(() => import('./agra-export-ecommerce-seo-domination')),
   'demo-ai-agent-support-automation': lazy(() => import('./demo-ai-agent-support-automation')),
   'demo-ecommerce-platform-rebuild': lazy(() => import('./demo-ecommerce-platform-rebuild')),
+  'hathras-manufacturing-digital-transformation': lazy(() => import('./hathras-manufacturing-digital-transformation')),
+  'mathura-vrindavan-hospitality-ai-automation': lazy(() => import('./mathura-vrindavan-hospitality-ai-automation')),
 }
+

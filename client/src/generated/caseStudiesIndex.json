@@ -1,24 +1,35 @@
 [
   {
-    "slug": "demo-ai-agent-support-automation",
-    "title": "How a [Industry] Company Used AI Agents to Automate Support Workflows — Sample Case Study",
-    "excerpt": "A sample/demo case study showing the layout and structure HMorix uses for AI Solutions engagements. [Excerpt Placeholder — replace with a real summary once client data is available.]",
-    "clientName": "[Client Name]",
-    "industry": "[Industry]",
-    "isDemo": true,
-    "canonicalUrl": "https://hmorix.in/case-studies/demo-ai-agent-support-automation",
-    "publishedAt": "2026-07-24T00:00:00+00:00",
-    "wordCount": 1180
+    "slug": "hathras-manufacturing-digital-transformation",
+    "title": "How a Hathras Manufacturing Enterprise Scaled Operations with HMorix Custom ERP, BillingFlow & Web Platform",
+    "excerpt": "Discover how Shree Ganesh Agro & Brassware in Hathras transformed inventory, streamlined GST invoicing via BillingFlow, and increased wholesale revenue by 320% with HMorix engineering.",
+    "clientName": "Shree Ganesh Agro & Brassware",
+    "industry": "Industrial Manufacturing",
+    "isDemo": false,
+    "canonicalUrl": "https://hmorix.in/case-studies/hathras-manufacturing-digital-transformation",
+    "publishedAt": "2026-08-20T10:00:00.000Z",
+    "wordCount": 1350
   },
   {
-    "slug": "demo-ecommerce-platform-rebuild",
-    "title": "Rebuilding an Online Store for a [Industry] Brand — Sample Case Study",
-    "excerpt": "A sample/demo case study showing the layout and structure HMorix uses for E-commerce engagements. [Excerpt Placeholder — replace with a real summary once client data is available.]",
-    "clientName": "[Client Name]",
-    "industry": "[Industry]",
-    "isDemo": true,
-    "canonicalUrl": "https://hmorix.in/case-studies/demo-ecommerce-platform-rebuild",
-    "publishedAt": "2026-07-24T00:00:00+00:00",
-    "wordCount": 1050
+    "slug": "mathura-vrindavan-hospitality-ai-automation",
+    "title": "Automating Hotel Bookings & 24/7 Guest Support in Mathura & Vrindavan with HMorix AI Agents & BillingFlow",
+    "excerpt": "How Braj Heritage Hospitality Group in Mathura & Vrindavan used HMorix AI Agents and BillingFlow to automate 94% of guest reservations and increase direct bookings by 4.2x.",
+    "clientName": "Braj Heritage Hospitality Group",
+    "industry": "Hospitality & Tourism",
+    "isDemo": false,
+    "canonicalUrl": "https://hmorix.in/case-studies/mathura-vrindavan-hospitality-ai-automation",
+    "publishedAt": "2026-08-22T10:00:00.000Z",
+    "wordCount": 1280
+  },
+  {
+    "slug": "agra-export-ecommerce-seo-domination",
+    "title": "Ranking #1 on Google: How an Agra Export Brand Reached Global Buyers with HMorix SEO & Web Engineering",
+    "excerpt": "How Taj Crafts Global in Agra partnered with HMorix and Harsh Sharma to dominate Google search, rank #1 for international export keywords, and generate 350% more B2B inquiries.",
+    "clientName": "Taj Crafts Global Exports",
+    "industry": "Handicrafts & International Exports",
+    "isDemo": false,
+    "canonicalUrl": "https://hmorix.in/case-studies/agra-export-ecommerce-seo-domination",
+    "publishedAt": "2026-08-25T10:00:00.000Z",
+    "wordCount": 1420
   }
 ]

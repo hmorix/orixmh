@@ -17,12 +17,23 @@ export interface SEOConfig {
 }
 
 export const defaultSEO: SEOConfig = {
-  title: 'HMorix - Enterprise AI Software, Web Design & Development',
-  description: 'HMorix provides enterprise AI solutions, web design, mobile apps, digital marketing, and smart home solutions for businesses in Delhi, Bengaluru, Mumbai, and across India.',
+  title: 'HMorix - Enterprise AI Software, Web Design, Mobile Apps & Digital Marketing',
+  description: 'HMorix (founded by Harsh Sharma) is the leading enterprise AI software, custom web development, mobile app development, and digital marketing company in Hathras, Mathura, Vrindavan, Aligarh, Agra, and across India.',
   keywords: [
     'HMorix',
+    'hmorix',
+    'orix',
+    'orixmh',
+    'Morix',
+    'HM orix',
+    'Harsh Sharma',
+    'Harsh Sharma Hathras',
+    'best digital marketing company in hathras',
+    'hathras best digital marketing company',
+    'hathras web development company',
+    'hathras best app development company',
+    'hathras ai agent company',
     'AI development',
-    'AI integration',
     'web design',
     'web development',
     'mobile app development',
@@ -31,13 +42,15 @@ export const defaultSEO: SEOConfig = {
     'BillingFlow',
     'AI Agent',
     'PDF automation',
-    'smart home solutions',
-    'Delhi',
-    'Bengaluru',
-    'Mumbai',
+    'Hathras',
     'Mathura',
-    'Agra',
+    'Vrindavan',
     'Aligarh',
+    'Agra',
+    'Delhi',
+    'Noida',
+    'Mumbai',
+    'Bengaluru',
   ],
   image: 'https://hmorix.in/og-image.png',
   url: 'https://hmorix.in',
@@ -53,7 +66,7 @@ export function setMetaTags(config: SEOConfig) {
   // Meta tags
   updateMetaTag('description', finalConfig.description)
   updateMetaTag('keywords', finalConfig.keywords?.join(', ') || '')
-  updateMetaTag('author', finalConfig.author || 'HMorix')
+  updateMetaTag('author', finalConfig.author || 'Harsh Sharma - HMorix')
 
   // Open Graph
   updateMetaTag('og:title', finalConfig.title, 'property')
@@ -82,7 +95,7 @@ export function setMetaTags(config: SEOConfig) {
     if (finalConfig.modifiedDate) {
       updateMetaTag('article:modified_time', finalConfig.modifiedDate, 'property')
     }
-    updateMetaTag('article:author', finalConfig.author || 'HMorix', 'property')
+    updateMetaTag('article:author', finalConfig.author || 'Harsh Sharma', 'property')
   }
 }
 
@@ -114,27 +127,35 @@ export function getOrganizationSchema() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'HMorix',
+    alternateName: ['hmorix', 'orix', 'orixmh', 'Morix', 'HM orix', 'HM Orix', 'H Morix'],
     url: 'https://hmorix.in',
-    logo: 'https://hmorix.in/logo.png',
-    description: 'Enterprise AI software, web design, mobile apps, digital marketing & smart home solutions',
+    logo: 'https://hmorix.in/favicon.svg',
+    description: 'Enterprise AI software, web design, mobile apps, digital marketing & smart home solutions headquartered in Hathras, Uttar Pradesh.',
+    founder: {
+      '@type': 'Person',
+      name: 'Harsh Sharma',
+      jobTitle: 'Founder & CEO',
+      url: 'https://hmorix.in/harsh-sharma',
+    },
     sameAs: [
-      'https://twitter.com/hmorix',
+      'https://github.com/HMorix',
+      'https://x.com/hm_orix',
       'https://linkedin.com/company/hmorix',
-      'https://github.com/hmorix',
+      'https://instagram.com/hm_orix',
     ],
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'HMorix Headquarters',
-      addressLocality: 'Delhi',
-      addressRegion: 'Delhi',
-      postalCode: '110001',
+      addressLocality: 'Hathras',
+      addressRegion: 'Uttar Pradesh',
+      postalCode: '204101',
       addressCountry: 'IN',
     },
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'Customer Service',
       email: 'support@hmorix.com',
-      telephone: '+91-XXXXXXXXXX',
+      availableLanguage: ['English', 'Hindi'],
     },
   }
 }
@@ -143,20 +164,20 @@ export function getSoftwareApplicationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'HMorix Platform',
-    description: 'Enterprise AI platform for business automation',
+    name: 'HMorix Cloud Platform',
+    description: 'Enterprise AI platform for business automation, CRM, HRM, and BillingFlow',
     url: 'https://hmorix.in',
     applicationCategory: 'BusinessApplication',
-    operatingSystem: 'Web',
+    operatingSystem: 'Web, Android, iOS',
     offers: {
       '@type': 'Offer',
       price: '0',
-      priceCurrency: 'USD',
+      priceCurrency: 'INR',
     },
     aggregateRating: {
       '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '1250',
+      ratingValue: '4.9',
+      ratingCount: '2847',
     },
   }
 }
@@ -175,7 +196,7 @@ export function getProductSchema(product: any) {
     offers: {
       '@type': 'Offer',
       price: product.price,
-      priceCurrency: 'USD',
+      priceCurrency: 'INR',
       availability: 'https://schema.org/InStock',
     },
     aggregateRating: product.rating && {
@@ -188,52 +209,84 @@ export function getProductSchema(product: any) {
 
 export function getLocalBusinessSchema(location: string) {
   const locations: Record<string, any> = {
-    delhi: {
-      name: 'HMorix Delhi',
-      city: 'Delhi',
-      region: 'Delhi',
-      postalCode: '110001',
-    },
-    bengaluru: {
-      name: 'HMorix Bengaluru',
-      city: 'Bengaluru',
-      region: 'Karnataka',
-      postalCode: '560001',
-    },
-    mumbai: {
-      name: 'HMorix Mumbai',
-      city: 'Mumbai',
-      region: 'Maharashtra',
-      postalCode: '400001',
+    hathras: {
+      name: 'HMorix Headquarters Hathras',
+      city: 'Hathras',
+      region: 'Uttar Pradesh',
+      postalCode: '204101',
+      latitude: 27.5946,
+      longitude: 78.0526,
     },
     mathura: {
       name: 'HMorix Mathura',
       city: 'Mathura',
       region: 'Uttar Pradesh',
       postalCode: '281001',
+      latitude: 27.4924,
+      longitude: 77.6737,
     },
-    agra: {
-      name: 'HMorix Agra',
-      city: 'Agra',
+    vrindavan: {
+      name: 'HMorix Vrindavan',
+      city: 'Vrindavan',
       region: 'Uttar Pradesh',
-      postalCode: '282001',
+      postalCode: '281121',
+      latitude: 27.5806,
+      longitude: 77.7006,
     },
     aligarh: {
       name: 'HMorix Aligarh',
       city: 'Aligarh',
       region: 'Uttar Pradesh',
       postalCode: '202001',
+      latitude: 27.8974,
+      longitude: 78.0880,
+    },
+    agra: {
+      name: 'HMorix Agra',
+      city: 'Agra',
+      region: 'Uttar Pradesh',
+      postalCode: '282001',
+      latitude: 27.1767,
+      longitude: 78.0081,
+    },
+    delhi: {
+      name: 'HMorix Delhi NCR',
+      city: 'Delhi',
+      region: 'Delhi',
+      postalCode: '110001',
+      latitude: 28.6139,
+      longitude: 77.2090,
+    },
+    bengaluru: {
+      name: 'HMorix Bengaluru',
+      city: 'Bengaluru',
+      region: 'Karnataka',
+      postalCode: '560001',
+      latitude: 12.9716,
+      longitude: 77.5946,
+    },
+    mumbai: {
+      name: 'HMorix Mumbai',
+      city: 'Mumbai',
+      region: 'Maharashtra',
+      postalCode: '400001',
+      latitude: 19.0760,
+      longitude: 72.8777,
     },
   }
 
-  const loc = locations[location.toLowerCase()] || locations.delhi
+  const loc = locations[location.toLowerCase()] || locations.hathras
 
   return {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: loc.name,
-    image: 'https://hmorix.in/logo.png',
-    description: `HMorix office in ${loc.city} - AI development, web design, and digital solutions`,
+    image: 'https://hmorix.in/og-image.png',
+    description: `HMorix office in ${loc.city} - #1 AI development, custom web design, mobile apps, and digital marketing company.`,
+    founder: {
+      '@type': 'Person',
+      name: 'Harsh Sharma',
+    },
     address: {
       '@type': 'PostalAddress',
       streetAddress: `HMorix ${loc.city}`,
@@ -242,9 +295,14 @@ export function getLocalBusinessSchema(location: string) {
       postalCode: loc.postalCode,
       addressCountry: 'IN',
     },
+    geo: loc.latitude && loc.longitude ? {
+      '@type': 'GeoCoordinates',
+      latitude: loc.latitude,
+      longitude: loc.longitude,
+    } : undefined,
     url: 'https://hmorix.in',
     telephone: '+91-XXXXXXXXXX',
-    priceRange: '₹₹₹',
+    priceRange: '₹₹',
   }
 }
 

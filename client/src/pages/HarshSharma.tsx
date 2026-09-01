@@ -30,14 +30,17 @@ export default function HarshSharma() {
       geo: { '@type': 'GeoCoordinates', latitude: 27.5946, longitude: 78.0526 }
     },
     knowsAbout: [
-      'AI Software Development', 'Web Development', 'Business Automation',
-      'Billing Systems', 'Cloud Systems', 'SEO Automation', 'Product Strategy'
+      'Full-Stack Web Development', 'AI Agent & LLM Systems', 'Business Automation',
+      'Billing Systems & Invoicing', 'Cloud Infrastructure', 'Local SEO Domination', 'Product Strategy'
     ],
     sameAs: [
-      // Fill with real profile URLs — this is the highest-impact field on this page
+      'https://github.com/HMorix',
+      'https://x.com/hm_orix',
+      'https://instagram.com/hm_orix',
+      'https://linkedin.com/company/hmorix'
     ],
     description:
-      'Harsh Sharma is the Founder and CEO of HMorix, based in Hathras, Uttar Pradesh, India, leading the company in AI software, web development, automation, billing systems, and digital products.'
+      'Harsh Sharma is an Indian full-stack software engineer and the Founder & CEO of HMorix, based in Hathras, Uttar Pradesh, India, leading the development of enterprise AI software, BillingFlow, and custom web applications.'
   }
 
   const orgSchema = {
@@ -47,16 +50,22 @@ export default function HarshSharma() {
     name: 'HMorix',
     alternateName: orgAlternateNames,
     url: 'https://hmorix.in',
-    logo: 'https://hmorix.in/logo.png',
+    logo: 'https://hmorix.in/favicon.svg',
     founder: { '@id': 'https://hmorix.in/harsh-sharma#person' },
     foundingLocation: { '@type': 'Place', name: 'Hathras, Uttar Pradesh, India' },
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Hathras',
       addressRegion: 'Uttar Pradesh',
+      postalCode: '204101',
       addressCountry: 'IN'
     },
-    sameAs: []
+    sameAs: [
+      'https://github.com/HMorix',
+      'https://x.com/hm_orix',
+      'https://instagram.com/hm_orix',
+      'https://linkedin.com/company/hmorix'
+    ]
   }
 
   const breadcrumbSchema = {
