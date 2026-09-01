@@ -1628,11 +1628,24 @@ async function handleJobApplications(req: VercelRequest, res: VercelResponse) {
   const applications = await mongoCollection('job_applications')
   const recruitment = await mongoCollection('hrm_recruitment')
   const employees = await mongoCollection('hrm_employees')
+  const supabase = getSupabaseAdminClient()
+  const hasSupabase = Boolean(process.env.SUPABASE_URL && (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_PUBLISHABLE_KEY))
+
   if (req.method === 'GET') {
     const { jobId } = req.query as any
     const filter = jobId ? { jobId: String(jobId) } : {}
-    return res.json({ success: true, data: await applications.find(filter).sort({ createdAt: -1 }).toArray() })
+    let data = await applications.find(filter).sort({ createdAt: -1 }).toArray()
+    if (data.length === 0 && hasSupabase) {
+      try {
+        let q = supabase.from('job_applications').select('*').order('created_at', { ascending: false })
+        if (jobId) q = q.eq('job_id', jobId)
+        const { data: supaApps } = await q
+        if (supaApps && supaApps.length > 0) data = supaApps
+      } catch (err) {}
+    }
+    return res.json({ success: true, data })
   }
+
   if (req.method === 'POST') {
     const body = req.body || {}
     const jobId = String(body.jobId || '')
@@ -1643,11 +1656,72 @@ async function handleJobApplications(req: VercelRequest, res: VercelResponse) {
     const email = cleanEmail(body.email || '')
     if (!name || !email) return res.status(400).json({ error: 'Name and email are required' })
     const now = new Date()
-    const doc = { jobId, jobTitle: job.role || job.title, name, email, phone: sanitizeText(body.phone || '', 40), location: sanitizeText(body.location || '', 100), resumeUrl: sanitizeText(body.resumeUrl || '', 500), resumeText: sanitizeText(body.resumeText || '', 4000), portfolio: sanitizeText(body.portfolio || '', 300), coverLetter: sanitizeText(body.coverLetter || '', 3000), status: 'applied', score: 0, notes: '', createdAt: now, updatedAt: now }
+    const doc = {
+      jobId,
+      jobTitle: job.role || job.title,
+      name,
+      email,
+      phone: sanitizeText(body.phone || '', 40),
+      location: sanitizeText(body.location || '', 100),
+      resumeUrl: sanitizeText(body.resumeUrl || '', 500),
+      resumeText: sanitizeText(body.resumeText || '', 4000),
+      portfolio: sanitizeText(body.portfolio || '', 300),
+      coverLetter: sanitizeText(body.coverLetter || '', 3000),
+      experience: sanitizeText(body.experience || '', 60),
+      currentCTC: sanitizeText(body.currentCTC || '', 60),
+      salaryExpectation: Number(body.salaryExpectation || 0),
+      noticePeriod: sanitizeText(body.noticePeriod || '30', 30),
+      status: 'applied',
+      score: 0,
+      notes: '',
+      createdAt: now,
+      updatedAt: now
+    }
     const result = await applications.insertOne(doc)
     await recruitment.updateOne({ _id: new ObjectId(jobId) }, { $inc: { applicants: 1 }, $set: { updatedAt: now } })
+
+    // Dual-sync to Supabase table
+    if (hasSupabase) {
+      try {
+        await supabase.from('job_applications').insert({
+          job_id: jobId,
+          job_title: job.role || job.title,
+          name,
+          email,
+          phone: doc.phone,
+          location: doc.location,
+          resume_url: doc.resumeUrl,
+          status: 'applied',
+          created_at: now.toISOString()
+        })
+      } catch (err) {}
+    }
+
+    // Send confirmation email to candidate via SMTP
+    try {
+      await sendMail({
+        to: email,
+        subject: `Application Received: ${job.role || job.title} at HMorix`,
+        html: brandedEmailTemplate({
+          eyebrow: 'HMorix Careers',
+          title: 'Application Received',
+          body: `Dear ${name},\n\nThank you for applying for the position of ${job.role || job.title} at HMorix Technologies. Our talent acquisition team is reviewing your application and resume. We will contact you soon regarding the next interview rounds.`,
+          details: [
+            { label: 'Position', value: job.role || job.title },
+            { label: 'Department', value: job.department || 'Engineering' },
+            { label: 'Reference ID', value: `APP-${String(result.insertedId).slice(-6).toUpperCase()}` },
+            { label: 'Status', value: 'Under Review' },
+          ],
+          action: { label: 'Visit HMorix Careers', url: `${process.env.APP_URL || 'https://hmorix.in'}/careers` },
+        }),
+      })
+    } catch (mailErr: any) {
+      console.error('Candidate email dispatch warning:', mailErr?.message)
+    }
+
     return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
   }
+
   if (req.method === 'PUT') {
     const body = req.body || {}
     const id = String(req.body?.id || '')
@@ -1665,6 +1739,7 @@ async function handleJobApplications(req: VercelRequest, res: VercelResponse) {
     const joiningLetter = req.body?.generateJoiningLetter || ['joining_letter', 'hired'].includes(status)
       ? `Joining Letter\n\nEmployee: ${applicationBefore?.name || 'Employee'}\nRole: ${applicationBefore?.jobTitle || 'Employee'}\nDate: ${now.toISOString().slice(0, 10)}\n\nThis confirms the employee is scheduled to join HMorix subject to completion of onboarding requirements.`
       : undefined
+
     await applications.updateOne(
       { _id: new ObjectId(id) },
       {
@@ -1681,12 +1756,75 @@ async function handleJobApplications(req: VercelRequest, res: VercelResponse) {
       }
     )
     const application = await applications.findOne({ _id: new ObjectId(id) })
+
+    // If interview scheduled, send interview email to candidate
+    if (status === 'interview_scheduled' && application?.email && req.body?.nextInterviewDate) {
+      try {
+        const intDateStr = new Date(req.body.nextInterviewDate).toLocaleString('en-IN', { dateStyle: 'full', timeStyle: 'short' })
+        await sendMail({
+          to: application.email,
+          subject: `Interview Scheduled: ${application.jobTitle || 'Role'} at HMorix`,
+          html: brandedEmailTemplate({
+            eyebrow: 'Interview Invitation',
+            title: 'Interview Scheduled',
+            body: `Dear ${application.name},\n\nWe are pleased to invite you for an interview for the ${application.jobTitle || 'Role'} position at HMorix Technologies.`,
+            details: [
+              { label: 'Date & Time', value: intDateStr },
+              { label: 'Position', value: application.jobTitle || 'Role' },
+              { label: 'Mode', value: 'Google Meet / Online Video Conference' },
+            ],
+            action: { label: 'View Application Status', url: `${process.env.APP_URL || 'https://hmorix.in'}/careers` },
+          }),
+        })
+      } catch (err: any) {
+        console.error('Interview schedule email warning:', err?.message)
+      }
+    }
+
+    // If offer extended, send offer notice
+    if ((status === 'final_offer' || status === 'offer') && application?.email) {
+      try {
+        await sendMail({
+          to: application.email,
+          subject: `Job Offer: ${application.jobTitle || 'Role'} at HMorix Technologies`,
+          html: brandedEmailTemplate({
+            eyebrow: 'Offer Letter',
+            title: 'Congratulations on your Offer!',
+            body: `Dear ${application.name},\n\nWe are excited to extend an official job offer for the position of ${application.jobTitle || 'Role'} at HMorix Technologies. Welcome to our team!`,
+            details: [
+              { label: 'Position', value: application.jobTitle || 'Role' },
+              { label: 'Status', value: 'Offer Extended' },
+            ],
+            action: { label: 'Review Offer Details', url: `${process.env.APP_URL || 'https://hmorix.in'}/careers` },
+          }),
+        })
+      } catch (err: any) {}
+    }
+
     let credentials: any = null
     if ((status === 'selected' || status === 'hired' || status === 'joining_letter') && application && req.body?.createEmployee) {
       const existing = await employees.findOne({ email: application.email })
       if (!existing) {
-        const now = new Date()
-        const employeeDoc = { name: application.name, email: application.email, phone: application.phone || '', employeeId: `HM-${Date.now().toString().slice(-6)}`, department: 'General', role: application.jobTitle || 'Employee', location: application.location || 'Remote', status: 'onboarding', salary: 0, performanceScore: 4, startDate: now.toISOString().slice(0, 10), documents: [{ name: 'Resume', status: application.resumeUrl ? 'received' : 'pending', url: application.resumeUrl || '' }, { name: 'Offer letter', status: offerLetter ? 'generated' : 'pending', url: '' }, { name: 'Identity proof', status: 'pending', url: '' }], createdAt: now, updatedAt: now }
+        const employeeDoc = {
+          name: application.name,
+          email: application.email,
+          phone: application.phone || '',
+          employeeId: `HM-${Date.now().toString().slice(-6)}`,
+          department: 'General',
+          role: application.jobTitle || 'Employee',
+          location: application.location || 'Remote',
+          status: 'onboarding',
+          salary: 0,
+          performanceScore: 4,
+          startDate: now.toISOString().slice(0, 10),
+          documents: [
+            { name: 'Resume', status: application.resumeUrl ? 'received' : 'pending', url: application.resumeUrl || '' },
+            { name: 'Offer letter', status: offerLetter ? 'generated' : 'pending', url: '' },
+            { name: 'Identity proof', status: 'pending', url: '' }
+          ],
+          createdAt: now,
+          updatedAt: now
+        }
         await employees.insertOne(employeeDoc)
         credentials = await createEmployeeAccess(employeeDoc, { email: application.email, username: body.username || '', password: body.password || '' })
       }
