@@ -2030,9 +2030,9 @@ export function printInternshipOfferLetter(data: InternshipOfferData) {
     <div class="recipient-block">
       <strong>To,</strong><br>
       ${data.name}<br>
-      ${data.college ? \`\${data.college}<br>\` : ''}
-      ${data.course ? \`Course: \${data.course}<br>\` : ''}
-      ${data.email ? \`Email: \${data.email}\` : ''}
+      ${data.college ? data.college + '<br>' : ''}
+      ${data.course ? 'Course: ' + data.course + '<br>' : ''}
+      ${data.email ? 'Email: ' + data.email : ''}
     </div>
 
     <div class="highlight-box">
@@ -2102,7 +2102,7 @@ export function printInternshipOfferLetter(data: InternshipOfferData) {
 
     ${renderFooter()}
   `;
-  openPrintWindow(html, \`Internship Offer - \${data.name}\`);
+  openPrintWindow(html, `Internship Offer - ${data.name}`);
 }
 
 export interface InternshipCertData {
@@ -2120,143 +2120,84 @@ export interface InternshipCertData {
 }
 
 export function printInternshipCertificate(data: InternshipCertData) {
-  const html = \`
+  const certNo = data.certificateNo
+  const internId = data.internId
+  const name = data.name
+  const role = data.role
+  const department = data.department
+  const startFmt = new Date(data.startDate).toLocaleDateString('en-GB')
+  const endFmt = new Date(data.endDate).toLocaleDateString('en-GB')
+  const performance = data.performance || 'Satisfactory'
+  const skills = data.skills || ''
+  const college = data.college || ''
+  const course = data.course || ''
+
+  const html = `
     <style>
-      @page { size: A4 landscape; margin: 15mm; }
-      body {
-        font-family: 'Inter', system-ui, sans-serif;
-        color: #1a1a1a;
-        margin: 0;
-        padding: 0;
-        text-align: center;
-      }
-      .cert-container {
-        border: 15px solid #1a1a1a;
-        padding: 40px;
-        position: relative;
-        height: calc(100vh - 110px);
-        box-sizing: border-box;
-        overflow: hidden;
-      }
-      .cert-inner {
-        border: 2px solid #C8FF00;
-        padding: 40px;
-        height: 100%;
-        box-sizing: border-box;
-        position: relative;
-        z-index: 2;
-      }
-      .watermark {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) rotate(-30deg);
-        font-size: 100px;
-        color: rgba(200, 255, 0, 0.1);
-        white-space: nowrap;
-        font-weight: 900;
-        z-index: 1;
-        pointer-events: none;
-      }
-      .logo { margin-bottom: 30px; }
-      .logo svg { height: 60px; }
-      .title {
-        font-size: 36px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 4px;
-        margin-bottom: 40px;
-        color: #1a1a1a;
-      }
-      .body-text { font-size: 18px; line-height: 1.6; margin-bottom: 20px; }
-      .name {
-        font-size: 32px;
-        font-weight: 700;
-        margin: 20px 0;
-        color: #1a1a1a;
-        text-transform: uppercase;
-      }
-      .details { margin: 30px 0; font-size: 16px; }
-      .details-grid {
-        display: inline-grid;
-        grid-template-columns: auto auto;
-        gap: 15px 40px;
-        text-align: left;
-        margin: 0 auto;
-        background: rgba(200, 255, 0, 0.05);
-        padding: 20px 40px;
-        border-radius: 8px;
-        border: 1px solid rgba(200, 255, 0, 0.3);
-      }
-      .signatures {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-top: 60px;
-        padding: 0 40px;
-      }
+      @page { size: A4 portrait; margin: 10mm; }
+      body { font-family: 'Inter', system-ui, sans-serif; color: #1a1a1a; margin: 0; padding: 0; text-align: center; }
+      .cert-container { border: 14px solid #0f172a; padding: 36px; position: relative; min-height: calc(100vh - 60px); box-sizing: border-box; overflow: hidden; }
+      .cert-inner { border: 2px solid #C8FF00; padding: 36px; height: 100%; box-sizing: border-box; position: relative; z-index: 2; }
+      .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 90px; color: rgba(200,255,0,0.07); white-space: nowrap; font-weight: 900; z-index: 1; pointer-events: none; }
+      .logo { margin-bottom: 20px; }
+      .cert-title { font-size: 30px; font-weight: 800; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 30px; color: #0f172a; }
+      .body-text { font-size: 16px; line-height: 1.7; margin-bottom: 12px; color: #334155; }
+      .cert-name { font-size: 28px; font-weight: 800; margin: 16px 0; color: #0f172a; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid #C8FF00; display: inline-block; padding-bottom: 6px; }
+      .details-grid { display: inline-grid; grid-template-columns: auto auto; gap: 12px 40px; text-align: left; margin: 20px auto; background: rgba(200,255,0,0.05); padding: 18px 36px; border-radius: 8px; border: 1px solid rgba(200,255,0,0.3); font-size: 14px; }
+      .perf-badge { display: inline-block; background: #C8FF00; color: #0f172a; font-weight: 800; padding: 4px 14px; border-radius: 20px; font-size: 13px; margin-left: 6px; }
+      .signatures { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 50px; padding: 0 30px; }
       .sig-block { text-align: center; }
-      .sig-line {
-        border-top: 2px solid #1a1a1a;
-        width: 200px;
-        margin-bottom: 10px;
-      }
-      .qr-block { width: 100px; }
-      .meta {
-        position: absolute;
-        bottom: 20px;
-        left: 40px;
-        right: 40px;
-        display: flex;
-        justify-content: space-between;
-        font-size: 12px;
-        color: #666;
-      }
+      .sig-line { border-top: 2px solid #0f172a; width: 180px; margin-bottom: 8px; }
+      .meta-row { display: flex; justify-content: space-between; font-size: 11px; color: #64748b; margin-top: 24px; border-top: 1px dashed #e2e8f0; padding-top: 12px; }
     </style>
     <div class="cert-container">
       <div class="watermark">HMORIX CERTIFIED</div>
       <div class="cert-inner">
-        <div class="logo">\${COMPANY_LOGO_MARK}</div>
-        <div class="title">Certificate of Internship Completion</div>
-        
+        <div class="logo">${COMPANY_LOGO_MARK}</div>
+        <div style="font-size:11px;color:#64748b;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">${COMPANY.legalName} &bull; ${COMPANY.iso}</div>
+        <div class="cert-title">Certificate of Internship Completion</div>
+
         <div class="body-text">This is to certify that</div>
-        <div class="name">\${data.name}</div>
-        <div class="body-text">has successfully completed an internship programme at<br><strong>HMORIX TECHNOLOGIES PRIVATE LIMITED</strong></div>
-        
-        <div class="details">
-          <div class="details-grid">
-            <div><strong>Duration:</strong> \${new Date(data.startDate).toLocaleDateString('en-GB')} to \${new Date(data.endDate).toLocaleDateString('en-GB')}</div>
-            <div><strong>Role:</strong> \${data.role}</div>
-            <div><strong>Department:</strong> \${data.department}</div>
-            <div><strong>Performance:</strong> \${data.performance || 'Satisfactory'}</div>
-            \${data.skills ? \`<div style="grid-column: 1 / -1;"><strong>Skills Acquired:</strong> \${data.skills}</div>\` : ''}
-          </div>
+        <div class="cert-name">${name}</div>
+        ${college ? `<div class="body-text" style="font-size:13px;color:#64748b;">${college}${course ? ' &bull; ' + course : ''}</div>` : ''}
+        <div class="body-text">has successfully completed an internship programme at<br><strong>${COMPANY.legalName}</strong></div>
+
+        <div class="details-grid">
+          <div><strong>Duration:</strong> ${startFmt} to ${endFmt}</div>
+          <div><strong>Role:</strong> ${role}</div>
+          <div><strong>Department:</strong> ${department}</div>
+          <div><strong>Performance:</strong> <span class="perf-badge">${performance}</span></div>
+          ${skills ? `<div style="grid-column:1/-1"><strong>Skills Acquired:</strong> ${skills}</div>` : ''}
         </div>
-        
+
         <div class="signatures">
           <div class="sig-block">
             <div class="sig-line"></div>
-            <strong>Program Director</strong>
+            <strong>Program Director</strong><br>
+            <span style="font-size:12px;color:#64748b;">HMorix Technologies</span>
           </div>
-          <div class="qr-block">
-            <svg width="80" height="80" viewBox="0 0 100 100" style="background:#fff; padding:5px;">
+          <div style="text-align:center;">
+            <svg width="70" height="70" viewBox="0 0 100 100" style="background:#fff;padding:4px;border:1px solid #e2e8f0;border-radius:4px;">
               <path d="M10,10 h30 v30 h-30 z M15,15 h20 v20 h-20 z M60,10 h30 v30 h-30 z M65,15 h20 v20 h-20 z M10,60 h30 v30 h-30 z M15,65 h20 v20 h-20 z M50,50 h10 v10 h-10 z M70,50 h10 v20 h-10 z M60,70 h30 v10 h-30 z M80,80 h10 v10 h-10 z" fill="#000"/>
             </svg>
+            <div style="font-size:9px;color:#64748b;margin-top:4px;">Scan to Verify</div>
           </div>
           <div class="sig-block">
             <div class="sig-line"></div>
-            <strong>Human Resources</strong>
+            <strong>Human Resources</strong><br>
+            <span style="font-size:12px;color:#64748b;">${COMPANY.name}</span>
           </div>
         </div>
-        
-        <div class="meta">
-          <div>Certificate No: \${data.certificateNo}</div>
-          <div>Intern ID: \${data.internId}</div>
+
+        <div class="meta-row">
+          <div>Certificate No: <strong>${certNo}</strong></div>
+          <div>Intern ID: <strong>${internId}</strong></div>
+          <div>Issue Date: <strong>${new Date().toLocaleDateString('en-GB')}</strong></div>
         </div>
       </div>
     </div>
-  \`;
-  openPrintWindow(html, \`Internship Certificate - \${data.name}\`);
+  `;
+  openPrintWindow(html, `Internship Certificate - ${name}`);
 }
 
 export interface PermanentOfferData {
@@ -2281,36 +2222,36 @@ export function printPermanentOfferLetter(data: PermanentOfferData) {
   const special = Math.round(data.ctc * 0.3);
   const statutory = Math.round(data.ctc * 0.1);
 
-  const html = \`
-    \${renderHeader('Permanent Employment Offer Letter')}
+  const html = `
+    ${renderHeader('Permanent Employment Offer Letter')}
     
     <div class="highlight-box" style="background: rgba(200,255,0,0.1); border-left-color: #C8FF00;">
       <strong>Transition from Internship to Permanent Employment</strong>
     </div>
 
     <div class="ref-ribbon">
-      <strong>Ref:</strong> HMT/HR/OFR/\${new Date(data.joiningDate).getFullYear()}/\${Date.now().toString().slice(-4)}
-      <span style="float: right;"><strong>Date:</strong> \${new Date().toLocaleDateString('en-GB')}</span>
+      <strong>Ref:</strong> HMT/HR/OFR/${new Date(data.joiningDate).getFullYear()}/${Date.now().toString().slice(-4)}
+      <span style="float: right;"><strong>Date:</strong> ${new Date().toLocaleDateString('en-GB')}</span>
     </div>
 
     <div class="recipient-block">
       <strong>To,</strong><br>
-      \${data.name}<br>
-      \${data.email ? \`Email: \${data.email}<br>\` : ''}
-      Previous Intern ID: \${data.internId}
+      ${data.name}<br>
+      ${data.email ? 'Email: ' + data.email + '<br>' : ''}
+      Previous Intern ID: ${data.internId}
     </div>
 
-    <p>Dear <strong>\${data.name}</strong>,</p>
-    <p>Following the successful completion of your internship programme\${data.prevInternDuration ? \` (\${data.prevInternDuration})\` : ''} and a comprehensive performance evaluation, we are delighted to offer you a permanent position at HMORIX TECHNOLOGIES.</p>
+    <p>Dear <strong>${data.name}</strong>,</p>
+    <p>Following the successful completion of your internship programme${data.prevInternDuration ? ' (' + data.prevInternDuration + ')' : ''} and a comprehensive performance evaluation, we are delighted to offer you a permanent position at HMORIX TECHNOLOGIES.</p>
 
     <div class="details-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: rgba(0,0,0,0.02); padding: 15px; border: 1px solid #ddd; margin-bottom: 20px;">
-      <div><strong>Employee ID:</strong> \${data.employeeId}</div>
-      <div><strong>Designation:</strong> \${data.role}</div>
-      <div><strong>Department:</strong> \${data.department}</div>
-      <div><strong>Joining Date:</strong> \${new Date(data.joiningDate).toLocaleDateString('en-GB')}</div>
-      <div><strong>Location:</strong> \${data.location}</div>
-      <div><strong>Reporting Manager:</strong> \${data.reportingTo || 'Department Head'}</div>
-      <div><strong>Annual CTC:</strong> ₹\${data.ctc.toLocaleString()}</div>
+      <div><strong>Employee ID:</strong> ${data.employeeId}</div>
+      <div><strong>Designation:</strong> ${data.role}</div>
+      <div><strong>Department:</strong> ${data.department}</div>
+      <div><strong>Joining Date:</strong> ${new Date(data.joiningDate).toLocaleDateString('en-GB')}</div>
+      <div><strong>Location:</strong> ${data.location}</div>
+      <div><strong>Reporting Manager:</strong> ${data.reportingTo || 'Department Head'}</div>
+      <div><strong>Annual CTC:</strong> ₹${data.ctc.toLocaleString()}</div>
     </div>
 
     <h4>Salary & Compensation Breakdown (Annual)</h4>
@@ -2322,13 +2263,13 @@ export function printPermanentOfferLetter(data: PermanentOfferData) {
         </tr>
       </thead>
       <tbody>
-        <tr><td>Basic Salary (40%)</td><td style="text-align: right;">₹\${basic.toLocaleString()}</td></tr>
-        <tr><td>House Rent Allowance (20%)</td><td style="text-align: right;">₹\${hra.toLocaleString()}</td></tr>
-        <tr><td>Special Allowance (30%)</td><td style="text-align: right;">₹\${special.toLocaleString()}</td></tr>
-        <tr><td>Statutory Contributions (PF, ESI etc. 10%)</td><td style="text-align: right;">₹\${statutory.toLocaleString()}</td></tr>
+        <tr><td>Basic Salary (40%)</td><td style="text-align: right;">₹${basic.toLocaleString()}</td></tr>
+        <tr><td>House Rent Allowance (20%)</td><td style="text-align: right;">₹${hra.toLocaleString()}</td></tr>
+        <tr><td>Special Allowance (30%)</td><td style="text-align: right;">₹${special.toLocaleString()}</td></tr>
+        <tr><td>Statutory Contributions (PF, ESI etc. 10%)</td><td style="text-align: right;">₹${statutory.toLocaleString()}</td></tr>
         <tr style="font-weight: bold; background: #f9f9f9;">
           <td>Total Cost to Company (CTC)</td>
-          <td style="text-align: right;">₹\${data.ctc.toLocaleString()}</td>
+          <td style="text-align: right;">₹${data.ctc.toLocaleString()}</td>
         </tr>
       </tbody>
     </table>
@@ -2343,7 +2284,7 @@ export function printPermanentOfferLetter(data: PermanentOfferData) {
 
     <h4>Terms & Conditions</h4>
     <ol>
-      <li><strong>Probation:</strong> You will be on probation for a period of \${data.probationMonths || 3} months from your joining date.</li>
+      <li><strong>Probation:</strong> You will be on probation for a period of ${data.probationMonths || 3} months from your joining date.</li>
       <li><strong>Notice Period:</strong> During probation, the notice period is 15 days. Post confirmation, it is 60 days.</li>
       <li><strong>Exclusivity:</strong> You are required to devote your full working time to the company and cannot engage in any other employment.</li>
       <li><strong>Confidentiality:</strong> You will continue to be bound by the Non-Disclosure Agreement (NDA) and Intellectual Property rights policy.</li>
@@ -2353,20 +2294,20 @@ export function printPermanentOfferLetter(data: PermanentOfferData) {
 
     <p>Please review these terms and sign the duplicate copy of this letter as a token of your acceptance.</p>
 
-    \${renderSignatures('Human Resources', 'Authorized Signatory')}
+    ${renderSignatures('Human Resources', 'Authorized Signatory')}
     
     <div style="border-top: 2px dashed #999; margin: 40px 0; padding-top: 20px;">
       <h4>Candidate Acceptance Declaration</h4>
-      <p>I, <strong>\${data.name}</strong>, acknowledge that I have read, understood, and accept the terms and conditions outlined in this permanent employment offer letter.</p>
+      <p>I, <strong>${data.name}</strong>, acknowledge that I have read, understood, and accept the terms and conditions outlined in this permanent employment offer letter.</p>
       <div style="margin-top: 40px; display: flex; justify-content: space-between;">
         <div style="border-top: 1px solid #000; width: 250px; text-align: center; padding-top: 5px;">Signature</div>
         <div style="border-top: 1px solid #000; width: 150px; text-align: center; padding-top: 5px;">Date</div>
       </div>
     </div>
 
-    \${renderFooter()}
-  \`;
-  openPrintWindow(html, \`Permanent Offer - \${data.name}\`);
+    ${renderFooter()}
+  `;
+  openPrintWindow(html, `Permanent Offer - ${data.name}`);
 }
 
 export interface InternApprovalData {
@@ -2385,30 +2326,30 @@ export interface InternApprovalData {
 }
 
 export function printInternApprovalLetter(data: InternApprovalData) {
-  const html = \`
-    \${renderHeader('Internship Approval & Onboarding Letter')}
+  const html = `
+    ${renderHeader('Internship Approval & Onboarding Letter')}
     
     <div class="ref-ribbon">
-      <strong>Ref:</strong> HMT/HR/ONB/\${new Date(data.startDate).getFullYear()}/\${Date.now().toString().slice(-4)}
-      <span style="float: right;"><strong>Date:</strong> \${new Date().toLocaleDateString('en-GB')}</span>
+      <strong>Ref:</strong> HMT/HR/ONB/${new Date(data.startDate).getFullYear()}/${Date.now().toString().slice(-4)}
+      <span style="float: right;"><strong>Date:</strong> ${new Date().toLocaleDateString('en-GB')}</span>
     </div>
 
-    <p>Dear <strong>\${data.name}</strong>,</p>
+    <p>Dear <strong>${data.name}</strong>,</p>
     <p>Welcome to HMORIX TECHNOLOGIES! We are pleased to formally approve your internship application and welcome you onboard. Your background check and document verification have been completed successfully.</p>
 
     <div class="highlight-box">
       <strong>Internship Details</strong><br>
-      Role: \${data.role} | Department: \${data.department}<br>
-      Duration: \${new Date(data.startDate).toLocaleDateString('en-GB')} to \${new Date(data.endDate).toLocaleDateString('en-GB')}<br>
-      Intern ID: \${data.internId}
-      \${data.projectTitle ? \`<br>Project: \${data.projectTitle}\` : ''}
+      Role: ${data.role} | Department: ${data.department}<br>
+      Duration: ${new Date(data.startDate).toLocaleDateString('en-GB')} to ${new Date(data.endDate).toLocaleDateString('en-GB')}<br>
+      Intern ID: ${data.internId}
+      ${data.projectTitle ? '<br>Project: ' + data.projectTitle : ''}
     </div>
 
     <h4>Supervisor Information</h4>
     <p>Your primary point of contact and supervisor for this internship will be:</p>
     <ul>
-      <li><strong>Name:</strong> \${data.supervisorName}</li>
-      <li><strong>Email:</strong> \${data.supervisorEmail}</li>
+      <li><strong>Name:</strong> ${data.supervisorName}</li>
+      <li><strong>Email:</strong> ${data.supervisorEmail}</li>
     </ul>
 
     <h4>System Access & IT Setup</h4>
@@ -2433,8 +2374,8 @@ export function printInternApprovalLetter(data: InternApprovalData) {
 
     <p>We look forward to a mutually beneficial association and wish you a fantastic learning experience at HMORIX.</p>
 
-    \${renderSignatures('Human Resources', 'Authorized Signatory')}
-    \${renderFooter()}
-  \`;
-  openPrintWindow(html, \`Intern Approval - \${data.name}\`);
+    ${renderSignatures('Human Resources', 'Authorized Signatory')}
+    ${renderFooter()}
+  `;
+  openPrintWindow(html, `Intern Approval - ${data.name}`);
 }
