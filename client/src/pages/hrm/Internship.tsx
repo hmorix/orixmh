@@ -98,7 +98,7 @@ export default function Internship() {
 
   return (
     <div className="min-h-screen bg-obsidian text-cream p-6">
-      <SEOHead title="Internship Management - HMorix" />
+      <SEOHead title="Internship Management - HMorix" description="Manage internship applications, track active interns, issue certificates, and convert interns to permanent employees." keywords="internship management, intern tracking, internship certificate, HMorix HRM" />
       
       <div className="max-w-7xl mx-auto">
         <header className="mb-8">
