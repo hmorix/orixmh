@@ -138,6 +138,8 @@ async function ensureIndexes() {
     db.collection('user_integrations').createIndex({ userId: 1, provider: 1 }, { unique: true }),
     db.collection('otp_records').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
     db.collection('employee_attendance').createIndex({ employeeId: 1, date: 1 }, { unique: true }),
+    db.collection('hrm_interns').createIndex({ internId: 1 }, { unique: true, sparse: true }),
+    db.collection('hrm_interns').createIndex({ status: 1 }),
     db.collection('hrm_teams').createIndex({ name: 1 }, { unique: true }),
     db.collection('hrm_trainings').createIndex({ title: 1, assignedTo: 1 }),
   ])
@@ -1870,6 +1872,94 @@ async function handleHrmSeed(req: VercelRequest, res: VercelResponse) {
   }
   await ensureHrmSeed()
   return res.json({ success: true, message: 'HRM enterprise test data seeded successfully.' })
+}
+
+async function handleHrmInterns(req: VercelRequest, res: VercelResponse) {
+  try {
+    const user = await getAuthUser(req)
+    if (!user) return res.status(401).json({ error: 'Unauthorized' })
+    requireRole(user, ['hr', 'admin', 'manager'])
+
+    const db = await mongoDb()
+    const internsCollection = db.collection('hrm_interns')
+
+    if (req.method === 'GET') {
+      const status = req.query.status as string
+      const query = status ? { status } : {}
+      const interns = await internsCollection.find(query).sort({ createdAt: -1 }).toArray()
+      return res.status(200).json({ data: interns })
+    }
+
+    if (req.method === 'POST') {
+      const { name, email, phone, college, course, year, role, department, startDate, endDate, stipend, mode, location } = req.body
+      
+      const yearStr = new Date().getFullYear().toString()
+      const count = await internsCollection.countDocuments()
+      const paddedCount = (count + 1).toString().padStart(3, '0')
+      const internId = \`INT-\${yearStr}-\${paddedCount}\`
+
+      const newIntern = {
+        name: sanitizeText(name),
+        email: sanitizeText(email),
+        phone: sanitizeText(phone),
+        college: sanitizeText(college),
+        course: sanitizeText(course),
+        year: sanitizeText(year),
+        role: sanitizeText(role),
+        department: sanitizeText(department),
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        stipend: Number(stipend),
+        mode: sanitizeText(mode || 'On-site'),
+        location: sanitizeText(location),
+        internId,
+        status: 'applied',
+        createdAt: new Date(),
+      }
+
+      await internsCollection.insertOne(newIntern)
+      return res.status(201).json({ success: true, internId })
+    }
+    
+    // Check if it's a PATCH on a specific intern id
+    // Wait, the route is just `hrm/interns`. The client called `/api/hrm/interns/${id}`
+    // Oh, the route dispatch logic for `hrm/interns/${id}` needs to be added, or I should handle it inside `handleHrmInterns` by checking req.query.path
+  } catch (err: any) {
+    console.error(err)
+    return res.status(500).json({ error: 'Server error', details: err.message })
+  }
+}
+
+async function handleHrmInternsId(req: VercelRequest, res: VercelResponse, id: string) {
+  try {
+    const user = await getAuthUser(req)
+    if (!user) return res.status(401).json({ error: 'Unauthorized' })
+    requireRole(user, ['hr', 'admin', 'manager'])
+
+    const db = await mongoDb()
+    const internsCollection = db.collection('hrm_interns')
+
+    if (req.method === 'PATCH') {
+      const { status } = req.body
+      if (!status) return res.status(400).json({ error: 'Status is required' })
+      
+      const { ObjectId } = require('mongodb')
+      let query: any
+      try {
+        query = { _id: new ObjectId(id) }
+      } catch (e) {
+        query = { internId: id }
+      }
+
+      await internsCollection.updateOne(query, { $set: { status, updatedAt: new Date() } })
+      return res.status(200).json({ success: true })
+    }
+
+    return res.status(405).json({ error: 'Method not allowed' })
+  } catch (err: any) {
+    console.error(err)
+    return res.status(500).json({ error: 'Server error', details: err.message })
+  }
 }
 
 async function handleHrmCalendar(req: VercelRequest, res: VercelResponse) {
@@ -4151,6 +4241,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'hrm/payroll/export': return handleHrmPayrollExport(req, res)
       case 'hrm/recruitment': return handleHrmRecruitment(req, res)
       case 'hrm/calendar': return handleHrmCalendar(req, res)
+      case 'hrm/interns': return handleHrmInterns(req, res)
       case 'hrm/seed': return handleHrmSeed(req, res)
       case 'careers': return handleCareers(req, res)
       case 'careers/applications': return handleJobApplications(req, res)
@@ -4210,6 +4301,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (routePath.startsWith('account/billing/invoices/') && routePath.endsWith('/pdf')) {
           const id = routePath.replace('account/billing/invoices/', '').replace('/pdf', '')
           return handleInvoicePdf(req, res, id)
+        }
+        if (routePath.startsWith('hrm/interns/')) {
+          const id = routePath.replace('hrm/interns/', '')
+          return handleHrmInternsId(req, res, id)
         }
         return res.status(404).json({ error: 'Not found', path: routePath })
     }
