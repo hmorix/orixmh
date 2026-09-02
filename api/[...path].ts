@@ -759,38 +759,43 @@ async function handleCrmOverview(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleHrmStats(req: VercelRequest, res: VercelResponse) {
-  const overview = await getHrmOverviewData()
-  res.json({
-    employees: {
-      total: overview.stats.totalEmployees,
-      active: overview.stats.activeEmployees,
-      onLeave: overview.todaySnapshot.onLeaveToday,
-      onboarding: overview.employees.filter((employee: any) => employee.status === 'onboarding').length,
-    },
-    recruitment: {
-      openPositions: overview.stats.openPositions,
-      totalApplicants: overview.recruitment.reduce((sum: number, job: any) => sum + Number(job.applicants || 0), 0),
-      inInterview: overview.recruitment.reduce((sum: number, job: any) => sum + Number(job.pipeline?.interview || 0), 0),
-      offersExtended: overview.recruitment.reduce((sum: number, job: any) => sum + Number(job.pipeline?.offer || 0), 0),
-    },
-    attendance: {
-      avgRate: overview.stats.totalEmployees ? Number((((overview.stats.activeEmployees - overview.todaySnapshot.onLeaveToday) / overview.stats.totalEmployees) * 100).toFixed(1)) : 0,
-      lateToday: 0,
-      absentToday: 0,
-    },
-    payroll: {
-      totalMonthly: overview.stats.monthlyPayroll,
-      avgSalary: overview.employees.length ? Math.round(overview.employees.reduce((sum: number, employee: any) => sum + Number(employee.salary || 0), 0) / overview.employees.length) : 0,
-      nextPayDate: overview.lastPayroll?.period ? `${overview.lastPayroll.period}-28` : '',
-    },
-    performance: {
-      avgScore: overview.stats.avgPerformance,
-      reviewsDue: overview.upcomingReviews.length,
-      goalsMet: 0,
-    },
-    turnover: { rate: 0, voluntary: 0, involuntary: 0 },
-    todaySnapshot: overview.todaySnapshot,
-  })
+  try {
+    const overview = await getHrmOverviewData()
+    res.json({
+      employees: {
+        total: overview.stats.totalEmployees,
+        active: overview.stats.activeEmployees,
+        onLeave: overview.todaySnapshot.onLeaveToday,
+        onboarding: overview.employees.filter((employee: any) => employee.status === 'onboarding').length,
+      },
+      recruitment: {
+        openPositions: overview.stats.openPositions,
+        totalApplicants: overview.recruitment.reduce((sum: number, job: any) => sum + Number(job.applicants || 0), 0),
+        inInterview: overview.recruitment.reduce((sum: number, job: any) => sum + Number(job.pipeline?.interview || 0), 0),
+        offersExtended: overview.recruitment.reduce((sum: number, job: any) => sum + Number(job.pipeline?.offer || 0), 0),
+      },
+      attendance: {
+        avgRate: overview.stats.totalEmployees ? Number((((overview.stats.activeEmployees - overview.todaySnapshot.onLeaveToday) / overview.stats.totalEmployees) * 100).toFixed(1)) : 0,
+        lateToday: 0,
+        absentToday: 0,
+      },
+      payroll: {
+        totalMonthly: overview.stats.monthlyPayroll,
+        avgSalary: overview.employees.length ? Math.round(overview.employees.reduce((sum: number, employee: any) => sum + Number(employee.salary || 0), 0) / overview.employees.length) : 0,
+        nextPayDate: overview.lastPayroll?.period ? `${overview.lastPayroll.period}-28` : '',
+      },
+      performance: {
+        avgScore: overview.stats.avgPerformance,
+        reviewsDue: overview.upcomingReviews.length,
+        goalsMet: 0,
+      },
+      turnover: { rate: 0, voluntary: 0, involuntary: 0 },
+      todaySnapshot: overview.todaySnapshot,
+    })
+  } catch (err: any) {
+    console.error('handleHrmStats error:', err?.message)
+    return res.status(500).json({ error: 'Failed to load HRM stats', details: err?.message })
+  }
 }
 
 async function handleHrmEmployees(req: VercelRequest, res: VercelResponse) {
@@ -1878,7 +1883,7 @@ async function handleHrmInterns(req: VercelRequest, res: VercelResponse) {
   try {
     const user = await getAuthUser(req)
     if (!user) return res.status(401).json({ error: 'Unauthorized' })
-    requireRole(user, ['hr', 'admin', 'manager'])
+    if (!requireRole(user, ['hr', 'admin', 'manager'])) return res.status(403).json({ error: 'Access denied' })
 
     const db = await mongoDb()
     const internsCollection = db.collection('hrm_interns')
@@ -1892,26 +1897,33 @@ async function handleHrmInterns(req: VercelRequest, res: VercelResponse) {
 
     if (req.method === 'POST') {
       const { name, email, phone, college, course, year, role, department, startDate, endDate, stipend, mode, location } = req.body
-      
+
+      if (!name || !role || !department) {
+        return res.status(400).json({ error: 'Name, role, and department are required' })
+      }
+
       const yearStr = new Date().getFullYear().toString()
       const count = await internsCollection.countDocuments()
       const paddedCount = (count + 1).toString().padStart(3, '0')
-      const internId = \`INT-\${yearStr}-\${paddedCount}\`
+      const internId = `INT-${yearStr}-${paddedCount}`
+
+      const parsedStart = startDate ? new Date(startDate) : null
+      const parsedEnd = endDate ? new Date(endDate) : null
 
       const newIntern = {
         name: sanitizeText(name),
-        email: sanitizeText(email),
-        phone: sanitizeText(phone),
-        college: sanitizeText(college),
-        course: sanitizeText(course),
-        year: sanitizeText(year),
+        email: sanitizeText(email || ''),
+        phone: sanitizeText(phone || ''),
+        college: sanitizeText(college || ''),
+        course: sanitizeText(course || ''),
+        year: sanitizeText(year || ''),
         role: sanitizeText(role),
         department: sanitizeText(department),
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
-        stipend: Number(stipend),
+        startDate: parsedStart && !isNaN(parsedStart.getTime()) ? parsedStart : null,
+        endDate: parsedEnd && !isNaN(parsedEnd.getTime()) ? parsedEnd : null,
+        stipend: Number(stipend) || 0,
         mode: sanitizeText(mode || 'On-site'),
-        location: sanitizeText(location),
+        location: sanitizeText(location || ''),
         internId,
         status: 'applied',
         createdAt: new Date(),
@@ -1920,12 +1932,10 @@ async function handleHrmInterns(req: VercelRequest, res: VercelResponse) {
       await internsCollection.insertOne(newIntern)
       return res.status(201).json({ success: true, internId })
     }
-    
-    // Check if it's a PATCH on a specific intern id
-    // Wait, the route is just `hrm/interns`. The client called `/api/hrm/interns/${id}`
-    // Oh, the route dispatch logic for `hrm/interns/${id}` needs to be added, or I should handle it inside `handleHrmInterns` by checking req.query.path
+
+    return res.status(405).json({ error: 'Method not allowed' })
   } catch (err: any) {
-    console.error(err)
+    console.error('handleHrmInterns error:', err?.message)
     return res.status(500).json({ error: 'Server error', details: err.message })
   }
 }
@@ -1934,7 +1944,7 @@ async function handleHrmInternsId(req: VercelRequest, res: VercelResponse, id: s
   try {
     const user = await getAuthUser(req)
     if (!user) return res.status(401).json({ error: 'Unauthorized' })
-    requireRole(user, ['hr', 'admin', 'manager'])
+    if (!requireRole(user, ['hr', 'admin', 'manager'])) return res.status(403).json({ error: 'Access denied' })
 
     const db = await mongoDb()
     const internsCollection = db.collection('hrm_interns')
