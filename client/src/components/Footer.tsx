@@ -32,12 +32,15 @@ export default function Footer() {
               <li><Link to="/pdf-automation" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">PDF Automation</Link></li>
               <li><Link to="/smart-home" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">Smart Home</Link></li>
               <li><Link to="/playground" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">AI Playground</Link></li>
-              <li><Link to="/developers" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">Developers</Link></li>
+              <li><Link to="/developers" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">Developer Portal</Link></li>
+              <li><Link to="/docs" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">API Documentation</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-display font-semibold text-sm mb-4">Resources</h4>
             <ul className="flex flex-col gap-2">
+              <li><a href="/openapi.json" target="_blank" rel="noreferrer" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">OpenAPI Spec</a></li>
+              <li><a href="/llms.txt" target="_blank" rel="noreferrer" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">Agent Guide (llms.txt)</a></li>
               <li><Link to="/blog" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">Blog</Link></li>
               <li><Link to="/case-studies" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">Case Studies</Link></li>
               <li><Link to="/whitepapers" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">Whitepapers</Link></li>

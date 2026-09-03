@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="alternate icon" href="/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HMorix Developer Portal, API Keys & Sandbox</title>
+  <meta name="description" content="The official HMorix developer portal: OpenAPI 3.0 specs, API keys, interactive sandbox, quickstarts, and CLI tools." />
+  <link rel="canonical" href="https://hmorix.in/developers" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body { background-color: #0A0A0B; color: #F5F5F7; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+    a { color: #C8FF00; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 60px 24px; }
+    h1 { font-family: 'Space Grotesk', sans-serif; font-size: 38px; line-height: 1.2; margin-bottom: 20px; }
+    h2 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; margin-top: 36px; margin-bottom: 16px; border-bottom: 1px solid #222; padding-bottom: 8px; }
+    h3 { font-size: 18px; margin-top: 24px; margin-bottom: 10px; color: #E5E5E7; }
+    p, li { color: #A1A1AA; line-height: 1.7; font-size: 15px; }
+    ul, ol { padding-left: 24px; }
+    code, pre { font-family: 'JetBrains Mono', monospace; background: #16161A; border: 1px solid #27272A; border-radius: 4px; padding: 2px 6px; font-size: 13px; }
+    pre { padding: 16px; overflow-x: auto; }
+    .btn { display: inline-block; background: #C8FF00; color: #0A0A0B; padding: 10px 20px; border-radius: 4px; font-weight: 600; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div class="container">
+      <p style="color:#C8FF00;font-family:monospace;font-size:14px;margin-bottom:8px;">DEVELOPER PLATFORM</p>
+<h1>HMorix Developer Portal & API Sandbox</h1>
+<p style="font-size:18px;color:#bbb;line-height:1.6;margin-bottom:30px;">
+  Everything developers and autonomous AI agents need to integrate HMorix services: typed REST APIs, OpenAPI 3.0 schemas, interactive sandbox probes, and our official CLI tool.
+</p>
+
+<h2>Quick Start (cURL)</h2>
+<pre><code>curl -s -X GET "https://hmorix.in/api/status" \
+  -H "Accept: application/json"</code></pre>
+
+<h2>API Keys & Authentication</h2>
+<p>
+  All authenticated requests accept an <code>Authorization: Bearer &lt;HMORIX_API_KEY&gt;</code> header or an HTTP-only <code>hm_session</code> cookie. Developers can generate API keys directly in the <a href="/signin">Developer Account Settings</a>.
+</p>
+
+<h2>Interactive Sandbox Probes</h2>
+<ul>
+  <li><code>GET /api/health</code> – Operational gateway and database cluster connectivity.</li>
+  <li><code>GET /api/status</code> – Live subsystem latency and uptime metrics.</li>
+  <li><code>GET /api/services</code> – Full catalog of enterprise solutions and base pricing.</li>
+  <li><code>POST /api/ai/chat</code> – Autonomous agent inference with NVIDIA NIM orchestration.</li>
+</ul>
+
+<h2>Official CLI Tool (@hmorix/cli)</h2>
+<p>
+  Script your workflows and automate API calls using the official HMorix CLI:
+</p>
+<pre><code># Run instantly with npx
+npx @hmorix/cli status
+
+# Inspect OpenAPI spec
+npx @hmorix/cli openapi</code></pre>
+
+<h2>Machine-Readable Specifications</h2>
+<p>
+  Download and validate our API schemas in standard formats:
+</p>
+<ul style="line-height:1.8;">
+  <li><a href="/openapi.json">OpenAPI 3.0 Specification (JSON)</a></li>
+  <li><a href="/openapi.yaml">OpenAPI Specification (YAML)</a></li>
+  <li><a href="/docs">Full Public API Documentation</a></li>
+  <li><a href="/pricing.md">Pricing & Plan Breakdown (pricing.md)</a></li>
+  <li><a href="/.well-known/api-catalog">RFC 9727 API Catalog</a></li>
+  <li><a href="/llms.txt">AI Agent Instructions (llms.txt)</a></li>
+</ul>
+    </div>
+  </div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

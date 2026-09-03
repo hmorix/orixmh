@@ -72,14 +72,94 @@ export default function Developers() {
           </div>
         </div>
 
+        {/* Live Interactive Sandbox */}
+        <div className="p-8 bg-obsidian-2 border border-glass-border rounded-[16px] mb-12">
+          <div className="flex items-center gap-3 mb-4">
+            <Terminal className="text-[#C8FF00]" size={22} />
+            <h2 className="font-display text-xl font-bold">Interactive API Sandbox</h2>
+          </div>
+          <p className="text-sm text-cream/60 mb-6">
+            Test live API endpoints directly in your browser. All sandbox requests return production-accurate data without mutating account state.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+            <button
+              onClick={() => {
+                fetch('/api/health').then(r => r.json()).then(d => {
+                  const el = document.getElementById('sandbox-output')
+                  if (el) el.textContent = JSON.stringify(d, null, 2)
+                }).catch(() => {
+                  const el = document.getElementById('sandbox-output')
+                  if (el) el.textContent = '{"status": "Probe error"}'
+                })
+              }}
+              className="px-4 py-2.5 bg-obsidian border border-glass-border hover:border-[#C8FF00] rounded-[6px] text-xs font-mono text-left transition-colors"
+            >
+              <span className="text-blue-400 font-bold">GET</span> /api/health
+            </button>
+            <button
+              onClick={() => {
+                fetch('/api/status').then(r => r.json()).then(d => {
+                  const el = document.getElementById('sandbox-output')
+                  if (el) el.textContent = JSON.stringify(d, null, 2)
+                }).catch(() => {
+                  const el = document.getElementById('sandbox-output')
+                  if (el) el.textContent = '{"status": "Probe error"}'
+                })
+              }}
+              className="px-4 py-2.5 bg-obsidian border border-glass-border hover:border-[#C8FF00] rounded-[6px] text-xs font-mono text-left transition-colors"
+            >
+              <span className="text-blue-400 font-bold">GET</span> /api/status
+            </button>
+            <button
+              onClick={() => {
+                fetch('/api/services').then(r => r.json()).then(d => {
+                  const el = document.getElementById('sandbox-output')
+                  if (el) el.textContent = JSON.stringify(d, null, 2)
+                }).catch(() => {
+                  const el = document.getElementById('sandbox-output')
+                  if (el) el.textContent = '{"status": "Probe error"}'
+                })
+              }}
+              className="px-4 py-2.5 bg-obsidian border border-glass-border hover:border-[#C8FF00] rounded-[6px] text-xs font-mono text-left transition-colors"
+            >
+              <span className="text-blue-400 font-bold">GET</span> /api/services
+            </button>
+          </div>
+          <pre id="sandbox-output" className="p-4 bg-obsidian border border-glass-border rounded-[8px] font-mono text-xs text-cream/70 overflow-x-auto max-h-[220px]">
+            {"// Click an endpoint above to run a live sandbox probe"}
+          </pre>
+        </div>
+
+        {/* CLI Tool */}
+        <div id="cli" className="p-8 bg-obsidian-2 border border-glass-border rounded-[16px] mb-12">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-xl font-bold">Official CLI Tool (@hmorix/cli)</h2>
+            <span className="text-xs px-2.5 py-1 bg-[#C8FF00]/10 text-[#C8FF00] rounded-full font-mono">v1.0.0</span>
+          </div>
+          <p className="text-sm text-cream/60 mb-6">
+            The official command-line interface lets agents and developers script interactions, inspect OpenAPI schemas, and invoke AI agents from the terminal.
+          </p>
+          <div className="bg-obsidian border border-glass-border rounded-[8px] p-4 font-mono text-xs leading-relaxed overflow-x-auto mb-4 text-cream/80">
+            <div className="text-cream/40"># Run instantly without global install</div>
+            <div className="text-[#C8FF00]">npx @hmorix/cli status</div>
+            <div className="mt-3 text-cream/40"># Install globally via npm</div>
+            <div>npm install -g @hmorix/cli</div>
+            <div className="mt-3 text-cream/40"># Fetch OpenAPI schema</div>
+            <div>hmorix openapi</div>
+            <div className="mt-3 text-cream/40"># Trigger AI Agent prompt</div>
+            <div>hmorix agent "Check invoice status for INV-2841"</div>
+          </div>
+        </div>
+
         {/* OpenAPI */}
         <div className="p-8 bg-obsidian-2 border border-glass-border rounded-[16px] mb-12">
           <h2 className="font-display text-xl font-bold mb-4">OpenAPI Specification</h2>
-          <p className="text-sm text-cream/60 mb-6">Our complete API is documented using OpenAPI 3.0. Import the spec into your favorite API client.</p>
+          <p className="text-sm text-cream/60 mb-6">Our complete API is documented using OpenAPI 3.0. Import the spec into your favorite API client or LLM function calling workflow.</p>
           <div className="flex gap-3 flex-wrap">
-            <button className="px-4 py-2 bg-white/[0.04] border border-glass-border rounded-[4px] text-sm text-cream/60 hover:text-[#C8FF00] hover:border-[#C8FF00] transition-all">Download OpenAPI Spec</button>
-            <button className="px-4 py-2 bg-white/[0.04] border border-glass-border rounded-[4px] text-sm text-cream/60 hover:text-[#C8FF00] hover:border-[#C8FF00] transition-all">View in Swagger UI</button>
-            <button className="px-4 py-2 bg-white/[0.04] border border-glass-border rounded-[4px] text-sm text-cream/60 hover:text-[#C8FF00] hover:border-[#C8FF00] transition-all">Import to Postman</button>
+            <a href="/openapi.json" target="_blank" rel="noreferrer" className="px-4 py-2 bg-white/[0.04] border border-glass-border rounded-[4px] text-sm text-cream/60 hover:text-[#C8FF00] hover:border-[#C8FF00] transition-all">Download OpenAPI Spec (JSON)</a>
+            <a href="/openapi.yaml" target="_blank" rel="noreferrer" className="px-4 py-2 bg-white/[0.04] border border-glass-border rounded-[4px] text-sm text-cream/60 hover:text-[#C8FF00] hover:border-[#C8FF00] transition-all">Download OpenAPI Spec (YAML)</a>
+            <a href="/docs" className="px-4 py-2 bg-[#C8FF00] text-obsidian font-semibold rounded-[4px] text-sm hover:opacity-90 transition-all">View API Documentation</a>
+            <a href="/pricing.md" target="_blank" rel="noreferrer" className="px-4 py-2 bg-white/[0.04] border border-glass-border rounded-[4px] text-sm text-cream/60 hover:text-[#C8FF00] hover:border-[#C8FF00] transition-all">Pricing Spec (pricing.md)</a>
           </div>
         </div>
 

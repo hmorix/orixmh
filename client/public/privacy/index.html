@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="alternate icon" href="/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HMorix Privacy Policy & Data Protection Charter</title>
+  <meta name="description" content="Learn how HMorix protects customer and enterprise data in accordance with the Indian DPDP Act and GDPR." />
+  <link rel="canonical" href="https://hmorix.in/privacy" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body { background-color: #0A0A0B; color: #F5F5F7; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+    a { color: #C8FF00; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 60px 24px; }
+    h1 { font-family: 'Space Grotesk', sans-serif; font-size: 38px; line-height: 1.2; margin-bottom: 20px; }
+    h2 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; margin-top: 36px; margin-bottom: 16px; border-bottom: 1px solid #222; padding-bottom: 8px; }
+    h3 { font-size: 18px; margin-top: 24px; margin-bottom: 10px; color: #E5E5E7; }
+    p, li { color: #A1A1AA; line-height: 1.7; font-size: 15px; }
+    ul, ol { padding-left: 24px; }
+    code, pre { font-family: 'JetBrains Mono', monospace; background: #16161A; border: 1px solid #27272A; border-radius: 4px; padding: 2px 6px; font-size: 13px; }
+    pre { padding: 16px; overflow-x: auto; }
+    .btn { display: inline-block; background: #C8FF00; color: #0A0A0B; padding: 10px 20px; border-radius: 4px; font-weight: 600; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div class="container">
+      <p style="color:#C8FF00;font-family:monospace;font-size:14px;margin-bottom:8px;">LEGAL & DATA GOVERNANCE</p>
+<h1>HMorix Privacy Policy & Data Protection Charter</h1>
+<p style="font-size:18px;color:#bbb;line-height:1.6;margin-bottom:30px;">
+  This document sets forth the comprehensive privacy policy for HMorix (<a href="https://hmorix.in">https://hmorix.in</a>), detailing our collection, usage, and cryptographic protection of personal and enterprise information.
+</p>
+
+<h2>Principles of Data Protection</h2>
+<p>
+  HMorix is built on an enterprise-first foundation. We uphold strict adherence to the Indian Digital Personal Data Protection (DPDP) Act of 2023 and the General Data Protection Regulation (GDPR). We enforce zero data monetization: customer data is never sold, leased, or transmitted to advertising brokers.
+</p>
+
+<h2>Information Collected</h2>
+<ul>
+  <li><strong>Authentication Details:</strong> Email addresses, names, and bcrypt-salted credential hashes.</li>
+  <li><strong>Enterprise Invoicing Data:</strong> Corporate legal name, GSTIN, invoice lines, and payment metadata.</li>
+  <li><strong>System Logs:</strong> IP address, user-agent string, and HMAC-signed session identifiers (<code>hm_session</code>).</li>
+</ul>
+
+<h2>Data Security Controls</h2>
+<p>
+  All data transmission is protected via TLS 1.3 encryption. At-rest storage is hosted on encrypted MongoDB Atlas clusters with automated access auditing and role-based access control (RBAC). Session tokens are stored in signed, HTTP-only cookies to protect against cross-site scripting (XSS).
+</p>
+
+<h2>User Rights & Contact</h2>
+<p>
+  You have the right to inspect, export, or permanently delete your account data. Inquiries and data deletion requests should be directed to our Data Protection Officer at <a href="mailto:support@hmorix.com">support@hmorix.com</a>.
+</p>
+    </div>
+  </div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://hmorix.in/api",
+      "service-desc": [
+        {
+          "href": "https://hmorix.in/openapi.json",
+          "type": "application/vnd.oai.openapi+json;version=3.0",
+          "title": "HMorix OpenAPI 3.0 Specification (JSON)"
+        },
+        {
+          "href": "https://hmorix.in/openapi.yaml",
+          "type": "application/yaml",
+          "title": "HMorix OpenAPI 3.0 Specification (YAML)"
+        },
+        {
+          "href": "https://hmorix.in/api/openapi.yaml",
+          "type": "application/yaml",
+          "title": "HMorix API Gateway Specification"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://hmorix.in/docs",
+          "type": "text/html",
+          "title": "HMorix Public API Documentation"
+        },
+        {
+          "href": "https://hmorix.in/developers",
+          "type": "text/html",
+          "title": "HMorix Developer Portal & Sandbox"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://hmorix.in/status",
+          "type": "text/html",
+          "title": "HMorix Platform Status"
+        }
+      ]
+    }
+  ]
+}

@@ -113,7 +113,8 @@ export default function Navbar({ onCommandOpen }: NavbarProps) {
             <div className="relative group">
               <button className="px-3 py-1.5 text-sm font-medium text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px] transition-all">Platform ▾</button>
               <div className="hidden group-hover:block absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-obsidian-2 border border-glass-border rounded-[8px] p-2 min-w-[220px] backdrop-blur-[20px]">
-                <Link to="/developers" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">Developers</Link>
+                <Link to="/developers" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">Developer Portal</Link>
+                <Link to="/docs" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">API Documentation</Link>
                 <Link to="/dashboard" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">Dashboard</Link>
                 <Link to="/architecture" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">Architecture</Link>
                 <Link to="/portal" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">Client Portal</Link>

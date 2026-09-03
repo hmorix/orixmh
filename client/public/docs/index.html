@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="alternate icon" href="/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HMorix Public API Documentation & Endpoint Reference</title>
+  <meta name="description" content="Complete public REST API reference for HMorix: endpoints, authentication, request examples, and response schemas." />
+  <link rel="canonical" href="https://hmorix.in/docs" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body { background-color: #0A0A0B; color: #F5F5F7; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+    a { color: #C8FF00; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 60px 24px; }
+    h1 { font-family: 'Space Grotesk', sans-serif; font-size: 38px; line-height: 1.2; margin-bottom: 20px; }
+    h2 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; margin-top: 36px; margin-bottom: 16px; border-bottom: 1px solid #222; padding-bottom: 8px; }
+    h3 { font-size: 18px; margin-top: 24px; margin-bottom: 10px; color: #E5E5E7; }
+    p, li { color: #A1A1AA; line-height: 1.7; font-size: 15px; }
+    ul, ol { padding-left: 24px; }
+    code, pre { font-family: 'JetBrains Mono', monospace; background: #16161A; border: 1px solid #27272A; border-radius: 4px; padding: 2px 6px; font-size: 13px; }
+    pre { padding: 16px; overflow-x: auto; }
+    .btn { display: inline-block; background: #C8FF00; color: #0A0A0B; padding: 10px 20px; border-radius: 4px; font-weight: 600; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div class="container">
+      <p style="color:#C8FF00;font-family:monospace;font-size:14px;margin-bottom:8px;">API REFERENCE</p>
+<h1>HMorix Public API Documentation & Endpoint Reference</h1>
+<p style="font-size:18px;color:#bbb;line-height:1.6;margin-bottom:30px;">
+  Comprehensive documentation for the HMorix REST API. Designed for developers, autonomous AI agents, and enterprise integrations.
+</p>
+
+<h2>Authentication</h2>
+<p>
+  Include your API key via Bearer token: <code>Authorization: Bearer &lt;HMORIX_API_KEY&gt;</code>. Alternatively, browser sessions use signed HTTP-only cookies (<code>hm_session</code>).
+</p>
+
+<h2>Core API Endpoints</h2>
+<ul>
+  <li><strong>GET /api/health:</strong> System health and database connectivity probe.</li>
+  <li><strong>GET /api/status:</strong> Live component uptime, latency, and incident reports.</li>
+  <li><strong>GET /api/services:</strong> Active software packages and base pricing.</li>
+  <li><strong>POST /api/contact:</strong> Business inquiries and automated CRM lead generation.</li>
+  <li><strong>POST /api/ai/chat:</strong> AI workflow execution and LLM inference.</li>
+  <li><strong>GET /api/blogs:</strong> Paginated engineering articles and updates.</li>
+  <li><strong>GET /api/account/api-keys:</strong> List authenticated API access keys.</li>
+</ul>
+
+<h2>OpenAPI Specification</h2>
+<p>
+  Download the machine-readable schema for your tool calling pipeline: <a href="/openapi.json">openapi.json</a> or <a href="/openapi.yaml">openapi.yaml</a>.
+</p>
+<p style="margin-top:30px;">
+  <a href="/developers" class="btn">Open Developer Portal</a>
+</p>
+    </div>
+  </div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

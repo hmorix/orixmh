@@ -37,6 +37,7 @@ const PDFDocs = lazy(() => import('./pages/products/PDFDocs'))
 const PDFDemo = lazy(() => import('./pages/products/PDFDemo'))
 const PDFTemplates = lazy(() => import('./pages/products/PDFTemplates'))
 const Developers = lazy(() => import('./pages/Developers'))
+const Docs = lazy(() => import('./pages/Docs'))
 const Playground = lazy(() => import('./pages/Playground'))
 const SmartHome = lazy(() => import('./pages/SmartHome'))
 const HarshSharma = lazy(() => import('./pages/HarshSharma'))
@@ -272,6 +273,7 @@ function App() {
 
           {/* Platform */}
           <Route path="/developers" element={<Developers />} />
+          <Route path="/docs" element={<Docs />} />
           <Route path="/playground" element={<Playground />} />
           <Route path="/smart-home" element={<SmartHome />} />
           <Route path="/harsh-sharma" element={<HarshSharma />} />

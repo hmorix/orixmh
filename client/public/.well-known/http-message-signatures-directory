@@ -1,0 +1,22 @@
+{
+  "keys": [
+    {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "kid": "hmorix-bot-auth-2026-01",
+      "use": "sig",
+      "x": "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrGwOWnN56gI",
+      "nbf": 1767225600,
+      "exp": 1830297600
+    },
+    {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "kid": "hmorix-bot-auth-primary",
+      "use": "sig",
+      "x": "b8z79VpQz7F9P9wV0J9mB7oN4yK2L8wX3qV1mZ6tR0E",
+      "nbf": 1767225600,
+      "exp": 1861833600
+    }
+  ]
+}

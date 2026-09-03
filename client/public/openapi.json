@@ -1,0 +1,1069 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "HMorix Enterprise Platform API",
+    "version": "2.4.0",
+    "description": "The official REST API for HMorix Enterprise Cloud Platform. Provides endpoints for AI agent automation, BillingFlow invoicing, public services, contact submissions, blogs, recruitment, and developer tools. Fully typed and optimized for LLM function calling and agent integration.",
+    "contact": {
+      "name": "HMorix Developer Support",
+      "email": "support@hmorix.com",
+      "url": "https://hmorix.in/developers"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://hmorix.in/api",
+      "description": "Production API Gateway"
+    }
+  ],
+  "tags": [
+    {
+      "name": "System",
+      "description": "Platform health, status, and configuration"
+    },
+    {
+      "name": "AI Agent",
+      "description": "Enterprise AI workflows and LLM chat completions"
+    },
+    {
+      "name": "Services",
+      "description": "HMorix professional services and catalog"
+    },
+    {
+      "name": "Contact",
+      "description": "Public inquiries, lead generation, and client support"
+    },
+    {
+      "name": "Content",
+      "description": "Blog articles, categories, and knowledge base"
+    },
+    {
+      "name": "Careers",
+      "description": "Job openings and talent acquisition"
+    },
+    {
+      "name": "Authentication",
+      "description": "User sessions, credentials, and email OTP verification"
+    },
+    {
+      "name": "Developer",
+      "description": "API keys and sandbox management"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Check API health status",
+        "description": "Returns operational connectivity status for the API gateway, MongoDB primary datastore, and Supabase auxiliary store.",
+        "operationId": "getHealthStatus",
+        "responses": {
+          "200": {
+            "description": "System health summary",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/status": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Retrieve live platform component metrics",
+        "description": "Returns uptime percentages, operational status, and latency benchmarks for all HMorix subsystems including BillingFlow, AI Agent Engine, PDF Processing, and Database Cluster.",
+        "operationId": "getSystemStatus",
+        "responses": {
+          "200": {
+            "description": "Platform status breakdown",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/StatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services": {
+      "get": {
+        "tags": [
+          "Services"
+        ],
+        "summary": "List enterprise software and agency services",
+        "description": "Returns all active services offered by HMorix including AI & Machine Learning, Web Design, Mobile App Development, Digital Marketing, and Custom Software with starting prices.",
+        "operationId": "listServices",
+        "responses": {
+          "200": {
+            "description": "List of available services",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/ServicesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contact": {
+      "post": {
+        "tags": [
+          "Contact"
+        ],
+        "summary": "Submit a business inquiry or consultation request",
+        "description": "Sends a message to HMorix sales and engineering teams. Automatically generates a CRM lead pipeline entry and notifies project triage.",
+        "operationId": "submitContactInquiry",
+        "requestBody": {
+          "required": true,
+          "description": "Contact inquiry payload",
+          "content": {
+            "application/json": {
+              "schema": {
+                "": "#/components/schemas/ContactRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inquiry accepted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid submission payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blogs": {
+      "get": {
+        "tags": [
+          "Content"
+        ],
+        "summary": "List published blog articles",
+        "description": "Retrieves published technical articles, engineering updates, and market insights with author metadata, tags, and reading times.",
+        "operationId": "listBlogPosts",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number for pagination (starts at 1)",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum number of posts to return",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "description": "Filter by article category slug",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of blog articles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/BlogListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blog/{slug}": {
+      "get": {
+        "tags": [
+          "Content"
+        ],
+        "summary": "Get article by slug",
+        "description": "Retrieves the full markdown/HTML content, SEO metadata, and published timestamps for a specific blog post.",
+        "operationId": "getBlogPostBySlug",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "description": "Unique URL slug of the blog article",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Article details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/BlogPostResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Article not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/status": {
+      "get": {
+        "tags": [
+          "AI Agent"
+        ],
+        "summary": "Check AI agent engine status",
+        "description": "Returns operational status and active LLM models (e.g. NVIDIA NIM Llama 3.1 405B) for autonomous workflows.",
+        "operationId": "getAiEngineStatus",
+        "responses": {
+          "200": {
+            "description": "AI engine status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/AiStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/chat": {
+      "post": {
+        "tags": [
+          "AI Agent"
+        ],
+        "summary": "Send prompt to HMorix AI Assistant",
+        "description": "Executes enterprise workflow automation, code generation, or customer support reasoning via HMorix AI orchestration.",
+        "operationId": "createAiChatCompletion",
+        "requestBody": {
+          "required": true,
+          "description": "Chat prompt message",
+          "content": {
+            "application/json": {
+              "schema": {
+                "": "#/components/schemas/AiChatRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "AI response generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/AiChatResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/careers": {
+      "get": {
+        "tags": [
+          "Careers"
+        ],
+        "summary": "List active career opportunities",
+        "description": "Returns current job openings, engineering roles, and internship opportunities at HMorix.",
+        "operationId": "listCareers",
+        "responses": {
+          "200": {
+            "description": "Active job listings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/CareersResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/signin": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Sign in with email and password",
+        "description": "Authenticates a registered user or employee and sets a signed HMAC-SHA256 session cookie ().",
+        "operationId": "signInUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "": "#/components/schemas/SignInRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/AuthUserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Get authenticated user profile",
+        "description": "Returns user identity, active role (admin, manager, hr, employee, sales, user), and verification status for current session.",
+        "operationId": "getCurrentUser",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authenticated session profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/AuthUserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/api-keys": {
+      "get": {
+        "tags": [
+          "Developer"
+        ],
+        "summary": "List developer API keys",
+        "description": "Returns masked API keys created by the current authenticated developer account.",
+        "operationId": "listApiKeys",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of active developer keys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/ApiKeysResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Developer"
+        ],
+        "summary": "Generate a new developer API key",
+        "description": "Creates a secure API key with configurable rate limits for programmatic automation and function calling.",
+        "operationId": "generateApiKey",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "": "#/components/schemas/CreateApiKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Key generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/ApiKeyCreatedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "SessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "hm_session",
+        "description": "Signed HMAC-SHA256 session cookie"
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT / HMKey",
+        "description": "API key generated in Developer Portal or JWT authorization token"
+      }
+    },
+    "schemas": {
+      "HealthResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "status",
+          "timestamp"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "status": {
+            "type": "object",
+            "required": [
+              "api",
+              "mongodb",
+              "supabase"
+            ],
+            "properties": {
+              "api": {
+                "type": "boolean",
+                "example": true
+              },
+              "mongodb": {
+                "type": "boolean",
+                "example": true
+              },
+              "supabase": {
+                "type": "boolean",
+                "example": true
+              }
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "StatusItem": {
+        "type": "object",
+        "required": [
+          "name",
+          "status",
+          "uptime",
+          "latency"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "API Gateway"
+          },
+          "status": {
+            "type": "string",
+            "example": "operational"
+          },
+          "uptime": {
+            "type": "number",
+            "example": 99.99
+          },
+          "latency": {
+            "type": "string",
+            "example": "12ms"
+          }
+        }
+      },
+      "StatusResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "overall",
+          "services",
+          "lastUpdated"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "overall": {
+            "type": "string",
+            "example": "operational"
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "": "#/components/schemas/StatusItem"
+            }
+          },
+          "lastUpdated": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ServiceItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "category",
+          "description",
+          "startingPrice",
+          "popular"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "ai-solutions"
+          },
+          "name": {
+            "type": "string",
+            "example": "AI & Machine Learning"
+          },
+          "category": {
+            "type": "string",
+            "example": "AI"
+          },
+          "description": {
+            "type": "string",
+            "example": "Custom AI agents, NLP, computer vision solutions"
+          },
+          "startingPrice": {
+            "type": "number",
+            "example": 9999
+          },
+          "popular": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "ServicesResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "": "#/components/schemas/ServiceItem"
+            }
+          }
+        }
+      },
+      "ContactRequest": {
+        "type": "object",
+        "required": [
+          "first_name",
+          "email",
+          "message"
+        ],
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "maxLength": 80,
+            "example": "John"
+          },
+          "last_name": {
+            "type": "string",
+            "maxLength": 80,
+            "example": "Doe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@company.com"
+          },
+          "service": {
+            "type": "string",
+            "maxLength": 120,
+            "example": "AI Agents & Autonomous Workflows"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 2000,
+            "example": "We want to automate our enterprise invoice matching and customer support."
+          }
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "message"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Thank you for contacting us. We will get back to you soon."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "Invalid request parameter"
+          },
+          "code": {
+            "type": "string",
+            "example": "BAD_REQUEST"
+          }
+        }
+      },
+      "BlogPost": {
+        "type": "object",
+        "required": [
+          "slug",
+          "title",
+          "excerpt",
+          "category",
+          "publishedAt"
+        ],
+        "properties": {
+          "slug": {
+            "type": "string",
+            "example": "what-is-hmorix-ai-solutions-guide"
+          },
+          "title": {
+            "type": "string",
+            "example": "Enterprise AI Solutions: Architecture & Best Practices"
+          },
+          "excerpt": {
+            "type": "string",
+            "example": "A comprehensive architectural breakdown of autonomous enterprise agents..."
+          },
+          "category": {
+            "type": "string",
+            "example": "AI & Engineering"
+          },
+          "readingTime": {
+            "type": "number",
+            "example": 6
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BlogListResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "": "#/components/schemas/BlogPost"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "example": 24
+          }
+        }
+      },
+      "BlogPostResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "required": [
+              "slug",
+              "title",
+              "content"
+            ],
+            "properties": {
+              "slug": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "publishedAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "AiStatusResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "model",
+          "status"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "model": {
+            "type": "string",
+            "example": "meta/llama-3.1-405b-instruct"
+          },
+          "status": {
+            "type": "string",
+            "example": "ready"
+          }
+        }
+      },
+      "AiChatRequest": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Explain BillingFlow features and GST calculation support."
+          },
+          "conversationId": {
+            "type": "string",
+            "example": "conv_982431"
+          }
+        }
+      },
+      "AiChatResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "reply"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "reply": {
+            "type": "string",
+            "example": "HMorix BillingFlow automatically calculates Indian GST (CGST/SGST/IGST)..."
+          }
+        }
+      },
+      "CareersResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "department": {
+                  "type": "string"
+                },
+                "location": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SignInRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "dev@company.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "SecretPass123!"
+          }
+        }
+      },
+      "AuthUserResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "user"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "user": {
+            "type": "object",
+            "required": [
+              "id",
+              "email",
+              "name",
+              "role"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "admin",
+                  "manager",
+                  "hr",
+                  "employee",
+                  "sales",
+                  "crm",
+                  "user"
+                ]
+              },
+              "emailVerified": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "CreateApiKeyRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Production Agent Pipeline"
+          },
+          "rateLimit": {
+            "type": "integer",
+            "default": 600,
+            "description": "Requests per minute limit"
+          }
+        }
+      },
+      "ApiKeysResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "maskedKey": {
+                  "type": "string",
+                  "example": "hm_live_\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u20223a9b"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ApiKeyCreatedResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "apiKey",
+          "name"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "apiKey": {
+            "type": "string",
+            "example": "hm_live_8f7b3c2e1a90d45f6a7b8c9d0e"
+          },
+          "note": {
+            "type": "string",
+            "example": "Store this key safely. It will not be shown again."
+          }
+        }
+      }
+    }
+  }
+}

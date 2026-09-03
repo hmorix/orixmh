@@ -1,0 +1,35 @@
+{
+  "name": "@hmorix/cli",
+  "version": "1.0.0",
+  "description": "Official command-line interface for the HMorix Enterprise Cloud Platform and AI Agents",
+  "bin": {
+    "hmorix": "./bin/hmorix.js"
+  },
+  "main": "./index.js",
+  "scripts": {
+    "start": "node ./bin/hmorix.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HMorix/orixmh",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://hmorix.in/developers",
+  "bugs": {
+    "url": "https://github.com/HMorix/orixmh/issues",
+    "email": "support@hmorix.com"
+  },
+  "keywords": [
+    "hmorix",
+    "hmorix-cli",
+    "enterprise-ai",
+    "agent",
+    "billingflow",
+    "developer-tools"
+  ],
+  "author": "Harsh Sharma <support@hmorix.com> (https://hmorix.in)",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

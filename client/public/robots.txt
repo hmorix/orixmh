@@ -7,8 +7,18 @@ Allow: /manifest.webmanifest
 Allow: /site.webmanifest
 Allow: /security.txt
 Allow: /.well-known/security.txt
+Allow: /openapi.json
+Allow: /openapi.yaml
+Allow: /api/openapi.yaml
+Allow: /api/openapi.json
+Allow: /pricing.md
+Allow: /developers
+Allow: /docs
+Allow: /agent-instructions.txt
+Allow: /.well-known/api-catalog
+Allow: /.well-known/http-message-signatures-directory
 Disallow: /admin
-Disallow: /api
+Disallow: /api/
 Disallow: /settings
 Disallow: /profile
 Disallow: /dashboard
@@ -18,7 +28,7 @@ Disallow: /crm
 Disallow: /hrm
 Disallow: /retry
 Disallow: /generated
-Disallow: /*.json
+Disallow: /*.json$
 
 # Googlebot
 User-agent: Googlebot
@@ -44,29 +54,59 @@ Crawl-delay: 0
 User-agent: GPTBot
 Allow: /
 Allow: /llms.txt
+Allow: /openapi.json
+Allow: /docs
+Allow: /developers
+Allow: /pricing.md
+Allow: /agent-instructions.txt
 
 User-agent: ChatGPT-User
 Allow: /
 Allow: /llms.txt
+Allow: /openapi.json
+Allow: /docs
+Allow: /developers
+Allow: /pricing.md
+Allow: /agent-instructions.txt
 
 # Anthropic ClaudeBot
 User-agent: ClaudeBot
 Allow: /
 Allow: /llms.txt
+Allow: /openapi.json
+Allow: /docs
+Allow: /developers
+Allow: /pricing.md
+Allow: /agent-instructions.txt
 
 User-agent: anthropic-ai
 Allow: /
 Allow: /llms.txt
+Allow: /openapi.json
+Allow: /docs
+Allow: /developers
+Allow: /pricing.md
+Allow: /agent-instructions.txt
 
 # PerplexityBot
 User-agent: PerplexityBot
 Allow: /
 Allow: /llms.txt
+Allow: /openapi.json
+Allow: /docs
+Allow: /developers
+Allow: /pricing.md
+Allow: /agent-instructions.txt
 
 # Google Extended / Gemini
 User-agent: Google-Extended
 Allow: /
 Allow: /llms.txt
+Allow: /openapi.json
+Allow: /docs
+Allow: /developers
+Allow: /pricing.md
+Allow: /agent-instructions.txt
 
 # Applebot
 User-agent: Applebot

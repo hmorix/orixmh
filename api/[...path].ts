@@ -1,4 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import fs from 'fs'
+import path from 'path'
 import { createClient } from '@supabase/supabase-js'
 import { MongoClient, ObjectId } from 'mongodb'
 import * as bcrypt from 'bcryptjs'
@@ -20,6 +22,7 @@ function setCors(res: VercelResponse) {
   res.setHeader('X-Content-Type-Options', 'nosniff')
   res.setHeader('X-Frame-Options', 'DENY')
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
+  res.setHeader('Vary', 'Accept, Accept-Encoding')
 }
 
 function handleCors(req: VercelRequest, res: VercelResponse): boolean {
@@ -4205,6 +4208,83 @@ async function handleConfigDatabase(req: VercelRequest, res: VercelResponse) {
   res.json({ provider: db.provider, switchable: true, instructions: 'Set DATABASE=supabase or DATABASE=mysql in Vercel environment variables to switch providers' })
 }
 
+function handleOpenApiJson(_req: VercelRequest, res: VercelResponse) {
+  try {
+    const filePath = path.join(process.cwd(), 'client', 'public', 'openapi.json')
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf-8')
+      res.setHeader('Content-Type', 'application/json; charset=utf-8')
+      res.setHeader('Vary', 'Accept, Accept-Encoding')
+      return res.status(200).send(content)
+    }
+  } catch {}
+  return res.status(404).json({ error: 'OpenAPI specification not found' })
+}
+
+function handleOpenApiYaml(_req: VercelRequest, res: VercelResponse) {
+  try {
+    const filePath = path.join(process.cwd(), 'client', 'public', 'openapi.yaml')
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf-8')
+      res.setHeader('Content-Type', 'application/yaml; charset=utf-8')
+      res.setHeader('Vary', 'Accept, Accept-Encoding')
+      return res.status(200).send(content)
+    }
+  } catch {}
+  return res.status(404).json({ error: 'OpenAPI specification not found' })
+}
+
+function handleNotFoundRoute(req: VercelRequest, res: VercelResponse) {
+  const queryPath = String(req.query.path || req.url || '').split('?')[0]
+  res.status(404)
+  res.setHeader('Content-Type', 'text/markdown; charset=utf-8')
+  res.setHeader('Vary', 'Accept, Accept-Encoding')
+  return res.send(`# 404 Not Found
+
+The requested resource \`${queryPath}\` was not found on HMorix (\`https://hmorix.in\`).
+
+## Discoverable Resources for Agents & Developers
+- [Homepage](https://hmorix.in/)
+- [LLMs Index & Instructions](https://hmorix.in/llms.txt)
+- [XML Sitemap](https://hmorix.in/sitemap.xml)
+- [Public API Documentation](https://hmorix.in/docs)
+- [Developer Portal & Sandbox](https://hmorix.in/developers)
+- [OpenAPI Specification](https://hmorix.in/openapi.json)
+- [Pricing Specifications](https://hmorix.in/pricing.md)
+`)
+}
+
+function handleMarkdownRoute(req: VercelRequest, res: VercelResponse) {
+  const queryPath = String(req.query.path || '').replace(/^\/+|\/+$/g, '').toLowerCase()
+  res.setHeader('Content-Type', 'text/markdown; charset=utf-8')
+  res.setHeader('Vary', 'Accept, Accept-Encoding')
+  const fileMap: Record<string, string> = {
+    '': 'llms.txt',
+    'about': 'about.md',
+    'contact': 'contact.md',
+    'privacy': 'privacy.md',
+    'developers': 'developers.md',
+    'docs': 'docs.md',
+    'pricing': 'pricing.md',
+    'pricing.md': 'pricing.md',
+    'llms.txt': 'llms.txt',
+    'agent-instructions.txt': 'agent-instructions.txt'
+  }
+  const targetFile = fileMap[queryPath]
+  if (targetFile) {
+    const fullPath = path.join(process.cwd(), 'client', 'public', targetFile)
+    if (fs.existsSync(fullPath)) {
+      const content = fs.readFileSync(fullPath, 'utf-8')
+      return res.status(200).send(content)
+    }
+  }
+  const llmsPath = path.join(process.cwd(), 'client', 'public', 'llms.txt')
+  if (fs.existsSync(llmsPath)) {
+    return res.status(200).send(fs.readFileSync(llmsPath, 'utf-8'))
+  }
+  return res.status(200).send('# HMorix Platform\n\nVisit https://hmorix.in for more info.')
+}
+
 // ============================================
 // MAIN ROUTER
 // ============================================
@@ -4298,6 +4378,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'services': return handleServices(req, res)
       case 'employee/profile': return handleEmployeeProfile(req, res)
       case 'config/database': return handleConfigDatabase(req, res)
+      case 'openapi.json': return handleOpenApiJson(req, res)
+      case 'openapi.yaml': return handleOpenApiYaml(req, res)
+      case 'not-found': return handleNotFoundRoute(req, res)
+      case 'markdown': return handleMarkdownRoute(req, res)
       default:
         // Handle blog/[slug] pattern
         if (routePath.startsWith('blog/')) {
@@ -4316,7 +4400,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           const id = routePath.replace('hrm/interns/', '')
           return handleHrmInternsId(req, res, id)
         }
-        return res.status(404).json({ error: 'Not found', path: routePath })
+        return res.status(404).json({
+          error: 'Endpoint not found',
+          path: routePath,
+          docs: 'https://hmorix.in/docs',
+          openapi: 'https://hmorix.in/openapi.json',
+          resolutionHint: 'Verify endpoint path against OpenAPI specification at https://hmorix.in/openapi.json'
+        })
     }
   } catch (error: any) {
     console.error('API Error:', { code: error?.code, message: error?.message, route: req.url })

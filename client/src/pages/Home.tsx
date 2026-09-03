@@ -60,7 +60,8 @@ export default function Home() {
             </p>
             <div className="grid grid-cols-1 sm:flex sm:items-center gap-3 sm:gap-4 mb-12 sm:mb-16 lg:mb-20">
               <Link to="/contact" className="px-8 py-3.5 bg-[#C8FF00] text-obsidian font-display font-semibold rounded-[4px] text-center hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(200,255,0,0.25)] transition-all">Start a Project</Link>
-              <Link to="/playground" className="px-8 py-3.5 border border-glass-border text-cream/60 font-display rounded-[4px] text-center hover:border-cream hover:text-cream hover:bg-white/[0.04] transition-all">Explore Products</Link>
+              <Link to="/docs" className="px-6 py-3.5 border border-[#C8FF00]/40 text-[#C8FF00] font-display rounded-[4px] text-center hover:bg-[#C8FF00]/10 transition-all">Public API Docs</Link>
+              <Link to="/developers" className="px-6 py-3.5 border border-glass-border text-cream/60 font-display rounded-[4px] text-center hover:border-cream hover:text-cream hover:bg-white/[0.04] transition-all">Developer Portal</Link>
             </div>
           </div>
           <div className="grid grid-cols-2 lg:flex gap-6 lg:gap-12 pt-8 sm:pt-12 border-t border-glass-border">
@@ -240,6 +241,32 @@ export default function Home() {
             {['React','Next.js','Node.js','Express','PostgreSQL','MongoDB','Python','TensorFlow','Docker','Kubernetes','AWS','TypeScript','GraphQL','Redis','Nginx','Linux','Flutter','React Native'].map(t => (
               <span key={t} className="px-4 py-2 border border-glass-border rounded-full font-mono text-xs text-cream/60 hover:border-[#C8FF00] hover:text-[#C8FF00] transition-all cursor-default">{t}</span>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* DEVELOPERS & PUBLIC APIS */}
+      <section className="py-16 border-t border-glass-border bg-obsidian-2">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 p-8 border border-glass-border rounded-[12px] bg-obsidian">
+            <div>
+              <span className="label-mono text-[#C8FF00]">Public API & Tool Calling</span>
+              <h2 className="font-display text-2xl font-bold mt-2 mb-2">Build with HMorix Public APIs & SDKs</h2>
+              <p className="text-sm text-cream/60 max-w-[620px]">
+                Integrate autonomous agents, invoice calculation, and document processing into your applications with our OpenAPI 3.0 specification, developer sandbox, and official CLI tool.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Link to="/docs" className="px-6 py-3 bg-[#C8FF00] text-obsidian font-semibold rounded-[4px] text-sm hover:opacity-90 transition-all">
+                API Documentation
+              </Link>
+              <Link to="/developers" className="px-6 py-3 border border-glass-border text-cream/70 hover:text-cream rounded-[4px] text-sm transition-all">
+                Developer Portal
+              </Link>
+              <a href="/openapi.json" target="_blank" rel="noreferrer" className="px-6 py-3 border border-glass-border text-cream/70 hover:text-[#C8FF00] rounded-[4px] text-sm font-mono transition-all">
+                OpenAPI Spec
+              </a>
+            </div>
           </div>
         </div>
       </section>
