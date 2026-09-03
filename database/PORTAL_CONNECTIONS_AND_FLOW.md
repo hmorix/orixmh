@@ -96,3 +96,13 @@ Conflict priority:
 2. Newer user-owned draft fields win.
 3. Manager/admin approval status wins over employee draft status.
 4. Deleted records stay deleted unless restored by an admin.
+
+---
+
+## Interactive Topology & Node Graph Explorer
+
+For the interactive visual explorer of all files, inputs, outputs, durations, button actions, and database queries:
+- **Interactive UI**: Navigate to `/architecture` on `https://hmorix.in/architecture`
+- **Complete Architecture Specification**: Read [ARCHITECTURE.md](../ARCHITECTURE.md)
+- **Project Master Manual**: Read [PROJECT.md](../PROJECT.md)
+
