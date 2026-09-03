@@ -36,7 +36,7 @@ interface ProjectNode {
   title: string
   file: string
   path: string
-  category: 'entry' | 'animation' | 'page' | 'portal' | 'product' | 'backend' | 'database' | 'asset'
+  category: string
   duration: string
   working: string
   inputs: {
@@ -53,13 +53,13 @@ interface ProjectNode {
   buttons: NodeAction[]
   imports: string[]
   database: {
-    provider: 'MongoDB Atlas' | 'Supabase' | 'Dual / Hybrid' | 'None (Client Cache/Asset)'
+    provider: string
     collectionsOrTables: string[]
     queries: string[]
   }
   api: {
     route: string
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'MULTI' | 'NONE'
+    method: string
     handlerName: string
     handlerFile: string
     handlerPath: string
