@@ -3,7 +3,7 @@
 > Canonical URL: [https://hmorix.in/privacy](https://hmorix.in/privacy)
 > Last Modified: 2026-09-03
 > Effective Date: 2023-01-01
-> Data Protection Officer: [support@hmorix.in](mailto:support@hmorix.in) / [harsh@hmorix.in](mailto:harsh@hmorix.in)
+> Data Protection Officer: [offical@hmorix.in](mailto:offical@hmorix.in) / [harsh@hmorix.in](mailto:harsh@hmorix.in)
 
 ---
 

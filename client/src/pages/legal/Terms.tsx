@@ -86,7 +86,7 @@ export default function Terms() {
           <p>These terms are governed by the laws of India. Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the competent courts in Hathras, Uttar Pradesh, India.</p>
           
           <h2 className="font-display text-xl font-semibold text-cream !mt-8">9. Contact Information</h2>
-          <p>For legal inquiries, contract clarification, or compliance questions, reach our legal team at legal@hmorix.in or contact our headquarters in Hathras, UP.</p>
+          <p>For legal inquiries, contract clarification, or compliance questions, reach our legal team at offical@hmorix.in or contact our headquarters in Hathras, UP.</p>
         </div>
       </div>
     </div>

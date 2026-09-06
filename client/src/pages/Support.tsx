@@ -90,6 +90,10 @@ export default function Support() {
             ))}
           </div>
         )}
+        <div className="mt-10 text-center">
+          <p className="text-sm text-cream/40 mb-2">Prefer to email us directly?</p>
+          <a href="mailto:support@hmorix.in" className="text-[#C8FF00] hover:underline font-mono text-sm">support@hmorix.in</a>
+        </div>
       </div>
     </div>
   )

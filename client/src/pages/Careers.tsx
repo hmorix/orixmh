@@ -61,6 +61,23 @@ export default function Careers() {
             </Link>
           ))}
         </div>
+
+        <div className="mt-16 p-8 bg-obsidian-2 border border-glass-border rounded-[16px] flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <h3 className="font-display font-semibold text-lg text-cream mb-1">Don't see a role that fits?</h3>
+            <p className="text-sm text-cream/50 max-w-[620px]">
+              We're always looking for outstanding engineers, AI researchers, and marketers. Send your resume and portfolio directly to our recruiting team.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <a href="mailto:career@hmorix.in" className="btn-primary flex items-center gap-2">
+              Email career@hmorix.in
+            </a>
+            <a href="mailto:hr@hmorix.in" className="btn-outline flex items-center gap-2">
+              HR: hr@hmorix.in
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   )

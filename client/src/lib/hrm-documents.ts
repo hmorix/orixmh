@@ -23,7 +23,7 @@ export const COMPANY: CompanyInfo = {
   legalName: "HMORIX TECHNOLOGIES PRIVATE LIMITED",
   address: "MG Polytechnic Road, Hathras, Uttar Pradesh – 204101, India",
   registeredOffice: "Regd Off: Plot 14, Tech Boulevard, Hathras, UP – 204101, India",
-  email: "contact@hmorix.in",
+  email: "info@hmorix.in",
   hrEmail: "hr@hmorix.in",
   phone: "+91 98765 43210",
   website: "https://hmorix.in",
@@ -1458,7 +1458,7 @@ export function printPayslip(data: PayslipData) {
     </div>
 
     <p style="font-size:8.5px;color:#64748b;text-align:center;margin-top:12px;line-height:1.5;">
-      This is a system-generated pay advice issued in compliance with the Payment of Wages Act, 1936 and Income Tax Rules, 1962. No physical signature is required. For salary queries, contact payroll@hmorix.in.
+      This is a system-generated pay advice issued in compliance with the Payment of Wages Act, 1936 and Income Tax Rules, 1962. No physical signature is required. For salary queries, contact hr@hmorix.in.
     </p>
 
     ${renderSignatures("Finance & Payroll Controller", "Chief Financial Officer")}

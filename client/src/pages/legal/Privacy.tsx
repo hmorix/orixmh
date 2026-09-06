@@ -80,7 +80,7 @@ export default function Privacy() {
           <p>We use essential cookies strictly for secure session management and authentication. No intrusive third-party cross-site tracking scripts are loaded on authenticated user dashboards.</p>
           
           <h2 className="font-display text-xl font-semibold text-cream !mt-8">7. Contact the Data Protection Officer</h2>
-          <p>For data access requests, deletion requests, or privacy compliance questions, contact our Data Protection Officer at privacy@hmorix.in or visit HMorix Headquarters in Hathras, Uttar Pradesh.</p>
+          <p>For data access requests, deletion requests, or privacy compliance questions, contact our Data Protection Officer at offical@hmorix.in or visit HMorix Headquarters in Hathras, Uttar Pradesh.</p>
         </div>
       </div>
     </div>
