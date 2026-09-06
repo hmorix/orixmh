@@ -21,14 +21,22 @@ function CounterNumber({ target, suffix }: { target: number; suffix: string }) {
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    let current = 0
-    const step = target / 60
-    const timer = setInterval(() => {
-      current = Math.min(current + step, target)
-      el.textContent = Math.round(current).toString()
-      if (current >= target) clearInterval(timer)
-    }, 20)
-    return () => clearInterval(timer)
+    let startTime: number | null = null
+    const duration = 1000
+    let rafId: number
+
+    const update = (timestamp: number) => {
+      if (!startTime) startTime = timestamp
+      const progress = Math.min((timestamp - startTime) / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      const current = Math.round(eased * target)
+      if (el) el.textContent = current.toString()
+      if (progress < 1) {
+        rafId = requestAnimationFrame(update)
+      }
+    }
+    rafId = requestAnimationFrame(update)
+    return () => cancelAnimationFrame(rafId)
   }, [target])
   return <><span ref={ref}>0</span>{suffix}</>
 }

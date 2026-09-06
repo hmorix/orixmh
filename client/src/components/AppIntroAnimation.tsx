@@ -6,6 +6,11 @@ interface AppIntroAnimationProps {
 }
 
 export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps) {
+  const [isMobile] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return window.innerWidth < 768 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
+  })
+
   const [visible, setVisible] = useState(() => {
     if (typeof window === 'undefined') return false
     // Show only once per browser session
@@ -26,16 +31,21 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
       return
     }
 
-    const timer1 = setTimeout(() => setPhase('revealing'), 700)
-    const timer2 = setTimeout(() => setPhase('ready'), 1400)
+    const tReveal = isMobile ? 320 : 700
+    const tReady = isMobile ? 680 : 1400
+    const tExit = isMobile ? 1050 : 2100
+    const tFade = isMobile ? 320 : 600
+
+    const timer1 = setTimeout(() => setPhase('revealing'), tReveal)
+    const timer2 = setTimeout(() => setPhase('ready'), tReady)
     const timer3 = setTimeout(() => {
       setPhase('exit')
       setTimeout(() => {
         setVisible(false)
         sessionStorage.setItem('hm_intro_seen', 'true')
         onComplete?.()
-      }, 600)
-    }, 2100)
+      }, tFade)
+    }, tExit)
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
@@ -50,7 +60,7 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
       clearTimeout(timer3)
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [visible, onComplete])
+  }, [visible, onComplete, isMobile])
 
   const skipIntro = () => {
     setPhase('exit')
@@ -58,7 +68,7 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
       setVisible(false)
       sessionStorage.setItem('hm_intro_seen', 'true')
       onComplete?.()
-    }, 200)
+    }, 150)
   }
 
   if (!visible) return null
@@ -68,11 +78,16 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
       <motion.div
         key="app-intro-overlay"
         initial={{ opacity: 1 }}
-        animate={{ opacity: phase === 'exit' ? 0 : 1, scale: phase === 'exit' ? 1.05 : 1 }}
+        animate={{ opacity: phase === 'exit' ? 0 : 1, scale: phase === 'exit' ? 1.04 : 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed inset-0 z-[99999] bg-[#0A0A0B] flex flex-col items-center justify-center overflow-hidden select-none"
-        style={{ pointerEvents: phase === 'exit' ? 'none' : 'auto' }}
+        transition={{ duration: isMobile ? 0.32 : 0.55, ease: [0.16, 1, 0.3, 1] }}
+        onClick={skipIntro}
+        className="fixed inset-0 z-[99999] bg-[#0A0A0B] flex flex-col items-center justify-center overflow-hidden select-none cursor-pointer"
+        style={{
+          pointerEvents: phase === 'exit' ? 'none' : 'auto',
+          transform: 'translateZ(0)',
+          willChange: 'opacity, transform',
+        }}
       >
         {/* Subtle Cyber Grid Background */}
         <div
@@ -83,23 +98,28 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
           }}
         />
 
-        {/* Ambient Radial Glowing Aura */}
+        {/* Ambient Radial Glowing Aura - GPU accelerated without expensive blur filters */}
         <motion.div
           animate={{
-            scale: phase === 'revealing' || phase === 'ready' ? [1, 1.25, 1.1] : 1,
-            opacity: phase === 'revealing' || phase === 'ready' ? [0.15, 0.3, 0.22] : 0.1,
+            scale: phase === 'revealing' || phase === 'ready' ? [1, 1.18, 1.08] : 1,
+            opacity: phase === 'revealing' || phase === 'ready' ? [0.22, 0.38, 0.28] : 0.12,
           }}
-          transition={{ duration: 1.6, ease: 'easeOut' }}
-          className="absolute w-[480px] h-[480px] rounded-full bg-[#C8FF00] blur-[110px] pointer-events-none -z-10"
+          transition={{ duration: isMobile ? 0.8 : 1.5, ease: 'easeOut' }}
+          className="absolute w-[320px] sm:w-[480px] h-[320px] sm:h-[480px] rounded-full pointer-events-none -z-10"
+          style={{
+            background: 'radial-gradient(circle, rgba(200,255,0,0.32) 0%, rgba(200,255,0,0.06) 45%, transparent 70%)',
+            transform: 'translateZ(0)',
+            willChange: 'transform, opacity',
+          }}
         />
 
         {/* Central Core Emblem & Brand Reveal */}
-        <div className="relative flex flex-col items-center justify-center">
+        <div className="relative flex flex-col items-center justify-center pointer-events-auto" onClick={(e) => e.stopPropagation()}>
           {/* Animated SVG Hexagonal Logo */}
-          <div className="relative w-32 h-32 flex items-center justify-center mb-6">
+          <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center mb-5 sm:mb-6">
             <svg
               viewBox="0 0 48 48"
-              className="w-full h-full drop-shadow-[0_0_28px_rgba(200,255,0,0.45)]"
+              className="w-full h-full drop-shadow-[0_0_12px_rgba(200,255,0,0.35)] sm:drop-shadow-[0_0_24px_rgba(200,255,0,0.45)]"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
@@ -119,7 +139,7 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
                   opacity: 1,
                   fill: phase !== 'drawing' ? '#0D0D0D' : 'rgba(13,13,13,0)',
                 }}
-                transition={{ duration: 0.85, ease: 'easeInOut' }}
+                transition={{ duration: isMobile ? 0.45 : 0.85, ease: 'easeInOut' }}
                 stroke="#C8FF00"
                 strokeWidth="1.5"
                 strokeLinejoin="miter"
@@ -132,7 +152,7 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
                   points="24,4.5 40.8,14.2 40.8,33.8 24,43.5 7.2,33.8 7.2,14.2"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ duration: 0.4 }}
+                  transition={{ duration: isMobile ? 0.25 : 0.4 }}
                   fill="url(#intro-sheen)"
                 />
               )}
@@ -145,7 +165,7 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
                 y2="17.7"
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.15, ease: 'easeInOut' }}
+                transition={{ duration: isMobile ? 0.3 : 0.5, delay: isMobile ? 0.08 : 0.15, ease: 'easeInOut' }}
                 stroke="#C8FF00"
                 strokeWidth="1.5"
                 strokeLinecap="square"
@@ -157,7 +177,7 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
                 y2="44.94"
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.15, ease: 'easeInOut' }}
+                transition={{ duration: isMobile ? 0.3 : 0.5, delay: isMobile ? 0.08 : 0.15, ease: 'easeInOut' }}
                 stroke="#C8FF00"
                 strokeWidth="1.5"
                 strokeLinecap="square"
@@ -171,7 +191,7 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
                 y2="23.72"
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 0.55, delay: 0.2, ease: 'easeInOut' }}
+                transition={{ duration: isMobile ? 0.35 : 0.55, delay: isMobile ? 0.1 : 0.2, ease: 'easeInOut' }}
                 stroke="#C8FF00"
                 strokeWidth="1.5"
                 strokeLinecap="square"
@@ -185,7 +205,7 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
                   pathLength: 1,
                   opacity: phase !== 'drawing' ? 1 : 0.8,
                 }}
-                transition={{ duration: 0.65, delay: 0.25, ease: 'easeInOut' }}
+                transition={{ duration: isMobile ? 0.4 : 0.65, delay: isMobile ? 0.12 : 0.25, ease: 'easeInOut' }}
                 stroke="#C8FF00"
                 strokeWidth="1.5"
                 strokeLinejoin="miter"
@@ -201,7 +221,7 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
                   pathLength: 1,
                   opacity: phase !== 'drawing' ? 1 : 0.8,
                 }}
-                transition={{ duration: 0.65, delay: 0.25, ease: 'easeInOut' }}
+                transition={{ duration: isMobile ? 0.4 : 0.65, delay: isMobile ? 0.12 : 0.25, ease: 'easeInOut' }}
                 stroke="#C8FF00"
                 strokeWidth="1.5"
                 strokeLinejoin="miter"
@@ -217,7 +237,7 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
                   pathLength: 1,
                   opacity: phase !== 'drawing' ? 1 : 0.8,
                 }}
-                transition={{ duration: 0.65, delay: 0.3, ease: 'easeInOut' }}
+                transition={{ duration: isMobile ? 0.4 : 0.65, delay: isMobile ? 0.15 : 0.3, ease: 'easeInOut' }}
                 stroke="#C8FF00"
                 strokeWidth="1.5"
                 strokeLinejoin="miter"
@@ -233,7 +253,7 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
                   pathLength: 1,
                   opacity: phase !== 'drawing' ? 1 : 0.8,
                 }}
-                transition={{ duration: 0.65, delay: 0.3, ease: 'easeInOut' }}
+                transition={{ duration: isMobile ? 0.4 : 0.65, delay: isMobile ? 0.15 : 0.3, ease: 'easeInOut' }}
                 stroke="#C8FF00"
                 strokeWidth="1.5"
                 strokeLinejoin="miter"
@@ -243,24 +263,25 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
             </svg>
           </div>
 
-          {/* Typography Brand Reveal */}
+          {/* Typography Brand Reveal - Zero layout reflow using transforms and opacity */}
           <motion.div
-            initial={{ opacity: 0, y: 12, letterSpacing: '0.3em' }}
+            initial={{ opacity: 0, y: 10, scale: 0.96 }}
             animate={{
               opacity: phase !== 'drawing' ? 1 : 0,
-              y: phase !== 'drawing' ? 0 : 12,
-              letterSpacing: '0.08em',
+              y: phase !== 'drawing' ? 0 : 10,
+              scale: phase !== 'drawing' ? 1 : 0.96,
             }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="flex items-center justify-center gap-1.5"
+            transition={{ duration: isMobile ? 0.4 : 0.65, ease: [0.16, 1, 0.3, 1] }}
+            className="flex items-center justify-center gap-1.5 tracking-[0.08em]"
+            style={{ willChange: 'opacity, transform' }}
           >
-            <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-wider text-cream">
+            <h1 className="font-display text-2xl sm:text-4xl font-bold text-cream">
               HMORIX
             </h1>
             <motion.div
-              animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.8] }}
-              transition={{ repeat: Infinity, duration: 1.4 }}
-              className="w-2 h-2 rounded-full bg-[#C8FF00] ml-1 shadow-[0_0_12px_#C8FF00]"
+              animate={{ scale: [1, 1.35, 1], opacity: [0.6, 1, 0.8] }}
+              transition={{ repeat: Infinity, duration: 1.2 }}
+              className="w-2 h-2 rounded-full bg-[#C8FF00] ml-1 shadow-[0_0_8px_#C8FF00]"
             />
           </motion.div>
 
@@ -268,18 +289,18 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: phase === 'ready' ? 0.75 : phase === 'revealing' ? 0.4 : 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-[11px] font-mono text-[#C8FF00] tracking-[0.24em] uppercase mt-2.5 font-medium"
+            transition={{ duration: isMobile ? 0.3 : 0.45 }}
+            className="text-[10px] sm:text-[11px] font-mono text-[#C8FF00] tracking-[0.2em] sm:tracking-[0.24em] uppercase mt-2 font-medium"
           >
             Enterprise AI Architecture
           </motion.p>
 
           {/* Progress Bar & Telemetry */}
-          <div className="w-56 h-[2px] bg-white/[0.08] rounded-full overflow-hidden mt-6 relative">
+          <div className="w-48 sm:w-56 h-[2px] bg-white/[0.08] rounded-full overflow-hidden mt-5 sm:mt-6 relative">
             <motion.div
               initial={{ width: '0%' }}
               animate={{ width: phase === 'ready' || phase === 'exit' ? '100%' : '60%' }}
-              transition={{ duration: 1.6, ease: 'easeInOut' }}
+              transition={{ duration: isMobile ? 0.9 : 1.5, ease: 'easeInOut' }}
               className="h-full bg-gradient-to-r from-[#C8FF00] to-[#EAE8E3] shadow-[0_0_8px_#C8FF00]"
             />
           </div>
@@ -288,7 +309,7 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.5 }}
-            className="text-[10px] font-mono text-cream/40 mt-3"
+            className="text-[9px] sm:text-[10px] font-mono text-cream/40 mt-2.5"
           >
             {phase === 'drawing' && 'INITIALIZING SYSTEM...'}
             {phase === 'revealing' && 'LOADING NEURAL INTERFACES...'}
@@ -298,10 +319,14 @@ export default function AppIntroAnimation({ onComplete }: AppIntroAnimationProps
 
         {/* Interactive Skip Button */}
         <button
-          onClick={skipIntro}
-          className="absolute bottom-8 right-8 text-[11px] font-mono text-cream/30 hover:text-[#C8FF00] tracking-wider transition-colors px-3 py-1.5 rounded-[4px] border border-white/[0.05] hover:border-[#C8FF00]/30 backdrop-blur-sm"
+          onClick={(e) => {
+            e.stopPropagation()
+            skipIntro()
+          }}
+          className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 text-[11px] font-mono text-cream/40 hover:text-[#C8FF00] tracking-wider transition-colors px-3 py-1.5 rounded-[4px] border border-white/[0.08] hover:border-[#C8FF00]/40 backdrop-blur-sm active:scale-95"
+          aria-label="Skip intro animation"
         >
-          SKIP [ESC]
+          {isMobile ? 'SKIP ✕' : 'SKIP [ESC]'}
         </button>
       </motion.div>
     </AnimatePresence>
