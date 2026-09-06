@@ -19,7 +19,7 @@ export default function BillingFlowAPI() {
             <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
               <h3 className="font-display font-semibold mb-2">Base URL</h3>
               <div className="flex items-center gap-2 p-3 bg-obsidian rounded-[4px] font-mono text-sm">
-                <span className="text-[#C8FF00]">https://api.hmorix.com/billing/v1</span>
+                <span className="text-[#C8FF00]">https://api.hmorix.in/billing/v1</span>
                 <Copy size={14} className="text-cream/30 cursor-pointer hover:text-cream ml-auto" />
               </div>
             </div>

@@ -21,10 +21,10 @@ const audienceOptions: { id: NotificationAudience; label: string; description: s
 ]
 
 const fallbackRecipients: Recipient[] = [
-  { id: 'emp_harsh', name: 'Harsh Sharma', email: 'harsh@hmorix.com', role: 'admin', department: 'Leadership' },
-  { id: 'emp_aarav', name: 'Aarav Singh', email: 'aarav@hmorix.com', role: 'employee', department: 'Engineering' },
-  { id: 'emp_neha', name: 'Neha Sharma', email: 'neha@hmorix.com', role: 'hr', department: 'HR' },
-  { id: 'emp_sales', name: 'Sales Team', email: 'sales@hmorix.com', role: 'crm', department: 'Sales' },
+  { id: 'emp_harsh', name: 'Harsh Sharma', email: 'harsh@hmorix.in', role: 'admin', department: 'Leadership' },
+  { id: 'emp_aarav', name: 'Aarav Singh', email: 'aarav@hmorix.in', role: 'employee', department: 'Engineering' },
+  { id: 'emp_neha', name: 'Neha Sharma', email: 'neha@hmorix.in', role: 'hr', department: 'HR' },
+  { id: 'emp_sales', name: 'Sales Team', email: 'sales@hmorix.in', role: 'crm', department: 'Sales' },
 ]
 
 export default function AdminNotifications() {

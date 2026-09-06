@@ -68,7 +68,7 @@ export default function Terms() {
           <p>HMorix, founded by Harsh Sharma and headquartered in Hathras, Uttar Pradesh, provides enterprise B2B SaaS software, autonomous AI agent workflows, custom full-stack web and mobile application engineering, digital marketing, local SEO optimization, PDF automation, and smart technology solutions.</p>
           
           <h2 className="font-display text-xl font-semibold text-cream !mt-8">3. User Accounts and Security</h2>
-          <p>Users must provide accurate registration details. You are responsible for safeguarding your credentials and any API tokens issued by the HMorix Client Portal. Notify support@hmorix.com immediately upon noticing unauthorized account activity.</p>
+          <p>Users must provide accurate registration details. You are responsible for safeguarding your credentials and any API tokens issued by the HMorix Client Portal. Notify support@hmorix.in immediately upon noticing unauthorized account activity.</p>
           
           <h2 className="font-display text-xl font-semibold text-cream !mt-8">4. Acceptable Use Policy</h2>
           <p>You agree not to use HMorix infrastructure for malicious scraping, unlawful spam campaigns, reverse engineering proprietary LLM or BillingFlow pipelines, or interfering with system integrity.</p>
@@ -86,7 +86,7 @@ export default function Terms() {
           <p>These terms are governed by the laws of India. Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the competent courts in Hathras, Uttar Pradesh, India.</p>
           
           <h2 className="font-display text-xl font-semibold text-cream !mt-8">9. Contact Information</h2>
-          <p>For legal inquiries, contract clarification, or compliance questions, reach our legal team at legal@hmorix.com or contact our headquarters in Hathras, UP.</p>
+          <p>For legal inquiries, contract clarification, or compliance questions, reach our legal team at legal@hmorix.in or contact our headquarters in Hathras, UP.</p>
         </div>
       </div>
     </div>

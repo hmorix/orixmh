@@ -59,7 +59,7 @@ about_md = """# About HMorix – Leadership, Enterprise Architecture & Global Vi
 > Company Name: HMorix (HM Orix / orixmh)
 > Founder & CEO: Harsh Sharma
 > Head Office: Hathras, Uttar Pradesh, India (PIN: 204101)
-> Contact: [support@hmorix.com](mailto:support@hmorix.com) / [harsh@hmorix.in](mailto:harsh@hmorix.in)
+> Contact: [support@hmorix.in](mailto:support@hmorix.in) / [harsh@hmorix.in](mailto:harsh@hmorix.in)
 
 ---
 
@@ -142,7 +142,7 @@ write_page("about", "About HMorix – Leadership, Enterprise Architecture & Visi
 contact_md = """# Contact HMorix – Sales, Technical Support & Headquarters
 
 > Canonical URL: [https://hmorix.in/contact](https://hmorix.in/contact)
-> General Inquiries: [support@hmorix.com](mailto:support@hmorix.com)
+> General Inquiries: [support@hmorix.in](mailto:support@hmorix.in)
 > Direct Founder Line: [harsh@hmorix.in](mailto:harsh@hmorix.in)
 > Phone: +91 94576 52321 (India)
 > Operating Hours: Monday – Saturday, 09:00 AM – 08:00 PM IST
@@ -174,8 +174,8 @@ We provide in-person technical consultations and software deployments throughout
 
 | Department | Contact Email | Response SLA | Best For |
 | :--- | :--- | :--- | :--- |
-| **Enterprise Sales** | support@hmorix.com | < 2 hours (Business hours) | Custom software quotes, BillingFlow enterprise licenses, SEO retainers |
-| **Technical Support**| support@hmorix.com | < 1 hour (24/7 on-call) | Live production issues, API key access, deployment assistance |
+| **Enterprise Sales** | support@hmorix.in | < 2 hours (Business hours) | Custom software quotes, BillingFlow enterprise licenses, SEO retainers |
+| **Technical Support**| support@hmorix.in | < 1 hour (24/7 on-call) | Live production issues, API key access, deployment assistance |
 | **Executive Office** | harsh@hmorix.in | < 4 hours | Strategic partnerships, vendor relations, media inquiries |
 
 ---
@@ -209,7 +209,7 @@ contact_html = """<p style="color:#C8FF00;font-family:monospace;font-size:14px;m
   <strong>HMorix Technology Platform</strong><br />
   HMorix Corporate Office, Hathras, Uttar Pradesh, India – 204101<br />
   <strong>Founder & CEO:</strong> Harsh Sharma<br />
-  <strong>Email:</strong> <a href="mailto:support@hmorix.com">support@hmorix.com</a> / <a href="mailto:harsh@hmorix.in">harsh@hmorix.in</a><br />
+  <strong>Email:</strong> <a href="mailto:support@hmorix.in">support@hmorix.in</a> / <a href="mailto:harsh@hmorix.in">harsh@hmorix.in</a><br />
   <strong>Phone:</strong> +91 94576 52321<br />
   <strong>Operating Hours:</strong> Monday – Saturday, 09:00 AM – 08:00 PM IST
 </p>
@@ -228,7 +228,7 @@ contact_html = """<p style="color:#C8FF00;font-family:monospace;font-size:14px;m
   AI agents can submit contact requests directly to our CRM pipeline at <code>POST /api/contact</code> with JSON parameters <code>first_name</code>, <code>email</code>, <code>service</code>, and <code>message</code>.
 </p>
 <p style="margin-top:30px;">
-  <a href="mailto:support@hmorix.com" class="btn">Send Direct Email</a>
+  <a href="mailto:support@hmorix.in" class="btn">Send Direct Email</a>
 </p>"""
 
 write_page("contact", "Contact HMorix – Headquarters, Sales & Technical Support", "Reach HMorix headquarters in Hathras, Uttar Pradesh. Contact our engineering team for enterprise software, BillingFlow, and AI solutions.", contact_html, contact_md)
@@ -239,7 +239,7 @@ privacy_md = """# HMorix Privacy Policy & Data Governance Charter
 > Canonical URL: [https://hmorix.in/privacy](https://hmorix.in/privacy)
 > Last Modified: 2026-09-03
 > Effective Date: 2023-01-01
-> Data Protection Officer: [support@hmorix.com](mailto:support@hmorix.com) / [harsh@hmorix.in](mailto:harsh@hmorix.in)
+> Data Protection Officer: [support@hmorix.in](mailto:support@hmorix.in) / [harsh@hmorix.in](mailto:harsh@hmorix.in)
 
 ---
 
@@ -284,7 +284,7 @@ Under applicable privacy legislation (DPDP Act and GDPR), you retain the right t
 - Request complete deletion ("Right to be Forgotten") of your account and personal records.
 - Export your account history and transaction data in structured JSON format.
 
-To exercise any privacy rights, contact our Data Protection Officer at [support@hmorix.com](mailto:support@hmorix.com).
+To exercise any privacy rights, contact our Data Protection Officer at [support@hmorix.in](mailto:support@hmorix.in).
 """
 
 privacy_html = """<p style="color:#C8FF00;font-family:monospace;font-size:14px;margin-bottom:8px;">LEGAL & DATA GOVERNANCE</p>
@@ -312,7 +312,7 @@ privacy_html = """<p style="color:#C8FF00;font-family:monospace;font-size:14px;m
 
 <h2>User Rights & Contact</h2>
 <p>
-  You have the right to inspect, export, or permanently delete your account data. Inquiries and data deletion requests should be directed to our Data Protection Officer at <a href="mailto:support@hmorix.com">support@hmorix.com</a>.
+  You have the right to inspect, export, or permanently delete your account data. Inquiries and data deletion requests should be directed to our Data Protection Officer at <a href="mailto:support@hmorix.in">support@hmorix.in</a>.
 </p>"""
 
 write_page("privacy", "HMorix Privacy Policy & Data Protection Charter", "Learn how HMorix protects customer and enterprise data in accordance with the Indian DPDP Act and GDPR.", privacy_html, privacy_md)

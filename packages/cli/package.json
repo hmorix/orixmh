@@ -17,7 +17,7 @@
   "homepage": "https://hmorix.in/developers",
   "bugs": {
     "url": "https://github.com/HMorix/orixmh/issues",
-    "email": "support@hmorix.com"
+    "email": "support@hmorix.in"
   },
   "keywords": [
     "hmorix",
@@ -27,7 +27,7 @@
     "billingflow",
     "developer-tools"
   ],
-  "author": "Harsh Sharma <support@hmorix.com> (https://hmorix.in)",
+  "author": "Harsh Sharma <support@hmorix.in> (https://hmorix.in)",
   "license": "MIT",
   "engines": {
     "node": ">=16.0.0"

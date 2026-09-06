@@ -1,7 +1,7 @@
 # Contact HMorix – Sales, Technical Support & Headquarters
 
 > Canonical URL: [https://hmorix.in/contact](https://hmorix.in/contact)
-> General Inquiries: [support@hmorix.com](mailto:support@hmorix.com)
+> General Inquiries: [support@hmorix.in](mailto:support@hmorix.in)
 > Direct Founder Line: [harsh@hmorix.in](mailto:harsh@hmorix.in)
 > Phone: +91 94576 52321 (India)
 > Operating Hours: Monday – Saturday, 09:00 AM – 08:00 PM IST
@@ -33,8 +33,8 @@ We provide in-person technical consultations and software deployments throughout
 
 | Department | Contact Email | Response SLA | Best For |
 | :--- | :--- | :--- | :--- |
-| **Enterprise Sales** | support@hmorix.com | < 2 hours (Business hours) | Custom software quotes, BillingFlow enterprise licenses, SEO retainers |
-| **Technical Support**| support@hmorix.com | < 1 hour (24/7 on-call) | Live production issues, API key access, deployment assistance |
+| **Enterprise Sales** | support@hmorix.in | < 2 hours (Business hours) | Custom software quotes, BillingFlow enterprise licenses, SEO retainers |
+| **Technical Support**| support@hmorix.in | < 1 hour (24/7 on-call) | Live production issues, API key access, deployment assistance |
 | **Executive Office** | harsh@hmorix.in | < 4 hours | Strategic partnerships, vendor relations, media inquiries |
 
 ---

@@ -11,7 +11,7 @@ export default function ActivityFeed() {
     { type: 'alert', icon: Bell, color: 'text-[#C8FF00]', title: 'System alert resolved', desc: 'PDF processing queue cleared - all jobs complete', time: '4 hours ago', user: 'System' },
     { type: 'api', icon: Code, color: 'text-pink-400', title: 'API key generated', desc: 'New production key created for CI/CD pipeline', time: '5 hours ago', user: 'John Doe' },
     { type: 'deploy', icon: Server, color: 'text-green-400', title: 'Staging deployment', desc: 'AI Agent v2.1-beta deployed to staging', time: '6 hours ago', user: 'CI/CD Pipeline' },
-    { type: 'security', icon: Shield, color: 'text-yellow-400', title: 'SSL certificate renewed', desc: 'Wildcard cert for *.hmorix.com renewed (365 days)', time: '8 hours ago', user: 'Security Bot' },
+    { type: 'security', icon: Shield, color: 'text-yellow-400', title: 'SSL certificate renewed', desc: 'Wildcard cert for *.hmorix.in renewed (365 days)', time: '8 hours ago', user: 'Security Bot' },
     { type: 'commit', icon: GitCommit, color: 'text-blue-400', title: '3 PRs merged', desc: 'fix: rate limiter, feat: webhook retry, chore: deps update', time: '10 hours ago', user: 'Multiple authors' },
     { type: 'ai', icon: Zap, color: 'text-purple-400', title: 'PDF batch processing complete', desc: 'Processed 1,420 invoices for NovaTech (99.8% accuracy)', time: '12 hours ago', user: 'PDF Engine' },
   ]

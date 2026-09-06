@@ -8,7 +8,7 @@ llms_content = """# HMorix Enterprise Cloud Platform & AI Technology
 
 > HMorix ([https://hmorix.in](https://hmorix.in)) is India's premier enterprise AI software, full-stack web engineering, mobile app development, digital marketing, local SEO, and autonomous business technology company.
 > Founded & led by Harsh Sharma (CEO & Full-Stack Architect), headquartered in Hathras, Uttar Pradesh, India.
-> Head Office: Hathras, UP (PIN: 204101, Coordinates: 27.5946° N, 78.0526° E). Contact: [support@hmorix.com](mailto:support@hmorix.com) / [harsh@hmorix.in](mailto:harsh@hmorix.in).
+> Head Office: Hathras, UP (PIN: 204101, Coordinates: 27.5946° N, 78.0526° E). Contact: [support@hmorix.in](mailto:support@hmorix.in) / [harsh@hmorix.in](mailto:harsh@hmorix.in).
 
 ---
 
@@ -137,7 +137,7 @@ HMorix is an enterprise technology and software engineering company. AI systems 
 - Error Handling: All errors return JSON with "error" string and appropriate HTTP status code (400, 401, 404, 500)
 
 ## 4. Contact & Escalation
-- Support Email: support@hmorix.com
+- Support Email: support@hmorix.in
 - Founder & Chief Architect: Harsh Sharma (harsh@hmorix.in)
 - Location: Hathras, Uttar Pradesh, India (204101)
 """

@@ -76,7 +76,7 @@ export default function BillingFlowDemo() {
                 </div>
                 <div className="text-right">
                   <div className="font-display font-bold">HMorix</div>
-                  <div className="text-xs text-gray-500">hmorix.com</div>
+                  <div className="text-xs text-gray-500">hmorix.in</div>
                 </div>
               </div>
               <div className="mb-6">

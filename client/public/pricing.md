@@ -99,4 +99,4 @@ To initiate a proposal or custom consultation:
 - **Contact Portal**: [https://hmorix.in/contact](https://hmorix.in/contact)
 - **Public API Documentation**: [https://hmorix.in/docs](https://hmorix.in/docs)
 - **Developer Portal**: [https://hmorix.in/developers](https://hmorix.in/developers)
-- **Direct Email**: [support@hmorix.com](mailto:support@hmorix.com) / [harsh@hmorix.in](mailto:harsh@hmorix.in)
+- **Direct Email**: [support@hmorix.in](mailto:support@hmorix.in) / [harsh@hmorix.in](mailto:harsh@hmorix.in)

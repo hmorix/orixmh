@@ -154,7 +154,7 @@ export function getOrganizationSchema() {
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'Customer Service',
-      email: 'support@hmorix.com',
+      email: 'support@hmorix.in',
       availableLanguage: ['English', 'Hindi'],
     },
   }

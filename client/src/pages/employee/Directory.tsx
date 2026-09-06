@@ -16,7 +16,7 @@ type Employee = {
 }
 
 const fallbackEmployees: Employee[] = [
-  { name: 'Harsh Sharma', role: 'CEO', department: 'Leadership', location: 'Hathras', email: 'harsh@hmorix.com', status: 'active', performanceScore: 4.9 },
+  { name: 'Harsh Sharma', role: 'CEO', department: 'Leadership', location: 'Hathras', email: 'harsh@hmorix.in', status: 'active', performanceScore: 4.9 },
 ]
 
 export default function Directory() {

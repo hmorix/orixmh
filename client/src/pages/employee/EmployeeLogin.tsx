@@ -41,7 +41,7 @@ export default function EmployeeLogin() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-medium text-cream/60 mb-1.5">Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="employee@hmorix.com" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00] placeholder:text-cream/30 transition-colors" />
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="employee@hmorix.in" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00] placeholder:text-cream/30 transition-colors" />
             </div>
             <div>
               <label className="block text-xs font-medium text-cream/60 mb-1.5">Password</label>

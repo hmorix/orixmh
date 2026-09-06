@@ -3,7 +3,7 @@
 > Canonical URL: [https://hmorix.in/privacy](https://hmorix.in/privacy)
 > Last Modified: 2026-09-03
 > Effective Date: 2023-01-01
-> Data Protection Officer: [support@hmorix.com](mailto:support@hmorix.com) / [harsh@hmorix.in](mailto:harsh@hmorix.in)
+> Data Protection Officer: [support@hmorix.in](mailto:support@hmorix.in) / [harsh@hmorix.in](mailto:harsh@hmorix.in)
 
 ---
 
@@ -48,4 +48,4 @@ Under applicable privacy legislation (DPDP Act and GDPR), you retain the right t
 - Request complete deletion ("Right to be Forgotten") of your account and personal records.
 - Export your account history and transaction data in structured JSON format.
 
-To exercise any privacy rights, contact our Data Protection Officer at [support@hmorix.com](mailto:support@hmorix.com).
+To exercise any privacy rights, contact our Data Protection Officer at [support@hmorix.in](mailto:support@hmorix.in).

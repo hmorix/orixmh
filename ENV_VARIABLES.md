@@ -32,7 +32,7 @@ SMTP_FROM_NAME=HMorix
 SESSION_SECRET=replace_with_32_plus_random_bytes
 JWT_SECRET=replace_with_32_plus_random_bytes
 JWT_REFRESH_SECRET=replace_with_32_plus_random_bytes
-ADMIN_EMAIL=admin@hmorix.com
+ADMIN_EMAIL=admin@hmorix.in
 ```
 
 ## Optional Server Variables

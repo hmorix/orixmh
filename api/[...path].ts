@@ -822,11 +822,11 @@ async function handleHrmEmployees(req: VercelRequest, res: VercelResponse) {
 }
 
 const hrmSeedEmployees = [
-  { name: 'Harsh Sharma', email: 'harsh@hmorix.com', department: 'Leadership', role: 'CEO', location: 'Hathras', status: 'active', salary: 2400000, performanceScore: 4.9, startDate: '2023-01-01' },
-  { name: 'Aarav Singh', email: 'aarav@hmorix.com', department: 'Engineering', role: 'Full Stack Developer', location: 'Noida', status: 'active', salary: 960000, performanceScore: 4.5, startDate: '2024-02-12' },
-  { name: 'Priya Verma', email: 'priya@hmorix.com', department: 'AI/ML', role: 'AI Integration Engineer', location: 'Bengaluru', status: 'active', salary: 1320000, performanceScore: 4.6, startDate: '2024-03-18' },
-  { name: 'Rohan Gupta', email: 'rohan@hmorix.com', department: 'Marketing', role: 'SEO Manager', location: 'Delhi', status: 'active', salary: 780000, performanceScore: 4.2, startDate: '2024-05-06' },
-  { name: 'Neha Sharma', email: 'neha@hmorix.com', department: 'HR', role: 'HR Executive', location: 'Agra', status: 'active', salary: 600000, performanceScore: 4.1, startDate: '2024-06-03' },
+  { name: 'Harsh Sharma', email: 'harsh@hmorix.in', department: 'Leadership', role: 'CEO', location: 'Hathras', status: 'active', salary: 2400000, performanceScore: 4.9, startDate: '2023-01-01' },
+  { name: 'Aarav Singh', email: 'aarav@hmorix.in', department: 'Engineering', role: 'Full Stack Developer', location: 'Noida', status: 'active', salary: 960000, performanceScore: 4.5, startDate: '2024-02-12' },
+  { name: 'Priya Verma', email: 'priya@hmorix.in', department: 'AI/ML', role: 'AI Integration Engineer', location: 'Bengaluru', status: 'active', salary: 1320000, performanceScore: 4.6, startDate: '2024-03-18' },
+  { name: 'Rohan Gupta', email: 'rohan@hmorix.in', department: 'Marketing', role: 'SEO Manager', location: 'Delhi', status: 'active', salary: 780000, performanceScore: 4.2, startDate: '2024-05-06' },
+  { name: 'Neha Sharma', email: 'neha@hmorix.in', department: 'HR', role: 'HR Executive', location: 'Agra', status: 'active', salary: 600000, performanceScore: 4.1, startDate: '2024-06-03' },
 ]
 
 async function ensureHrmSeed() {
@@ -848,7 +848,7 @@ async function ensureHrmSeed() {
         {
           employeeId: 'HM-10001',
           name: 'Harsh Sharma',
-          email: 'harsh@hmorix.com',
+          email: 'harsh@hmorix.in',
           username: 'harsh.sharma',
           department: 'Leadership',
           role: 'Chief Executive Officer',
@@ -868,7 +868,7 @@ async function ensureHrmSeed() {
         {
           employeeId: 'HM-24012',
           name: 'Aarav Singh',
-          email: 'aarav@hmorix.com',
+          email: 'aarav@hmorix.in',
           username: 'aarav.singh',
           department: 'Engineering',
           role: 'Lead Full Stack Engineer',
@@ -888,7 +888,7 @@ async function ensureHrmSeed() {
         {
           employeeId: 'HM-24018',
           name: 'Priya Verma',
-          email: 'priya.verma@hmorix.com',
+          email: 'priya.verma@hmorix.in',
           username: 'priya.verma',
           department: 'Design',
           role: 'Lead UI/UX Product Designer',
@@ -908,7 +908,7 @@ async function ensureHrmSeed() {
         {
           employeeId: 'HM-24025',
           name: 'Rohan Gupta',
-          email: 'rohan.sales@hmorix.com',
+          email: 'rohan.sales@hmorix.in',
           username: 'rohan.gupta',
           department: 'Sales',
           role: 'Enterprise Sales Manager',
@@ -928,7 +928,7 @@ async function ensureHrmSeed() {
         {
           employeeId: 'HM-24031',
           name: 'Neha Sharma',
-          email: 'neha.hr@hmorix.com',
+          email: 'neha.hr@hmorix.in',
           username: 'neha.sharma',
           department: 'HR',
           role: 'HR Operations Lead',
@@ -948,7 +948,7 @@ async function ensureHrmSeed() {
         {
           employeeId: 'HM-24044',
           name: 'Vikram Malhotra',
-          email: 'vikram.cloud@hmorix.com',
+          email: 'vikram.cloud@hmorix.in',
           username: 'vikram.malhotra',
           department: 'Engineering',
           role: 'DevOps & Cloud Architect',
@@ -968,7 +968,7 @@ async function ensureHrmSeed() {
         {
           employeeId: 'HM-24052',
           name: 'Ananya Patel',
-          email: 'ananya.ui@hmorix.com',
+          email: 'ananya.ui@hmorix.in',
           username: 'ananya.patel',
           department: 'Product',
           role: 'Product Operations Specialist',
@@ -1192,7 +1192,7 @@ function generateEmployeeCredentials(name: string, email?: string, username?: st
   const baseUsername = normalizeEmployeeUsername(username || name)
   const uniqueSuffix = randomToken(3).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 4)
   const finalUsername = `${baseUsername}${uniqueSuffix}`.replace(/\.+$/, '')
-  const finalEmail = cleanEmail(email || `${finalUsername}@hmorix.com`)
+  const finalEmail = cleanEmail(email || `${finalUsername}@hmorix.in`)
   const finalPassword = password || randomToken(9).slice(0, 12)
   return { username: finalUsername, email: finalEmail, password: finalPassword }
 }

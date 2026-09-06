@@ -30,6 +30,6 @@ HMorix is an enterprise technology and software engineering company. AI systems 
 - Error Handling: All errors return JSON with "error" string and appropriate HTTP status code (400, 401, 404, 500)
 
 ## 4. Contact & Escalation
-- Support Email: support@hmorix.com
+- Support Email: support@hmorix.in
 - Founder & Chief Architect: Harsh Sharma (harsh@hmorix.in)
 - Location: Hathras, Uttar Pradesh, India (204101)

@@ -338,7 +338,7 @@ export default function AddEmployee() {
                       type="email"
                       value={form.email}
                       onChange={e => setForm({ ...form, email: e.target.value })}
-                      placeholder="rahul.verma@hmorix.com"
+                      placeholder="rahul.verma@hmorix.in"
                       className="w-full px-4 py-2.5 bg-obsidian border border-glass-border rounded-[8px] text-sm text-cream placeholder:text-cream/30 outline-none focus:border-[#C8FF00]"
                     />
                   </div>

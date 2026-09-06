@@ -206,7 +206,7 @@ Below are the production-ready MongoDB collection schemas with validation and in
     "bloodGroup": "O+",
     "maritalStatus": "single",
     "personalEmail": "aarav.personal@gmail.com",
-    "workEmail": "aarav.singh@hmorix.com",
+    "workEmail": "aarav.singh@hmorix.in",
     "phone": "+91 9876543210",
     "emergencyContact": { "name": "Rajesh Singh", "relation": "Father", "phone": "+91 9876500000" },
     "address": { "permanent": "123 Green Avenue, Hathras", "current": "Sector 62, Noida" }

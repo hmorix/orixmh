@@ -4,7 +4,7 @@
 > Company Name: HMorix (HM Orix / orixmh)
 > Founder & CEO: Harsh Sharma
 > Head Office: Hathras, Uttar Pradesh, India (PIN: 204101)
-> Contact: [support@hmorix.com](mailto:support@hmorix.com) / [harsh@hmorix.in](mailto:harsh@hmorix.in)
+> Contact: [support@hmorix.in](mailto:support@hmorix.in) / [harsh@hmorix.in](mailto:harsh@hmorix.in)
 
 ---
 

@@ -114,7 +114,7 @@ const post = {
     {
       "type": "code",
       "language": "python",
-      "text": "import requests\n\napi_url = 'https://api.hmorix.com/ai-agent'\ndata = {'query': 'user_input'}\nresponse = requests.post(api_url, json=data)\nprint(response.json())"
+      "text": "import requests\n\napi_url = 'https://api.hmorix.in/ai-agent'\ndata = {'query': 'user_input'}\nresponse = requests.post(api_url, json=data)\nprint(response.json())"
     },
     {
       "type": "heading",

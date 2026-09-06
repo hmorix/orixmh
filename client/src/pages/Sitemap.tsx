@@ -7,7 +7,7 @@ export default function Sitemap() {
     <div className="pt-32 pb-20 min-h-screen">
       <SEOHead
         title="Sitemap"
-        description="Complete sitemap of HMorix.com — navigate all pages including services, products, resources, enterprise trust, company info, and account pages."
+        description="Complete sitemap of HMorix.in — navigate all pages including services, products, resources, enterprise trust, company info, and account pages."
         keywords="HMorix sitemap, site map, all pages, navigation, HMorix pages"
         canonical="/sitemap"
       />

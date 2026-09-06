@@ -247,7 +247,7 @@ export default function TopDigitalMarketingHathrasPost() {
             <div className="space-y-4">
               <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[8px]">
                 <h3 className="font-semibold text-cream mb-2">How do I start a project with HMorix in Hathras?</h3>
-                <p className="text-sm text-cream/50">Contact Harsh Sharma and the HMorix team via the <Link to="/contact" className="text-[#C8FF00] hover:underline">Contact page</Link> or email support@hmorix.com for a free roadmap consultation.</p>
+                <p className="text-sm text-cream/50">Contact Harsh Sharma and the HMorix team via the <Link to="/contact" className="text-[#C8FF00] hover:underline">Contact page</Link> or email support@hmorix.in for a free roadmap consultation.</p>
               </div>
               <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[8px]">
                 <h3 className="font-semibold text-cream mb-2">Do you serve nearby cities like Mathura, Aligarh, and Agra?</h3>

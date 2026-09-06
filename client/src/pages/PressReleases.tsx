@@ -54,7 +54,7 @@ export default function PressReleases() {
 
         <div className="mt-12 text-center">
           <p className="text-sm text-cream/40 mb-4">For media inquiries, please contact:</p>
-          <a href="mailto:press@hmorix.com" className="text-[#C8FF00] hover:underline">press@hmorix.com</a>
+          <a href="mailto:press@hmorix.in" className="text-[#C8FF00] hover:underline">press@hmorix.in</a>
         </div>
       </div>
     </div>

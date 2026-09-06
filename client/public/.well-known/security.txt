@@ -1,4 +1,4 @@
-Contact: mailto:support@hmorix.com
+Contact: mailto:support@hmorix.in
 Preferred-Languages: en
 Canonical: https://hmorix.in/.well-known/security.txt
 Policy: https://hmorix.in/security

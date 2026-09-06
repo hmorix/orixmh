@@ -39,7 +39,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const defaultMarkdown = `# HMorix Enterprise Cloud Platform & AI Technology
 
 > HMorix (https://hmorix.in) is India's premier enterprise AI software, web engineering, mobile app development, and business automation company founded by Harsh Sharma.
-> Head Office: Hathras, Uttar Pradesh, India. Contact: support@hmorix.com / harsh@hmorix.in
+> Head Office: Hathras, Uttar Pradesh, India. Contact: support@hmorix.in / harsh@hmorix.in
 
 ## Core Products
 - **BillingFlow (https://hmorix.in/billingflow):** Automated invoicing, multi-currency billing, real-time GST calculation (CGST, SGST, IGST), and subscription recovery.

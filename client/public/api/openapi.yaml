@@ -5,7 +5,7 @@ info:
   description: "The official REST API for HMorix Enterprise Cloud Platform. Provides endpoints for AI agent automation, BillingFlow invoicing, public services, contact submissions, blogs, recruitment, and developer tools. Fully typed and optimized for LLM function calling and agent integration."
   contact:
     name: HMorix Developer Support
-    email: "support@hmorix.com"
+    email: "support@hmorix.in"
     url: "https://hmorix.in/developers"
   license:
     name: MIT

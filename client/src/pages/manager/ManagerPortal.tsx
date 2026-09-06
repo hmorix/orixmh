@@ -875,7 +875,7 @@ export default function ManagerPortal() {
                     <input
                       value={teamForm.lead}
                       onChange={e => setTeamForm({ ...teamForm, lead: e.target.value })}
-                      placeholder="e.g. harsh.sharma@hmorix.com"
+                      placeholder="e.g. harsh.sharma@hmorix.in"
                       className="w-full px-3 py-2 bg-obsidian border border-glass-border rounded-[8px] text-xs text-cream outline-none focus:border-[#C8FF00]"
                     />
                   </div>

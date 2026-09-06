@@ -447,8 +447,8 @@ CREATE TABLE IF NOT EXISTS blog_posts (
 -- ============================================
 
 INSERT INTO users (email, name, password_hash, role, company, plan) VALUES
-('admin@hmorix.com', 'Hamza Morix', '$2b$10$demo_hash', 'admin', 'HMorix', 'enterprise'),
-('sarah@hmorix.com', 'Sarah Chen', '$2b$10$demo_hash', 'manager', 'HMorix', 'enterprise'),
-('alex@hmorix.com', 'Alex Rivera', '$2b$10$demo_hash', 'developer', 'HMorix', 'enterprise'),
-('mike@hmorix.com', 'Mike Johnson', '$2b$10$demo_hash', 'developer', 'HMorix', 'enterprise'),
-('demo@hmorix.com', 'Demo User', '$2b$10$demo_hash', 'user', 'Demo Corp', 'business');
+('admin@hmorix.in', 'Hamza Morix', '$2b$10$demo_hash', 'admin', 'HMorix', 'enterprise'),
+('sarah@hmorix.in', 'Sarah Chen', '$2b$10$demo_hash', 'manager', 'HMorix', 'enterprise'),
+('alex@hmorix.in', 'Alex Rivera', '$2b$10$demo_hash', 'developer', 'HMorix', 'enterprise'),
+('mike@hmorix.in', 'Mike Johnson', '$2b$10$demo_hash', 'developer', 'HMorix', 'enterprise'),
+('demo@hmorix.in', 'Demo User', '$2b$10$demo_hash', 'user', 'Demo Corp', 'business');
