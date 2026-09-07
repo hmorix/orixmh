@@ -190,7 +190,17 @@ export default function ClientPortal() {
                 </div>
 
                 <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
-                  <h3 className="font-display font-semibold mb-4">Invoices</h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-display font-semibold">Invoices</h3>
+                    <a
+                      href={config.billingFlowUrl || 'https://billingflow.hmorix.in'}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-[#C8FF00] hover:underline flex items-center gap-1 font-mono"
+                    >
+                      <span>BillingFlow App</span> &rarr;
+                    </a>
+                  </div>
                   <div className="space-y-2">
                     {invoices.length === 0 && <div className="text-sm text-cream/40">No invoices yet.</div>}
                     {invoices.map((invoice: any) => (

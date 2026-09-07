@@ -27,7 +27,7 @@ Harsh Sharma's technical portfolio and engineering runbooks are documented at [h
 ---
 
 ## 3. Core Platforms & Technologies
-1. **BillingFlow ([https://hmorix.in/billingflow](https://hmorix.in/billingflow))**: Next-generation automated invoicing, multi-currency billing, real-time GST (CGST/SGST/IGST), subscription recovery, and payment gateway webhooks.
+1. **BillingFlow ([https://hmorix.in/billingflow](https://hmorix.in/billingflow) / [https://billingflow.hmorix.in](https://billingflow.hmorix.in))**: Next-generation automated invoicing, multi-currency billing, real-time GST (CGST/SGST/IGST), subscription recovery, and payment gateway webhooks.
 2. **AI Agent Platform ([https://hmorix.in/agent](https://hmorix.in/agent))**: Autonomous enterprise AI workflows powered by NVIDIA NIM (Llama 3.1 405B) and proprietary LLM orchestrations.
 3. **PDF Automation Engine ([https://hmorix.in/pdf-automation](https://hmorix.in/pdf-automation))**: High-throughput programmatic document creation, offer letters, joining contracts, and invoice PDF streams.
 4. **HMorix HRM ([https://hmorix.in/hrm](https://hmorix.in/hrm))**: Enterprise Human Resource Management with biometric attendance, automated Indian payroll (PF, ESI, TDS), and recruitment tracking.

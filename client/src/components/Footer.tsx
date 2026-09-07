@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { BrandLogo } from './BrandLogo'
+import { config } from '../lib/config'
 
 export default function Footer() {
   return (
@@ -27,7 +28,19 @@ export default function Footer() {
           <div>
             <h4 className="font-display font-semibold text-sm mb-4">Products</h4>
             <ul className="flex flex-col gap-2">
-              <li><Link to="/billingflow" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">BillingFlow</Link></li>
+              <li>
+                <div className="flex items-center gap-2">
+                  <Link to="/billingflow" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">BillingFlow</Link>
+                  <a
+                    href={config.billingFlowUrl || 'https://billingflow.hmorix.in'}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[10px] px-1.5 py-0.2 bg-[#C8FF00]/10 text-[#C8FF00] rounded font-mono hover:bg-[#C8FF00]/20 transition-colors"
+                  >
+                    App ↗
+                  </a>
+                </div>
+              </li>
               <li><Link to="/agent" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">AI Agent</Link></li>
               <li><Link to="/pdf-automation" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">PDF Automation</Link></li>
               <li><Link to="/smart-home" className="text-sm text-cream/35 hover:text-[#C8FF00] transition-colors">Smart Home</Link></li>

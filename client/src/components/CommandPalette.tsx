@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, ArrowRight, FileText, Code, Shield, Home, Zap, Users, Settings, User, Bell, BookOpen, Award, Newspaper } from 'lucide-react'
+import { Search, ArrowRight, FileText, Code, Shield, Home, Zap, Users, Settings, User, Bell, BookOpen, Award, Newspaper, ExternalLink } from 'lucide-react'
 
 interface CommandPaletteProps {
   isOpen: boolean
@@ -13,7 +13,8 @@ const commands = [
   { label: 'Contact', path: '/contact', icon: Users, category: 'Pages' },
   { label: 'Blog', path: '/blog', icon: Newspaper, category: 'Pages' },
 
-  { label: 'BillingFlow', path: '/billingflow', icon: FileText, category: 'Products' },
+  { label: 'BillingFlow (Overview)', path: '/billingflow', icon: FileText, category: 'Products' },
+  { label: 'Launch BillingFlow App (billingflow.hmorix.in)', path: 'https://billingflow.hmorix.in', icon: ExternalLink, category: 'Products' },
   { label: 'BillingFlow Features', path: '/billingflow/features', icon: FileText, category: 'Products' },
   { label: 'BillingFlow Pricing', path: '/billingflow/pricing', icon: FileText, category: 'Products' },
   { label: 'BillingFlow Docs', path: '/billingflow/docs', icon: Code, category: 'Products' },
@@ -84,7 +85,11 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
   }, {} as Record<string, typeof commands>)
 
   const handleSelect = (path: string) => {
-    navigate(path)
+    if (path.startsWith('http')) {
+      window.open(path, '_blank')
+    } else {
+      navigate(path)
+    }
     onClose()
   }
 

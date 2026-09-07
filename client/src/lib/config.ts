@@ -7,6 +7,7 @@ export const config = {
   // Application URLs
   appUrl: import.meta.env.VITE_APP_URL || 'https://hmorix.in',
   apiUrl: import.meta.env.VITE_API_URL || '/api',
+  billingFlowUrl: import.meta.env.VITE_BILLINGFLOW_URL || 'https://billingflow.hmorix.in',
   
   // Supabase
   supabaseUrl: import.meta.env.VITE_SUPABASE_URL || '',

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Search, Menu, X, Moon, Sun, Bell, User, LogOut } from 'lucide-react'
+import { Search, Menu, X, Moon, Sun, Bell, User, LogOut, ExternalLink } from 'lucide-react'
 import { useAuth } from '../lib/AuthContext'
 import { useTheme } from '../lib/ThemeContext'
 import { config } from '../lib/config'
@@ -99,8 +99,20 @@ export default function Navbar({ onCommandOpen }: NavbarProps) {
             {/* Products Dropdown */}
             <div className="relative group">
               <button className="px-3 py-1.5 text-sm font-medium text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px] transition-all">Products ▾</button>
-              <div className="hidden group-hover:block absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-obsidian-2 border border-glass-border rounded-[8px] p-2 min-w-[220px] backdrop-blur-[20px]">
-                <Link to="/billingflow" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">BillingFlow</Link>
+              <div className="hidden group-hover:block absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-obsidian-2 border border-glass-border rounded-[8px] p-2 min-w-[240px] backdrop-blur-[20px] shadow-2xl">
+                <div className="flex items-center justify-between px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px] group/item">
+                  <Link to="/billingflow" className="flex-1">BillingFlow</Link>
+                  <a
+                    href={config.billingFlowUrl || 'https://billingflow.hmorix.in'}
+                    target="_blank"
+                    rel="noreferrer"
+                    title="Launch Web App at billingflow.hmorix.in"
+                    className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-[#C8FF00]/10 text-[#C8FF00] hover:bg-[#C8FF00]/20 flex items-center gap-1 transition-colors"
+                  >
+                    <span>App</span>
+                    <ExternalLink size={10} />
+                  </a>
+                </div>
                 <Link to="/agent" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">AI Agent</Link>
                 <Link to="/pdf-automation" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">PDF Automation</Link>
                 <Link to="/smart-home" className="block px-3 py-2 text-sm text-cream/60 hover:text-cream hover:bg-white/[0.04] rounded-[4px]">Smart Home</Link>
@@ -249,8 +261,18 @@ export default function Navbar({ onCommandOpen }: NavbarProps) {
         {mobileOpen && (
           <div className="md:hidden mt-4 space-y-2 pb-4 bg-obsidian-2/95 border border-glass-border rounded-[12px] p-2 shadow-2xl backdrop-blur-[24px]">
             <Link to="/" className="block px-3 py-2 text-sm text-cream/85 hover:text-cream hover:bg-white/[0.08] rounded-[6px]">Home</Link>
-            <Link to="/services" className="block px-3 py-2 text-sm text-cream/85 hover:text-cream hover:bg-white/[0.08] rounded-[6px]">Services</Link>
-            <Link to="/billingflow" className="block px-3 py-2 text-sm text-cream/85 hover:text-cream hover:bg-white/[0.08] rounded-[6px]">BillingFlow</Link>
+            <div className="flex items-center justify-between px-3 py-2 rounded-[6px] hover:bg-white/[0.08]">
+              <Link to="/billingflow" className="text-sm text-cream/85 hover:text-cream">BillingFlow</Link>
+              <a
+                href={config.billingFlowUrl || 'https://billingflow.hmorix.in'}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs font-mono px-2 py-0.5 rounded bg-[#C8FF00]/10 text-[#C8FF00] hover:bg-[#C8FF00]/20 flex items-center gap-1"
+              >
+                <span>App</span>
+                <ExternalLink size={10} />
+              </a>
+            </div>
             <Link to="/agent" className="block px-3 py-2 text-sm text-cream/85 hover:text-cream hover:bg-white/[0.08] rounded-[6px]">AI Agent</Link>
             <Link to="/pricing" className="block px-3 py-2 text-sm text-cream/85 hover:text-cream hover:bg-white/[0.08] rounded-[6px]">Pricing</Link>
             <Link to="/blog" className="block px-3 py-2 text-sm text-cream/85 hover:text-cream hover:bg-white/[0.08] rounded-[6px]">Blog</Link>

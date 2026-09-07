@@ -100,11 +100,11 @@ export default function Home() {
                 <div className="w-2 h-2 rounded-full bg-red-500" />
                 <div className="w-2 h-2 rounded-full bg-yellow-500" />
                 <div className="w-2 h-2 rounded-full bg-green-500" />
-                <span className="font-mono text-[0.7rem] text-cream/35 ml-2">BillingFlow Dashboard</span>
+                <a href="https://billingflow.hmorix.in" target="_blank" rel="noreferrer" className="font-mono text-[0.7rem] text-cream/40 hover:text-[#C8FF00] ml-2 transition-colors">BillingFlow Dashboard (billingflow.hmorix.in ↗)</a>
               </div>
               <div className="mb-4">
                 <div className="font-mono text-[0.65rem] text-cream/35">Total Revenue</div>
-                <div className="font-display text-2xl font-bold tracking-tight">$84,210<span className="text-[#C8FF00] text-base"> ↑12%</span></div>
+                <div className="font-display text-2xl font-bold tracking-tight">₹8,42,100<span className="text-[#C8FF00] text-base"> ↑14%</span></div>
               </div>
               <div className="flex items-end gap-1 h-[60px] mb-4">
                 {[40,65,50,85,70,90,75,100].map((h, i) => (
@@ -141,7 +141,7 @@ export default function Home() {
   { icon: Bot, title: 'AI Agents', desc: 'Custom AI solutions that automate workflows and generate content.' },
   { icon: ShieldCheck, title: 'Cyber Security', desc: 'Penetration testing, audits, and continuous security monitoring.' },
   { icon: FileText, title: 'PDF Automation', desc: 'Intelligent document processing at enterprise scale.' },
-  { icon: CreditCard, title: 'BillingFlow', desc: 'Complete invoicing and payment management platform.' },
+  { icon: CreditCard, title: 'BillingFlow', desc: 'Complete invoicing, automated GST billing & payment platform at billingflow.hmorix.in.' },
  {
   icon: HomeIcon,
   title: "Smart Home",

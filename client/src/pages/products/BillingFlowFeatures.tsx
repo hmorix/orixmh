@@ -1,16 +1,44 @@
 import { Link } from 'react-router-dom'
+import { ExternalLink } from 'lucide-react'
+import SEOHead from '../../components/seo/SEOHead'
+import { config } from '../../lib/config'
 
 export default function BillingFlowFeatures() {
+  const appUrl = config.billingFlowUrl || 'https://billingflow.hmorix.in'
+
   return (
     <div className="pt-32 pb-20">
+      <SEOHead
+        title="BillingFlow Features – Smart Invoicing & GST Automation"
+        description="Explore BillingFlow features: smart invoice creation, 20+ payment gateway integrations, automated GST compliance, and cash flow analytics on billingflow.hmorix.in."
+        keywords="BillingFlow features, smart invoicing, GST calculation, payment tracking, billingflow.hmorix.in"
+        canonical="/billingflow/features"
+      />
+
       <div className="max-w-[1280px] mx-auto px-8">
-        <span className="label-mono">BillingFlow</span>
-        <h1 className="section-title mt-3 mb-6">Features</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <span className="label-mono">BillingFlow</span>
+            <h1 className="section-title mt-2 mb-3">Enterprise Features</h1>
+            <p className="text-lg text-cream/60 max-w-[600px]">Advanced automation designed for frictionless receivables and accounting compliance.</p>
+          </div>
+          <a
+            href={appUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-primary text-xs px-4 py-2.5 flex items-center gap-1.5 w-fit"
+          >
+            <span>Launch Live App</span>
+            <ExternalLink size={13} />
+          </a>
+        </div>
+
         <div className="flex gap-2 flex-wrap mb-12 p-1 bg-obsidian-2 border border-glass-border rounded-[8px] w-fit">
           <Link to="/billingflow" className="px-4 py-2 text-sm font-medium text-cream/50 hover:text-cream rounded-[4px]">Overview</Link>
           <Link to="/billingflow/features" className="px-4 py-2 text-sm font-medium bg-[#C8FF00]/10 text-[#C8FF00] rounded-[4px]">Features</Link>
           <Link to="/billingflow/pricing" className="px-4 py-2 text-sm font-medium text-cream/50 hover:text-cream rounded-[4px]">Pricing</Link>
           <Link to="/billingflow/docs" className="px-4 py-2 text-sm font-medium text-cream/50 hover:text-cream rounded-[4px]">Docs</Link>
+          <Link to="/billingflow/demo" className="px-4 py-2 text-sm font-medium text-cream/50 hover:text-cream rounded-[4px]">Demo</Link>
         </div>
         <div className="space-y-12">
           {[

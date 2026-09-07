@@ -1,17 +1,40 @@
 import { useState } from 'react'
-import { Play, FileText, Send, CheckCircle } from 'lucide-react'
+import { Play, FileText, Send, CheckCircle, ExternalLink } from 'lucide-react'
+import SEOHead from '../../components/seo/SEOHead'
+import { config } from '../../lib/config'
 
 export default function BillingFlowDemo() {
   const [step, setStep] = useState(0)
+  const appUrl = config.billingFlowUrl || 'https://billingflow.hmorix.in'
 
   return (
     <div className="pt-32 pb-20">
-      <div className="max-w-[1280px] mx-auto px-8">
-        <span className="label-mono">BillingFlow / Demo</span>
-        <h1 className="section-title mt-3 mb-6">Try BillingFlow</h1>
-        <p className="text-lg text-cream/60 max-w-[600px] mb-12">Create and send a professional invoice in under 60 seconds. No signup required.</p>
+      <SEOHead
+        title="BillingFlow Interactive Demo – Try Invoicing"
+        description="Try the interactive BillingFlow invoicing demo or launch the full application at billingflow.hmorix.in."
+        keywords="BillingFlow demo, invoice generator, try BillingFlow, billingflow.hmorix.in"
+        canonical="/billingflow/demo"
+      />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="max-w-[1280px] mx-auto px-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <span className="label-mono">BillingFlow / Demo</span>
+            <h1 className="section-title mt-2 mb-3">Try BillingFlow</h1>
+            <p className="text-lg text-cream/60 max-w-[600px]">Create and test a professional invoice in under 60 seconds.</p>
+          </div>
+          <a
+            href={appUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-primary text-xs px-4 py-2.5 flex items-center gap-1.5 w-fit"
+          >
+            <span>Launch Live App</span>
+            <ExternalLink size={13} />
+          </a>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10">
           {/* Demo Form */}
           <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[16px]">
             <div className="flex items-center gap-2 mb-6">
@@ -53,9 +76,22 @@ export default function BillingFlowDemo() {
                 <CheckCircle size={48} className="text-[#C8FF00] mx-auto mb-4" />
                 <h3 className="font-display font-semibold text-xl mb-2">Invoice Generated!</h3>
                 <p className="text-sm text-cream/50 mb-6">INV-DEMO-001 has been created and is ready to send.</p>
-                <div className="flex gap-3 justify-center">
+                <div className="flex gap-3 justify-center mb-6">
                   <button className="btn-primary flex items-center gap-2"><Send size={14} /> Send Invoice</button>
                   <button className="btn-outline flex items-center gap-2"><FileText size={14} /> Download PDF</button>
+                </div>
+                <div className="p-4 bg-obsidian border border-glass-border rounded-[10px] text-left">
+                  <div className="text-xs font-mono text-[#C8FF00] mb-1">Production Platform</div>
+                  <div className="text-sm text-cream/80 mb-3">Want automated GST tax handling, recurring invoices, and live payment tracking?</div>
+                  <a
+                    href={appUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn-primary text-xs w-full py-2.5 flex items-center justify-center gap-1.5 font-semibold"
+                  >
+                    <span>Launch Full App at billingflow.hmorix.in</span>
+                    <ExternalLink size={13} />
+                  </a>
                 </div>
                 <button onClick={() => setStep(0)} className="text-xs text-cream/30 mt-4 hover:text-cream">Start over</button>
               </div>
