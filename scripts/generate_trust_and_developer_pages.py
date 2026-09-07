@@ -5,11 +5,8 @@ def write_page(slug, title, description, html_body, md_content):
     md_path = f"client/public/{slug}.md"
     with open(md_path, "w", encoding="utf-8") as f:
         f.write(md_content.strip() + "\n")
-    
-    # 2. Write HTML file in client/public/{slug}/index.html
-    dir_path = f"client/public/{slug}"
-    os.makedirs(dir_path, exist_ok=True)
-    html_file = f"{dir_path}/index.html"
+    print(f"Generated {slug}: {md_path}")
+    return
     
     full_html = f"""<!DOCTYPE html>
 <html lang="en" class="dark">

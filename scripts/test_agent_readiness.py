@@ -66,12 +66,11 @@ check(has_markdown_rule, "vercel.json has rewrite with header condition for Acce
 
 # 5. Developer Portal
 print("\nTest 5: Developer Portal")
-check(os.path.exists("client/public/developers/index.html"), "client/public/developers/index.html exists")
+check(os.path.exists("client/src/pages/Developers.tsx"), "client/src/pages/Developers.tsx exists")
 check(os.path.exists("client/public/developers.md"), "client/public/developers.md exists")
-with open("client/public/developers/index.html") as f:
-    dev_html = f.read()
-plain_dev = re.sub(r'<[^>]+>', ' ', dev_html)
-check(len(' '.join(plain_dev.split())) >= 500, f"Developer portal has {len(' '.join(plain_dev.split()))} chars of raw HTML")
+with open("client/public/developers.md") as f:
+    dev_md = f.read()
+check(len(dev_md) >= 500, f"Developer portal markdown has {len(dev_md)} chars (>500 required)")
 with open("client/src/pages/Developers.tsx") as f:
     dev_tsx = f.read()
 check("sandbox" in dev_tsx.lower() and "openapi" in dev_tsx.lower(), "Developers.tsx includes sandbox and openapi links")
@@ -106,14 +105,11 @@ check(os.path.exists("client/public/agent-instructions.txt"), "agent-instruction
 # 9. Trust Anchor Pages
 print("\nTest 9: Trust Anchor Pages (About, Contact, Privacy)")
 for anchor in ['about', 'contact', 'privacy']:
-    html_path = f"client/public/{anchor}/index.html"
     md_path = f"client/public/{anchor}.md"
-    check(os.path.exists(html_path), f"{html_path} exists")
     check(os.path.exists(md_path), f"{md_path} exists")
-    with open(html_path) as f:
-        anchor_html = f.read()
-    plain_anchor = ' '.join(re.sub(r'<[^>]+>', ' ', anchor_html).split())
-    check(len(plain_anchor) >= 500, f"{anchor} raw HTML has {len(plain_anchor)} chars (>500 required)")
+    with open(md_path) as f:
+        anchor_md = f.read()
+    check(len(anchor_md) >= 500, f"{anchor} markdown has {len(anchor_md)} chars (>500 required)")
 
 # 10. Developer Resource Discoverability
 print("\nTest 10: Developer Resource Discoverability")

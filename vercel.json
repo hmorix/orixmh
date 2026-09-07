@@ -317,6 +317,18 @@
       "destination": "/index.html"
     },
     {
+      "source": "/developer",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/developer-portal",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/dev",
+      "destination": "/index.html"
+    },
+    {
       "source": "/docs",
       "destination": "/index.html"
     },

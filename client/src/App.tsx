@@ -273,6 +273,9 @@ function App() {
 
           {/* Platform */}
           <Route path="/developers" element={<Developers />} />
+          <Route path="/developer" element={<Developers />} />
+          <Route path="/developer-portal" element={<Developers />} />
+          <Route path="/dev" element={<Developers />} />
           <Route path="/docs" element={<Docs />} />
           <Route path="/playground" element={<Playground />} />
           <Route path="/smart-home" element={<SmartHome />} />
