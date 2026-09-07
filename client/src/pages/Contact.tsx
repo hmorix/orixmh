@@ -9,7 +9,7 @@ const HMORIX_CID_LINK = 'https://www.google.com/maps?cid=6647719562825355400'
 
 declare global {
   interface Window {
-    google: typeof google
+    google: any
     initHmorixMap: () => void
   }
 }
