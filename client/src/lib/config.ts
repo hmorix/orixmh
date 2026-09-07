@@ -13,6 +13,9 @@ export const config = {
   supabaseUrl: import.meta.env.VITE_SUPABASE_URL || '',
   supabaseKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '',
   
+  // Google Maps Platform
+  googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
+  
   // NVIDIA AI
   nvidiaApiKey: import.meta.env.VITE_NVIDIA_API_KEY || '',
   nvidiaModel: import.meta.env.VITE_NVIDIA_MODEL || 'nvidia/deepseek-v4-flash',
