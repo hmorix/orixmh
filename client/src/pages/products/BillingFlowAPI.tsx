@@ -21,7 +21,7 @@ export default function BillingFlowAPI() {
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
-  const baseUrl = 'https://api.billingflow.hmorix.com'
+  const baseUrl = 'https://api.billingflow.hmorix.in'
   const appUrl = config.billingFlowUrl || 'https://billingflow.hmorix.in'
 
   const copyToClipboard = (text: string, id: string) => {

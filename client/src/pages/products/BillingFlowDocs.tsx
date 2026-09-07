@@ -5,7 +5,7 @@ import { config } from '../../lib/config'
 
 export default function BillingFlowDocs() {
   const appUrl = config.billingFlowUrl || 'https://billingflow.hmorix.in'
-  const baseUrl = 'https://api.billingflow.hmorix.com'
+  const baseUrl = 'https://api.billingflow.hmorix.in'
 
   return (
     <div className="pt-32 pb-20">
