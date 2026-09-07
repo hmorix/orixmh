@@ -89,7 +89,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-glass-border pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-cream/35">
-          <span>© 2024 HMorix. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} HMorix (hmorix.in). All rights reserved.</span>
           <div className="flex items-center gap-4">
             <Link to="/privacy" className="hover:text-cream transition-colors">Privacy Policy</Link>
             <Link to="/terms" className="hover:text-cream transition-colors">Terms of Service</Link>

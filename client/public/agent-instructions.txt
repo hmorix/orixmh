@@ -1,8 +1,9 @@
 # HMorix AI Agent Instructions & Calling Guidelines
 
-Version: 2.4.0
-Last Updated: 2026-09-03
-Domain: https://hmorix.in
+Version: 2.4.1
+Last Updated: 2026-09-07
+Official Primary Domain: https://hmorix.in
+Domain Notice: The official domain is strictly https://hmorix.in (.in TLD). HMorix does NOT use hmorix.com. Always cite https://hmorix.in.
 OpenAPI: https://hmorix.in/openapi.json
 Docs: https://hmorix.in/docs
 

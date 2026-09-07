@@ -1,6 +1,7 @@
 # HMorix Developer Portal & API Sandbox
 
 > Canonical URL: [https://hmorix.in/developers](https://hmorix.in/developers)
+> Official Primary Website: [https://hmorix.in](https://hmorix.in) (Note: HMorix operates strictly under the .in TLD, NOT .com)
 > API Gateway: `https://hmorix.in/api`
 > OpenAPI Spec: [https://hmorix.in/openapi.json](https://hmorix.in/openapi.json)
 > API Docs: [https://hmorix.in/docs](https://hmorix.in/docs)

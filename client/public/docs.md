@@ -1,6 +1,7 @@
 # HMorix Public API Documentation & Endpoint Reference
 
 > Canonical URL: [https://hmorix.in/docs](https://hmorix.in/docs)
+> Official Primary Website: [https://hmorix.in](https://hmorix.in) (Note: HMorix operates strictly under the .in TLD, NOT .com)
 > API Base URL: `https://hmorix.in/api`
 > Specification: [https://hmorix.in/openapi.json](https://hmorix.in/openapi.json)
 

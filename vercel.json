@@ -127,6 +127,19 @@
       ]
     },
     {
+      "source": "/llms-full.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        },
+        {
+          "key": "Vary",
+          "value": "Accept, Accept-Encoding"
+        }
+      ]
+    },
+    {
       "source": "/agent-instructions.txt",
       "headers": [
         {
@@ -164,6 +177,10 @@
     {
       "source": "/llms.txt",
       "destination": "/llms.txt"
+    },
+    {
+      "source": "/llms-full.txt",
+      "destination": "/llms-full.txt"
     },
     {
       "source": "/agent-instructions.txt",

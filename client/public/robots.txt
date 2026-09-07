@@ -3,6 +3,7 @@ Allow: /
 Allow: /sitemap.xml
 Allow: /rss.xml
 Allow: /llms.txt
+Allow: /llms-full.txt
 Allow: /manifest.webmanifest
 Allow: /site.webmanifest
 Allow: /security.txt
@@ -54,6 +55,7 @@ Crawl-delay: 0
 User-agent: GPTBot
 Allow: /
 Allow: /llms.txt
+Allow: /llms-full.txt
 Allow: /openapi.json
 Allow: /docs
 Allow: /developers
@@ -63,6 +65,7 @@ Allow: /agent-instructions.txt
 User-agent: ChatGPT-User
 Allow: /
 Allow: /llms.txt
+Allow: /llms-full.txt
 Allow: /openapi.json
 Allow: /docs
 Allow: /developers
@@ -73,6 +76,7 @@ Allow: /agent-instructions.txt
 User-agent: ClaudeBot
 Allow: /
 Allow: /llms.txt
+Allow: /llms-full.txt
 Allow: /openapi.json
 Allow: /docs
 Allow: /developers
@@ -82,6 +86,7 @@ Allow: /agent-instructions.txt
 User-agent: anthropic-ai
 Allow: /
 Allow: /llms.txt
+Allow: /llms-full.txt
 Allow: /openapi.json
 Allow: /docs
 Allow: /developers
@@ -92,6 +97,7 @@ Allow: /agent-instructions.txt
 User-agent: PerplexityBot
 Allow: /
 Allow: /llms.txt
+Allow: /llms-full.txt
 Allow: /openapi.json
 Allow: /docs
 Allow: /developers
@@ -102,6 +108,7 @@ Allow: /agent-instructions.txt
 User-agent: Google-Extended
 Allow: /
 Allow: /llms.txt
+Allow: /llms-full.txt
 Allow: /openapi.json
 Allow: /docs
 Allow: /developers

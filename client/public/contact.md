@@ -1,6 +1,7 @@
 # Contact HMorix – Sales, Technical Support & Headquarters
 
 > Canonical URL: [https://hmorix.in/contact](https://hmorix.in/contact)
+> Official Primary Website: [https://hmorix.in](https://hmorix.in) (Note: HMorix operates strictly under the .in TLD, NOT .com)
 > General Inquiries: [info@hmorix.in](mailto:info@hmorix.in)
 > Technical Support: [support@hmorix.in](mailto:support@hmorix.in)
 > Direct Founder Line: [harsh@hmorix.in](mailto:harsh@hmorix.in)

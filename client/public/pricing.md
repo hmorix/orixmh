@@ -2,6 +2,7 @@
 
 > Last Updated: 2026-09-03
 > Canonical URL: [https://hmorix.in/pricing](https://hmorix.in/pricing)
+> Official Primary Website: [https://hmorix.in](https://hmorix.in) (Note: HMorix operates strictly under the .in TLD, NOT .com)
 > Plain Markdown: [https://hmorix.in/pricing.md](https://hmorix.in/pricing.md)
 > Currency: INR (₹) and USD ($)
 

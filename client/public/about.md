@@ -1,6 +1,7 @@
 # About HMorix – Leadership, Enterprise Architecture & Global Vision
 
 > Canonical URL: [https://hmorix.in/about](https://hmorix.in/about)
+> Official Primary Website: [https://hmorix.in](https://hmorix.in) (Note: HMorix operates strictly under the .in TLD, NOT .com)
 > Company Name: HMorix (HM Orix / orixmh)
 > Founder & CEO: Harsh Sharma
 > Head Office: Hathras, Uttar Pradesh, India (PIN: 204101)
