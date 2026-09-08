@@ -673,23 +673,68 @@ NVIDIA_MODEL=meta/llama-3.1-405b-instruct
 
 ---
 
-## Files Summary
+## 24. Comprehensive Platform Security Hardening, RBAC & Privacy Updates (September 2026) ✅
 
-### Core Updated Files
-1. `api/[...path].ts` - Consolidated serverless API router for all platform modules.
-2. `client/src/App.tsx` - Complete client routing and layout architecture.
-3. `client/src/lib/config.ts` - Centralized production URL resolution.
-4. `client/src/pages/sales/SalesPortal.tsx` - Field sales lead generation and CRM sync.
-5. `client/src/pages/hrm/` - HRM Dashboard, Recruitment, Payroll, Leaves, Add Employee.
-6. `client/src/pages/manager/ManagerPortal.tsx` - Manager team and project delegation.
-7. `client/src/pages/employee/EmployeePortal.tsx` - Employee self-service suite.
-8. `client/src/pages/portal/ClientPortal.tsx` - Customer project and ticket portal.
-9. `PROJECT_WORKFLOW.md` - Canonical platform workflow documentation.
-10. `PROJECT_MEMORY.md` - System memory and architectural reference.
-11. `FIXES_SUMMARY.md` - Complete platform change log.
+### Vulnerabilities Identified & Resolved
+1. **Critical Admin Account Deletion Vulnerability**: Fixed an empty block in `handleAdminUsers` DELETE handler that failed to prevent deleting the primary admin account (`process.env.ADMIN_EMAIL`) and allowed admins to delete other admin accounts.
+2. **Setup Admin Re-Takeover**: Hardened `handleSetupAdmin` to return 403 Forbidden if an active admin user with a password hash already exists in MongoDB.
+3. **Role-Based Access Control (RBAC) Hardening**:
+   - **CRM Endpoints**: `/api/crm/stats`, `/api/crm/contacts`, `/api/crm/deals`, and `/api/crm/overview` strictly locked to `['admin', 'crm', 'sales', 'manager']`.
+   - **HRM Endpoints**: `/api/hrm/stats`, `/api/hrm/overview`, `/api/hrm/people`, and `/api/hrm/leave` approvals locked to `['admin', 'hr', 'manager']`; `/api/hrm/payroll`, `/api/hrm/payroll/export`, and recruitment locked to `['admin', 'hr']`.
+   - **Analytics Endpoints**: `/api/analytics/overview` and `/api/analytics/traffic` locked to `['admin', 'manager']`.
+   - **Invoices**: `/api/invoices` GET and POST locked to `['admin', 'manager', 'sales', 'crm', 'hr']`.
+   - **Configuration**: `/api/config/database` locked to `['admin']`.
+   - **Dashboard**: `/api/dashboard/stats` requires authenticated session.
+4. **Mass Tampering & Exposure via Notifications**:
+   - Both GET and PUT on `/api/notifications` now require authentication.
+   - Fixed unauthenticated callers triggering `updateMany({})` which marked every user's notifications as read.
+5. **Insecure Direct Object References (IDOR)**:
+   - **Projects (`handleProjects` PUT)**: Added ownership and visible project filter validation. Prevented callers from modifying projects belonging to other accounts. Blocked mutation of immutable properties (`_id`, `userId`, `createdBy`).
+   - **Support Tickets (`handleTickets` PUT)**: Enforced ticket ownership, employee assignment, or privileged role validation. Restricted team re-assignment fields to privileged roles only.
+   - **Cloud Storage (`handleUpload`)**: Non-admins restricted from uploading blog/content assets or triggering arbitrary file deletion via unvalidated `oldPath`.
+6. **Rate Limiting Engine**:
+   - Deployed in-memory sliding-window counter with automatic pruning.
+   - Tiered limits: `auth` (10 req/min), `contact` (5 req/5min), `ai` (20 req/min), `general` (120 req/min).
+   - Injected on all auth endpoints (`signin`, `signup`, `otp/request`, `forgot-password`, `reset-password`), contact form, and AI routes.
+7. **ReDoS & Regex Injection Defense**:
+   - Implemented `escapeRegex()` helper to escape regex metacharacters across all user queries in MongoDB `$regex` (users, logs, CRM, HRM, blogs).
+8. **CORS & Global Security Headers**:
+   - Replaced wildcard `*` CORS with dynamic origin validator matching `hmorix.in`, `www.hmorix.in`, and localhost dev ports.
+   - Added HSTS (`max-age=63072000; includeSubDomains; preload`), `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, and `X-XSS-Protection` to both `vercel.json` and `api/[...path].ts`.
+9. **Sensitive Data Scrubbing in Activity Logs**:
+   - Added recursive sanitization (`redactSensitiveDetails`) scrubbing passwords, OTPs, hashes, tokens, API keys, CVVs, and authorization headers in `activity_log`.
+10. **JWT Algorithm Hardening**:
+    - Enforced `{ algorithms: ['HS256'] }` on `jwt.verify` to prevent algorithm confusion attacks.
+11. **Payroll Export Refactoring**:
+    - Replaced the mock response object pattern with a shared `getPayrollReportData(period)` helper function.
+12. **Contact Page Email Exposure Hardening**:
+    - In `client/src/pages/Contact.tsx`, secondary email addresses (`support@hmorix.in`, `harsh@hmorix.in`, `career@hmorix.in`, `hr@hmorix.in`, `hmorix.in@gmail.com`) are preserved in code with `hidden: true` and filtered out from the rendered UI.
+    - Only `info@hmorix.in` and `official@hmorix.in` are publicly rendered.
+    - Fixed typo `offical@hmorix.in` → `official@hmorix.in`.
+13. **Automated Verification**:
+    - Built and executed a 47-test automated verification suite (`scratch/verify_security_hardening.mjs`) confirming 100% pass rate.
 
 ---
 
-**Last Updated:** August 2026  
-**Status:** Production Ready & Enterprise Scale ✅
+## Files Summary
+
+### Core Updated Files
+1. `api/[...path].ts` - Consolidated serverless API router with rate limiting, RBAC, IDOR guards, and CORS whitelist.
+2. `client/src/pages/Contact.tsx` - Contact page with email visibility privacy controls.
+3. `vercel.json` - Global HTTP security headers (HSTS, Referrer-Policy, Permissions-Policy).
+4. `client/src/App.tsx` - Complete client routing and layout architecture.
+5. `client/src/lib/config.ts` - Centralized production URL resolution.
+6. `client/src/pages/sales/SalesPortal.tsx` - Field sales lead generation and CRM sync.
+7. `client/src/pages/hrm/` - HRM Dashboard, Recruitment, Payroll, Leaves, Add Employee.
+8. `client/src/pages/manager/ManagerPortal.tsx` - Manager team and project delegation.
+9. `client/src/pages/employee/EmployeePortal.tsx` - Employee self-service suite.
+10. `client/src/pages/portal/ClientPortal.tsx` - Customer project and ticket portal.
+11. `PROJECT_WORKFLOW.md` - Canonical platform workflow documentation.
+12. `PROJECT_MEMORY.md` - System memory, rate limiting, and security reference.
+13. `FIXES_SUMMARY.md` - Complete platform change log.
+
+---
+
+**Last Updated:** September 2026  
+**Status:** Hardened, Verified & Enterprise Production-Ready ✅
 

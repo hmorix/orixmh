@@ -51,15 +51,36 @@ This file serves as the canonical system reference for HMorix (`hmorix.in`), cap
    - Content: Cryptographic payload signed with HMAC-SHA256 (`sessionId.signature`).
    - Flags: `HttpOnly; SameSite=Lax; Path=/; Secure` (in production).
 2. **Password Security**: Passwords hashed with `bcryptjs` using 12 salt rounds.
-3. **Role Routing**:
+3. **JWT Algorithm Hardening**: `jwt.verify` strictly locked to `{ algorithms: ['HS256'] }`.
+4. **Rate Limiting Engine**:
+   - In-memory sliding-window counter with automatic pruning.
+   - `auth` tier: **10 req/min** (`signin`, `signup`, `otp/request`, `forgot-password`, `reset-password`).
+   - `contact` tier: **5 req/5 min** (`contact`).
+   - `ai` tier: **20 req/min** (`ai/chat`, `ai/playground`).
+   - `general` tier: **120 req/min**.
+   - Exceeded limits return HTTP 429 with standard `Retry-After`, `X-RateLimit-*` headers.
+5. **CORS & Global Security Headers**:
+   - Dynamic origin allowlist matching `https://hmorix.in`, `https://www.hmorix.in`, local development ports.
+   - HSTS (`max-age=63072000; includeSubDomains; preload`), `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, `X-XSS-Protection: 1; mode=block`, `X-Content-Type-Options: nosniff`.
+6. **Role Routing & RBAC Matrix**:
    - `admin` / `manager` → `/manager` or `/admin`
    - `hr` → `/hrm`
    - `employee` → `/employee`
    - `sales` / `crm` → `/sales` or `/crm`
    - `user` (Client) → `/portal`
-4. **Data Isolation Filters**:
-   - Client Portal queries are strictly scoped to `userId`, `clientEmail`, or `ownerEmail`.
-   - Employee queries are strictly scoped to `employeeId`, email, username, or team ID.
+   - Endpoints strictly role-gated: CRM (`admin`, `crm`, `sales`, `manager`), HRM (`admin`, `hr`, `manager`), Analytics (`admin`, `manager`), Invoices (`admin`, `manager`, `sales`, `crm`, `hr`).
+7. **IDOR & Data Isolation Filters**:
+   - Client Portal queries strictly scoped to `userId`, `clientEmail`, or `ownerEmail`.
+   - Employee queries strictly scoped to `employeeId`, email, username, or team ID.
+   - Project and Ticket updates enforce ownership or assignment validation prior to mutation.
+8. **ReDoS & XSS Defense**:
+   - All text inputs sanitized via enhanced `sanitizeText()`.
+   - All MongoDB `$regex` search parameters sanitized with `escapeRegex()`.
+9. **Log Data Privacy**:
+   - `activity_log` recursively redacts `password`, `token`, `secret`, `otp`, `apikey`, `cvv`, `authorization`.
+10. **Contact Page Privacy**:
+    - Secondary email addresses hidden from public UI (`support@`, `harsh@`, `career@`, `hr@`, `hmorix.in@gmail.com`) while retained in code.
+    - Only `info@hmorix.in` and `official@hmorix.in` displayed publicly.
 
 ---
 

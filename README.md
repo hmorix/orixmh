@@ -141,41 +141,41 @@ To switch from Supabase to MySQL:
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/health` | Health check + database status |
-| GET | `/api/status` | System status page data |
-| GET | `/api/config/database` | Current database provider info |
-| POST | `/api/auth/signin` | Sign in (MySQL mode) |
-| POST | `/api/auth/signup` | Sign up (MySQL mode) |
-| GET | `/api/auth/me` | Get current user |
-| GET | `/api/dashboard/stats` | Dashboard statistics |
-| GET | `/api/profile` | User profile |
-| PUT | `/api/profile` | Update profile |
-| GET | `/api/settings` | User settings |
-| PUT | `/api/settings` | Update settings |
-| GET | `/api/notifications` | Get notifications |
-| GET | `/api/projects` | List projects |
-| POST | `/api/projects` | Create project |
-| GET | `/api/invoices` | List invoices |
-| POST | `/api/invoices` | Create invoice |
-| GET | `/api/tickets` | List support tickets |
-| POST | `/api/tickets` | Create ticket |
-| POST | `/api/contact` | Submit contact form |
-| GET | `/api/blog` | List blog posts |
-| GET | `/api/blog/:slug` | Get blog post |
-| GET | `/api/crm/stats` | CRM statistics |
-| GET | `/api/crm/contacts` | List CRM contacts |
-| POST | `/api/crm/contacts` | Create contact |
-| GET | `/api/crm/deals` | List deals |
-| GET | `/api/hrm/stats` | HRM statistics |
-| GET | `/api/hrm/employees` | List employees |
-| GET | `/api/analytics/overview` | Analytics overview |
-| GET | `/api/analytics/traffic` | Traffic sources |
-| GET | `/api/admin/stats` | Admin statistics |
-| GET | `/api/admin/logs` | System logs |
-| GET | `/api/services` | List services |
-| GET | `/api/employee/profile` | Employee profile |
+| Method | Endpoint | Access / Role | Rate Limit | Description |
+|:---|:---|:---|:---|:---|
+| GET | `/api/health` | Public | General (120/m) | Health check + database status |
+| GET | `/api/status` | Public | General (120/m) | System status page data |
+| GET | `/api/config/database` | `admin` | General (120/m) | Current database provider info |
+| POST | `/api/auth/signin` | Public | Auth (10/m) | Sign in with email/password |
+| POST | `/api/auth/signup` | Public | Auth (10/m) | Sign up new account |
+| POST | `/api/auth/otp/request` | Public | Auth (10/m) | Request 6-digit OTP |
+| POST | `/api/auth/forgot-password` | Public | Auth (10/m) | Send password reset OTP |
+| POST | `/api/auth/reset-password` | Public | Auth (10/m) | Reset password with OTP |
+| GET | `/api/auth/me` | Authenticated | General (120/m) | Get current user session |
+| GET | `/api/dashboard/stats` | Authenticated | General (120/m) | Dashboard metrics |
+| GET / PUT | `/api/profile` | Authenticated | General (120/m) | User profile management |
+| GET / PUT | `/api/settings` | Authenticated | General (120/m) | User preferences & settings |
+| GET / PUT | `/api/notifications` | Authenticated | General (120/m) | User notifications |
+| GET / POST / PUT | `/api/projects` | Authenticated (IDOR-guarded) | General (120/m) | Projects management |
+| GET / POST | `/api/invoices` | `admin`, `manager`, `sales`, `crm`, `hr` | General (120/m) | Invoice records |
+| GET / POST / PUT | `/api/tickets` | Authenticated (IDOR-guarded) | General (120/m) | Support tickets |
+| POST | `/api/contact` | Public | Contact (5/5m) | Submit contact form |
+| POST | `/api/ai/chat` | Authenticated / Public | AI (20/m) | NVIDIA AI Assistant |
+| POST | `/api/ai/playground` | Authenticated / Public | AI (20/m) | AI Playground generator |
+| GET | `/api/blog` | Public (Drafts: `admin`) | General (120/m) | List blog posts |
+| GET | `/api/crm/stats` | `admin`, `crm`, `sales`, `manager` | General (120/m) | CRM pipeline statistics |
+| GET / POST | `/api/crm/contacts` | `admin`, `crm`, `sales`, `manager` | General (120/m) | CRM contacts |
+| GET | `/api/crm/deals` | `admin`, `crm`, `sales`, `manager` | General (120/m) | CRM deal board |
+| GET | `/api/hrm/stats` | `admin`, `hr`, `manager` | General (120/m) | HRM statistics |
+| GET | `/api/hrm/employees` | `admin`, `hr`, `manager`, `employee` | General (120/m) | List employees |
+| GET / POST | `/api/hrm/payroll` | `admin`, `hr` | General (120/m) | Payroll runs |
+| GET | `/api/hrm/payroll/export` | `admin`, `hr` | General (120/m) | Export payroll CSV |
+| GET | `/api/analytics/overview` | `admin`, `manager` | General (120/m) | Web analytics overview |
+| GET | `/api/analytics/traffic` | `admin`, `manager` | General (120/m) | Traffic acquisition sources |
+| GET | `/api/admin/stats` | `admin` | General (120/m) | Admin system metrics |
+| GET | `/api/admin/logs` | `admin` | General (120/m) | Sensitive-scrubbed audit logs |
+| GET | `/api/services` | Public | General (120/m) | Public services listing |
+| GET | `/api/employee/profile` | Authenticated | General (120/m) | Employee profile |
 
 ---
 

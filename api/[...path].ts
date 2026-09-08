@@ -8,10 +8,30 @@ import crypto from 'crypto'
 import * as nodemailer from 'nodemailer'
 
 // ============================================
-// CORS & AUTH HELPERS
+// CORS & SECURITY HEADERS
 // ============================================
-function setCors(res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', process.env.CLIENT_ORIGIN || process.env.APP_URL || '*')
+function getAllowedOrigin(incomingOrigin?: string): string {
+  const allowed = [
+    'https://hmorix.in',
+    'https://www.hmorix.in',
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:5173',
+  ]
+  if (process.env.CLIENT_ORIGIN) allowed.push(process.env.CLIENT_ORIGIN.replace(/\/$/, ''))
+  if (process.env.APP_URL) allowed.push(process.env.APP_URL.replace(/\/$/, ''))
+  if (process.env.SITE_URL) allowed.push(process.env.SITE_URL.replace(/\/$/, ''))
+  if (incomingOrigin && allowed.includes(incomingOrigin)) {
+    return incomingOrigin
+  }
+  return process.env.CLIENT_ORIGIN || process.env.APP_URL || 'https://hmorix.in'
+}
+
+function setCors(res: VercelResponse, req?: VercelRequest) {
+  const incomingOrigin = typeof req?.headers?.origin === 'string' ? req.headers.origin : undefined
+  const origin = getAllowedOrigin(incomingOrigin)
+  res.setHeader('Access-Control-Allow-Origin', origin)
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-Token')
   res.setHeader('Access-Control-Allow-Credentials', 'true')
@@ -21,14 +41,100 @@ function setCors(res: VercelResponse) {
   res.setHeader('Surrogate-Control', 'no-store')
   res.setHeader('X-Content-Type-Options', 'nosniff')
   res.setHeader('X-Frame-Options', 'DENY')
+  res.setHeader('X-XSS-Protection', '1; mode=block')
+  res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload')
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
-  res.setHeader('Vary', 'Accept, Accept-Encoding')
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+  res.setHeader('Vary', 'Origin, Accept, Accept-Encoding')
 }
 
 function handleCors(req: VercelRequest, res: VercelResponse): boolean {
-  setCors(res)
-  if (req.method === 'OPTIONS') { res.status(200).end(); return true }
+  setCors(res, req)
+  if (req.method === 'OPTIONS') { res.status(204).end(); return true }
   return false
+}
+
+// ============================================
+// RATE LIMITING ENGINE
+// ============================================
+interface RateLimitBucket {
+  count: number
+  resetAt: number
+}
+
+const rateLimitStore = new Map<string, RateLimitBucket>()
+let lastCleanupTime = Date.now()
+
+function pruneRateLimitStore() {
+  const now = Date.now()
+  if (now - lastCleanupTime < 60000) return
+  lastCleanupTime = now
+  for (const [key, bucket] of rateLimitStore.entries()) {
+    if (bucket.resetAt <= now) {
+      rateLimitStore.delete(key)
+    }
+  }
+}
+
+interface RateLimitTier {
+  windowMs: number
+  max: number
+}
+
+const RATE_LIMIT_TIERS: Record<string, RateLimitTier> = {
+  auth: { windowMs: 60 * 1000, max: 10 },        // 10 requests / min for auth endpoints
+  contact: { windowMs: 300 * 1000, max: 5 },     // 5 requests / 5 min for contact form
+  ai: { windowMs: 60 * 1000, max: 20 },          // 20 requests / min for AI inference
+  general: { windowMs: 60 * 1000, max: 120 },    // 120 requests / min for standard API
+}
+
+function checkRateLimit(req: VercelRequest, tierName: 'auth' | 'contact' | 'ai' | 'general' = 'general') {
+  pruneRateLimitStore()
+  const rawIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '127.0.0.1'
+  const clientIp = String(Array.isArray(rawIp) ? rawIp[0] : rawIp).split(',')[0].trim()
+  const key = `${tierName}:${clientIp}`
+  const tier = RATE_LIMIT_TIERS[tierName] || RATE_LIMIT_TIERS.general
+  const now = Date.now()
+
+  let bucket = rateLimitStore.get(key)
+  if (!bucket || bucket.resetAt <= now) {
+    bucket = { count: 1, resetAt: now + tier.windowMs }
+    rateLimitStore.set(key, bucket)
+    return {
+      allowed: true,
+      limit: tier.max,
+      remaining: tier.max - 1,
+      resetSeconds: Math.ceil(tier.windowMs / 1000),
+    }
+  }
+
+  bucket.count += 1
+  const resetSeconds = Math.max(1, Math.ceil((bucket.resetAt - now) / 1000))
+  const remaining = Math.max(0, tier.max - bucket.count)
+  const allowed = bucket.count <= tier.max
+
+  return { allowed, limit: tier.max, remaining, resetSeconds }
+}
+
+function applyRateLimit(req: VercelRequest, res: VercelResponse, tierName: 'auth' | 'contact' | 'ai' | 'general' = 'general'): boolean {
+  const result = checkRateLimit(req, tierName)
+  res.setHeader('RateLimit-Limit', String(result.limit))
+  res.setHeader('RateLimit-Remaining', String(result.remaining))
+  res.setHeader('RateLimit-Reset', String(result.resetSeconds))
+  if (!result.allowed) {
+    res.setHeader('Retry-After', String(result.resetSeconds))
+    res.status(429).json({
+      success: false,
+      error: 'Too many requests. Please slow down and try again later.',
+      retryAfter: result.resetSeconds,
+    })
+    return false
+  }
+  return true
+}
+
+function escapeRegex(str: string): string {
+  return String(str || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 const SESSION_COOKIE = 'hm_session'
@@ -289,6 +395,26 @@ function parseUserAgent(userAgent = '') {
   return { browser, os, device }
 }
 
+function redactSensitiveDetails(obj: any): any {
+  if (!obj || typeof obj !== 'object') return obj
+  if (Array.isArray(obj)) return obj.map(redactSensitiveDetails)
+  const redacted: Record<string, any> = {}
+  const SENSITIVE_KEYS = new Set([
+    'password', 'passwordhash', 'token', 'secret', 'otp', 'otphash',
+    'apikey', 'creditcard', 'cardnumber', 'cvv', 'authorization'
+  ])
+  for (const [key, val] of Object.entries(obj)) {
+    if (SENSITIVE_KEYS.has(key.toLowerCase())) {
+      redacted[key] = '[REDACTED]'
+    } else if (val && typeof val === 'object') {
+      redacted[key] = redactSensitiveDetails(val)
+    } else {
+      redacted[key] = val
+    }
+  }
+  return redacted
+}
+
 async function logActivity(userId: string, action: string, details: any = {}, req?: VercelRequest, level: string = "INFO", service: string = "api-gateway") {
   try {
     const activity = await mongoCollection("activity_log")
@@ -301,7 +427,7 @@ async function logActivity(userId: string, action: string, details: any = {}, re
       msg: action,
       level: ["INFO", "WARN", "ERROR", "SECURITY", "AUDIT"].includes(level.toUpperCase()) ? level.toUpperCase() : "INFO",
       service: service || "system",
-      details,
+      details: redactSensitiveDetails(details),
       ip,
       userAgent,
       time: now.toISOString().replace("T", " ").slice(0, 19),
@@ -318,7 +444,7 @@ async function getAuthUser(req: VercelRequest) {
   const token = authHeader.split(' ')[1]
   try {
     const jwt = await import('jsonwebtoken')
-    const decoded = jwt.default.verify(token, process.env.JWT_SECRET || 'hmorix-jwt-secret-change-me') as any
+    const decoded = jwt.default.verify(token, process.env.JWT_SECRET || 'hmorix-jwt-secret-change-me', { algorithms: ['HS256'] }) as any
     return { id: decoded.sub || decoded.id, email: decoded.email, role: decoded.role || 'user', name: decoded.name }
   } catch { return null }
 }
@@ -524,9 +650,13 @@ async function handleSetupAdmin(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
   const { name = 'Admin', email, password } = req.body || {}
   if (!email || !password) return res.status(400).json({ error: 'Email and password are required' })
-  if (process.env.ADMIN_EMAIL && email !== process.env.ADMIN_EMAIL) return res.status(403).json({ error: 'Use the configured ADMIN_EMAIL for setup' })
+  if (process.env.ADMIN_EMAIL && cleanEmail(email) !== cleanEmail(process.env.ADMIN_EMAIL)) return res.status(403).json({ error: 'Use the configured ADMIN_EMAIL for setup' })
   await ensureIndexes()
   const users = await mongoCollection('users')
+  const existingAdmin = await users.findOne({ role: 'admin' })
+  if (existingAdmin && existingAdmin.passwordHash) {
+    return res.status(403).json({ error: 'Admin setup has already been completed. Please sign in normally.' })
+  }
   const normalizedEmail = cleanEmail(email)
   const passwordHash = await bcrypt.hash(password, 12)
   const now = new Date()
@@ -551,6 +681,7 @@ async function handleLogout(req: VercelRequest, res: VercelResponse) {
 
 async function handleAuthSignin(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  if (applyRateLimit(req, res, 'auth')) return
   const { email, password } = req.body || {}
   if (!email || !password) return res.status(400).json({ error: 'Email and password are required' })
   await ensureIndexes()
@@ -566,6 +697,7 @@ async function handleAuthSignin(req: VercelRequest, res: VercelResponse) {
 
 async function handleAuthSignup(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  if (applyRateLimit(req, res, 'auth')) return
   const { name, email, password, company } = req.body || {}
   if (!name || !email || !password) return res.status(400).json({ error: 'Name, email, and password are required' })
   if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' })
@@ -606,6 +738,8 @@ async function handleAuthMe(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleDashboardStats(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!user) return res.status(401).json({ error: 'Authentication required' })
   const db = getDatabase()
   try {
     const { data: projects } = await db.query('projects', { count: true })
@@ -617,6 +751,8 @@ async function handleDashboardStats(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleCrmStats(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!requireRole(user, ['admin', 'crm', 'sales', 'manager'])) return res.status(403).json({ error: 'CRM access required' })
   const overview = await getCrmOverviewData()
   res.json({ success: true, data: overview.stats })
 }
@@ -650,6 +786,8 @@ async function getCrmOverviewData() {
 }
 
 async function handleCrmContacts(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!requireRole(user, ['admin', 'crm', 'sales', 'manager'])) return res.status(403).json({ error: 'CRM access required' })
   const contactsCol = await mongoCollection('crm_contacts')
   const dealsCol = await mongoCollection('crm_deals')
   if (req.method === 'GET') {
@@ -657,7 +795,10 @@ async function handleCrmContacts(req: VercelRequest, res: VercelResponse) {
     const pageNum = parseInt(page); const limitNum = parseInt(limit)
     const filter: any = {}
     if (status && status !== 'all') filter.status = status
-    if (search) filter.$or = ['name', 'email', 'company', 'phone'].map(field => ({ [field]: { $regex: String(search), $options: 'i' } }))
+    if (search) {
+      const esc = escapeRegex(String(search))
+      filter.$or = ['name', 'email', 'company', 'phone'].map(field => ({ [field]: { $regex: esc, $options: 'i' } }))
+    }
     const [contacts, total] = await Promise.all([
       contactsCol.find(filter).sort({ updatedAt: -1, name: 1 }).skip((pageNum - 1) * limitNum).limit(limitNum).toArray(),
       contactsCol.countDocuments(filter),
@@ -709,6 +850,8 @@ async function handleCrmContacts(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleCrmDeals(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!requireRole(user, ['admin', 'crm', 'sales', 'manager'])) return res.status(403).json({ error: 'CRM access required' })
   const dealsCol = await mongoCollection('crm_deals')
   const contactsCol = await mongoCollection('crm_contacts')
   if (req.method === 'GET') {
@@ -748,6 +891,8 @@ async function handleCrmDeals(req: VercelRequest, res: VercelResponse) {
 
 async function handleCrmOverview(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+  const user = await getAuthUser(req)
+  if (!requireRole(user, ['admin', 'crm', 'sales', 'manager'])) return res.status(403).json({ error: 'CRM access required' })
   const overview = await getCrmOverviewData()
   const activeDeals = overview.deals.filter((deal: any) => !['closed_won', 'closed_lost'].includes(deal.stage))
   const recentDeals = overview.deals.slice(0, 5)
@@ -763,6 +908,8 @@ async function handleCrmOverview(req: VercelRequest, res: VercelResponse) {
 
 async function handleHrmStats(req: VercelRequest, res: VercelResponse) {
   try {
+    const user = await getAuthUser(req)
+    if (!requireRole(user, ['admin', 'hr', 'manager'])) return res.status(403).json({ error: 'HRM access required' })
     const overview = await getHrmOverviewData()
     res.json({
       employees: {
@@ -803,13 +950,18 @@ async function handleHrmStats(req: VercelRequest, res: VercelResponse) {
 
 async function handleHrmEmployees(req: VercelRequest, res: VercelResponse) {
   try {
+    const user = await getAuthUser(req)
+    if (!requireRole(user, ['admin', 'hr', 'manager', 'employee'])) return res.status(403).json({ error: 'HRM access required' })
     await ensureHrmSeed()
     const employeesCol = await mongoCollection('hrm_employees')
     const { department, status, search, page = '1', limit = '100' } = req.query as any
     const filter: any = {}
     if (department) filter.department = department
     if (status) filter.status = status
-    if (search) filter.$or = [{ name: { $regex: String(search), $options: 'i' } }, { role: { $regex: String(search), $options: 'i' } }, { department: { $regex: String(search), $options: 'i' } }]
+    if (search) {
+      const esc = escapeRegex(String(search))
+      filter.$or = [{ name: { $regex: esc, $options: 'i' } }, { role: { $regex: esc, $options: 'i' } }, { department: { $regex: esc, $options: 'i' } }]
+    }
     const data = await employeesCol.find(filter).sort({ name: 1 }).toArray()
     const pageNum = parseInt(page)
     const limitNum = parseInt(limit)
@@ -1474,6 +1626,7 @@ async function handleManagerOverview(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
   const user = await getAuthUser(req)
   if (!user) return res.status(401).json({ error: 'Login required' })
+  if (!requireRole(user, ['admin', 'manager', 'hr'])) return res.status(403).json({ error: 'Manager access required' })
   const [employeesCol, tasksCol, teamsCol, projectsCol] = await Promise.all([
     mongoCollection('hrm_employees'),
     mongoCollection('hrm_tasks'),
@@ -1507,6 +1660,7 @@ async function handleManagerOverview(req: VercelRequest, res: VercelResponse) {
 async function handleManagerTeams(req: VercelRequest, res: VercelResponse) {
   const user = await getAuthUser(req)
   if (!user) return res.status(401).json({ error: 'Login required' })
+  if (!requireRole(user, ['admin', 'manager', 'hr'])) return res.status(403).json({ error: 'Manager access required' })
   const teams = await mongoCollection('hrm_teams')
   if (req.method === 'GET') {
     return res.json({ success: true, data: await teams.find({}).sort({ updatedAt: -1 }).toArray() })
@@ -1558,11 +1712,13 @@ async function handleManagerTeams(req: VercelRequest, res: VercelResponse) {
 async function handleManagerTraining(req: VercelRequest, res: VercelResponse) {
   const user = await getAuthUser(req)
   if (!user) return res.status(401).json({ error: 'Login required' })
+  if (!requireRole(user, ['admin', 'manager', 'hr', 'employee'])) return res.status(403).json({ error: 'Access denied' })
   const trainings = await mongoCollection('hrm_trainings')
   if (req.method === 'GET') {
     return res.json({ success: true, data: await trainings.find({}).sort({ updatedAt: -1 }).toArray() })
   }
   if (req.method === 'POST') {
+    if (!requireRole(user, ['admin', 'manager', 'hr'])) return res.status(403).json({ error: 'Manager access required' })
     const body = req.body || {}
     const title = sanitizeText(body.title || '', 140)
     if (!title) return res.status(400).json({ error: 'Training title is required' })
@@ -1669,14 +1825,17 @@ async function getHrmOverviewData() {
 
 async function handleHrmOverview(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+  const user = await getAuthUser(req)
+  if (!requireRole(user, ['admin', 'hr', 'manager'])) return res.status(403).json({ error: 'HRM access required' })
   return res.json({ success: true, data: await getHrmOverviewData() })
 }
 
 async function handleHrmPeople(req: VercelRequest, res: VercelResponse) {
+  const actor = await getAuthUser(req)
+  if (!requireRole(actor, ['admin', 'hr', 'manager'])) return res.status(403).json({ error: 'HRM access required' })
   const employees = await mongoCollection('hrm_employees')
   if (req.method === 'GET') return res.json({ success: true, data: await employees.find({}).sort({ name: 1 }).toArray() })
   if (req.method === 'POST') {
-    const actor = await getAuthUser(req)
     if (!requireRole(actor, ['admin', 'hr'])) return res.status(403).json({ error: 'Admin or HR access required' })
     const body = req.body || {}
     const name = sanitizeText(body.name, 120)
@@ -1699,6 +1858,7 @@ async function handleHrmPeople(req: VercelRequest, res: VercelResponse) {
     return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc, credentials: access } })
   }
   if (req.method === 'PUT') {
+    if (!requireRole(actor, ['admin', 'hr'])) return res.status(403).json({ error: 'Admin or HR access required' })
     const id = String(req.body?.id || '')
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid employee id is required' })
     const update = { ...req.body, updatedAt: new Date() }
@@ -1716,10 +1876,12 @@ async function handleHrmLeave(req: VercelRequest, res: VercelResponse) {
   const leaves = await mongoCollection('hrm_leave_requests')
   if (req.method === 'GET') {
     const user = await getAuthUser(req)
-    const mineOnly = String(req.query.mine || '') === '1' || String(req.query.mine || '').toLowerCase() === 'true'
-    if (mineOnly && user) {
+    if (!user) return res.status(401).json({ error: 'Login required' })
+    const isPrivileged = requireRole(user, ['admin', 'hr', 'manager'])
+    const mineOnly = !isPrivileged || String(req.query.mine || '') === '1' || String(req.query.mine || '').toLowerCase() === 'true'
+    if (mineOnly) {
       const employee = await resolveEmployeeForUser(user)
-      const filter = employee ? { $or: [{ employeeId: String(employee._id) }, { email: cleanEmail(employee.email || '') }] } : {}
+      const filter = employee ? { $or: [{ employeeId: String(employee._id) }, { email: cleanEmail(employee.email || '') }] } : { userId: user.id }
       return res.json({ success: true, data: await leaves.find(filter).sort({ createdAt: -1 }).toArray() })
     }
     return res.json({ success: true, data: await leaves.find({}).sort({ createdAt: -1 }).toArray() })
@@ -1740,6 +1902,8 @@ async function handleHrmLeave(req: VercelRequest, res: VercelResponse) {
     return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
   }
   if (req.method === 'PUT') {
+    const user = await getAuthUser(req)
+    if (!requireRole(user, ['admin', 'hr', 'manager'])) return res.status(403).json({ error: 'Manager or HR access required to approve leave' })
     const body = req.body || {}
     const id = String(req.body?.id || '')
     const status = String(req.body?.status || '')
@@ -1752,10 +1916,19 @@ async function handleHrmLeave(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleHrmTasks(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!user) return res.status(401).json({ error: 'Login required' })
   const tasks = await mongoCollection('hrm_tasks')
   const employees = await mongoCollection('hrm_employees')
-  if (req.method === 'GET') return res.json({ success: true, data: await tasks.find({}).sort({ dueDate: 1 }).toArray() })
+  if (req.method === 'GET') {
+    const isManager = requireRole(user, ['admin', 'hr', 'manager'])
+    if (isManager) return res.json({ success: true, data: await tasks.find({}).sort({ dueDate: 1 }).toArray() })
+    const employee = await resolveEmployeeForUser(user)
+    const filter = employee ? { $or: [{ employeeId: String(employee._id) }, { assigneeName: employee.name }] } : { assigneeName: user.name }
+    return res.json({ success: true, data: await tasks.find(filter).sort({ dueDate: 1 }).toArray() })
+  }
   if (req.method === 'POST') {
+    if (!requireRole(user, ['admin', 'hr', 'manager'])) return res.status(403).json({ error: 'Manager or HR access required to assign tasks' })
     const body = req.body || {}
     const employee = body.employeeId ? await employees.findOne({ _id: new ObjectId(String(body.employeeId)) }).catch(() => null) : null
     const now = new Date()
@@ -1766,6 +1939,12 @@ async function handleHrmTasks(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'PUT') {
     const id = String(req.body?.id || '')
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid task id is required' })
+    const isManager = requireRole(user, ['admin', 'hr', 'manager'])
+    const existingTask = await tasks.findOne({ _id: new ObjectId(id) })
+    if (!existingTask) return res.status(404).json({ error: 'Task not found' })
+    const employee = await resolveEmployeeForUser(user)
+    const isAssigned = employee && (existingTask.employeeId === String(employee._id) || existingTask.assigneeName === employee.name)
+    if (!isManager && !isAssigned) return res.status(403).json({ error: 'Unauthorized to modify this task' })
     const status = String(req.body?.status || 'done')
     const score = Math.max(1, Math.min(5, Number(req.body?.performanceScore || (status === 'done' ? 4 : 3))))
     const update: any = { status, updatedAt: new Date() }
@@ -1778,11 +1957,10 @@ async function handleHrmTasks(req: VercelRequest, res: VercelResponse) {
   return res.status(405).json({ error: 'Method not allowed' })
 }
 
-async function handleHrmPayroll(req: VercelRequest, res: VercelResponse) {
+async function getPayrollReportData(period: string) {
   await ensureHrmSeed()
   const employees = await mongoCollection('hrm_employees')
   const payrollRuns = await mongoCollection('hrm_payroll_runs')
-  const period = String(req.query.period || req.body?.period || new Date().toISOString().slice(0, 7))
   const people = await employees.find({ status: { $ne: 'inactive' } }).sort({ name: 1 }).toArray()
   const rows = people.map((employee: any) => {
     const base = Math.round(Number(employee.salary || 0) / 12)
@@ -1790,20 +1968,40 @@ async function handleHrmPayroll(req: VercelRequest, res: VercelResponse) {
     const deductions = Math.round((base + bonus) * 0.12)
     return { employeeId: String(employee._id), name: employee.name, department: employee.department, role: employee.role, baseSalary: base, bonus, deductions, net: base + bonus - deductions, status: 'pending' }
   })
+  const lastRun = await payrollRuns.findOne({ period }, { sort: { createdAt: -1 } })
+  return {
+    period,
+    summary: {
+      employees: rows.length,
+      totalPayroll: rows.reduce((sum, row) => sum + row.net, 0),
+      avgSalary: rows.length ? Math.round(rows.reduce((sum, row) => sum + row.baseSalary, 0) / rows.length) : 0,
+      nextPayDate: `${period}-28`,
+    },
+    rows,
+    lastRun,
+  }
+}
+
+async function handleHrmPayroll(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!requireRole(user, ['admin', 'hr'])) return res.status(403).json({ error: 'Admin or HR access required for payroll' })
+  const period = String(req.query.period || req.body?.period || new Date().toISOString().slice(0, 7))
+  const data = await getPayrollReportData(period)
   if (req.method === 'POST') {
-    const run = { period, rows: rows.map(row => ({ ...row, status: 'processed' })), totalNet: rows.reduce((sum, row) => sum + row.net, 0), status: 'processed', createdAt: new Date() }
+    const payrollRuns = await mongoCollection('hrm_payroll_runs')
+    const run = { period, rows: data.rows.map(row => ({ ...row, status: 'processed' })), totalNet: data.rows.reduce((sum, row) => sum + row.net, 0), status: 'processed', createdAt: new Date() }
     const result = await payrollRuns.insertOne(run)
     return res.json({ success: true, data: { _id: result.insertedId, ...run } })
   }
-  return res.json({ success: true, data: { period, summary: { employees: rows.length, totalPayroll: rows.reduce((sum, row) => sum + row.net, 0), avgSalary: rows.length ? Math.round(rows.reduce((sum, row) => sum + row.baseSalary, 0) / rows.length) : 0, nextPayDate: `${period}-28` }, rows, lastRun: await payrollRuns.findOne({ period }, { sort: { createdAt: -1 } }) } })
+  return res.json({ success: true, data })
 }
 
 async function handleHrmPayrollExport(req: VercelRequest, res: VercelResponse) {
-  const payroll = await new Promise<any>(resolve => {
-    const fakeRes: any = { json: (payload: any) => resolve(payload) }
-    handleHrmPayroll({ ...req, method: 'GET' } as any, fakeRes)
-  })
-  const rows = payroll?.data?.rows || []
+  const user = await getAuthUser(req)
+  if (!requireRole(user, ['admin', 'hr'])) return res.status(403).json({ error: 'Admin or HR access required for payroll export' })
+  const period = String(req.query.period || req.body?.period || new Date().toISOString().slice(0, 7))
+  const data = await getPayrollReportData(period)
+  const rows = data.rows || []
   const csv = ['Employee,Department,Role,Base Salary,Bonus,Deductions,Net Pay,Status', ...rows.map((row: any) => [row.name, row.department, row.role, row.baseSalary, row.bonus, row.deductions, row.net, row.status].map((value: any) => `"${String(value).replace(/"/g, '""')}"`).join(','))].join('\n')
   res.setHeader('Content-Type', 'text/csv; charset=utf-8')
   res.setHeader('Content-Disposition', 'attachment; filename="hmorix-payroll.csv"')
@@ -1820,6 +2018,8 @@ async function handleHrmRecruitment(req: VercelRequest, res: VercelResponse) {
     return res.json({ success: true, data: jobs.map((job: any) => ({ ...job, applicants: counts.find((count: any) => count._id === String(job._id))?.count || Number(job.applicants || 0) })) })
   }
   if (req.method === 'POST') {
+    const user = await getAuthUser(req)
+    if (!requireRole(user, ['admin', 'hr'])) return res.status(403).json({ error: 'Admin or HR access required' })
     const body = req.body || {}
     const role = sanitizeText(body.role || body.title || '', 120)
     if (!role) return res.status(400).json({ error: 'Role title is required' })
@@ -1841,6 +2041,8 @@ async function handleHrmRecruitment(req: VercelRequest, res: VercelResponse) {
     return res.status(201).json({ success: true, data: { _id: result.insertedId, ...doc } })
   }
   if (req.method === 'PUT') {
+    const user = await getAuthUser(req)
+    if (!requireRole(user, ['admin', 'hr'])) return res.status(403).json({ error: 'Admin or HR access required' })
     const id = String(req.body?.id || '')
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid recruitment id is required' })
     const update = { ...req.body, updatedAt: new Date() }
@@ -1849,6 +2051,8 @@ async function handleHrmRecruitment(req: VercelRequest, res: VercelResponse) {
     return res.json({ success: true, data: await recruitment.findOne({ _id: new ObjectId(id) }) })
   }
   if (req.method === 'DELETE') {
+    const user = await getAuthUser(req)
+    if (!requireRole(user, ['admin', 'hr'])) return res.status(403).json({ error: 'Admin or HR access required' })
     const id = String(req.query.id || req.body?.id || '')
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid recruitment id is required' })
     await recruitment.updateOne({ _id: new ObjectId(id) }, { $set: { deletedAt: new Date(), status: 'closed', updatedAt: new Date() } })
@@ -1866,6 +2070,8 @@ async function handleCareers(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleHrmSeed(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!requireRole(user, ['admin'])) return res.status(403).json({ error: 'Admin access required to run seed' })
   if (req.query?.force === 'true') {
     const [employeesCol, recruitmentCol, applicationsCol, leavesCol] = await Promise.all([
       mongoCollection('hrm_employees'),
@@ -2341,6 +2547,7 @@ async function handleAiStatus(req: VercelRequest, res: VercelResponse) {
 
 async function handleAiChat(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  if (applyRateLimit(req, res, 'ai')) return
   const message = sanitizeText(req.body?.message || '', 1200)
   if (!message) return res.status(400).json({ error: 'Message is required' })
   const fallback = siteAssistantFallback(message)
@@ -2371,6 +2578,7 @@ async function handleAiChat(req: VercelRequest, res: VercelResponse) {
 
 async function handleAiPlayground(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  if (applyRateLimit(req, res, 'ai')) return
   const type = String(req.body?.type || 'chat')
   const prompt = sanitizeText(req.body?.prompt || '', 2000)
   if (!prompt) return res.status(400).json({ error: 'Prompt is required' })
@@ -2409,11 +2617,15 @@ async function handleAiPlayground(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleAnalyticsOverview(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!requireRole(user, ['admin', 'manager'])) return res.status(403).json({ error: 'Admin or Manager access required' })
   const { period = '30d' } = req.query as any
   res.json({ visitors: { total: 847230, unique: 623400, returning: 223830, growth: '+23.4%' }, pageViews: { total: 2400000, perSession: 2.84, growth: '+18.7%' }, sessions: { total: 845000, avgDuration: '4m 32s', growth: '+12.1%' }, bounceRate: { rate: 32.4, change: '-5.2%' }, conversions: { total: 12847, rate: 1.52, growth: '+34.2%' }, revenue: { total: 847000, perVisitor: 1.0, growth: '+28.9%' }, period })
 }
 
 async function handleAnalyticsTraffic(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!requireRole(user, ['admin', 'manager'])) return res.status(403).json({ error: 'Admin or Manager access required' })
   res.json({ sources: [
     { source: 'Google Organic', visitors: 312400, percentage: 36.9, sessions: 298000, bounceRate: 28, conversionRate: 2.1 },
     { source: 'Direct', visitors: 187200, percentage: 22.1, sessions: 175000, bounceRate: 35, conversionRate: 1.8 },
@@ -2439,11 +2651,12 @@ async function handleAdminUsers(req: VercelRequest, res: VercelResponse) {
     const roleFilter = String(req.query.role || "").trim()
     const query: any = {}
     if (search) {
+      const esc = escapeRegex(search)
       query.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
-        { username: { $regex: search, $options: "i" } },
-        { company: { $regex: search, $options: "i" } }
+        { name: { $regex: esc, $options: "i" } },
+        { email: { $regex: esc, $options: "i" } },
+        { username: { $regex: esc, $options: "i" } },
+        { company: { $regex: esc, $options: "i" } }
       ]
     }
     if (roleFilter && roleFilter !== "all") {
@@ -2545,8 +2758,11 @@ async function handleAdminUsers(req: VercelRequest, res: VercelResponse) {
     const targetFilter = ObjectId.isValid(targetId) ? { _id: new ObjectId(targetId) } : { email: targetId }
     const target = await users.findOne(targetFilter)
     if (!target) return res.status(404).json({ error: "User not found" })
-    if (target.email === process.env.ADMIN_EMAIL || target.role === "admin" && actor.email !== target.email) {
-      // Prevent deleting main admin
+    if (target.email === process.env.ADMIN_EMAIL) {
+      return res.status(403).json({ error: 'Cannot delete the primary admin account' })
+    }
+    if (target.role === 'admin' && actor.id !== String(target._id)) {
+      return res.status(403).json({ error: 'Admins cannot delete other admin accounts' })
     }
     await users.deleteOne(targetFilter)
     await logActivity(actor.id, `Admin deleted user account "${target.email}"`, { deletedEmail: target.email }, req, "SECURITY", "admin")
@@ -2558,7 +2774,7 @@ async function handleAdminUsers(req: VercelRequest, res: VercelResponse) {
 
 async function handleAdminStats(req: VercelRequest, res: VercelResponse) {
   const user = await getAuthUser(req)
-  if (user && user.role !== "admin") return res.status(403).json({ error: "Admin access required" })
+  if (!requireRole(user, ["admin"])) return res.status(403).json({ error: "Admin access required" })
 
   try {
     const usersCol = await mongoCollection("users")
@@ -2601,52 +2817,38 @@ async function handleAdminStats(req: VercelRequest, res: VercelResponse) {
     return res.json({
       success: true,
       data: {
+        totalUsers,
         total_users: totalUsers || 18,
+        totalEmployees,
         total_employees: totalEmployees || 6,
-        total_revenue: totalRevenue,
-        pipeline_revenue: pipelineRevenue,
-        mrr: Math.round(totalRevenue / 12),
-        api_calls_24h: (logs24h * 14) + 1200,
-        total_tickets: totalTickets || 4,
-        open_tickets: openTickets || 1,
+        wonDeals: wonDeals.length,
+        pipelineDeals: allDeals.length,
+        activeProjects,
         active_projects: activeProjects || 3,
-        total_ai_jobs: 384,
-        total_pdf_jobs: 192,
+        openTickets,
+        open_tickets: openTickets || 1,
+        totalTickets,
+        total_tickets: totalTickets || 4,
+        logs24h,
+        api_calls_24h: (logs24h * 14) + 1200,
+        totalRevenue,
+        total_revenue: totalRevenue,
+        dealWonRevenue,
+        invoiceRevenue,
+        pipeline_revenue: pipelineRevenue || 3500000,
+        mrr: Math.round(totalRevenue / 12) || 104000,
         uptime: 99.99,
         security_score: 98.8,
-        server_regions: 4,
-        database_nodes: 3,
-        edge_locations: 28,
       }
     })
-  } catch {
-    return res.json({
-      success: true,
-      data: {
-        total_users: 18,
-        total_employees: 6,
-        total_revenue: 1250000,
-        pipeline_revenue: 3500000,
-        mrr: 104000,
-        api_calls_24h: 1840,
-        total_tickets: 4,
-        open_tickets: 1,
-        active_projects: 3,
-        total_ai_jobs: 384,
-        total_pdf_jobs: 192,
-        uptime: 99.99,
-        security_score: 98.8,
-        server_regions: 4,
-        database_nodes: 3,
-        edge_locations: 28,
-      }
-    })
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message || "Failed to fetch admin stats" })
   }
 }
 
 async function handleAdminLogs(req: VercelRequest, res: VercelResponse) {
   const actor = await getAuthUser(req)
-  if (actor && actor.role !== "admin") return res.status(403).json({ error: "Admin access required" })
+  if (!requireRole(actor, ["admin"])) return res.status(403).json({ error: "Admin access required" })
   const logsCol = await mongoCollection("activity_log")
 
   if (req.method === "GET") {
@@ -2659,11 +2861,12 @@ async function handleAdminLogs(req: VercelRequest, res: VercelResponse) {
     if (level && level !== "ALL") query.level = level
     if (service && service !== "all") query.service = service
     if (search) {
+      const esc = escapeRegex(search)
       query.$or = [
-        { action: { $regex: search, $options: "i" } },
-        { msg: { $regex: search, $options: "i" } },
-        { service: { $regex: search, $options: "i" } },
-        { ip: { $regex: search, $options: "i" } }
+        { action: { $regex: esc, $options: "i" } },
+        { msg: { $regex: esc, $options: "i" } },
+        { service: { $regex: esc, $options: "i" } },
+        { ip: { $regex: esc, $options: "i" } }
       ]
     }
 
@@ -2726,9 +2929,17 @@ function stripHtml(value: string) {
 function sanitizeHtml(value: string) {
   return String(value || '')
     .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
-    .replace(/\son\w+="[^"]*"/gi, '')
-    .replace(/\son\w+='[^']*'/gi, '')
-    .replace(/javascript:/gi, '')
+    .replace(/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/gi, '')
+    .replace(/<object[\s\S]*?>[\s\S]*?<\/object>/gi, '')
+    .replace(/<embed[\s\S]*?>[\s\S]*?<\/embed>/gi, '')
+    .replace(/<applet[\s\S]*?>[\s\S]*?<\/applet>/gi, '')
+    .replace(/<meta[\s\S]*?>/gi, '')
+    .replace(/<link[\s\S]*?>/gi, '')
+    .replace(/<form[\s\S]*?>[\s\S]*?<\/form>/gi, '')
+    .replace(/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+    .replace(/javascript\s*:/gi, 'blocked:')
+    .replace(/vbscript\s*:/gi, 'blocked:')
+    .replace(/data\s*:\s*text\/(?:html|javascript)/gi, 'blocked:')
 }
 
 function slugifyTitle(value: string) {
@@ -2882,6 +3093,7 @@ async function handleResendVerification(req: VercelRequest, res: VercelResponse)
 
 async function handleOtpRequest(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  if (applyRateLimit(req, res, 'auth')) return
   const email = cleanEmail(req.body?.email)
   const purpose = String(req.body?.purpose || 'login')
   if (!email) return res.status(400).json({ error: 'Email is required' })
@@ -2909,6 +3121,7 @@ async function handleOtpVerify(req: VercelRequest, res: VercelResponse) {
 
 async function handleForgotPassword(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  if (applyRateLimit(req, res, 'auth')) return
   const email = cleanEmail(req.body?.email)
   if (!email) return res.status(400).json({ error: 'Email is required' })
   await sendOtp(email, 'forgot_password')
@@ -2917,6 +3130,7 @@ async function handleForgotPassword(req: VercelRequest, res: VercelResponse) {
 
 async function handleResetPassword(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  if (applyRateLimit(req, res, 'auth')) return
   const email = cleanEmail(req.body?.email)
   const code = String(req.body?.code || '').trim()
   const password = String(req.body?.password || '')
@@ -3118,15 +3332,28 @@ async function handleBlogs(req: VercelRequest, res: VercelResponse) {
     const pageNum = Math.max(1, parseInt(page))
     const limitNum = Math.max(1, parseInt(limit))
     const query: any = {}
-    if (status !== 'all') query.status = status
+    const user = await getAuthUser(req)
+    const isAdmin = requireRole(user, ['admin'])
+    if (status !== 'published') {
+      if (!isAdmin) {
+        query.status = 'published'
+      } else if (status !== 'all') {
+        query.status = status
+      }
+    } else {
+      query.status = 'published'
+    }
     if (category) query.category = category
     if (tag) query.tags = tag
-    if (search) query.$or = [
-      { title: { $regex: search, $options: 'i' } },
-      { content: { $regex: search, $options: 'i' } },
-      { category: { $regex: search, $options: 'i' } },
-      { tags: { $regex: search, $options: 'i' } },
-    ]
+    if (search) {
+      const esc = escapeRegex(search)
+      query.$or = [
+        { title: { $regex: esc, $options: 'i' } },
+        { content: { $regex: esc, $options: 'i' } },
+        { category: { $regex: esc, $options: 'i' } },
+        { tags: { $regex: esc, $options: 'i' } },
+      ]
+    }
     const [blogs, total] = await Promise.all([
       collection.find(query).sort({ publishedAt: -1, createdAt: -1 }).skip((pageNum - 1) * limitNum).limit(limitNum).toArray(),
       collection.countDocuments(query),
@@ -3236,11 +3463,15 @@ async function handleBlogTaxonomy(req: VercelRequest, res: VercelResponse, field
 
 async function handleContact(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  if (applyRateLimit(req, res, 'contact')) return
   const { first_name, last_name, email, service, message } = req.body || {}
   if (!first_name || !email) return res.status(400).json({ error: 'Name and email are required' })
+  const normalizedEmail = cleanEmail(email)
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    return res.status(400).json({ error: 'Please enter a valid email address' })
+  }
   const now = new Date()
   const name = `${sanitizeText(first_name, 80)} ${sanitizeText(last_name || '', 80)}`.trim()
-  const normalizedEmail = cleanEmail(email)
   const contacts = await mongoCollection('crm_contacts')
   const submissions = await mongoCollection('contact_submissions')
   const submission = { firstName: sanitizeText(first_name, 80), lastName: sanitizeText(last_name || '', 80), name, email: normalizedEmail, service: sanitizeText(service || 'General inquiry', 120), message: sanitizeText(message || '', 2000), status: 'new', source: 'contact_page', createdAt: now, updatedAt: now }
@@ -3286,21 +3517,22 @@ async function handleContact(req: VercelRequest, res: VercelResponse) {
 
 async function handleNotifications(req: VercelRequest, res: VercelResponse) {
   const user = await getAuthUser(req)
+  if (!user) return res.status(401).json({ error: 'Authentication required' })
   const notifications = await mongoCollection('notifications')
   if (req.method === 'GET') {
-    const role = String(user?.role || '').toLowerCase()
+    const role = String(user.role || '').toLowerCase()
     const audienceFilters: any[] = [{ audience: 'all', userId: { $exists: false } }, { userId: 'system' }, { audience: { $exists: false }, userId: { $exists: false } }]
     if (role === 'user') audienceFilters.push({ audience: 'users', userId: { $exists: false } })
     if (['employee', 'hr', 'manager', 'crm'].includes(role)) audienceFilters.push({ audience: 'employees', userId: { $exists: false } })
     if (['employee', 'hr', 'manager'].includes(role)) audienceFilters.push({ audience: 'team', userId: { $exists: false } })
     if (role === 'crm') audienceFilters.push({ audience: 'sales', userId: { $exists: false } })
     if (role === 'admin') audienceFilters.push({ audience: { $in: ['users', 'employees', 'team', 'sales'] }, userId: { $exists: false } })
-    const filter = user ? { $or: [{ userId: user.id }, ...audienceFilters] } : { $or: [{ audience: 'all', userId: { $exists: false } }, { audience: { $exists: false }, userId: { $exists: false } }] }
+    const filter = { $or: [{ userId: user.id }, ...audienceFilters] }
     const data = await notifications.find(filter).sort({ createdAt: -1 }).limit(30).toArray()
     return res.json({ success: true, data })
   }
   if (req.method === 'PUT') {
-    const filter = user ? { $or: [{ userId: user.id }, { audience: 'all', userId: { $exists: false } }, { userId: 'system' }] } : {}
+    const filter = { $or: [{ userId: user.id }, { audience: 'all', userId: { $exists: false } }, { userId: 'system' }] }
     await notifications.updateMany(filter, { $set: { read: true, readAt: new Date() } })
     return res.json({ success: true, message: 'All notifications marked as read' })
   }
@@ -3658,6 +3890,10 @@ async function handleUpload(req: VercelRequest, res: VercelResponse) {
   if (!allowed.has(parsed.mime)) return res.status(400).json({ error: `Unsupported file type: ${parsed.mime}` })
   if (parsed.file.length > maxSize) return res.status(413).json({ error: `File too large (max ${Math.round(maxSize/1024/1024)}MB)` })
 
+  if ((kind === 'blog' || kind === 'content' || kind === 'json') && user.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin access required to upload blog assets' })
+  }
+
   const folderMap: Record<string, string> = {
     avatar: `profiles/${user.id}/avatar`,
     profile: `profiles/${user.id}/avatar`,
@@ -3671,7 +3907,13 @@ async function handleUpload(req: VercelRequest, res: VercelResponse) {
     attachments: `attachments/${user.id}`,
   }
   const upload = await uploadBufferToStorage(parsed.file, parsed.mime, folderMap[kind] || `attachments/${user.id}`, parsed.filename)
-  if (parsed.oldPath) await deleteStoragePath(parsed.oldPath)
+  if (parsed.oldPath) {
+    const oldPathStr = String(parsed.oldPath)
+    const isUserFile = oldPathStr.startsWith(`profiles/${user.id}/`) || oldPathStr.startsWith(`attachments/${user.id}/`) || oldPathStr.startsWith(`resumes/${user.id}/`) || oldPathStr.startsWith(`documents/${user.id}/`)
+    if (isUserFile || user.role === 'admin') {
+      await deleteStoragePath(oldPathStr)
+    }
+  }
   if (kind === 'avatar' || kind === 'profile') {
     await upsertProfile({ _id: user.id, email: user.email, name: user.name, displayName: (user as any).displayName || user.name }, { avatarUrl: upload.url, avatarPath: upload.path })
     await logActivity(user.id, 'profile_picture_changed', { path: upload.path }, req)
@@ -3757,8 +3999,14 @@ async function handleProjects(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'PUT') {
     const id = String(req.body?.id || '')
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid project id is required' })
+    const filter = privilegedPortalRole(user) ? { _id: new ObjectId(id) } : { _id: new ObjectId(id), ...await getVisibleProjectFilter(user) }
+    const existing = await projects.findOne(filter)
+    if (!existing) return res.status(404).json({ error: 'Project not found or access denied' })
     const update = { ...req.body, updatedAt: new Date() }
     delete update.id
+    delete update._id
+    delete update.userId
+    delete update.createdBy
     if (update.clientEmail) update.clientEmail = cleanEmail(update.clientEmail)
     if (update.ownerEmail) update.ownerEmail = cleanEmail(update.ownerEmail)
     if (update.budget !== undefined) update.budget = Number(update.budget || 0)
@@ -3772,6 +4020,8 @@ async function handleProjects(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleInvoices(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!requireRole(user, ['admin', 'manager', 'sales', 'crm', 'hr'])) return res.status(403).json({ error: 'Billing role required' })
   const db = getDatabase()
   if (req.method === 'GET') { try { const { data } = await db.query('invoices', { orderBy: { column: 'created_at', ascending: false } }); return res.json({ success: true, data }) } catch { return res.json({ success: true, data: [] }) } }
   if (req.method === 'POST') {
@@ -3843,8 +4093,17 @@ async function handleTickets(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'PUT') {
     const id = String(req.body?.id || '')
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Valid ticket id is required' })
+    const existing = await tickets.findOne({ _id: new ObjectId(id) })
+    if (!existing) return res.status(404).json({ error: 'Ticket not found' })
+    const isPrivileged = privilegedPortalRole(user)
+    const isOwner = existing.userId === user.id || existing.clientEmail === cleanEmail(user.email || '')
+    const isAssigned = Array.isArray(existing.assignedEmployees) && (existing.assignedEmployees.includes(user.id) || existing.assignedEmployees.includes(user.email))
+    if (!isPrivileged && !isOwner && !isAssigned) {
+      return res.status(403).json({ error: 'Access denied to this ticket' })
+    }
     const update: any = { updatedAt: new Date() }
-    for (const key of ['status', 'priority', 'assignedTeamId', 'assignedTeamName']) if (req.body?.[key] !== undefined) update[key] = sanitizeText(req.body[key], 120)
+    const allowedFields = isPrivileged ? ['status', 'priority', 'assignedTeamId', 'assignedTeamName'] : ['status']
+    for (const key of allowedFields) if (req.body?.[key] !== undefined) update[key] = sanitizeText(req.body[key], 120)
     if (req.body?.message) {
       update.$push = { updates: { authorId: user.id, authorName: user.name || user.email, message: sanitizeText(req.body.message, 1000), createdAt: new Date() } }
     }
@@ -4204,6 +4463,8 @@ async function handleEmployeeProfile(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleConfigDatabase(req: VercelRequest, res: VercelResponse) {
+  const user = await getAuthUser(req)
+  if (!requireRole(user, ['admin'])) return res.status(403).json({ error: 'Admin access required' })
   const db = getDatabase()
   res.json({ provider: db.provider, switchable: true, instructions: 'Set DATABASE=supabase or DATABASE=mysql in Vercel environment variables to switch providers' })
 }

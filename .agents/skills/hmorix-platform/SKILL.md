@@ -80,6 +80,13 @@ HMorix is a unified enterprise B2B SaaS platform that combines:
 - **Role Routing**: Dynamic post-login redirection based on role (`admin`, `manager`, `hr`, `employee`, `sales`, `crm`, `user`).
 - **No Mock Data Rule**: All portal operations connect to real backend database collections.
 - **PWA & Offline Capability**: Service Worker and IndexedDB (`hmorix-offline`) provide graceful offline degradation with waiting sync states.
+- **Security Hardening (September 2026)**:
+  - **Tiered Rate Limiter**: In-memory sliding-window counter protecting `auth` (10 req/min), `contact` (5 req/5min), `ai` (20 req/min), and `general` (120 req/min).
+  - **Strict CORS Origin Whitelist**: Dynamic origin validation (`https://hmorix.in`, `https://www.hmorix.in`, local development ports).
+  - **Security Headers**: HSTS (`max-age=63072000; includeSubDomains; preload`), `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, `X-XSS-Protection`, `X-Content-Type-Options: nosniff`.
+  - **RBAC & IDOR Guards**: Explicit role checks and object ownership validation on CRM, HRM, Analytics, Invoices, Projects, and Tickets.
+  - **Sensitive Data Redaction**: Recursive scrubbing of passwords, OTPs, hashes, and API keys in `activity_log`.
+  - **ReDoS Prevention**: Mandatory `escapeRegex()` for all user queries interpolated into MongoDB `$regex`.
 
 ### 3.2 Active Engineering Focus
 1. **Enterprise HRM Model Expansion**: Upgrading from the current core HRM to a comprehensive, enterprise-grade architecture covering multi-branch organizational hierarchy, advanced biometric/geo-fenced attendance, multi-tiered leave approval workflows, global & Indian statutory payroll (PF, ESI, TDS, PT), 360-degree OKR/KPI appraisal cycles, and automated talent acquisition with AI resume scoring.
@@ -87,6 +94,7 @@ HMorix is a unified enterprise B2B SaaS platform that combines:
    - Field Sales logs a deal → CRM pipeline updates → Manager delegates team → Employee gets task → Client monitors live progress on Portal.
    - Public candidate applies → HR moves candidate to hire → System auto-generates `HM-XXXXXX` employee profile & login credentials.
    - Client submits a support ticket → Manager receives notification → Task automatically created for project engineering team.
+3. **Continuous Security Hardening & Zero-Trust Architecture**: Maintaining strict RBAC, rate limiting, and defensive input validation across all current and newly added endpoints.
 
 ---
 
@@ -94,14 +102,16 @@ HMorix is a unified enterprise B2B SaaS platform that combines:
 
 ### 4.1 Adding a New API Endpoint
 1. Open `api/[...path].ts`.
-2. Locate the handler dispatch `switch (routePath)` block around line 3220.
+2. Locate the handler dispatch `switch (routePath)` block.
 3. Add your route case (e.g. `case 'hrm/analytics': return handleHrmAnalytics(req, res)`).
 4. Implement the asynchronous handler function:
-   - Always call `setCors(res)` (handled automatically at top of router).
+   - Apply rate limiting if public/sensitive: `if (applyRateLimit(req, res, 'general')) return`.
    - Authenticate with `const user = await getAuthUser(req)` if private.
    - Enforce RBAC with `if (!requireRole(user, ['admin', 'hr'])) return res.status(403).json({ error: 'Unauthorized' })`.
+   - For update operations (`PUT`/`DELETE`), ALWAYS enforce object ownership/assignment to prevent IDOR vulnerabilities.
    - Perform database queries using `const col = await mongoCollection('collection_name')`.
    - Sanitize all text inputs using `sanitizeText()`.
+   - Escape regex search patterns using `escapeRegex(search)`.
    - Return structured JSON: `res.json({ success: true, data: result })`.
 
 ### 4.2 Adding a New Portal Page
@@ -114,18 +124,20 @@ HMorix is a unified enterprise B2B SaaS platform that combines:
 ### 4.3 Database Access & Security Rules
 - **Client Data Isolation**: Always filter by `userId == user.id || clientEmail == user.email || ownerEmail == user.email`.
 - **Employee Data Isolation**: Always filter by `employeeId == employee._id || email == employee.email || teamId in employee.teams`.
+- **Admin Accounts Protection**: Primary admin (`process.env.ADMIN_EMAIL`) can never be deleted; admins cannot delete other admin accounts.
 - **Indexes**: When introducing a new collection, register its unique/lookup indexes inside `ensureIndexes()` in `api/[...path].ts`.
 
 ---
 
 ## 5. Verification Protocol
 
-Before finishing any task, run the validation suite:
+Before finishing any task, verify both functionality and security:
 
 ```bash
-# Typecheck
-npx tsc --noEmit
+# 1. Verify syntax and types with Node 22
+node --experimental-strip-types --check "api/[...path].ts"
 
-# Build client
-npm run build
+# 2. Run the security verification test suite
+node scratch/verify_security_hardening.mjs
 ```
+

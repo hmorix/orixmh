@@ -153,17 +153,18 @@ export default function Contact() {
             <p className="text-cream/60 mb-8">Ready to start your project? Have questions? We'd love to hear from you.</p>
             <div className="space-y-4">
               {[
-                { icon: Mail, title: 'General Inquiries', value: 'info@hmorix.in' },
-                { icon: Mail, title: 'Technical Support', value: 'support@hmorix.in' },
-                { icon: Mail, title: 'Executive / Founder', value: 'harsh@hmorix.in' },
-                { icon: Mail, title: 'Careers & Hiring', value: 'career@hmorix.in' },
-                { icon: Mail, title: 'Human Resources', value: 'hr@hmorix.in' },
-                { icon: Mail, title: 'Official & Legal', value: 'offical@hmorix.in' },
-                { icon: Mail, title: 'Direct Backup Inbox', value: 'hmorix.in@gmail.com' },
-                { icon: Phone, title: 'Phone', value: '+91 93681 53189' },
-                { icon: MapPin, title: 'Office (Hathras HQ)', value: 'Agra Road, Hathras, Uttar Pradesh - 204101, India' },
-                { icon: MapPin, title: 'Office (Kanpur)', value: 'Gujani J Block Kanpur, Uttar Pradesh - 208022, India' },
-              ].map((item, i) => (
+                { icon: Mail, title: 'General Inquiries', value: 'info@hmorix.in', hidden: false },
+                { icon: Mail, title: 'Official & Legal', value: 'official@hmorix.in', hidden: false },
+                // Retained in code but hidden from display on Contact page as requested:
+                { icon: Mail, title: 'Technical Support', value: 'support@hmorix.in', hidden: true },
+                { icon: Mail, title: 'Executive / Founder', value: 'harsh@hmorix.in', hidden: true },
+                { icon: Mail, title: 'Careers & Hiring', value: 'career@hmorix.in', hidden: true },
+                { icon: Mail, title: 'Human Resources', value: 'hr@hmorix.in', hidden: true },
+                { icon: Mail, title: 'Direct Backup Inbox', value: 'hmorix.in@gmail.com', hidden: true },
+                { icon: Phone, title: 'Phone', value: '+91 93681 53189', hidden: false },
+                { icon: MapPin, title: 'Office (Hathras HQ)', value: 'Agra Road, Hathras, Uttar Pradesh - 204101, India', hidden: false },
+                { icon: MapPin, title: 'Office (Kanpur)', value: 'Gujani J Block Kanpur, Uttar Pradesh - 208022, India', hidden: false },
+              ].filter(item => !item.hidden).map((item, i) => (
                 <div key={i} className="flex items-start gap-4">
                   <div className="w-10 h-10 bg-[#C8FF00]/10 border border-[rgba(200,255,0,0.2)] rounded-[4px] flex items-center justify-center flex-shrink-0">
                     <item.icon size={18} className="text-[#C8FF00]" />

@@ -109,9 +109,30 @@
 
 ---
 
-## 5. 🌐 Deployment & Verification
+## 5. 🛡️ Security Gateway & Hardening Layer
+
+- **Rate Limiting Engine**:
+  - `auth`: 10 requests / min (`signin`, `signup`, `otp/request`, `forgot-password`, `reset-password`).
+  - `contact`: 5 requests / 5 min (`contact`).
+  - `ai`: 20 requests / min (`ai/chat`, `ai/playground`).
+  - `general`: 120 requests / min.
+- **CORS & HTTP Security**:
+  - Dynamic allowlist origin checking (`hmorix.in`, `www.hmorix.in`, localhost dev ports).
+  - Strict HSTS, Referrer-Policy, Permissions-Policy, X-XSS-Protection, and X-Content-Type-Options.
+- **Access Control & IDOR Defense**:
+  - Role gating on all CRM, HRM, Analytics, Invoices, Settings, and Admin routes.
+  - Mandatory ownership / visible project filter enforcement on all mutation requests (`PUT`/`DELETE`).
+  - Primary admin account deletion prohibited; admin accounts cannot delete other admins.
+- **Input & Output Sanitization**:
+  - `escapeRegex()` applied to all MongoDB `$regex` search fields.
+  - Recursive redaction of sensitive credentials in `activity_log`.
+
+---
+
+## 6. 🌐 Deployment & Verification
 
 - **Production Domain**: `https://hmorix.in`
 - **Interactive Node Architecture**: `https://hmorix.in/architecture`
 - **Public API Documentation**: `https://hmorix.in/docs`
 - **OpenAPI 3.0 Specification**: `https://hmorix.in/openapi.json`
+- **Automated Security Verification**: `node scratch/verify_security_hardening.mjs` (47/47 passing tests)
