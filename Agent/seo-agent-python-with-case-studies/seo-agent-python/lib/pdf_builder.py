@@ -16,6 +16,9 @@ try:
     from reportlab.pdfgen import canvas
     REPORTLAB_AVAILABLE = True
 except ImportError:
+    MM = 72.0 / 25.4  # 1 mm in standard PostScript points (~2.8346 pt)
+    stringWidth = None
+    canvas = None
     REPORTLAB_AVAILABLE = False
 
 ACCENT = (200 / 255, 255 / 255, 0 / 255)   # #C8FF00, reportlab wants 0-1 floats
