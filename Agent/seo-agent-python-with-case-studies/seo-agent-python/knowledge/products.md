@@ -1,212 +1,147 @@
-# Products & Services
+# HMorix Products & Core SaaS Ecosystem
 
-> This file is the source of truth for HMorix products and services. The AI must not invent features, pricing, or capabilities that are not listed here.
-
----
-
-# Services
-
-## Web Design
-
-### What it does
-Designs and develops modern, responsive websites for businesses, startups, creators, and organizations.
-
-### Target Users
-- Small Businesses
-- Startups
-- Agencies
-- Brands
-- Content Creators
+This file serves as the definitive source of truth for all HMorix SaaS products, multi-portal platforms, and enterprise solutions. The AI agent must accurately represent these capabilities, modules, and target use cases.
 
 ---
 
-## Mobile Apps & APK
+## 1. Enterprise HRM (Human Resource Management)
 
-### What it does
-Develops Android applications and cross-platform mobile applications tailored to business requirements.
+### Overview
+A comprehensive, end-to-end workforce management and human capital platform built for growing enterprises, multi-branch corporations, and regional industries.
 
-### Target Users
-- Businesses
-- Startups
-- Enterprises
+### Core Modules & Capabilities
+- **Multi-Branch Organizational Hierarchy:** Manage regional branches (e.g. Hathras, Agra, Mathura, Delhi NCR) with departmental silos and role delegations.
+- **Biometric & Geo-Fenced Attendance:** Real-time clock-in/clock-out, shift scheduling, late-entry policies, and mobile GPS check-ins.
+- **Multi-Tiered Leave Approval Workflows:** Customizable leave categories (Casual, Sick, Earned, Maternity, Unpaid), quota tracking, and hierarchical approvals (Employee -> Manager -> HR).
+- **Statutory Indian Payroll Processing:**
+  - Automated calculation of Provident Fund (PF), Employee State Insurance (ESI), Professional Tax (PT), and Tax Deducted at Source (TDS).
+  - One-click monthly payroll runs, salary slip generation, and direct bank disbursement export formats.
+- **Talent Acquisition & ATS Pipeline:** Job requisition creation, resume parsing, candidate scoring, interview stage tracking (`applied` -> `screening` -> `interview` -> `offered` -> `hired`), and automated offer letter generation.
+- **Performance Appraisals (OKR/KPI):** 360-degree reviews, goal setting, manager ratings, and promotion cycle audits.
 
----
-
-## SEO & Marketing
-
-### What it does
-Provides search engine optimization, digital marketing strategies, and online growth solutions.
-
-### Target Users
-- Businesses
-- Brands
-- E-commerce Stores
-- Creators
+### Target Audiences
+- Regional manufacturing units, factories, hospitality chains, hospitals/clinics, educational institutions, retail chains, and IT services firms (50 to 5,000+ employees).
 
 ---
 
-## AI Solutions
+## 2. BillingFlow 2.0 (Automated Invoicing & GST Engine)
 
-### What it does
-Develops AI-powered applications, business automation systems, AI assistants, and intelligent software solutions.
+### Overview
+Automated business billing, subscription recurring billing, and GST-compliant tax invoicing platform designed to eliminate manual billing errors and accelerate cash flow.
 
-### Target Users
-- Businesses
-- Enterprises
-- Startups
+### Core Modules & Capabilities
+- **GST Compliant Invoicing:** Auto-calculates CGST, SGST, IGST based on client state and HSN/SAC codes with reverse charge mechanism support.
+- **Automated PDF Engine:** Generates downloadable, print-ready, professional branded PDF invoices instantly upon order completion or milestone approval.
+- **Recurring Subscriptions & Milestones:** Automated billing cycles (monthly, quarterly, annual, milestone-based) with automatic late payment reminders.
+- **Client Ledger & Reconciliation:** Complete financial statement tracking, payment receipts, outstanding balances, and credit notes.
+- **Direct Integration:** Seamless connection with HMorix Client Portal and CRM deals (`closed_won` automatically triggers project invoice).
 
----
-
-## Advertising
-
-### What it does
-Supports businesses with digital advertising and promotional campaigns.
-
-### Target Users
-- Brands
-- Small Businesses
-- Marketing Teams
+### Target Audiences
+- B2B SaaS businesses, consulting agencies, wholesale traders, service providers, freelance networks, and retail vendors.
 
 ---
 
-## E-commerce
+## 3. HMorix CRM (Customer Relationship Management)
 
-### What it does
-Builds online stores and custom e-commerce platforms with modern technologies.
+### Overview
+High-velocity sales pipeline and contact relationship management system engineered to convert leads into long-term enterprise contracts.
 
-### Target Users
-- Retail Businesses
-- Online Sellers
-- Brands
+### Core Modules & Capabilities
+- **Lead Capture & Contact Management:** Centralized database of contacts, organizations, decision-makers, and interaction history.
+- **Deal Stage Progression:** Visual kanban tracking from `lead` -> `qualified` -> `proposal` -> `negotiation` -> `closed_won` -> `closed_lost`.
+- **Revenue Forecasting & Pipeline Velocity:** Real-time analytics on expected monthly close revenue, conversion win rates, and stage drop-offs.
+- **Automated Hand-off:** Won deals immediately trigger client onboarding, initial milestone invoice in BillingFlow, and operational ticketing.
 
----
-
-## Software Development
-
-### What it does
-Develops custom software, web applications, dashboards, APIs, and business management systems.
-
-### Target Users
-- Businesses
-- Enterprises
-- Government Organizations
-- Startups
+### Target Audiences
+- B2B sales teams, agency account managers, real estate developers, and corporate service providers.
 
 ---
 
-# Products
+## 4. Field Sales Portal
 
-## BillingFlow
+### Overview
+Mobile-optimized portal for on-ground sales executives visiting regional businesses across target territories (Hotels, Hospitals, Retail, Restaurants, Factories).
 
-### What it does
-BillingFlow is HMorix's billing and business management platform.
-
-### Target Users
-- Small Businesses
-- Retail Businesses
-- Service Providers
-- Enterprises
-
-### Pricing
-Custom pricing.
+### Core Modules & Capabilities
+- **On-the-Spot Lead Entry:** Instant capture of business details, decision-maker WhatsApp/phone, industry type, and estimated budget.
+- **GPS Location Tagging:** Validates field visit check-ins with geo-coordinates.
+- **Live CRM Sync:** Instant pipeline reflection so headquarters managers can assign follow-up tasks in real-time.
+- **Territory Analytics:** Tracks field rep performance across regional corridors (Agra, Hathras, Mathura, Aligarh, NCR).
 
 ---
 
-## AI Agent
+## 5. Employee Self-Service (ESS) Portal
 
-### What it does
-A customizable AI assistant platform for business automation, customer interaction, and workflow assistance.
+### Overview
+A dedicated, clean portal for staff members to manage their daily work life without burdening HR staff.
 
-### Target Users
-- Businesses
-- Agencies
-- Enterprises
-
-### Pricing
-Custom pricing.
-
----
-
-## PDF Automation
-
-### What it does
-Automates the generation, processing, and management of PDF documents.
-
-### Target Users
-- Businesses
-- Offices
-- Educational Institutions
-
-### Pricing
-Custom pricing.
+### Core Capabilities
+- **One-Tap Clock-in/Clock-out:** With location and timestamp logging.
+- **Personal Leave Manager:** View leave balances, submit leave requests with reason, and track approval status.
+- **Payslips & Tax Documents:** Instant download of monthly PDF payslips and tax withholding summaries.
+- **Task & Project Board:** View delegated tasks, update completion status, and record notes.
+- **Corporate Documents Vault:** Secure access to employee handbook, company policies, and training material.
 
 ---
 
-## Smart Home
+## 6. Manager Portal (MSS - Manager Self-Service)
 
-### What it does
-Develops smart home and IoT-based automation solutions.
+### Overview
+Operational control center for team leaders, department heads, and project managers.
 
-### Target Users
-- Homeowners
-- Businesses
-- Property Developers
-
-### Pricing
-Custom pricing.
+### Core Capabilities
+- **Team Workload Assembly:** View real-time availability, clock-in status, and current task distribution.
+- **Direct Leave Triage:** One-click approve or reject leave requests with manager feedback.
+- **Employee Performance Scoring:** Monthly evaluation scoring across delivery quality, punctuality, and peer collaboration.
+- **Support Ticket Escalation:** Manage client tickets assigned to the manager's team.
 
 ---
 
-## AI Playground
+## 7. Client / Customer Portal
 
-### What it does
-An experimental environment for testing AI models, prompts, and automation workflows.
+### Overview
+Transparent, branded portal provided to HMorix clients to monitor progress and handle account operations.
 
-### Target Users
-- Developers
-- Students
-- Businesses
-- Researchers
-
-### Pricing
-May vary depending on deployment.
+### Core Capabilities
+- **Real-Time Project Milestones:** Interactive timeline of active deliverables and launch targets.
+- **Billing & Invoice Center:** View all past and outstanding invoices, download receipts, and pay online.
+- **Support Ticketing (`TKT-XXXXXX`):** Submit priority tickets with file attachments and track engineering resolution in real-time.
+- **API & Access Tokens:** Generate and rotate production and sandbox API keys for developer integrations.
 
 ---
 
-## Developers
+## 8. HMorix AI Agent & SEO Master
 
-### What it does
-Developer-focused tools, APIs, SDKs, integrations, and technical resources provided by HMorix.
+### Overview
+Autonomous AI software suite integrating NVIDIA NIM enterprise LLMs for content strategy, marketing automation, and business intelligence.
 
-### Target Users
-- Software Developers
-- Technical Teams
-- Startups
-
-### Pricing
-Depends on the specific product or service.
-
----
-
-# Public Roadmap
-
-The following items may be discussed publicly only if officially announced:
-
-- Expansion of AI-powered business solutions.
-- Continuous improvement of existing products.
-- New automation capabilities.
-- Additional integrations with modern technologies.
-
-Do not announce unreleased products, features, timelines, or pricing unless officially published by HMorix.
+### Core Capabilities
+- **Interactive SEO Master Chat:** ChatGPT/Claude-style conversational workspace featuring:
+  - Multi-step Chain-of-Thought thinking display.
+  - Interactive clarifying questions to pinpoint audience and search intent.
+  - Automatic discovery of high-intent **long-tail keywords** and LSI semantic clusters.
+  - Publication-ready generation of Blogs, Case Studies, Whitepapers, Press Releases, and SEO Content Audits.
+  - Direct pipeline draft saving to the approval staging queue.
+- **NVIDIA NIM Integration:** Powered by `meta/llama-4-maverick-17b`, `llama-3.3-nemotron-super-49b`, and `llama-3.1-70b` models with automatic fallback resilience.
 
 ---
 
-# AI Rules
+## 9. PDF Automation Suite
 
-The AI must:
+### Overview
+High-throughput document generation engine for enterprise compliance, legal paperwork, and transactional receipts.
 
-- Never invent product features.
-- Never promise unreleased functionality.
-- Never estimate launch dates.
-- Recommend the most appropriate product based on customer requirements.
-- Explain when a product requires custom development.
+### Core Capabilities
+- Offer letters, joining kits, appointment orders with dynamic company letterhead.
+- ReportLab-backed binary generation with embedded vector diagrams and clickable TOCs.
+- Automated tax compliance and invoice dispatch.
+
+---
+
+## 10. Smart Home & IoT Solutions
+
+### Overview
+Hardware-software integrations for smart offices, industrial monitoring, and connected properties.
+
+### Core Capabilities
+- Remote environmental controls, security sensor logging, and smart power management.

@@ -20,7 +20,7 @@ KNOWLEDGE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__f
 def _load_knowledge():
     """Loads HMorix core context so generated content is deeply grounded."""
     parts = []
-    files = ["company.md", "products.md", "brand-voice.md", "audience.md"]
+    files = ["company.md", "products.md", "services.md", "brand-voice.md", "audience.md", "faq.md"]
     for f in files:
         p = os.path.join(KNOWLEDGE_DIR, f)
         if os.path.exists(p):
