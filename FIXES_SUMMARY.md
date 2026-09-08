@@ -6,6 +6,37 @@ This document summarizes all fixes and improvements made to the HMorix platform 
 
 ---
 
+## 0. Enterprise Hardening, 2FA & Disaster Recovery (September 2026) ✅
+
+### Key Achievements
+1. **Google Two-Factor Authentication (RFC 6238 TOTP)**:
+   - Native Node.js `crypto` zero-dependency implementation.
+   - Endpoints: `POST /api/auth/2fa/setup`, `POST /api/auth/2fa/verify-enable`, `POST /api/auth/2fa/disable`, `POST /api/auth/2fa/authenticate`.
+   - QR code generation, manual base32 secret entry, and 8 single-use emergency backup recovery keys (salted and SHA-256 hashed).
+   - Frontend UI: Complete step-by-step modal and settings panel in `client/src/pages/settings/Settings.tsx` and 2FA challenge screen during sign-in in `client/src/pages/auth/SignIn.tsx`.
+2. **Active Session & Device Management**:
+   - Endpoints: `GET /api/account/sessions`, `DELETE /api/account/sessions`.
+   - Records IP, user-agent, parsed OS, browser, device category, createdAt, and lastActive.
+   - Real-time revocation of individual sessions or bulk revocation of all other active sessions (`revoke_others`).
+   - Frontend UI: "Active Sessions" tab in `client/src/pages/settings/Settings.tsx`.
+3. **Automated Dual Database Backup & Disaster Recovery Verification**:
+   - `scripts/backup/backup_mongodb.mjs`: Exports MongoDB Atlas collections with SHA-256 integrity manifest.
+   - `scripts/backup/backup_supabase.mjs`: Exports Supabase PostgreSQL tables.
+   - `scripts/backup/verify_disaster_recovery.mjs`: Validates cryptographic checksums, JSON schema arrays, and sandbox non-destructive restore (passes 9/9 automated checks).
+4. **Termux PRoot Ubuntu ARM64 Local Database Suite**:
+   - `scripts/termux/mongod.conf`: Hard-caps WiredTiger engine memory at `cacheSizeGB: 0.5` for mobile PRoot stability.
+   - `scripts/termux/setup_databases.sh`: Installs MongoDB and PostgreSQL without systemd dependencies.
+   - `scripts/termux/start_databases.sh` & `stop_databases.sh`: Direct process / init script daemon management.
+   - `scripts/termux/status_databases.sh`: Socket and port validation on 27017 and 5432.
+5. **Content Security Policy (CSP)**:
+   - Enforced in `vercel.json` and API response headers (`setCors`).
+   - Grants Google Maps, Google Fonts, and Supabase connections while denying `frame-ancestors 'none'`.
+6. **OpenAPI 3.0 Sync & CI/CD**:
+   - Synced `client/public/openapi.json` with all 2FA, session, and backup endpoints.
+   - Created `.github/workflows/ci.yml` matrix testing Node 20 & 22 with syntax checks, security regressions (75/75 tests), and DR validation.
+
+---
+
 ## 1. Production URL Fixes ✅
 
 ### Issue

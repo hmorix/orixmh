@@ -46,6 +46,14 @@ export const api = {
     signin: `${config.apiUrl}/auth/signin`,
     signup: `${config.apiUrl}/auth/signup`,
     me: `${config.apiUrl}/auth/me`,
+    setup2fa: `${config.apiUrl}/auth/2fa/setup`,
+    verifyEnable2fa: `${config.apiUrl}/auth/2fa/verify-enable`,
+    disable2fa: `${config.apiUrl}/auth/2fa/disable`,
+    authenticate2fa: `${config.apiUrl}/auth/2fa/authenticate`,
+  },
+  sessions: {
+    list: `${config.apiUrl}/account/sessions`,
+    revoke: `${config.apiUrl}/account/sessions`,
   },
   profile: {
     get: `${config.apiUrl}/profile`,

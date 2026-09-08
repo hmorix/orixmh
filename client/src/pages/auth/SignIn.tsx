@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../../lib/AuthContext'
 import { config } from '../../lib/config'
 import { BrandLogo } from '../../components/BrandLogo'
@@ -19,7 +19,10 @@ export default function SignIn() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const { signIn } = useAuth()
+  const [is2fa, setIs2fa] = useState(false)
+  const [twoFactorCode, setTwoFactorCode] = useState('')
+  const [tempToken, setTempToken] = useState('')
+  const { signIn, authenticate2fa } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -39,10 +42,31 @@ export default function SignIn() {
     }
     setLoading(true)
     setError('')
-    const { error: authError } = await signIn(email, password)
+    const res = await signIn(email, password)
     setLoading(false)
-    if (authError) {
-      setError(authError.message || 'Invalid credentials')
+    if (res.error) {
+      setError(res.error.message || 'Invalid credentials')
+    } else if (res.require2fa) {
+      setIs2fa(true)
+      setTempToken(res.tempToken || '')
+    } else {
+      const saved = await fetch(`${config.apiUrl}/auth/me`, { credentials: 'include', cache: 'no-store' }).then(r => r.json()).catch(() => ({}))
+      navigate(routeAfterLogin(saved.user?.role))
+    }
+  }
+
+  const handle2faSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!twoFactorCode) {
+      setError('Please enter your 2FA code or recovery key')
+      return
+    }
+    setLoading(true)
+    setError('')
+    const res = await authenticate2fa(tempToken, twoFactorCode)
+    setLoading(false)
+    if (res.error) {
+      setError(res.error.message || 'Invalid 2FA code')
     } else {
       const saved = await fetch(`${config.apiUrl}/auth/me`, { credentials: 'include', cache: 'no-store' }).then(r => r.json()).catch(() => ({}))
       navigate(routeAfterLogin(saved.user?.role))
@@ -72,42 +96,85 @@ export default function SignIn() {
               {error}
             </div>
           )}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-cream/60 mb-1.5">Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@company.com" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00] placeholder:text-cream/30 transition-colors" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-cream/60 mb-1.5">Password</label>
-              <div className="relative">
-                <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00] placeholder:text-cream/30 transition-colors pr-10" />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-cream/40 hover:text-cream transition-colors">
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
+          {is2fa ? (
+            <form onSubmit={handle2faSubmit} className="space-y-4">
+              <div className="flex flex-col items-center justify-center text-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-[#C8FF00]/10 border border-[rgba(200,255,0,0.3)] flex items-center justify-center text-[#C8FF00] mb-3">
+                  <ShieldCheck size={24} />
+                </div>
+                <h2 className="font-display text-lg font-bold text-cream">Two-Factor Authentication</h2>
+                <p className="text-xs text-cream/50 mt-1">Enter the 6-digit code from Google Authenticator, or an emergency recovery key.</p>
               </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="w-4 h-4 rounded border-glass-border bg-obsidian accent-[#C8FF00]" />
-                <span className="text-xs text-cream/50">Remember me</span>
-              </label>
-              <Link to="/forgot-password" className="text-xs text-[#C8FF00] hover:underline">Forgot password?</Link>
-            </div>
-            <button type="submit" disabled={loading} className="w-full py-3 bg-[#C8FF00] text-obsidian font-display font-semibold rounded-[4px] hover:opacity-90 transition-all mt-2 disabled:opacity-50 flex items-center justify-center gap-2">
-              {loading && <Loader2 size={16} className="animate-spin" />}
-              {loading ? 'Signing in...' : 'Sign In'}
-            </button>
-          </form>
 
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-glass-border" /></div>
-            <div className="relative flex justify-center"><span className="px-3 bg-obsidian-2 text-xs text-cream/30">or continue with</span></div>
-          </div>
+              <div>
+                <label className="block text-xs font-medium text-cream/60 mb-1.5">Authentication Code / Recovery Key</label>
+                <input
+                  type="text"
+                  autoFocus
+                  value={twoFactorCode}
+                  onChange={e => setTwoFactorCode(e.target.value)}
+                  placeholder="123456 or XXXX-XXXX"
+                  className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-center tracking-widest text-lg font-mono text-cream outline-none focus:border-[#C8FF00] placeholder:text-cream/20 transition-colors"
+                />
+              </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={() => handleOAuth('google')} className="py-2.5 border border-glass-border rounded-[4px] text-sm text-cream/60 hover:border-cream hover:text-cream transition-all">Google</button>
-            <button onClick={() => handleOAuth('github')} className="py-2.5 border border-glass-border rounded-[4px] text-sm text-cream/60 hover:border-cream hover:text-cream transition-all">GitHub</button>
-          </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 bg-[#C8FF00] text-obsidian font-display font-semibold rounded-[4px] hover:opacity-90 transition-all mt-2 disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {loading && <Loader2 size={16} className="animate-spin" />}
+                {loading ? 'Verifying...' : 'Verify & Continue'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setIs2fa(false); setTwoFactorCode(''); setError(''); }}
+                className="w-full py-2 text-xs text-cream/40 hover:text-cream transition-colors text-center block"
+              >
+                ← Back to standard sign in
+              </button>
+            </form>
+          ) : (
+            <>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-cream/60 mb-1.5">Email</label>
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@company.com" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00] placeholder:text-cream/30 transition-colors" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-cream/60 mb-1.5">Password</label>
+                  <div className="relative">
+                    <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-3 bg-obsidian border border-glass-border rounded-[4px] text-sm text-cream outline-none focus:border-[#C8FF00] placeholder:text-cream/30 transition-colors pr-10" />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-cream/40 hover:text-cream transition-colors">
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" className="w-4 h-4 rounded border-glass-border bg-obsidian accent-[#C8FF00]" />
+                    <span className="text-xs text-cream/50">Remember me</span>
+                  </label>
+                  <Link to="/forgot-password" className="text-xs text-[#C8FF00] hover:underline">Forgot password?</Link>
+                </div>
+                <button type="submit" disabled={loading} className="w-full py-3 bg-[#C8FF00] text-obsidian font-display font-semibold rounded-[4px] hover:opacity-90 transition-all mt-2 disabled:opacity-50 flex items-center justify-center gap-2">
+                  {loading && <Loader2 size={16} className="animate-spin" />}
+                  {loading ? 'Signing in...' : 'Sign In'}
+                </button>
+              </form>
+
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-glass-border" /></div>
+                <div className="relative flex justify-center"><span className="px-3 bg-obsidian-2 text-xs text-cream/30">or continue with</span></div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <button onClick={() => handleOAuth('google')} className="py-2.5 border border-glass-border rounded-[4px] text-sm text-cream/60 hover:border-cream hover:text-cream transition-all">Google</button>
+                <button onClick={() => handleOAuth('github')} className="py-2.5 border border-glass-border rounded-[4px] text-sm text-cream/60 hover:border-cream hover:text-cream transition-all">GitHub</button>
+              </div>
+            </>
+          )}
         </div>
 
         <p className="text-center text-sm text-cream/40 mt-6">

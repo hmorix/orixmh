@@ -81,6 +81,35 @@ This file serves as the canonical system reference for HMorix (`hmorix.in`), cap
 10. **Contact Page Privacy**:
     - Secondary email addresses hidden from public UI (`support@`, `harsh@`, `career@`, `hr@`, `hmorix.in@gmail.com`) while retained in code.
     - Only `info@hmorix.in` and `official@hmorix.in` displayed publicly.
+11. **Google Two-Factor Authentication (RFC 6238 TOTP)**:
+    - Endpoints: `POST /api/auth/2fa/setup`, `POST /api/auth/2fa/verify-enable`, `POST /api/auth/2fa/disable`, `POST /api/auth/2fa/authenticate`.
+    - Standard 30-second window, 6-digit TOTP tokens compatible with Google Authenticator, Authy, and 1Password.
+    - Emergency recovery keys generated in batches of 8, salted and SHA-256 hashed before database persistence.
+    - UI: Full interactive setup, QR code display, manual secret copy, recovery key vault, and password-protected deactivation modal in `client/src/pages/settings/Settings.tsx`.
+12. **Active Session & Device Management**:
+    - Endpoints: `GET /api/account/sessions`, `DELETE /api/account/sessions`.
+    - Tracks IP address, parsed user-agent (Browser, OS, Device category), createdAt, and lastActive in MongoDB `sessions` collection.
+    - Supports individual session revocation and atomic bulk "Log Out All Other Devices" (`revoke_others`).
+    - UI: Tab in `client/src/pages/settings/Settings.tsx` displaying devices, current session badge, and instant revoke actions.
+13. **Content Security Policy (CSP)**:
+    - Enforced via both `vercel.json` HTTP headers and `api/[...path].ts` API gateway responses.
+    - Explicitly permits Google Maps, Google Fonts, and Supabase connections while denying `frame-ancestors 'none'` to eliminate clickjacking.
+14. **Automated Dual Database Backup & Disaster Recovery**:
+    - Zero-dependency backup suite in `scripts/backup/`:
+      - `backup_mongodb.mjs`: Exports MongoDB Atlas collections with SHA-256 integrity manifest.
+      - `backup_supabase.mjs`: Exports Supabase PostgreSQL tables.
+      - `verify_disaster_recovery.mjs`: Validates cryptographic hashes, schema arrays, and sandbox non-destructive restore test (75/75 checks passed).
+    - Admin endpoints: `GET /api/admin/backup`, `POST /api/admin/backup`.
+15. **Termux Ubuntu ARM64 Local Database Suite**:
+    - Local database process management scripts in `scripts/termux/`:
+      - `setup_databases.sh`: Installs MongoDB and PostgreSQL without systemd dependencies.
+      - `start_databases.sh`: Starts daemons using direct process invocation / init scripts.
+      - `stop_databases.sh`: Graceful termination of database processes.
+      - `status_databases.sh`: Real-time socket & port listener check on ports 27017 and 5432.
+      - `mongod.conf`: Hard-caps WiredTiger engine memory at `cacheSizeGB: 0.5` for mobile PRoot stability.
+16. **CI/CD & OpenAPI Sync**:
+    - `.github/workflows/ci.yml`: Automated GitHub Actions pipeline matrix testing Node 20 & 22 with syntax checks, security regressions, and DR validation.
+    - `client/public/openapi.json`: Synced with all newly added 2FA, session, and backup endpoints and security schemes (`CookieAuth`, `BearerAuth`).
 
 ---
 

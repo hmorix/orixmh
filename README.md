@@ -174,6 +174,12 @@ To switch from Supabase to MySQL:
 | GET | `/api/analytics/traffic` | `admin`, `manager` | General (120/m) | Traffic acquisition sources |
 | GET | `/api/admin/stats` | `admin` | General (120/m) | Admin system metrics |
 | GET | `/api/admin/logs` | `admin` | General (120/m) | Sensitive-scrubbed audit logs |
+| GET / POST | `/api/admin/backup` | `admin` | General (120/m) | Automated DB backup snapshot & manifests |
+| POST | `/api/auth/2fa/setup` | Authenticated | Auth (10/m) | Generate TOTP secret & QR code |
+| POST | `/api/auth/2fa/verify-enable` | Authenticated | Auth (10/m) | Verify TOTP code and activate 2FA |
+| POST | `/api/auth/2fa/disable` | Authenticated | Auth (10/m) | Disable 2FA with password confirmation |
+| POST | `/api/auth/2fa/authenticate` | Public (tempToken) | Auth (10/m) | Verify 2FA challenge during login |
+| GET / DELETE | `/api/account/sessions` | Authenticated | General (120/m) | List and revoke active device sessions |
 | GET | `/api/services` | Public | General (120/m) | Public services listing |
 | GET | `/api/employee/profile` | Authenticated | General (120/m) | Employee profile |
 

@@ -1,0 +1,47 @@
+name: HMorix Enterprise CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  security-and-build:
+    name: Security Hardening, Syntax & Build Verification
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [ 20.x, 22.x ]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          npm ci || npm install
+          cd client && (npm ci || npm install)
+
+      - name: Verify API Gateway Syntax & Types (Node 22 Native)
+        run: |
+          node --experimental-strip-types --check "api/[...path].ts"
+
+      - name: Run Automated Security Verification Suite
+        run: |
+          node scratch/verify_security_hardening.mjs
+
+      - name: Run Disaster Recovery Verification Check
+        run: |
+          node scripts/backup/verify_disaster_recovery.mjs
+
+      - name: Build Frontend Client (Production Vite Build)
+        run: |
+          cd client && npm run build

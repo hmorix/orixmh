@@ -11,6 +11,7 @@ type AppUser = {
   role?: string
   emailVerified?: boolean
   providers?: string[]
+  twoFactorEnabled?: boolean
   user_metadata?: { name?: string }
 }
 
@@ -25,7 +26,9 @@ interface AuthContextType {
   session: AppSession | null
   loading: boolean
   signUp: (email: string, password: string, metadata?: { name?: string; company?: string }) => Promise<{ error: any }>
-  signIn: (email: string, password: string) => Promise<{ error: any }>
+  signIn: (email: string, password: string) => Promise<{ error: any; require2fa?: boolean; tempToken?: string }>
+  authenticate2fa: (tempToken: string, code: string) => Promise<{ error: any }>
+  refreshUser: () => Promise<void>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<{ error: any }>
 }
@@ -89,14 +92,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       })
+      if (data.require2fa) {
+        return { error: null, require2fa: true, tempToken: data.tempToken }
+      }
+      const nextUser = { ...data.user, user_metadata: { name: data.user.name || data.user.displayName } }
+      setUser(nextUser)
+      setSession({ user: nextUser, access_token: 'cookie-session' })
+      return { error: null, require2fa: false }
+    } catch (error: any) {
+      setUser(null)
+      setSession(null)
+      return { error }
+    }
+  }
+
+  const authenticate2fa = async (tempToken: string, code: string) => {
+    try {
+      const data = await apiRequest(`${config.apiUrl}/auth/2fa/authenticate`, {
+        method: 'POST',
+        body: JSON.stringify({ tempToken, code }),
+      })
       const nextUser = { ...data.user, user_metadata: { name: data.user.name || data.user.displayName } }
       setUser(nextUser)
       setSession({ user: nextUser, access_token: 'cookie-session' })
       return { error: null }
     } catch (error: any) {
-      setUser(null)
-      setSession(null)
       return { error }
+    }
+  }
+
+  const refreshUser = async () => {
+    try {
+      const data = await apiRequest(api.auth.me)
+      if (data.user) {
+        const nextUser = { ...data.user, user_metadata: { name: data.user.name || data.user.displayName } }
+        setUser(nextUser)
+        setSession({ user: nextUser, access_token: 'cookie-session' })
+      }
+    } catch {
+      // ignore
     }
   }
 
@@ -121,7 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut, resetPassword }}>
+    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, authenticate2fa, refreshUser, signOut, resetPassword }}>
       {children}
     </AuthContext.Provider>
   )

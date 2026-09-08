@@ -80,7 +80,14 @@ HMorix is a unified enterprise B2B SaaS platform that combines:
 - **Role Routing**: Dynamic post-login redirection based on role (`admin`, `manager`, `hr`, `employee`, `sales`, `crm`, `user`).
 - **No Mock Data Rule**: All portal operations connect to real backend database collections.
 - **PWA & Offline Capability**: Service Worker and IndexedDB (`hmorix-offline`) provide graceful offline degradation with waiting sync states.
-- **Security Hardening (September 2026)**:
+- **Security Hardening & Zero-Trust (Enterprise Upgrades)**:
+  - **Google Two-Factor Authentication (RFC 6238 TOTP)**: Standard time-based OTP (`auth/2fa/setup`, `auth/2fa/verify-enable`, `auth/2fa/disable`, `auth/2fa/authenticate`) with QR code generation and salted SHA-256 emergency recovery backup keys.
+  - **Active Session & Device Management**: Tracks IP, parsed browser, OS, and device type in MongoDB `sessions` collection with single-session revocation and bulk "Log Out All Other Devices" (`/api/account/sessions`).
+  - **Automated Dual Database Backup & DR Verification**: Zero-dependency backup scripts for MongoDB Atlas and Supabase PostgreSQL with SHA-256 integrity manifests and sandbox restore tests (`scripts/backup/*`).
+  - **Termux Ubuntu ARM64 Local DB Suite**: Mobile PRoot Ubuntu environment scripts (`scripts/termux/*`) for MongoDB and PostgreSQL with non-systemd service controls and capped memory (`cacheSizeGB: 0.5`).
+  - **Automated CI/CD Pipeline**: GitHub Actions matrix workflow (`.github/workflows/ci.yml`) testing Node 20 & 22 with syntax checks, security regressions, and disaster recovery validation.
+  - **OpenAPI 3.0 Specification**: Full synchronization of all auth, 2fa, session, backup, and business endpoints at `client/public/openapi.json`.
+  - **Content Security Policy (CSP)**: Strict script, style, font, connect, and frame restrictions in `vercel.json` and API response headers.
   - **Tiered Rate Limiter**: In-memory sliding-window counter protecting `auth` (10 req/min), `contact` (5 req/5min), `ai` (20 req/min), and `general` (120 req/min).
   - **Strict CORS Origin Whitelist**: Dynamic origin validation (`https://hmorix.in`, `https://www.hmorix.in`, local development ports).
   - **Security Headers**: HSTS (`max-age=63072000; includeSubDomains; preload`), `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, `X-XSS-Protection`, `X-Content-Type-Options: nosniff`.
@@ -131,13 +138,16 @@ HMorix is a unified enterprise B2B SaaS platform that combines:
 
 ## 5. Verification Protocol
 
-Before finishing any task, verify both functionality and security:
+Before finishing any task or pushing to GitHub:
 
 ```bash
 # 1. Verify syntax and types with Node 22
 node --experimental-strip-types --check "api/[...path].ts"
 
-# 2. Run the security verification test suite
+# 2. Run the security verification test suite (75/75 tests)
 node scratch/verify_security_hardening.mjs
+
+# 3. Run disaster recovery backup verification
+node scripts/backup/verify_disaster_recovery.mjs
 ```
 

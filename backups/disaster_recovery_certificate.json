@@ -1,0 +1,38 @@
+{
+  "verificationId": "DR-CERT-1788839590058",
+  "verifiedAt": "2026-09-08T03:53:10.058Z",
+  "status": "PASSED_VERIFIED",
+  "checksPassed": 9,
+  "totalChecks": 9,
+  "backupMetadata": {
+    "backupId": "backup-2026-09-08T03-37-31-503Z",
+    "database": "hmorix_cloud",
+    "provider": "MongoDB Atlas",
+    "createdAt": "2026-09-08T03:37:31.526Z",
+    "collections": {
+      "users": {
+        "file": "users.json",
+        "count": 1,
+        "sha256": "0fedb10eb3a6d5860da41ade2d2a2b685de00171c0eb033e5ae2568dbe34a37b"
+      },
+      "client_projects": {
+        "file": "client_projects.json",
+        "count": 1,
+        "sha256": "9cce96414799bd7de01e0681746968e0bd4b6804bdaa13d83df4dcb785c8d4f7"
+      },
+      "support_tickets": {
+        "file": "support_tickets.json",
+        "count": 1,
+        "sha256": "169fcfdf09d252fdad295c3c96a048a1f3fc72ee6629ba997acdf08e5be6a07a"
+      }
+    },
+    "totalDocuments": 3,
+    "checksumAlgorithm": "SHA-256",
+    "status": "COMPLETED"
+  },
+  "integritySummary": {
+    "sha256Enforced": true,
+    "sandboxTested": true,
+    "recoveryReadiness": "READY_FOR_PRODUCTION"
+  }
+}
