@@ -86,12 +86,13 @@ function GoogleMapsWidget() {
   }, [mapsLoaded])
 
   if (!apiKey) {
-    // Fallback: static Google Maps embed (no API key needed)
+    // Fallback: OpenStreetMap embed — no API key, no "blocked" errors, free forever
+    const osmUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${HMORIX_LOCATION.lng - 0.01}%2C${HMORIX_LOCATION.lat - 0.01}%2C${HMORIX_LOCATION.lng + 0.01}%2C${HMORIX_LOCATION.lat + 0.01}&layer=mapnik&marker=${HMORIX_LOCATION.lat}%2C${HMORIX_LOCATION.lng}`
     return (
       <div className="w-full rounded-2xl overflow-hidden border border-glass-border" style={{ height: 380 }}>
         <iframe
           title="HMorix Location – Hathras HQ"
-          src={`https://maps.google.com/maps?q=${HMORIX_LOCATION.lat},${HMORIX_LOCATION.lng}&z=16&output=embed`}
+          src={osmUrl}
           width="100%"
           height="100%"
           style={{ border: 0 }}
@@ -99,6 +100,11 @@ function GoogleMapsWidget() {
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
         />
+        <div style={{ textAlign: 'center', fontSize: 11, padding: '2px 0' }}>
+          <a href={HMORIX_CID_LINK} target="_blank" rel="noopener noreferrer" style={{ color: '#1a73e8' }}>
+            View on Google Maps ↗
+          </a>
+        </div>
       </div>
     )
   }

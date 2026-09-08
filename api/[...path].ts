@@ -1141,39 +1141,50 @@ async function handleAuthSignup(req: VercelRequest, res: VercelResponse) {
   if (!name || !email || !password) return res.status(400).json({ error: 'Name, email, and password are required' })
   if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' })
   ensureIndexes().catch(() => {})
-  const users = await mongoCollection('users')
+
   const normalizedEmail = cleanEmail(email)
-  const existing = await users.findOne({ email: normalizedEmail })
-  if (existing?.passwordHash) return res.status(409).json({ error: 'An account with this email already exists' })
+  const isAutoVerified = !(process.env.REQUIRE_EMAIL_VERIFICATION === 'true')
   const now = new Date()
-  const passwordHash = await bcrypt.hash(password, 10)
-  const isVerificationRequired = process.env.REQUIRE_EMAIL_VERIFICATION === 'true'
-  const isAutoVerified = !isVerificationRequired
-  const insertResult = await users.insertOne({
-    email: normalizedEmail,
-    name,
-    displayName: name,
-    company: company || '',
-    passwordHash,
-    role: normalizedEmail === process.env.ADMIN_EMAIL ? 'admin' : 'user',
-    emailVerified: isAutoVerified,
-    providers: ['email'],
-    createdAt: now,
-    updatedAt: now,
-  })
-  const user = existing || insertResult.insertedId
-  if (existing) {
-    await users.updateOne({ _id: existing._id }, { $set: { name, displayName: name, company: company || '', passwordHash, emailVerified: isAutoVerified, updatedAt: now }, $addToSet: { providers: 'email' } })
-  }
-  const saved = existing ? await users.findOne({ _id: existing._id }) : await users.findOne({ _id: user })
+
+  // Run bcrypt + DB connection in parallel to save time
+  const [passwordHash, users] = await Promise.all([
+    bcrypt.hash(password, 8),
+    mongoCollection('users'),
+  ])
+
+  // Check if email already has a password (existing fully-registered account)
+  const existing = await users.findOne({ email: normalizedEmail }, { projection: { _id: 1, passwordHash: 1 } })
+  if (existing?.passwordHash) return res.status(409).json({ error: 'An account with this email already exists' })
+
+  // Single upsert: insert or update OAuth-only account in one round trip
+  const result = await users.findOneAndUpdate(
+    { email: normalizedEmail },
+    {
+      $set: {
+        name, displayName: name,
+        company: company || '',
+        passwordHash,
+        emailVerified: isAutoVerified,
+        updatedAt: now,
+      },
+      $setOnInsert: {
+        role: normalizedEmail === process.env.ADMIN_EMAIL ? 'admin' : 'user',
+        providers: ['email'],
+        createdAt: now,
+      },
+      $addToSet: { providers: 'email' },
+    },
+    { upsert: true, returnDocument: 'after' }
+  )
+  const saved = result
   if (!saved) return res.status(500).json({ error: 'Failed to create user account' })
 
-  // All background work: emails + profile upsert — non-blocking
+  // Fire-and-forget: emails + profile — never block the response
   Promise.allSettled([
     createVerificationEmail(saved),
     sendOtp(normalizedEmail, 'registration'),
     upsertProfile(saved, { name, displayName: name, company }),
-  ]).catch(err => console.warn('Non-fatal registration background warning:', err))
+  ]).catch(() => {})
 
   await createSession(res, saved, req)
 
@@ -1182,7 +1193,7 @@ async function handleAuthSignup(req: VercelRequest, res: VercelResponse) {
     user: publicUser(saved),
     message: isAutoVerified
       ? 'Account created successfully.'
-      : 'Account created. Check your email to verify your account.'
+      : 'Account created. Check your email to verify your account.',
   })
 }
 
