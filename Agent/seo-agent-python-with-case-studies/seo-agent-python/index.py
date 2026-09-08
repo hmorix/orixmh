@@ -17,12 +17,58 @@ from workflows.case_study_pipeline import run_case_study  # noqa: E402
 from workflows.whitepaper_pipeline import run_whitepaper  # noqa: E402
 from workflows.press_pipeline import run_press_release  # noqa: E402
 from workflows.image_pipeline import generate_social_image_pack  # noqa: E402
+from agent import seo_master  # noqa: E402
 
 
 def main():
     args = sys.argv[1:]
 
-    if "--now" in args:
+    if "--chat" in args or "--seo-master" in args:
+        prompt = ""
+        for flag in ("--chat", "--seo-master"):
+            if flag in args:
+                idx = args.index(flag)
+                if idx + 1 < len(args) and not args[idx + 1].startswith("--"):
+                    prompt = args[idx + 1]
+                break
+        if not prompt:
+            print("=== HMorix SEO Master Interactive CLI ===")
+            print("Type your request (or 'exit' to quit)\n")
+            while True:
+                try:
+                    user_in = input("SEO Master > ").strip()
+                    if user_in.lower() in ("exit", "quit", "q"):
+                        break
+                    if not user_in:
+                        continue
+                    res = seo_master.handle_chat(user_in)
+                    if res.get("thinking_steps"):
+                        print("\n[Thinking Steps]")
+                        for step in res["thinking_steps"]:
+                            print(f"  → {step}")
+                    if res.get("clarifying_questions"):
+                        print("\n[Clarifying Questions]")
+                        for q in res["clarifying_questions"]:
+                            opts = ", ".join(q.get("options", []))
+                            print(f"  ? {q.get('question')} [{opts}]")
+                    print("\n[Content / Strategy]")
+                    print(res.get("reply", ""))
+                    print("\n" + "=" * 50 + "\n")
+                except (KeyboardInterrupt, EOFError):
+                    print("\nExiting SEO Master.")
+                    break
+            sys.exit(0)
+        else:
+            res = seo_master.handle_chat(prompt)
+            if res.get("thinking_steps"):
+                print("\n[Thinking Steps]")
+                for step in res["thinking_steps"]:
+                    print(f"  → {step}")
+            print("\n[Output]")
+            print(res.get("reply", ""))
+            sys.exit(0)
+
+    elif "--now" in args:
         content_type = None
         if "--type" in args:
             idx = args.index("--type")
@@ -263,6 +309,7 @@ def main():
         print()
         print("Usage:")
         print("  python index.py --web [port]                         Launch the local web UI (default port 8787)")
+        print("  python index.py --chat [\"prompt\"]                   Interactive SEO Master Chat (ChatGPT/Claude style)")
         print("  python index.py --daily-schedule                    Run today's 15-topic batch once, right now")
         print("                       (wire this to cron / termux-job-scheduler for a guaranteed daily run)")
         print("  python index.py --now                                Run the daily blog pipeline once")

@@ -13,6 +13,7 @@ import json
 import os
 import re
 import sys
+import time
 import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -53,6 +54,7 @@ from lib.util import iso_now  # noqa: E402
 from agent.case_study_assist import suggest_questions, polish_text  # noqa: E402
 from agent.whitepaper_assist import suggest_questions as wp_suggest_questions  # noqa: E402
 from agent.press_assist import suggest_questions as press_suggest_questions  # noqa: E402
+from agent import seo_master  # noqa: E402
 
 KNOWLEDGE_FILES = {"company", "products", "services", "audience", "brand-voice", "faq"}
 KNOWLEDGE_DIR = os.path.join(os.getcwd(), "knowledge")
@@ -687,6 +689,10 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if path == "/" or path == "/index.html":
                 self._send_file(os.path.join(WEB_DIR, "index.html"), "text/html")
+            elif path == "/chat" or path == "/chat.html":
+                self._send_file(os.path.join(WEB_DIR, "chat.html"), "text/html")
+            elif path == "/chat.js":
+                self._send_file(os.path.join(WEB_DIR, "chat.js"), "application/javascript")
             elif path == "/app.js":
                 self._send_file(os.path.join(WEB_DIR, "app.js"), "application/javascript")
             elif path == "/style.css":
@@ -1010,6 +1016,83 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 render_page_mod.render_page(post)
                 self._send_json({"ok": True, "slug": slug, "url": f"/page/{slug}", "download_url": f"/page/{slug}/download", "stale": bool(error)})
+
+            elif path == "/api/chat":
+                msg = body.get("message") or ""
+                ctype = body.get("content_type") or "blog"
+                model = body.get("model")
+                thinking = bool(body.get("thinking_enabled", True))
+                history = body.get("history") or []
+                res = seo_master.handle_chat(
+                    message=msg,
+                    content_type=ctype,
+                    model=model,
+                    thinking_enabled=thinking,
+                    history=history,
+                )
+                if not res.get("ok"):
+                    self._send_json({"error": res.get("error") or "Chat inference failed"}, 500)
+                else:
+                    self._send_json(res)
+
+            elif path == "/api/chat/save-draft":
+                ctype = body.get("type") or "blog"
+                text = body.get("text") or ""
+                title = body.get("title") or "Generated Content"
+                slug_base = re.sub(r"[^a-zA-Z0-9]+", "-", title.lower()).strip("-") or "generated-content"
+                ts = int(time.time())
+                filename = f"{ts}_{slug_base[:40]}.json"
+
+                if ctype == "case-study":
+                    target_dir = PENDING_CS_DIR
+                    record = {
+                        "slug": slug_base,
+                        "title": title,
+                        "client_name": title,
+                        "is_demo": False,
+                        "created_at_ms": ts * 1000,
+                        "summary": text[:250],
+                        "challenge": text[:800],
+                        "solution": text,
+                        "raw_markdown": text,
+                    }
+                elif ctype == "whitepaper":
+                    target_dir = PENDING_WP_DIR
+                    record = {
+                        "slug": slug_base,
+                        "title": title,
+                        "topic": title,
+                        "created_at_ms": ts * 1000,
+                        "abstract": text[:300],
+                        "content": [{"type": "markdown", "text": text}],
+                        "raw_markdown": text,
+                    }
+                elif ctype == "press":
+                    target_dir = PENDING_PR_DIR
+                    record = {
+                        "slug": slug_base,
+                        "headline": title,
+                        "created_at_ms": ts * 1000,
+                        "dateline": "HATHRAS, INDIA",
+                        "body": text,
+                        "raw_markdown": text,
+                    }
+                else:
+                    target_dir = PENDING_DIR
+                    record = {
+                        "slug": slug_base,
+                        "title": title,
+                        "created_at_ms": ts * 1000,
+                        "content": [{"type": "markdown", "text": text}],
+                        "meta_description": text[:160],
+                        "raw_markdown": text,
+                    }
+
+                os.makedirs(target_dir, exist_ok=True)
+                with open(os.path.join(target_dir, filename), "w", encoding="utf-8") as f:
+                    json.dump(record, f, indent=2, ensure_ascii=False)
+
+                self._send_json({"ok": True, "saved_to": os.path.basename(target_dir), "filename": filename, "slug": slug_base})
 
             elif path == "/api/daily-plan/run":
                 job_id = job_queue.submit("daily-batch", run_daily_batch, meta={"title": "Daily 15-topic batch"})
