@@ -141,6 +141,7 @@ function escapeRegex(str: string): string {
 const SESSION_COOKIE = 'hm_session'
 const SESSION_TTL_MS = Number(process.env.SESSION_TTL_MS || 1000 * 60 * 60 * 24 * 7)
 let mongoClient: MongoClient | null = null
+let mongoClientPromise: Promise<MongoClient> | null = null
 
 function appUrl() {
   const raw = process.env.APP_URL || process.env.SITE_URL || process.env.CLIENT_ORIGIN || process.env.VITE_APP_URL || 'https://hmorix.in'
@@ -221,12 +222,30 @@ function clearSessionCookie(res: VercelResponse) {
 }
 
 async function mongoDb() {
-  if (!process.env.MONGODB_URI) throw Object.assign(new Error('Database is not configured'), { status: 500, code: 'ENV_MISSING' })
-  if (!mongoClient) {
-    mongoClient = new MongoClient(process.env.MONGODB_URI, { maxPoolSize: 5 })
-    await mongoClient.connect()
+  if (!process.env.MONGODB_URI) throw Object.assign(new Error('Database is not configured. Please set MONGODB_URI in environment variables.'), { status: 500, code: 'ENV_MISSING' })
+  if (!mongoClientPromise) {
+    const client = new MongoClient(process.env.MONGODB_URI, {
+      maxPoolSize: 10,
+      minPoolSize: 0,
+      maxIdleTimeMS: 15000,
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 5000,
+      socketTimeoutMS: 10000,
+    })
+    mongoClientPromise = client.connect()
+      .then(c => {
+        mongoClient = c
+        return c
+      })
+      .catch(err => {
+        mongoClient = null
+        mongoClientPromise = null
+        console.error('MongoDB Atlas connection error:', err?.message || err)
+        throw Object.assign(new Error('Database connection timed out. If using MongoDB Atlas, make sure Network Access IP whitelist includes 0.0.0.0/0.'), { status: 503, code: 'DB_TIMEOUT' })
+      })
   }
-  return mongoClient.db()
+  const client = await mongoClientPromise
+  return client.db()
 }
 
 async function mongoCollection(name: string) {
@@ -234,26 +253,32 @@ async function mongoCollection(name: string) {
   return db.collection(name)
 }
 
+let indexesEnsured = false
+let indexPromise: Promise<void> | null = null
+
 async function ensureIndexes() {
-  const db = await mongoDb()
-  await Promise.all([
-    db.collection('users').createIndex({ email: 1 }, { unique: true }),
-    db.collection('oauth_accounts').createIndex({ provider: 1, providerAccountId: 1 }, { unique: true }),
-    db.collection('oauth_accounts').createIndex({ email: 1 }),
-    db.collection('profiles').createIndex({ userId: 1 }, { unique: true }),
-    db.collection('profiles').createIndex({ username: 1 }, { unique: true, sparse: true }),
-    db.collection('sessions').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
-    db.collection('verification_tokens').createIndex({ tokenHash: 1 }, { unique: true }),
-    db.collection('verification_tokens').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
-    db.collection('oauth_states').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
-    db.collection('user_integrations').createIndex({ userId: 1, provider: 1 }, { unique: true }),
-    db.collection('otp_records').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
-    db.collection('employee_attendance').createIndex({ employeeId: 1, date: 1 }, { unique: true }),
-    db.collection('hrm_interns').createIndex({ internId: 1 }, { unique: true, sparse: true }),
-    db.collection('hrm_interns').createIndex({ status: 1 }),
-    db.collection('hrm_teams').createIndex({ name: 1 }, { unique: true }),
-    db.collection('hrm_trainings').createIndex({ title: 1, assignedTo: 1 }),
-  ])
+  if (indexesEnsured) return
+  if (indexPromise) return indexPromise
+
+  indexPromise = (async () => {
+    try {
+      const db = await mongoDb()
+      await Promise.allSettled([
+        db.collection('users').createIndex({ email: 1 }, { unique: true }),
+        db.collection('sessions').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
+        db.collection('verification_tokens').createIndex({ tokenHash: 1 }, { unique: true }),
+        db.collection('otp_records').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
+        db.collection('profiles').createIndex({ userId: 1 }, { unique: true }),
+      ])
+      indexesEnsured = true
+    } catch (err) {
+      console.warn('Non-fatal ensureIndexes warning:', err)
+    } finally {
+      indexPromise = null
+    }
+  })()
+
+  return indexPromise
 }
 
 function randomToken(bytes = 32) {
@@ -329,17 +354,29 @@ function brandedEmailTemplate(options: {
 async function sendMail(options: { to: string; subject: string; html: string; text?: string }) {
   const required = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS']
   const missing = required.filter(key => !process.env[key])
-  if (missing.length) throw Object.assign(new Error(`SMTP is not configured: ${missing.join(', ')}`), { status: 500, code: 'SMTP_CONFIG' })
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT || 465),
-    secure: Number(process.env.SMTP_PORT || 465) === 465,
-    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-  })
-  await transporter.sendMail({
-    from: `"${process.env.SMTP_FROM_NAME || 'HMorix'}" <${process.env.SMTP_USER}>`,
-    ...options,
-  })
+  if (missing.length) {
+    console.warn(`SMTP credentials missing: ${missing.join(', ')}. Email delivery skipped.`)
+    return false
+  }
+  try {
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT || 465),
+      secure: Number(process.env.SMTP_PORT || 465) === 465,
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+      connectionTimeout: 4000,
+      greetingTimeout: 4000,
+      socketTimeout: 5000,
+    })
+    await transporter.sendMail({
+      from: `"${process.env.SMTP_FROM_NAME || 'HMorix'}" <${process.env.SMTP_USER}>`,
+      ...options,
+    })
+    return true
+  } catch (err: any) {
+    console.warn('sendMail delivery error (non-fatal):', err?.message || err)
+    return false
+  }
 }
 
 async function createSession(res: VercelResponse, user: any, req?: VercelRequest) {
@@ -1035,14 +1072,14 @@ async function handleSetupAdmin(req: VercelRequest, res: VercelResponse) {
   const { name = 'Admin', email, password } = req.body || {}
   if (!email || !password) return res.status(400).json({ error: 'Email and password are required' })
   if (process.env.ADMIN_EMAIL && cleanEmail(email) !== cleanEmail(process.env.ADMIN_EMAIL)) return res.status(403).json({ error: 'Use the configured ADMIN_EMAIL for setup' })
-  await ensureIndexes()
+  ensureIndexes().catch(() => {})
   const users = await mongoCollection('users')
   const existingAdmin = await users.findOne({ role: 'admin' })
   if (existingAdmin && existingAdmin.passwordHash) {
     return res.status(403).json({ error: 'Admin setup has already been completed. Please sign in normally.' })
   }
   const normalizedEmail = cleanEmail(email)
-  const passwordHash = await bcrypt.hash(password, 12)
+  const passwordHash = await bcrypt.hash(password, 10)
   const now = new Date()
   const result = await users.findOneAndUpdate(
     { email: normalizedEmail },
@@ -1068,13 +1105,15 @@ async function handleAuthSignin(req: VercelRequest, res: VercelResponse) {
   if (applyRateLimit(req, res, 'auth')) return
   const { email, password } = req.body || {}
   if (!email || !password) return res.status(400).json({ error: 'Email and password are required' })
-  await ensureIndexes()
+  ensureIndexes().catch(() => {})
   const users = await mongoCollection('users')
   const user = await users.findOne({ email: cleanEmail(email) })
   if (!user?.passwordHash) return res.status(401).json({ success: false, error: 'Invalid email or password' })
   const valid = await bcrypt.compare(password, user.passwordHash)
   if (!valid) return res.status(401).json({ success: false, error: 'Invalid email or password' })
-  if (!user.emailVerified) return res.status(403).json({ success: false, code: 'EMAIL_NOT_VERIFIED', error: 'Please verify your email before signing in' })
+  if (process.env.REQUIRE_EMAIL_VERIFICATION === 'true' && user.emailVerified === false) {
+    return res.status(403).json({ success: false, code: 'EMAIL_NOT_VERIFIED', error: 'Please verify your email before signing in' })
+  }
   if (user.twoFactorEnabled) {
     const jwtModule = await import('jsonwebtoken')
     const jwt = (jwtModule.default || jwtModule) as any
@@ -1100,33 +1139,50 @@ async function handleAuthSignup(req: VercelRequest, res: VercelResponse) {
   const { name, email, password, company } = req.body || {}
   if (!name || !email || !password) return res.status(400).json({ error: 'Name, email, and password are required' })
   if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' })
-  await ensureIndexes()
+  ensureIndexes().catch(() => {})
   const users = await mongoCollection('users')
   const normalizedEmail = cleanEmail(email)
   const existing = await users.findOne({ email: normalizedEmail })
   if (existing?.passwordHash) return res.status(409).json({ error: 'An account with this email already exists' })
   const now = new Date()
-  const passwordHash = await bcrypt.hash(password, 12)
-  const user = existing || (await users.insertOne({
+  const passwordHash = await bcrypt.hash(password, 10)
+  const isVerificationRequired = process.env.REQUIRE_EMAIL_VERIFICATION === 'true'
+  const isAutoVerified = !isVerificationRequired
+  const insertResult = await users.insertOne({
     email: normalizedEmail,
     name,
     displayName: name,
     company: company || '',
     passwordHash,
     role: normalizedEmail === process.env.ADMIN_EMAIL ? 'admin' : 'user',
-    emailVerified: false,
+    emailVerified: isAutoVerified,
     providers: ['email'],
     createdAt: now,
     updatedAt: now,
-  })).insertedId
+  })
+  const user = existing || insertResult.insertedId
   if (existing) {
-    await users.updateOne({ _id: existing._id }, { $set: { name, displayName: name, company: company || '', passwordHash, updatedAt: now }, $addToSet: { providers: 'email' } })
+    await users.updateOne({ _id: existing._id }, { $set: { name, displayName: name, company: company || '', passwordHash, emailVerified: isAutoVerified, updatedAt: now }, $addToSet: { providers: 'email' } })
   }
   const saved = existing ? await users.findOne({ _id: existing._id }) : await users.findOne({ _id: user })
-  await createVerificationEmail(saved)
-  await sendOtp(normalizedEmail, 'registration')
+  if (!saved) return res.status(500).json({ error: 'Failed to create user account' })
+
+  // Send verification email & OTP asynchronously in background without blocking response
+  Promise.allSettled([
+    createVerificationEmail(saved),
+    sendOtp(normalizedEmail, 'registration')
+  ]).catch(err => console.warn('Non-fatal registration email warning:', err))
+
   await upsertProfile(saved, { name, displayName: name, company })
-  return res.status(201).json({ success: true, user: publicUser(saved), message: 'Account created. Check your email to verify your account.' })
+  await createSession(res, saved, req)
+
+  return res.status(201).json({
+    success: true,
+    user: publicUser(saved),
+    message: isAutoVerified
+      ? 'Account created successfully.'
+      : 'Account created. Check your email to verify your account.'
+  })
 }
 
 async function handleAuthMe(req: VercelRequest, res: VercelResponse) {
@@ -1749,7 +1805,7 @@ function generateEmployeeCredentials(name: string, email?: string, username?: st
 }
 
 async function createEmployeeAccess(employee: any, options: { email?: string; username?: string; password?: string; role?: string } = {}) {
-  await ensureIndexes()
+  ensureIndexes().catch(() => {})
   const users = await mongoCollection('users')
   const profiles = await mongoCollection('profiles')
   const credentials = generateEmployeeCredentials(employee.name, options.email || employee.email, options.username, options.password)
@@ -1848,7 +1904,7 @@ async function resolveEmployeeForUser(user: any) {
 }
 
 async function getEmployeePortalData(user: any) {
-  await ensureIndexes()
+  ensureIndexes().catch(() => {})
   const employee = await resolveEmployeeForUser(user)
   const attendanceCol = await mongoCollection('employee_attendance')
   const leavesCol = await mongoCollection('hrm_leave_requests')
@@ -3652,7 +3708,7 @@ async function fetchGithubUser(code: string, redirectUri: string) {
 }
 
 async function linkOAuthUser(provider: 'google' | 'github', oauthUser: any) {
-  await ensureIndexes()
+  ensureIndexes().catch(() => {})
   const users = await mongoCollection('users')
   const accounts = await mongoCollection('oauth_accounts')
   const now = new Date()
