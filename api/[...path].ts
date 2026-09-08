@@ -395,7 +395,8 @@ async function createSession(res: VercelResponse, user: any, req?: VercelRequest
     userAgent: req?.headers['user-agent'] || '',
     ip: req?.headers['x-forwarded-for']?.toString().split(',')[0] || '',
   })
-  await logActivity(String(user._id), 'login', parseUserAgent(String(req?.headers['user-agent'] || '')), req)
+  // Non-blocking activity log — don't delay the response for audit logging
+  logActivity(String(user._id), 'login', parseUserAgent(String(req?.headers['user-agent'] || '')), req).catch(() => {})
   setSessionCookie(res, sessionId)
   return { sessionId, expiresAt }
 }
@@ -1167,13 +1168,13 @@ async function handleAuthSignup(req: VercelRequest, res: VercelResponse) {
   const saved = existing ? await users.findOne({ _id: existing._id }) : await users.findOne({ _id: user })
   if (!saved) return res.status(500).json({ error: 'Failed to create user account' })
 
-  // Send verification email & OTP asynchronously in background without blocking response
+  // All background work: emails + profile upsert — non-blocking
   Promise.allSettled([
     createVerificationEmail(saved),
-    sendOtp(normalizedEmail, 'registration')
-  ]).catch(err => console.warn('Non-fatal registration email warning:', err))
+    sendOtp(normalizedEmail, 'registration'),
+    upsertProfile(saved, { name, displayName: name, company }),
+  ]).catch(err => console.warn('Non-fatal registration background warning:', err))
 
-  await upsertProfile(saved, { name, displayName: name, company })
   await createSession(res, saved, req)
 
   return res.status(201).json({
