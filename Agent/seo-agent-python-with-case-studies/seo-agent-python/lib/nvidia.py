@@ -60,22 +60,18 @@ def _get_progress_callback():
     return getattr(_thread_state, "on_progress", None)
 
 
-WRITER_MODEL = os.environ.get("NVIDIA_MODEL_WRITER", "meta/llama-4-maverick-17b-128e-instruct")
-FAST_MODEL = os.environ.get("NVIDIA_MODEL_FAST", "nvidia/llama-3.3-nemotron-super-49b-v1")
+WRITER_MODEL = os.environ.get("NVIDIA_MODEL_WRITER", "meta/llama-3.2-11b-vision-instruct")
+FAST_MODEL = os.environ.get("NVIDIA_MODEL_FAST", "nvidia/nemotron-3.5-lightning-30b-a3b")
 
-# Ordered fallback chain. Whatever model a call starts on, if it 404s (not
-# entitled on this account) or exhausts its retries, we drop to the next
-# entry here that hasn't been tried yet. Override with a comma-separated
-# NVIDIA_MODEL_CHAIN env var if you want a different order/set.
-# meta/llama-3.1-70b-instruct is kept in the chain since it's the one that
-# was actually confirmed working for you; meta/llama-3.2-1b-instruct stays
-# as the final, low-quality, last-resort fallback.
-# NOTE: NVIDIA's free catalog changes — models get deprecated/added with
-# little notice. If something in this chain stops working, swap it via
-# NVIDIA_MODEL_CHAIN rather than editing this file.
+# Ordered fallback chain of verified active models on NVIDIA NIM.
+# meta/llama-3.2-11b-vision-instruct: primary fast & high-accuracy writer
+# nvidia/nemotron-3.5-lightning-30b-a3b: ultra-fast completion
+# nvidia/nemotron-3-nano-omni-30b-a3b-reasoning: deep reasoning & SEO strategy
+# openai/gpt-oss-20b: alternative high-performance open model
+# meta/muse-glimmer-30b: creative long-form fallback
 _default_chain = os.environ.get(
     "NVIDIA_MODEL_CHAIN",
-    f"{WRITER_MODEL},{FAST_MODEL},meta/llama-3.1-70b-instruct,meta/llama-3.2-1b-instruct",
+    f"{WRITER_MODEL},{FAST_MODEL},nvidia/nemotron-3-nano-omni-30b-a3b-reasoning,openai/gpt-oss-20b,meta/muse-glimmer-30b",
 )
 MODEL_CHAIN = [m.strip() for m in _default_chain.split(",") if m.strip()]
 
@@ -138,9 +134,9 @@ def _is_retryable(status, code):
 
 
 def _is_not_entitled(status, _code):
-    # "Function not found" style 404s mean the model isn't deployed/entitled
-    # for this account/key — retrying the same model will never help.
-    return status == 404
+    # 404 = model not entitled on this account; 410 = model EOL/deprecated.
+    # Neither will ever succeed on retry — skip to the next model immediately.
+    return status in (404, 410)
 
 
 def _build_chain(requested_model):

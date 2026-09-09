@@ -9,31 +9,34 @@ def load_env(path=None):
     os.environ, without overriding any value already set in the real
     environment.
     """
-    if path is None:
-        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        path = os.path.join(root, ".env")
+    agent_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    repo_root = os.path.abspath(os.path.join(agent_root, "..", "..", ".."))
 
-    if not os.path.exists(path):
-        set_default_frontend_outputs()
-        return
+    candidate_paths = [
+        path if path else os.path.join(agent_root, ".env"),
+        os.path.join(repo_root, ".env"),
+    ]
 
-    with open(path, "r", encoding="utf-8") as f:
-        for raw_line in f:
-            line = raw_line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            key, _, value = line.partition("=")
-            key = key.strip()
-            value = value.strip()
-            if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
-                value = value[1:-1]
-            if value == "":
-                # An empty RHS (e.g. "SCHEDULE_HOUR=") means "not set" here,
-                # not "set to empty string" — otherwise os.environ.get(key,
-                # "6")-style defaults elsewhere in the codebase never kick
-                # in, because the key exists with value "".
-                continue
-            os.environ.setdefault(key, value)
+    for p in candidate_paths:
+        if not p or not os.path.exists(p):
+            continue
+        with open(p, "r", encoding="utf-8") as f:
+            for raw_line in f:
+                line = raw_line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, _, value = line.partition("=")
+                key = key.strip()
+                value = value.strip()
+                if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
+                    value = value[1:-1]
+                if value == "":
+                    continue
+                os.environ.setdefault(key, value)
+
+    # Alias VITE_NVIDIA_API_KEY to NVIDIA_API_KEY if not explicitly set
+    if "NVIDIA_API_KEY" not in os.environ and "VITE_NVIDIA_API_KEY" in os.environ:
+        os.environ["NVIDIA_API_KEY"] = os.environ["VITE_NVIDIA_API_KEY"]
 
     set_default_frontend_outputs()
 
