@@ -76,6 +76,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     repository: HMorixRepository,
+    onNavigateToProjects: () -> Unit,
+    onNavigateToTickets: () -> Unit,
     onNavigateToBilling: () -> Unit,
     onNavigateToAgent: () -> Unit,
     onNavigateToServices: () -> Unit,
@@ -149,7 +151,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Enterprise AI software, BillingFlow automated GST invoicing, autonomous agents, and digital transformation engineered by Harsh Sharma.",
+                        text = "Enterprise AI software, real-time project milestone tracking, BillingFlow GST invoicing, and 24/7 client support desk.",
                         color = TextMuted,
                         fontSize = 13.sp,
                         lineHeight = 19.sp
@@ -157,12 +159,13 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Row 1 of Action Buttons: Projects & Tickets
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Button(
-                            onClick = onNavigateToBilling,
+                            onClick = onNavigateToProjects,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = LimePrimary,
                                 contentColor = ObsidianBackground
@@ -171,12 +174,48 @@ fun HomeScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.DateRange,
+                                imageVector = Icons.Default.CheckCircle,
                                 contentDescription = null,
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("BillingFlow", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            Text("Projects", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        }
+
+                        Button(
+                            onClick = onNavigateToTickets,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF222227),
+                                contentColor = TextCream
+                            ),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, ObsidianBorder),
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = null,
+                                tint = LimePrimary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Raise Ticket", color = TextCream, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Row 2 of Action Buttons: Billing & AI Agent
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = onNavigateToBilling,
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Billing & Pricing", color = LimePrimary, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
                         }
 
                         OutlinedButton(
@@ -191,10 +230,10 @@ fun HomeScreen(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = null,
                                 tint = LimePrimary,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(14.dp)
                             )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text("AI Agent", color = TextCream, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("AI Agent", color = TextCream, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
                         }
                     }
                 }

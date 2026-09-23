@@ -223,6 +223,90 @@ export const publicSitemapSections: SitemapSection[] = [
         label: "Technical Architecture"
       },
       {
+        to: "/blog/complete-guide-to-local-seo-and-geo-targeting-hathras",
+        label: "Complete Local SEO & GEO-Targeting Guide for Hathras Businesses (2026): Rank #1 Everywhere"
+      },
+      {
+        to: "/blog/website-redesign-speed-optimization-services-hathras",
+        label: "Website Redesign & Speed Optimization Services in Hathras (2026): Sub-Second React Upgrades"
+      },
+      {
+        to: "/blog/hotel-restaurant-pos-billing-online-ordering-system-hathras",
+        label: "Restaurant POS, QR Code Ordering & Hotel Software in Hathras & Braj (2026)"
+      },
+      {
+        to: "/blog/real-estate-property-listing-portal-development-hathras",
+        label: "Real Estate & Builder Portal Website Development in Hathras (2026): Plots, Colonies & Villas"
+      },
+      {
+        to: "/blog/hospital-clinic-pharmacy-software-development-hathras",
+        label: "Hospital, Clinic & Pharmacy Management Software in Hathras (2026): OPD, E-Prescriptions & Billing"
+      },
+      {
+        to: "/blog/school-college-coaching-management-software-hathras",
+        label: "School, College & Coaching ERP Software in Hathras: Automated Fees, Attendance & Exams (2026)"
+      },
+      {
+        to: "/blog/custom-crm-software-for-wholesalers-dealers-hathras",
+        label: "Custom CRM & Dealer Management Software for Hathras Wholesalers & Distributors (2026)"
+      },
+      {
+        to: "/blog/billingflow-gst-invoicing-software-for-hathras-traders",
+        label: "BillingFlow: The Best GST Invoicing & Billing Software for Hathras Traders (2026)"
+      },
+      {
+        to: "/blog/cold-storage-management-software-erp-sadabad-hathras",
+        label: "Cold Storage ERP Software in Sadabad & Hathras: Automated Gate Passes, Lots & WhatsApp Slips"
+      },
+      {
+        to: "/blog/hathras-industrial-area-factory-automation-software",
+        label: "Factory Automation & Industrial Software in Hathras Industrial Area & Sasni (2026)"
+      },
+      {
+        to: "/blog/best-digital-marketing-agency-in-hathras-seo-ppc",
+        label: "Best Digital Marketing Agency in Hathras (2026): Google Ads PPC, Local SEO & Growth"
+      },
+      {
+        to: "/blog/whatsapp-ai-chatbot-business-automation-hathras",
+        label: "WhatsApp AI Chatbot & Business Automation in Hathras: 24/7 Sales, Orders & GST Billing"
+      },
+      {
+        to: "/blog/best-android-app-development-company-hathras",
+        label: "Best Android App Development Company in Hathras (2026): Custom APKs, Kotlin & Mobile Systems"
+      },
+      {
+        to: "/blog/top-ecommerce-website-development-company-hathras",
+        label: "Top E-Commerce Website Development Company in Hathras (2026 Guide): Custom Online Stores That Convert"
+      },
+      {
+        to: "/blog/how-to-rank-google-business-profile-in-hathras-local-seo-guide",
+        label: "How to Rank #1 on Google Business Profile in Hathras (2026 Local SEO & 3-Pack Blueprint)"
+      },
+      {
+        to: "/blog/ai-automation-ai-workflows-integration-company-hathras",
+        label: "AI Automation & Workflow Integration in Hathras: Enterprise Multi-Agent Systems by HMorix"
+      },
+      {
+        to: "/blog/best-software-development-custom-erp-crm-company-hathras",
+        label: "Custom Software Development, ERP & CRM in Hathras: Modernizing Hathras Businesses with HMorix"
+      },
+      {
+        to: "/blog/best-web-development-company-in-hathras-2026-guide",
+        label: "Best Web Development & Website Design Company in Hathras (2026 Guide): Why HMorix Leads Local Search"
+      },
+      {
+        to: "/blog/why-hmorix-orixmh-is-the-leading-tech-brand-in-braj-region",
+        label: "What is HMorix (orixmh)? The Definitive Brand & Technology Partner in Hathras, Mathura, Agra & Vrindavan"
+      },
+      {
+        to: "/blog/best-app-development-ai-agent-company-hathras-up",
+        label: "Best App Development & AI Agent Company in Hathras, Aligarh & Mathura: How HMorix is Transforming Business Automation"
+      },
+      {
+        to: "/blog/top-digital-marketing-web-development-companies-hathras",
+        label: "Top Digital Marketing & Web Development Companies in Hathras (2026 Comparison): Why HMorix Ranks #1"
+      },
+      {
         to: "/blog/custom-ai-vs-off-the-shelf-for-enterprises",
         label: "Custom AI Solutions vs Off-the-Shelf AI for Enterprises: Strategic Alignment and Innovation"
       },
@@ -237,6 +321,18 @@ export const publicSitemapSections: SitemapSection[] = [
       {
         to: "/blog/billingflow-invoicing-simplification",
         label: "5 Ways HMorix's BillingFlow Simplifies Invoicing with AI-Driven Proactive Payment Strategies"
+      },
+      {
+        to: "/case-studies/hathras-manufacturing-digital-transformation",
+        label: "How a Hathras Manufacturing Enterprise Scaled Operations with HMorix Custom ERP, BillingFlow & Web Platform"
+      },
+      {
+        to: "/case-studies/mathura-vrindavan-hospitality-ai-automation",
+        label: "Automating Hotel Bookings & 24/7 Guest Support in Mathura & Vrindavan with HMorix AI Agents & BillingFlow"
+      },
+      {
+        to: "/case-studies/agra-export-ecommerce-seo-domination",
+        label: "Ranking #1 on Google: How an Agra Export Brand Reached Global Buyers with HMorix SEO & Web Engineering"
       }
     ]
   },

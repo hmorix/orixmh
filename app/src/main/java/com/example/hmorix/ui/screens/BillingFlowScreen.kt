@@ -3,6 +3,8 @@ package com.example.hmorix.ui.screens
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,6 +31,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
@@ -46,10 +49,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -91,9 +99,12 @@ fun BillingFlowScreen(repository: HMorixRepository) {
     val context = LocalContext.current
     val invoices by repository.invoices.collectAsState()
 
+    var selectedTopTab by remember { mutableIntStateOf(0) } // 0: Invoices & GST, 1: SaaS Pricing Plans
     var selectedStatusFilter by remember { mutableStateOf<InvoiceStatus?>(null) }
     var viewingInvoice by remember { mutableStateOf<Invoice?>(null) }
     var isEditingNewInvoice by remember { mutableStateOf(false) }
+
+    val pricingPlans = remember { repository.getPricingPlans() }
 
     val filteredInvoices = remember(invoices, selectedStatusFilter) {
         if (selectedStatusFilter == null) invoices else invoices.filter { it.status == selectedStatusFilter }
@@ -127,35 +138,50 @@ fun BillingFlowScreen(repository: HMorixRepository) {
                     ) {
                         BrandBadge("BILLINGFLOW.HMORIX.IN")
 
-                        Button(
-                            onClick = { isEditingNewInvoice = true },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = LimePrimary,
-                                contentColor = ObsidianBackground
-                            ),
-                            shape = RoundedCornerShape(8.dp),
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("New Invoice", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        if (selectedTopTab == 0) {
+                            Button(
+                                onClick = { isEditingNewInvoice = true },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = LimePrimary,
+                                    contentColor = ObsidianBackground
+                                ),
+                                shape = RoundedCornerShape(8.dp),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("New Invoice", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            }
+                        } else {
+                            OutlinedButton(
+                                onClick = {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://hmorix.in/account/billing"))
+                                    context.startActivity(intent)
+                                },
+                                shape = RoundedCornerShape(8.dp),
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
+                            ) {
+                                Icon(Icons.Default.Share, contentDescription = null, tint = LimePrimary, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Web Checkout", color = LimePrimary, fontSize = 11.sp)
+                            }
                         }
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = "BillingFlow Platform",
+                        text = "BillingFlow & Enterprise Pricing",
                         color = TextCream,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Automated GST compliance, multi-currency invoicing, instant PDF exports, and payment tracking for modern enterprises.",
+                        text = "Automated GST compliance, multi-currency invoicing, instant PDF exports, and flexible SaaS enterprise tiers.",
                         color = TextMuted,
                         fontSize = 12.sp,
                         lineHeight = 17.sp
@@ -164,54 +190,67 @@ fun BillingFlowScreen(repository: HMorixRepository) {
             }
         }
 
-        // Metrics summary
+        // Top Navigation Tabs
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            TabRow(
+                selectedTabIndex = selectedTopTab,
+                containerColor = ObsidianCard,
+                contentColor = LimePrimary,
+                indicator = { tabPositions ->
+                    TabRowDefaults.SecondaryIndicator(
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTopTab]),
+                        color = LimePrimary
+                    )
+                }
             ) {
-                MetricCard(
-                    title = "Total Billed",
-                    value = "₹" + String.format(Locale.US, "%,.0f", totalBilled),
-                    subtitle = "${invoices.size} invoices total",
-                    accentColor = TextCream,
-                    modifier = Modifier.weight(1f)
+                Tab(
+                    selected = selectedTopTab == 0,
+                    onClick = { selectedTopTab = 0 },
+                    text = { Text("Invoices & GST (${invoices.size})", fontSize = 13.sp, fontWeight = FontWeight.SemiBold) }
                 )
-                MetricCard(
-                    title = "Paid Collected",
-                    value = "₹" + String.format(Locale.US, "%,.0f", totalPaid),
-                    subtitle = "Settled via UPI/NEFT",
-                    accentColor = AccentGreen,
-                    modifier = Modifier.weight(1f)
+                Tab(
+                    selected = selectedTopTab == 1,
+                    onClick = { selectedTopTab = 1 },
+                    text = { Text("SaaS Pricing Plans", fontSize = 13.sp, fontWeight = FontWeight.SemiBold) }
                 )
             }
         }
 
-        // Status Filter Chips
-        item {
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                item {
-                    FilterChip(
-                        selected = selectedStatusFilter == null,
-                        onClick = { selectedStatusFilter = null },
-                        label = { Text("All (${invoices.size})") },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = LimePrimary,
-                            selectedLabelColor = ObsidianBackground,
-                            containerColor = ObsidianCard,
-                            labelColor = TextCream
-                        )
+        // TAB 0: INVOICES & GST
+        if (selectedTopTab == 0) {
+            // Metrics summary
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    MetricCard(
+                        title = "Total Billed",
+                        value = "₹" + String.format(Locale.US, "%,.0f", totalBilled),
+                        subtitle = "${invoices.size} invoices total",
+                        accentColor = TextCream,
+                        modifier = Modifier.weight(1f)
+                    )
+                    MetricCard(
+                        title = "Paid Collected",
+                        value = "₹" + String.format(Locale.US, "%,.0f", totalPaid),
+                        subtitle = "Settled via UPI/NEFT",
+                        accentColor = AccentGreen,
+                        modifier = Modifier.weight(1f)
                     )
                 }
-                InvoiceStatus.values().forEach { status ->
-                    val count = invoices.count { it.status == status }
+            }
+
+            // Status Filter Chips
+            item {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     item {
                         FilterChip(
-                            selected = selectedStatusFilter == status,
-                            onClick = { selectedStatusFilter = if (selectedStatusFilter == status) null else status },
-                            label = { Text("${status.name} ($count)") },
+                            selected = selectedStatusFilter == null,
+                            onClick = { selectedStatusFilter = null },
+                            label = { Text("All (${invoices.size})") },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = LimePrimary,
                                 selectedLabelColor = ObsidianBackground,
@@ -220,43 +259,109 @@ fun BillingFlowScreen(repository: HMorixRepository) {
                             )
                         )
                     }
+                    InvoiceStatus.values().forEach { status ->
+                        val count = invoices.count { it.status == status }
+                        item {
+                            FilterChip(
+                                selected = selectedStatusFilter == status,
+                                onClick = { selectedStatusFilter = if (selectedStatusFilter == status) null else status },
+                                label = { Text("${status.name} ($count)") },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = LimePrimary,
+                                    selectedLabelColor = ObsidianBackground,
+                                    containerColor = ObsidianCard,
+                                    labelColor = TextCream
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Invoices List
+            if (filteredInvoices.isEmpty()) {
+                item {
+                    GlassCard(modifier = Modifier.fillMaxWidth()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = null,
+                                tint = TextSubtle,
+                                modifier = Modifier.size(40.dp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "No invoices found for this filter",
+                                color = TextMuted,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                }
+            } else {
+                items(filteredInvoices, key = { it.id }) { invoice ->
+                    InvoiceCard(
+                        invoice = invoice,
+                        onView = { viewingInvoice = invoice },
+                        onMarkStatus = { newStatus -> repository.markInvoiceStatus(invoice.id, newStatus) },
+                        onDelete = { repository.deleteInvoice(invoice.id) }
+                    )
                 }
             }
         }
 
-        // Invoices List
-        if (filteredInvoices.isEmpty()) {
+        // TAB 1: SAAS PRICING PLANS
+        if (selectedTopTab == 1) {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    MetricCard(
+                        title = "GST Compliance",
+                        value = "18% GST",
+                        subtitle = "Standard CGST + SGST",
+                        accentColor = LimePrimary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    MetricCard(
+                        title = "Payment Gateways",
+                        value = "UPI & Wire",
+                        subtitle = "Instant Webhook Sync",
+                        accentColor = AccentCyan,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            items(pricingPlans) { plan ->
+                PricingPlanCard(
+                    plan = plan,
+                    onSelect = {
+                        Toast.makeText(context, "Selected ${plan.name} - Opening HMorix Checkout", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://hmorix.in/account/billing"))
+                        context.startActivity(intent)
+                    }
+                )
+            }
+
             item {
                 GlassCard(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.DateRange,
-                            contentDescription = null,
-                            tint = TextSubtle,
-                            modifier = Modifier.size(40.dp)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Indian Statutory GST & Tax Exemption", color = TextCream, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                         Text(
-                            text = "No invoices found for this filter",
+                            text = "All invoice amounts are displayed exclusive of 18% Goods & Services Tax (GST). Indian registered GSTIN entities receive full input tax credit (ITC). International USD clients are processed under export reverse charge.",
                             color = TextMuted,
-                            fontSize = 14.sp
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp
                         )
                     }
                 }
-            }
-        } else {
-            items(filteredInvoices, key = { it.id }) { invoice ->
-                InvoiceCard(
-                    invoice = invoice,
-                    onView = { viewingInvoice = invoice },
-                    onMarkStatus = { newStatus -> repository.markInvoiceStatus(invoice.id, newStatus) },
-                    onDelete = { repository.deleteInvoice(invoice.id) }
-                )
             }
         }
 
@@ -1032,4 +1137,123 @@ fun NewInvoiceDialog(
             }
         }
     )
+}
+
+@Composable
+fun PricingPlanCard(
+    plan: com.example.hmorix.model.PricingPlan,
+    onSelect: () -> Unit
+) {
+    val borderColor = if (plan.isPopular) LimePrimary else ObsidianBorder
+    val borderWidth = if (plan.isPopular) 1.5.dp else 1.dp
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(ObsidianCard)
+            .border(borderWidth, borderColor, RoundedCornerShape(16.dp))
+            .padding(16.dp)
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = plan.name,
+                        color = TextCream,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = plan.tag,
+                        color = if (plan.isPopular) LimePrimary else TextSubtle,
+                        fontSize = 10.sp,
+                        fontFamily = FontFamily.Monospace,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.5.sp
+                    )
+                }
+
+                if (plan.isPopular) {
+                    BrandBadge("MOST POPULAR")
+                }
+            }
+
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = plan.priceInr,
+                    color = LimePrimary,
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Black,
+                    fontFamily = FontFamily.Monospace
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = "(${plan.priceUsd}) / ${plan.billingPeriod}",
+                    color = TextMuted,
+                    fontSize = 11.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+            }
+
+            Text(
+                text = plan.description,
+                color = TextMuted,
+                fontSize = 12.sp,
+                lineHeight = 16.sp
+            )
+
+            HorizontalDivider(color = ObsidianBorder, thickness = 0.8.dp)
+
+            Text(
+                text = "INCLUDED ENTERPRISE CAPABILITIES",
+                color = TextSubtle,
+                fontSize = 10.sp,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold
+            )
+
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                plan.features.forEach { feat ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = if (plan.isPopular) LimePrimary else AccentGreen,
+                            modifier = Modifier.size(15.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = feat,
+                            color = TextCream,
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Button(
+                onClick = onSelect,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (plan.isPopular) LimePrimary else Color(0xFF222227),
+                    contentColor = if (plan.isPopular) ObsidianBackground else TextCream
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = if (plan.isPopular) "Upgrade to Growth" else "Select ${plan.name}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp
+                )
+            }
+        }
+    }
 }

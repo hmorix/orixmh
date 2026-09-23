@@ -37,6 +37,69 @@ data class Invoice(
     val currencySymbol: String get() = if (currency == "INR") "₹" else "$"
 }
 
+data class User(
+    val id: String,
+    val email: String,
+    val name: String,
+    val role: String = "user",
+    val company: String = "",
+    val avatarUrl: String = "",
+    val emailVerified: Boolean = true,
+    val twoFactorEnabled: Boolean = false,
+    val provider: String = "email"
+)
+
+data class AuthResult(
+    val success: Boolean,
+    val user: User? = null,
+    val token: String? = null,
+    val sessionCookie: String? = null,
+    val error: String? = null,
+    val require2fa: Boolean = false,
+    val tempToken: String? = null
+)
+
+data class ProjectItem(
+    val id: String,
+    val name: String,
+    val clientName: String,
+    val clientEmail: String = "",
+    val status: String = "in_progress", // planning, active, in_progress, completed
+    val progress: Int = 0, // 0 to 100
+    val budget: Double = 0.0,
+    val currency: String = "INR",
+    val deadline: String = "",
+    val services: List<String> = emptyList(),
+    val description: String = "",
+    val assignedTeamName: String = "HMorix Core Engineering"
+)
+
+data class SupportTicket(
+    val id: String,
+    val number: String,
+    val subject: String,
+    val description: String,
+    val priority: String = "medium", // low, medium, high, urgent
+    val status: String = "open", // open, in_progress, resolved, closed
+    val clientEmail: String = "",
+    val clientName: String = "",
+    val projectName: String = "",
+    val createdAt: String = "Recently",
+    val updatedAt: String = "Recently"
+)
+
+data class PricingPlan(
+    val id: String,
+    val name: String,
+    val tag: String,
+    val priceInr: String,
+    val priceUsd: String,
+    val billingPeriod: String,
+    val description: String,
+    val isPopular: Boolean = false,
+    val features: List<String>
+)
+
 data class CaseMetric(
     val label: String,
     val value: String
