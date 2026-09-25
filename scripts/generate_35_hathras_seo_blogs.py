@@ -907,7 +907,7 @@ articles_data = [
         "sec2_title": "2. Next.js Architecture vs. WordPress Comparison",
         "card1_t": "Sub-500ms Edge Loading", "card1_d": "Next.js pre-renders static HTML and hydrates instantly via global CDN edge networks.",
         "card2_t": "Zero Plugin Dependency", "card2_d": "Clean custom React code eliminates security vulnerabilities and monthly plugin subscription fees.",
-        "card3_t": "Perfect 98+ Lighthouse Scores", "card3_d": "Flawless Largest Contentful Paint (LCP < 0.8s) and zero Cumulative Layout Shift (CLS = 0.00).",
+        "card3_t": "Perfect 98+ Lighthouse Scores", "card3_d": "Flawless Largest Contentful Paint (LCP under 0.8s) and zero Cumulative Layout Shift (CLS = 0.00).",
         "card4_t": "Native Modern API Bridges", "card4_d": "Seamless integration with MongoDB Atlas, BillingFlow GST billing, and WhatsApp Business APIs.",
         "faq1_q": "Can HMorix migrate our existing WordPress site in Hathras to Next.js without losing content?",
         "faq1_a": "Yes! We extract your blog articles, images, and product catalogs, recreating them within a high-speed Next.js frontend with 100% 301 URL redirect preservation.",

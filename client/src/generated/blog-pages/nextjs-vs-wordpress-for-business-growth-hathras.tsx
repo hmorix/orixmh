@@ -188,7 +188,7 @@ export default function NextjsVsWordpressPost() {
               <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[8px]">
                 <Shield className="text-[#C8FF00] mb-3" size={24} />
                 <h3 className="font-display font-bold text-cream mb-2">Perfect 98+ Lighthouse Scores</h3>
-                <p className="text-xs text-cream/50 leading-relaxed">Flawless Largest Contentful Paint (LCP < 0.8s) and zero Cumulative Layout Shift (CLS = 0.00).</p>
+                <p className="text-xs text-cream/50 leading-relaxed">Flawless Largest Contentful Paint (LCP under 0.8s) and zero Cumulative Layout Shift (CLS = 0.00).</p>
               </div>
               <div className="p-6 bg-obsidian-2 border border-glass-border rounded-[8px]">
                 <BarChart3 className="text-[#C8FF00] mb-3" size={24} />
