@@ -223,6 +223,146 @@ export const publicSitemapSections: SitemapSection[] = [
         label: "Technical Architecture"
       },
       {
+        to: "/blog/harsh-sharma-tech-ecosystem-vision-hathras",
+        label: "Harsh Sharma & HMorix: Building Hathras into Uttar Pradesh’s Premier Tech Innovation Hub"
+      },
+      {
+        to: "/blog/nextjs-vs-wordpress-for-business-growth-hathras",
+        label: "Next.js vs. WordPress for Hathras Businesses: Why Speed Determines Your Google Rank"
+      },
+      {
+        to: "/blog/answer-engine-optimization-aeo-guide-hathras",
+        label: "Answer Engine Optimization (AEO) for Hathras Businesses: Get Cited by ChatGPT & Perplexity"
+      },
+      {
+        to: "/blog/how-to-fix-suspended-google-business-profile-hathras",
+        label: "How to Fix or Reinstate a Suspended Google Business Profile in Hathras (2026 Guide)"
+      },
+      {
+        to: "/blog/google-maps-citation-audit-guide-hathras",
+        label: "Google Maps Local Citation Audit & NAP Cleanup Blueprint for Hathras Businesses"
+      },
+      {
+        to: "/blog/b2b-industrial-ecommerce-portal-western-up",
+        label: "B2B Industrial E-Commerce Marketplace Development in Western UP (2026)"
+      },
+      {
+        to: "/blog/braj-region-pilgrimage-travel-tour-portal-development",
+        label: "Braj 84 Kos Yatra, Travel & Tour Package Booking Portal Development (2026)"
+      },
+      {
+        to: "/blog/agra-footwear-leather-manufacturing-software",
+        label: "Footwear & Leather Manufacturing ERP Software in Agra & Hathras (2026)"
+      },
+      {
+        to: "/blog/aligarh-lock-hardware-export-portal-development",
+        label: "Aligarh Lock & Hardware Export Web Portal Development: Reaching Global Buyers"
+      },
+      {
+        to: "/blog/mathura-vrindavan-hotel-resort-booking-website-development",
+        label: "Hotel, Resort & Ashram Booking Website Development in Mathura & Vrindavan (2026)"
+      },
+      {
+        to: "/blog/pharmacy-chemist-inventory-gst-billing-software-hathras",
+        label: "Pharmacy & Chemist Wholesale/Retail GST Software in Hathras: Batch & Expiry (2026)"
+      },
+      {
+        to: "/blog/pathology-lab-diagnostic-reporting-software-hathras",
+        label: "Pathology Lab & Diagnostic Center Reporting Software in Hathras (2026)"
+      },
+      {
+        to: "/blog/cold-chain-dairy-milk-collection-software-hathras",
+        label: "Dairy, Milk Chilling Center & Cattle Feed ERP Software in Hathras & Mursan (2026)"
+      },
+      {
+        to: "/blog/textile-garment-wholesale-billing-software-hathras",
+        label: "Textile & Garment Wholesale Billing Software in Sikandra Rao & Hathras (2026)"
+      },
+      {
+        to: "/blog/automobile-dealership-garage-pos-software-hathras",
+        label: "Automobile Dealership & 2-Wheeler Garage POS Billing Software in Hathras (2026)"
+      },
+      {
+        to: "/blog/transport-fleet-logistics-software-hathras",
+        label: "Transport, Truck Fleet & Logistics ERP Software in Hathras (2026)"
+      },
+      {
+        to: "/blog/jewelry-showroom-gold-billing-software-hathras",
+        label: "Jewelry Showroom & Gold/Silver Billing Software in Hathras City (2026)"
+      },
+      {
+        to: "/blog/brick-kiln-management-software-bhatta-erp-hathras",
+        label: "Brick Kiln (Int-Bhatta) Management Software in Hathras & Sadabad (2026)"
+      },
+      {
+        to: "/blog/hardware-brassware-manufacturing-erp-sasni-hathras",
+        label: "Hardware & Brassware Manufacturing ERP in Sasni & Hathras: Shop Floor to Dispatch"
+      },
+      {
+        to: "/blog/asafoetida-hing-spice-export-website-hathras",
+        label: "E-Commerce & Export Website Development for Hathras Hing (Asafoetida) & Spices (2026)"
+      },
+      {
+        to: "/blog/custom-llm-fine-tuning-private-cloud-hathras",
+        label: "Private Cloud LLM Deployment & Custom AI Fine-Tuning in Hathras: Zero Data Leakage"
+      },
+      {
+        to: "/blog/ai-lead-generation-automated-crm-hathras",
+        label: "AI Lead Generation & Automated CRM Synchronization for B2B Hathras Traders (2026)"
+      },
+      {
+        to: "/blog/voice-ai-assistant-customer-support-hathras",
+        label: "Voice AI Assistants & Call Automation in Hathras: Hindi & English Conversational Agents"
+      },
+      {
+        to: "/blog/pdf-automation-invoice-data-extraction-hathras",
+        label: "PDF Automation & Intelligent Data Extraction Software in Hathras (2026)"
+      },
+      {
+        to: "/blog/enterprise-ai-agent-platform-deployment-hathras",
+        label: "Enterprise AI Agent Platform Deployment in Hathras: Automating Daily Workflows with Llama 3.1"
+      },
+      {
+        to: "/blog/nexa-solutions-vs-hmorix-hathras-manufacturers",
+        label: "Nexa Solutions vs. HMorix for Hathras Manufacturers: Full-Stack vs. Outdated Agency Sites"
+      },
+      {
+        to: "/blog/somskilltech-vs-hmorix-chatbot-software-hathras",
+        label: "SomSkillTech vs. HMorix: True Multi-Agent AI Systems vs. Generic Chatbot Templates"
+      },
+      {
+        to: "/blog/devzuno-vs-hmorix-ai-automation-comparison",
+        label: "Devzuno Technologies vs. HMorix (2026 Comparison): Enterprise AI & Real Architecture"
+      },
+      {
+        to: "/blog/top-software-companies-in-western-up-ranking",
+        label: "Top Software Companies in Western UP (2026 Ranking): Hathras, Aligarh, Agra & Mathura"
+      },
+      {
+        to: "/blog/hmorix-vs-freelancers-web-development-hathras",
+        label: "HMorix vs. Local Freelancers in Hathras: Why Cheap WordPress Sites Cost 10x More"
+      },
+      {
+        to: "/blog/hathras-city-local-business-website-development",
+        label: "Hathras City Local Business Website Development: Dominate Google Search & Maps (2026)"
+      },
+      {
+        to: "/blog/mursan-web-development-and-digital-marketing",
+        label: "Web Development & Digital Marketing Company in Mursan, Hathras (2026)"
+      },
+      {
+        to: "/blog/software-company-in-sikandra-rao-hathras",
+        label: "Best Software & Web Development Company in Sikandra Rao, Hathras (2026)"
+      },
+      {
+        to: "/blog/website-design-services-sadabad-hathras",
+        label: "Website Design & Software Development Services in Sadabad, Hathras (2026)"
+      },
+      {
+        to: "/blog/web-development-company-sasni-hathras",
+        label: "Best Web Development Company in Sasni, Hathras (2026): Custom React Portals for Exporters & Factories"
+      },
+      {
         to: "/blog/complete-guide-to-local-seo-and-geo-targeting-hathras",
         label: "Complete Local SEO & GEO-Targeting Guide for Hathras Businesses (2026): Rank #1 Everywhere"
       },

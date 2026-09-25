@@ -1,5 +1,320 @@
 [
   {
+    "slug": "harsh-sharma-tech-ecosystem-vision-hathras",
+    "title": "Harsh Sharma & HMorix: Building Hathras into Uttar Pradesh’s Premier Tech Innovation Hub",
+    "excerpt": "Discover the vision behind HMorix. Founder & CEO Harsh Sharma shares how Hathras, Uttar Pradesh is being transformed into a thriving center for enterprise AI software, SaaS innovation, and tech talent.",
+    "category": "Company & Brand Insights",
+    "canonicalUrl": "https://hmorix.in/blog/harsh-sharma-tech-ecosystem-vision-hathras",
+    "publishedAt": "2026-09-24T23:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "nextjs-vs-wordpress-for-business-growth-hathras",
+    "title": "Next.js vs. WordPress for Hathras Businesses: Why Speed Determines Your Google Rank",
+    "excerpt": "Choosing between Next.js and WordPress in Hathras? Harsh Sharma explains why Next.js React architecture delivers 98+ PageSpeed scores, sub-second load times, and higher sales conversions than WordPress.",
+    "category": "Web Engineering & Optimization",
+    "canonicalUrl": "https://hmorix.in/blog/nextjs-vs-wordpress-for-business-growth-hathras",
+    "publishedAt": "2026-09-24T22:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "answer-engine-optimization-aeo-guide-hathras",
+    "title": "Answer Engine Optimization (AEO) for Hathras Businesses: Get Cited by ChatGPT & Perplexity",
+    "excerpt": "Traditional SEO is no longer enough. Learn how to optimize your Hathras business for AI Answer Engines (ChatGPT, Perplexity, Gemini, Google SGE) with Harsh Sharma's definitive AEO blueprint.",
+    "category": "Local SEO & Marketing",
+    "canonicalUrl": "https://hmorix.in/blog/answer-engine-optimization-aeo-guide-hathras",
+    "publishedAt": "2026-09-24T22:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "how-to-fix-suspended-google-business-profile-hathras",
+    "title": "How to Fix or Reinstate a Suspended Google Business Profile in Hathras (2026 Guide)",
+    "excerpt": "Is your Google Business Profile suspended in Hathras? Learn how to fix 'Deceptive Content' and 'Quality Violations', submit successful reinstatement appeals, and restore your top map ranking with HMorix.",
+    "category": "Local SEO & Marketing",
+    "canonicalUrl": "https://hmorix.in/blog/how-to-fix-suspended-google-business-profile-hathras",
+    "publishedAt": "2026-09-24T21:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "google-maps-citation-audit-guide-hathras",
+    "title": "Google Maps Local Citation Audit & NAP Cleanup Blueprint for Hathras Businesses",
+    "excerpt": "Fix conflicting business listings and boost your Google Maps ranking in Hathras. Harsh Sharma breaks down the step-by-step NAP audit, citation building, and duplicate listing cleanup blueprint.",
+    "category": "Local SEO & Marketing",
+    "canonicalUrl": "https://hmorix.in/blog/google-maps-citation-audit-guide-hathras",
+    "publishedAt": "2026-09-24T21:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "b2b-industrial-ecommerce-portal-western-up",
+    "title": "B2B Industrial E-Commerce Marketplace Development in Western UP (2026)",
+    "excerpt": "Sell industrial goods directly to factories and distributors. HMorix engineers custom B2B e-commerce platforms with GST quotations, tiered wholesale pricing, and credit terms for Western UP.",
+    "category": "E-Commerce & Retail Tech",
+    "canonicalUrl": "https://hmorix.in/blog/b2b-industrial-ecommerce-portal-western-up",
+    "publishedAt": "2026-09-24T20:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "braj-region-pilgrimage-travel-tour-portal-development",
+    "title": "Braj 84 Kos Yatra, Travel & Tour Package Booking Portal Development (2026)",
+    "excerpt": "Build a modern pilgrimage booking platform. HMorix engineers travel portals for Braj 84 Kos Yatra, Mathura-Vrindavan tour packages, cab rentals, and customized pilgrim itineraries.",
+    "category": "Regional Web Engineering",
+    "canonicalUrl": "https://hmorix.in/blog/braj-region-pilgrimage-travel-tour-portal-development",
+    "publishedAt": "2026-09-24T20:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "agra-footwear-leather-manufacturing-software",
+    "title": "Footwear & Leather Manufacturing ERP Software in Agra & Hathras (2026)",
+    "excerpt": "Streamline shoe production and leather goods manufacturing. HMorix builds custom Footwear ERP software for upper/sole cutting, carton packing lists, and export documentation in Agra and Hathras.",
+    "category": "Industry-Specific Portals",
+    "canonicalUrl": "https://hmorix.in/blog/agra-footwear-leather-manufacturing-software",
+    "publishedAt": "2026-09-24T19:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "aligarh-lock-hardware-export-portal-development",
+    "title": "Aligarh Lock & Hardware Export Web Portal Development: Reaching Global Buyers",
+    "excerpt": "Connect Aligarh lock and builder hardware manufacturers with international buyers. HMorix builds high-speed B2B export portals, multi-lingual catalogs, and RFQ lead engines.",
+    "category": "Regional Web Engineering",
+    "canonicalUrl": "https://hmorix.in/blog/aligarh-lock-hardware-export-portal-development",
+    "publishedAt": "2026-09-24T19:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "mathura-vrindavan-hotel-resort-booking-website-development",
+    "title": "Hotel, Resort & Ashram Booking Website Development in Mathura & Vrindavan (2026)",
+    "excerpt": "Stop paying 20% OTA commissions to MakeMyTrip and Booking.com. HMorix builds direct hotel room booking websites, resort reservation engines, and ashram accommodation systems in Mathura and Vrindavan.",
+    "category": "Regional Web Engineering",
+    "canonicalUrl": "https://hmorix.in/blog/mathura-vrindavan-hotel-resort-booking-website-development",
+    "publishedAt": "2026-09-24T18:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "pharmacy-chemist-inventory-gst-billing-software-hathras",
+    "title": "Pharmacy & Chemist Wholesale/Retail GST Software in Hathras: Batch & Expiry (2026)",
+    "excerpt": "Eliminate expired medicine losses. HMorix builds custom Pharmacy & Chemist billing software for Hathras medical stores with salt-name substitute search, batch expiry alerts, and GST billing.",
+    "category": "HealthTech & Hospital ERP",
+    "canonicalUrl": "https://hmorix.in/blog/pharmacy-chemist-inventory-gst-billing-software-hathras",
+    "publishedAt": "2026-09-24T18:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "pathology-lab-diagnostic-reporting-software-hathras",
+    "title": "Pathology Lab & Diagnostic Center Reporting Software in Hathras (2026)",
+    "excerpt": "Modernize diagnostic testing in Hathras. HMorix engineers custom Pathology Lab software with automated analyzer interfacing, NABL test report templates, and WhatsApp report delivery.",
+    "category": "HealthTech & Hospital ERP",
+    "canonicalUrl": "https://hmorix.in/blog/pathology-lab-diagnostic-reporting-software-hathras",
+    "publishedAt": "2026-09-24T17:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "cold-chain-dairy-milk-collection-software-hathras",
+    "title": "Dairy, Milk Chilling Center & Cattle Feed ERP Software in Hathras & Mursan (2026)",
+    "excerpt": "Automate dairy operations in Hathras and Mursan. HMorix builds custom milk collection ERP software with FAT/SNF lactometer integration, farmer passbooks, and cattle feed billing.",
+    "category": "Industry-Specific Portals",
+    "canonicalUrl": "https://hmorix.in/blog/cold-chain-dairy-milk-collection-software-hathras",
+    "publishedAt": "2026-09-24T17:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "textile-garment-wholesale-billing-software-hathras",
+    "title": "Textile & Garment Wholesale Billing Software in Sikandra Rao & Hathras (2026)",
+    "excerpt": "Modernize textile wholesale in Hathras and Sikandra Rao. HMorix builds specialized clothing ERP software for size/color matrix inventory, bale dispatches, and dealer credit control.",
+    "category": "Industry-Specific Portals",
+    "canonicalUrl": "https://hmorix.in/blog/textile-garment-wholesale-billing-software-hathras",
+    "publishedAt": "2026-09-24T16:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "automobile-dealership-garage-pos-software-hathras",
+    "title": "Automobile Dealership & 2-Wheeler Garage POS Billing Software in Hathras (2026)",
+    "excerpt": "Streamline vehicle sales and garage workshops in Hathras. HMorix builds custom Automobile POS software for job card management, spare parts barcode inventory, and service reminders.",
+    "category": "Industry-Specific Portals",
+    "canonicalUrl": "https://hmorix.in/blog/automobile-dealership-garage-pos-software-hathras",
+    "publishedAt": "2026-09-24T16:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "transport-fleet-logistics-software-hathras",
+    "title": "Transport, Truck Fleet & Logistics ERP Software in Hathras (2026)",
+    "excerpt": "Modernize your transport company in Hathras. HMorix builds custom logistics ERP software for bilty generation, truck trip expense management, driver advances, and freight billing.",
+    "category": "Industry-Specific Portals",
+    "canonicalUrl": "https://hmorix.in/blog/transport-fleet-logistics-software-hathras",
+    "publishedAt": "2026-09-24T15:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "jewelry-showroom-gold-billing-software-hathras",
+    "title": "Jewelry Showroom & Gold/Silver Billing Software in Hathras City (2026)",
+    "excerpt": "Upgrade your jewelry showroom in Hathras. HMorix builds specialized gold and silver jewelry POS software with HUID hallmarking compliance, daily metal rate sync, and barcode tagging.",
+    "category": "Industry-Specific Portals",
+    "canonicalUrl": "https://hmorix.in/blog/jewelry-showroom-gold-billing-software-hathras",
+    "publishedAt": "2026-09-24T15:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "brick-kiln-management-software-bhatta-erp-hathras",
+    "title": "Brick Kiln (Int-Bhatta) Management Software in Hathras & Sadabad (2026)",
+    "excerpt": "Eliminate labor disputes and unaccounted brick sales. HMorix builds specialized Brick Kiln (Int-Bhatta) ERP software for pathera labor records, coal tracking, and truck billing in Hathras.",
+    "category": "Industry-Specific Portals",
+    "canonicalUrl": "https://hmorix.in/blog/brick-kiln-management-software-bhatta-erp-hathras",
+    "publishedAt": "2026-09-24T14:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "hardware-brassware-manufacturing-erp-sasni-hathras",
+    "title": "Hardware & Brassware Manufacturing ERP in Sasni & Hathras: Shop Floor to Dispatch",
+    "excerpt": "Streamline hardware casting and brassware manufacturing in Sasni and Hathras. HMorix engineers custom ERP software for metal weight reconciliation, mold tracking, and BillingFlow dispatch.",
+    "category": "Industry-Specific Portals",
+    "canonicalUrl": "https://hmorix.in/blog/hardware-brassware-manufacturing-erp-sasni-hathras",
+    "publishedAt": "2026-09-24T14:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "asafoetida-hing-spice-export-website-hathras",
+    "title": "E-Commerce & Export Website Development for Hathras Hing (Asafoetida) & Spices (2026)",
+    "excerpt": "Take Hathras's famous hing and spices to global buyers. HMorix builds high-speed B2B export portals, international eCommerce websites, and APEDA-compliant digital showcases.",
+    "category": "Industry-Specific Portals",
+    "canonicalUrl": "https://hmorix.in/blog/asafoetida-hing-spice-export-website-hathras",
+    "publishedAt": "2026-09-24T13:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "custom-llm-fine-tuning-private-cloud-hathras",
+    "title": "Private Cloud LLM Deployment & Custom AI Fine-Tuning in Hathras: Zero Data Leakage",
+    "excerpt": "Deploy secure, private AI models in Hathras. HMorix delivers on-premise and private VPC LLM fine-tuning for manufacturers, financial firms, and healthcare providers with zero data retention.",
+    "category": "Enterprise AI & Workflows",
+    "canonicalUrl": "https://hmorix.in/blog/custom-llm-fine-tuning-private-cloud-hathras",
+    "publishedAt": "2026-09-24T13:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "ai-lead-generation-automated-crm-hathras",
+    "title": "AI Lead Generation & Automated CRM Synchronization for B2B Hathras Traders (2026)",
+    "excerpt": "Fill your sales pipeline with verified buyers. HMorix engineers AI-powered B2B lead generation engines and automated CRM synchronization for Hathras manufacturers, wholesalers, and exporters.",
+    "category": "Enterprise AI & Workflows",
+    "canonicalUrl": "https://hmorix.in/blog/ai-lead-generation-automated-crm-hathras",
+    "publishedAt": "2026-09-24T12:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "voice-ai-assistant-customer-support-hathras",
+    "title": "Voice AI Assistants & Call Automation in Hathras: Hindi & English Conversational Agents",
+    "excerpt": "Never miss another customer phone call in Hathras. HMorix builds conversational Voice AI assistants that answer telephone calls in Hindi and English, take orders, and book appointments 24/7.",
+    "category": "Enterprise AI & Workflows",
+    "canonicalUrl": "https://hmorix.in/blog/voice-ai-assistant-customer-support-hathras",
+    "publishedAt": "2026-09-24T12:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "pdf-automation-invoice-data-extraction-hathras",
+    "title": "PDF Automation & Intelligent Data Extraction Software in Hathras (2026)",
+    "excerpt": "Eliminate manual data entry. HMorix PDF Automation software extracts line items, tax figures, and bank statements from scanned PDFs automatically, syncing directly with your Hathras ERP.",
+    "category": "Enterprise AI & Workflows",
+    "canonicalUrl": "https://hmorix.in/blog/pdf-automation-invoice-data-extraction-hathras",
+    "publishedAt": "2026-09-24T11:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "enterprise-ai-agent-platform-deployment-hathras",
+    "title": "Enterprise AI Agent Platform Deployment in Hathras: Automating Daily Workflows with Llama 3.1",
+    "excerpt": "Deploy autonomous AI agents in your Hathras business. HMorix engineers enterprise multi-agent workflows powered by NVIDIA NIM and Llama 3.1 405B for customer support, CRM, and ERP automation.",
+    "category": "Enterprise AI & Workflows",
+    "canonicalUrl": "https://hmorix.in/blog/enterprise-ai-agent-platform-deployment-hathras",
+    "publishedAt": "2026-09-24T11:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "nexa-solutions-vs-hmorix-hathras-manufacturers",
+    "title": "Nexa Solutions vs. HMorix for Hathras Manufacturers: Full-Stack vs. Outdated Agency Sites",
+    "excerpt": "Manufacturing in Hathras? Compare Nexa Solutions (Aligarh) and HMorix (Hathras). Discover why HMorix's sub-second React architecture, factory ERPs, and local presence lead the market.",
+    "category": "Competitor Analysis",
+    "canonicalUrl": "https://hmorix.in/blog/nexa-solutions-vs-hmorix-hathras-manufacturers",
+    "publishedAt": "2026-09-24T10:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "somskilltech-vs-hmorix-chatbot-software-hathras",
+    "title": "SomSkillTech vs. HMorix: True Multi-Agent AI Systems vs. Generic Chatbot Templates",
+    "excerpt": "Evaluating AI chatbots and software in Hathras? Compare SomSkillTech and HMorix. Discover why HMorix's autonomous agent pipelines, WhatsApp billing sync, and enterprise security rank #1.",
+    "category": "Competitor Analysis",
+    "canonicalUrl": "https://hmorix.in/blog/somskilltech-vs-hmorix-chatbot-software-hathras",
+    "publishedAt": "2026-09-24T10:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "devzuno-vs-hmorix-ai-automation-comparison",
+    "title": "Devzuno Technologies vs. HMorix (2026 Comparison): Enterprise AI & Real Architecture",
+    "excerpt": "Comparing Devzuno Technologies and HMorix for software development and AI automation in Hathras. See why HMorix's NVIDIA NIM multi-agent systems and BillingFlow SaaS offer superior performance.",
+    "category": "Competitor Analysis",
+    "canonicalUrl": "https://hmorix.in/blog/devzuno-vs-hmorix-ai-automation-comparison",
+    "publishedAt": "2026-09-24T09:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "top-software-companies-in-western-up-ranking",
+    "title": "Top Software Companies in Western UP (2026 Ranking): Hathras, Aligarh, Agra & Mathura",
+    "excerpt": "Comprehensive 2026 benchmark of the top software, IT, and AI development companies across Western Uttar Pradesh. Discover why HMorix ranks #1 for enterprise software, ERP, and AI automation.",
+    "category": "Competitor Analysis",
+    "canonicalUrl": "https://hmorix.in/blog/top-software-companies-in-western-up-ranking",
+    "publishedAt": "2026-09-24T09:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "hmorix-vs-freelancers-web-development-hathras",
+    "title": "HMorix vs. Local Freelancers in Hathras: Why Cheap WordPress Sites Cost 10x More",
+    "excerpt": "Hiring a cheap freelancer in Hathras? Discover why low-cost WordPress templates cost businesses 10x more in lost leads, security breaches, and slow load times compared to HMorix full-stack engineering.",
+    "category": "Competitor Analysis",
+    "canonicalUrl": "https://hmorix.in/blog/hmorix-vs-freelancers-web-development-hathras",
+    "publishedAt": "2026-09-24T08:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "hathras-city-local-business-website-development",
+    "title": "Hathras City Local Business Website Development: Dominate Google Search & Maps (2026)",
+    "excerpt": "Dominate Google Search and Google Maps in Hathras City. HMorix engineers custom websites, eCommerce portals, and local SEO for retail shops, jewelers, clinics, and traders in Hathras City.",
+    "category": "Local SEO & Marketing",
+    "canonicalUrl": "https://hmorix.in/blog/hathras-city-local-business-website-development",
+    "publishedAt": "2026-09-24T08:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "mursan-web-development-and-digital-marketing",
+    "title": "Web Development & Digital Marketing Company in Mursan, Hathras (2026)",
+    "excerpt": "Grow your business in Mursan, Hathras with HMorix. High-speed custom web development, Google Business Profile ranking, dairy ERP, and social media marketing engineered by Harsh Sharma.",
+    "category": "Regional Web Engineering",
+    "canonicalUrl": "https://hmorix.in/blog/mursan-web-development-and-digital-marketing",
+    "publishedAt": "2026-09-24T07:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "software-company-in-sikandra-rao-hathras",
+    "title": "Best Software & Web Development Company in Sikandra Rao, Hathras (2026)",
+    "excerpt": "Looking for the top software and web development company in Sikandra Rao, Hathras? HMorix engineers custom ERP, textile billing software, retail websites, and local SEO solutions.",
+    "category": "Regional Web Engineering",
+    "canonicalUrl": "https://hmorix.in/blog/software-company-in-sikandra-rao-hathras",
+    "publishedAt": "2026-09-24T07:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "website-design-services-sadabad-hathras",
+    "title": "Website Design & Software Development Services in Sadabad, Hathras (2026)",
+    "excerpt": "Discover premier website design and software development services in Sadabad, Hathras. HMorix builds high-speed websites, agro-business platforms, and cold storage ERP systems engineered by Harsh Sharma.",
+    "category": "Regional Web Engineering",
+    "canonicalUrl": "https://hmorix.in/blog/website-design-services-sadabad-hathras",
+    "publishedAt": "2026-09-24T06:30:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
+    "slug": "web-development-company-sasni-hathras",
+    "title": "Best Web Development Company in Sasni, Hathras (2026): Custom React Portals for Exporters & Factories",
+    "excerpt": "Looking for the top web development company in Sasni, Hathras? HMorix engineers ultra-fast custom React/Next.js websites, export catalogs, and industrial portals for Sasni glassware and hardware manufacturers.",
+    "category": "Regional Web Engineering",
+    "canonicalUrl": "https://hmorix.in/blog/web-development-company-sasni-hathras",
+    "publishedAt": "2026-09-24T06:00:00.000Z",
+    "updatedAt": "2026-09-25T10:00:00.000Z"
+  },
+  {
     "slug": "complete-guide-to-local-seo-and-geo-targeting-hathras",
     "title": "Complete Local SEO & GEO-Targeting Guide for Hathras Businesses (2026): Rank #1 Everywhere",
     "excerpt": "Discover how Hathras businesses can generate 10x more phone calls and client inquiries on Google. Harsh Sharma reveals the definitive Local SEO, NAP citation, and Generative Engine Optimization (GEO) blueprint.",
